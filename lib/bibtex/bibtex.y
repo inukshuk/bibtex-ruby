@@ -11,40 +11,22 @@
 #
 class BibTeX::Parser
 rule
-	target : { result = [] }
-	       | objects { result = val[0] }
+	target : space objects space { result = val[1] }
 
   objects : object { result = [val[0]] }
-          | objects object { result << val[0] }
+          | objects space object { result << val[2] }
 
-	object : string
-         | preamble
-         | comment
+  object : AT space at_object { result = val[2] }
 
-  string : AT STRING LB assignments RB opt_comma { result = [:string, val[3]] }
+  at_object : string { result = val[0] }
+						
+  string : STRING space LBRACE space assignment space RBRACE { result = {:string => val[4]} }
 
-  comment : AT COMMENT LB value RB opt_comma { result = [:comment, val[3]] }
+  assignment : NAME space EQ space STRING_LITERAL { result = { val[0].downcase.to_sym => val[4]} }
 
-  preamble : AT PREAMBLE LB value RB opt_comma { result = [:preamble, val[3]] }
-
-  assignments : assignment { result = val[0] }
-              | assignments COMMA assignment { result = val[0].merge(val[2]) }
-
-  assignment : key EQ value { result = { val[0] => val[2] } }
-
-	value : LB text RB { result = val[1] }
-	      | DQT text DQT { result = val[1] }
-	      | SQT text SQT { result = val[1] }
-	      | NUMBER { result = val[0] } # for @string fields a number is invalid
-
-	text : { result = '' }
-	     | WORD SYMBOL { result = val[0] }
+	space : /* empty */
+	      | SPACE
 	
-	key : WORD { result = val[0].downcase.to_sym }
-	
-	opt_comma :
-	          | COMMA
-
 end
 
 ---- header
@@ -54,43 +36,41 @@ end
 
 	def parse(str)
 		@q = []
-		
 		@yydebug = true
 		
 		until str.empty?
 			case str
-			when /\A\s+/
-			when /\A@/o
-				@q.push [:AT, $&]
-			when /\A\{/o
-				@q.push [:LB, $&]
-			when /\A\}/o
-				@q.push [:RB, $&]
-			when /\A'/o
-				@q.push [:SQT, $&]
-			when /\A"/o
-				@q.push [:DQT, $&]
-			when /\A\\/o
-				@q.push [:ESC, $&]
-			when /\A=/o
+			when /^\s+/
+				@q.push [:SPACE, $&]
+			when /^\{/o
+				@q.push [:LBRACE, $&]
+			when /^\}/o
+				@q.push [:RBRACE, $&]
+			when /^=/o
 				@q.push [:EQ, $&]
-			when /\A,/o
+			when /^#/o
+				@q.push [:SHARP, $&]
+			when /^@/o
+				@q.push [:AT, $&]
+			when /^,/o
 				@q.push [:COMMA, $&]
-			when /\Astring/io
+			when /^string/io
 				@q.push [:STRING, $&]
-			when /\Apreamble/io
+			when /^preamble/io
 				@q.push [:PREAMBLE, $&]
-			when /\Acomment/io
+			when /^comment/io
 				@q.push [:COMMENT, $&]
-			when /\A\d+/o
+			when /^\d+/o
 				@q.push [:NUMBER, $&.to_i]
-			when /\A\w+/o
-				@q.push [:WORD, $&]
-			when /\A./o
-				@q.push [:SYMBOL, $&]
-			when /\A.|\n/o
-				s = $&
-				@q.push [s,s]
+			when /^\w+/o
+				@q.push [:NAME, $&]
+			when /^"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
+				@q.push [:STRING_LITERAL, $&[1..-2]]
+#			when /^.|\n/o
+#				s = $&
+#				@q.push [s,s]
+#			when /^([^@].*)?\n/o
+#				@q.push [:JUNK, $&]
 			end
 			str = $'
 		end
@@ -102,4 +82,16 @@ end
 		@q.shift
 	end
 	
+	def on_error(token, val, vstack)
+		raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(token) || '?', vstack.inspect]) 
+	end
 ---- footer
+
+parser = BibTeX::Parser.new
+s = <<-EOF
+
+@string{ bar = 'foo bar' }
+
+EOF
+puts "Trying to parse:\n----\n%s\n-----" % s
+puts parser.parse(s).inspect
