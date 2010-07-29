@@ -11,7 +11,8 @@
 #
 class BibTeX::Parser
 rule
-	target : space objects space { result = val[1] }
+	target : space { result = [] }
+	       | space objects space { result = val[1] }
 
   objects : object { result = [val[0]] }
           | objects space object { result << val[2] }
@@ -20,78 +21,196 @@ rule
 
   at_object : string { result = val[0] }
 						
-  string : STRING space LBRACE space assignment space RBRACE { result = {:string => val[4]} }
+  string : STRING space LBRACE space assignment space RBRACE { result = {:string => val[4]}; @@log.debug(val.inspect) }
 
   assignment : NAME space EQ space STRING_LITERAL { result = { val[0].downcase.to_sym => val[4]} }
 
 	space : /* empty */
-	      | SPACE
+	      | space SPACE
 	
 end
 
 ---- header
-# TODO: RDoc
+require 'rubygems'
+require 'log4r'
+include Log4r
 
+# TODO: RDoc for parser
 ---- inner
 
-	def parse(str)
-		@q = []
+	@@log = Logger.new(self.to_s)
+	@@log.outputters = Outputter.stdout
+	@@log.level = DEBUG
+	
+	COMMENT_MODE = 0
+	BIBTEX_MODE = 1
+	
+
+	def initialize
+		super
+		@state = {
+			:stack => [],
+			:sp => 0,
+			:brace_level => 0,
+			:mode => COMMENT_MODE
+		}
 		@yydebug = true
+	end
+
+	# pushes a value onto the parse stack
+	def push(value)
+		@state[:stack].push(value)
+	end
+	
+	# called when parser encounters a new BibTeX object
+	def enter_object(post_match)
+		@@log.debug("Entering object: switching to BibTeX mode")
+		@state[:sp] = @state[:stack].empty? ? 0 : @state[:stack].length - 1
+		@state[:brace_level] = 0
+		@state[:mode] = BIBTEX_MODE
+		push [:AT,'@']
+		post_match
+	end
+	
+	# called when parser leaves a BibTeX object
+	def leave_object
+		@@log.debug("leaving object: switching to comment mode")
+		@state[:brace_level] = 0
+		@state[:mode] = COMMENT_MODE
+		push [:RBRACE,'}']
+	end
+	
+	def bibtex_mode?
+		@state[:mode] == BIBTEX_MODE
+	end
+
+	# lexical analysis
+	def parse(str)
 		
+		@@log.debug("Start")
+
 		until str.empty?
-			case str
-			when /^\s+/
-				@q.push [:SPACE, $&]
-			when /^\{/o
-				@q.push [:LBRACE, $&]
-			when /^\}/o
-				@q.push [:RBRACE, $&]
-			when /^=/o
-				@q.push [:EQ, $&]
-			when /^#/o
-				@q.push [:SHARP, $&]
-			when /^@/o
-				@q.push [:AT, $&]
-			when /^,/o
-				@q.push [:COMMA, $&]
-			when /^string/io
-				@q.push [:STRING, $&]
-			when /^preamble/io
-				@q.push [:PREAMBLE, $&]
-			when /^comment/io
-				@q.push [:COMMENT, $&]
-			when /^\d+/o
-				@q.push [:NUMBER, $&.to_i]
-			when /^\w+/o
-				@q.push [:NAME, $&]
-			when /^"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
-				@q.push [:STRING_LITERAL, $&[1..-2]]
-#			when /^.|\n/o
-#				s = $&
-#				@q.push [s,s]
-#			when /^([^@].*)?\n/o
-#				@q.push [:JUNK, $&]
+			if bibtex_mode?
+				case str
+				when /\A[\t\s\n]+/o
+					push [:SPACE, $&]
+					str = $'
+				when /\A\{/o
+					str = lbrace($')
+				when /\A\}/o
+					str = rbrace($')
+				when /\A=/o
+					push [:EQ, $&]
+					str = $'
+				when /\A#/o
+					push [:SHARP, $&]
+					str = $'
+				when /\A@/o
+					push [:AT, $&]
+					str = $'
+				when /\A,/o
+					push [:COMMA, $&]
+					str = $'
+				when /\Astring/io
+					push [:STRING, $&]
+					str = $'
+				when /\Apreamble/io
+					push [:PREAMBLE, $&]
+					str = $'
+				when /\Acomment/io
+					push [:COMMENT, $&]
+					str = $'
+				when /\A\d+/o
+					push [:NUMBER, $&.to_i]
+					str = $'
+				when /\A\w+/o
+					push [:NAME, $&]
+					str = $'
+				when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
+					push [:STRING_LITERAL, $&[1..-2]]
+					str = $'
+				when /\A.|\n/o
+					s = $&
+					push [s,s]
+					str = $'
+				end
+			else
+				@@log.debug("In comment mode")
+				str = str.match(/.*^@/o) ? enter_object($') : ''
 			end
-			str = $'
 		end
-		@q.push [false, '$end']
+		push [false, '$end']
+		@@log.debug("The Stack: %s" % @state[:stack].inspect)
 		do_parse
 	end
 	
-	def next_token
-		@q.shift
+	# handles opening brace
+	#
+	# Braces are balanced inside BibTeX objects with the exception of
+	# with the exception of braces occurring within string literals.
+	# 
+	def lbrace(post_match)
+		raise(ParseError, 'Parsed left brace in comment mode') unless bibtex_mode?
+		
+		# check whether entering a new object or a braced string
+		if @state[:brace_level] == 0		
+			@state[:brace_level] += 1
+			push [:LBRACE,'{']
+		else
+			# TODO
+		end
+		post_match
 	end
 	
-	def on_error(token, val, vstack)
-		raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(token) || '?', vstack.inspect]) 
+	# handles closing brace
+	#
+	# Braces are balanced inside BibTeX objects with the exception of
+	# with the exception of braces occurring within string literals.
+	# 
+	def rbrace(post_match)
+		raise(ParseError, 'Parsed right brace in comment mode') unless bibtex_mode?
+
+		if @state[:brace_level] == 1
+			leave_object
+		else
+			# TODO
+		end
+		post_match
+	end
+	
+	def next_token
+		@state[:stack].shift
+	end
+	
+	def to_s
+		@state.inspect
+	end
+	
+	def on_error(tid, val, vstack)
+		#raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
+		@@log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
 	end
 ---- footer
 
 parser = BibTeX::Parser.new
 s = <<-EOF
+%% A BibTeX File
+%% name@host.com
 
+Everything outside an object is treated as a comment
+ @ <-- technically this isn't allowed, but I'm assuming all
+objects start at the beginning of a line. Therefore, the `@'
+symbol can occur in comments.
+
+{ Here are just a few strings }
 @string{ bar = 'foo bar' }
 
+# One more comment:
+
+@string {foo=  "barr"}
+
+Some \emph{famous} last words?
+I didn't think so.
 EOF
 puts "Trying to parse:\n----\n%s\n-----" % s
 puts parser.parse(s).inspect
