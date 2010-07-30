@@ -21,9 +21,17 @@ rule
 
   at_object : string { result = val[0] }
 						
-  string : STRING space LBRACE space assignment space RBRACE { result = {:string => val[4]}; @@log.debug(val.inspect) }
+  string : STRING space LBRACE space assignment space RBRACE { result = BibTeX::String.new(val[4][0],val[4][1]); }
 
-  assignment : NAME space EQ space STRING_LITERAL { result = { val[0].downcase.to_sym => val[4]} }
+  assignment : NAME space EQ space value { result = [val[0].downcase.to_sym, val[4]] }
+
+  value : string { result = val[0] }
+
+  string : literal { result = [val[0]] }
+         | string space SHARP space literal { result << val[4] }
+
+  literal : NAME { result = val[0] }
+          | LITERAL { result = val[0] }
 
 	space : /* empty */
 	      | space SPACE
@@ -31,16 +39,12 @@ rule
 end
 
 ---- header
-require 'rubygems'
-require 'log4r'
-include Log4r
+require 'logger'
 
-# TODO: RDoc for parser
 ---- inner
 
-	@@log = Logger.new(self.to_s)
-	@@log.outputters = Outputter.stdout
-	@@log.level = DEBUG
+	@@log = Logger.new(STDOUT)
+	@@log.level = Logger::DEBUG
 	
 	COMMENT_MODE = 0
 	BIBTEX_MODE = 1
@@ -48,26 +52,27 @@ include Log4r
 
 	def initialize
 		super
-		@state = {
-			:stack => [],
-			:sp => 0,
-			:brace_level => 0,
-			:mode => COMMENT_MODE
-		}
-		@yydebug = true
+		@yydebug = false
+    clear_state
+  end
+
+  # sets all internal variables to initial state
+  def clear_state
+    @stack = []
+    @brace_level = 0
+    @mode = COMMENT_MODE
 	end
 
 	# pushes a value onto the parse stack
 	def push(value)
-		@state[:stack].push(value)
+		@stack.push(value)
 	end
 	
 	# called when parser encounters a new BibTeX object
 	def enter_object(post_match)
 		@@log.debug("Entering object: switching to BibTeX mode")
-		@state[:sp] = @state[:stack].empty? ? 0 : @state[:stack].length - 1
-		@state[:brace_level] = 0
-		@state[:mode] = BIBTEX_MODE
+		@brace_level = 0
+		@mode = BIBTEX_MODE
 		push [:AT,'@']
 		post_match
 	end
@@ -75,20 +80,17 @@ include Log4r
 	# called when parser leaves a BibTeX object
 	def leave_object
 		@@log.debug("leaving object: switching to comment mode")
-		@state[:brace_level] = 0
-		@state[:mode] = COMMENT_MODE
+		@brace_level = 0
+		@mode = COMMENT_MODE
 		push [:RBRACE,'}']
 	end
 	
 	def bibtex_mode?
-		@state[:mode] == BIBTEX_MODE
+		@mode == BIBTEX_MODE
 	end
 
 	# lexical analysis
 	def parse(str)
-		
-		@@log.debug("Start")
-
 		until str.empty?
 			if bibtex_mode?
 				case str
@@ -127,7 +129,7 @@ include Log4r
 					push [:NAME, $&]
 					str = $'
 				when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
-					push [:STRING_LITERAL, $&[1..-2]]
+					push [:LITERAL, $&[1..-2]]
 					str = $'
 				when /\A.|\n/o
 					s = $&
@@ -140,7 +142,7 @@ include Log4r
 			end
 		end
 		push [false, '$end']
-		@@log.debug("The Stack: %s" % @state[:stack].inspect)
+		@@log.debug("The Stack: %s" % @stack.inspect)
 		do_parse
 	end
 	
@@ -153,8 +155,8 @@ include Log4r
 		raise(ParseError, 'Parsed left brace in comment mode') unless bibtex_mode?
 		
 		# check whether entering a new object or a braced string
-		if @state[:brace_level] == 0		
-			@state[:brace_level] += 1
+		if @brace_level == 0		
+			@brace_level += 1
 			push [:LBRACE,'{']
 		else
 			# TODO
@@ -170,7 +172,7 @@ include Log4r
 	def rbrace(post_match)
 		raise(ParseError, 'Parsed right brace in comment mode') unless bibtex_mode?
 
-		if @state[:brace_level] == 1
+		if @brace_level == 1
 			leave_object
 		else
 			# TODO
@@ -179,11 +181,11 @@ include Log4r
 	end
 	
 	def next_token
-		@state[:stack].shift
+		@stack.shift
 	end
 	
 	def to_s
-		@state.inspect
+		"Stack #{@stack.inspect}; Brace Level #{@brace_level}"
 	end
 	
 	def on_error(tid, val, vstack)
@@ -191,26 +193,3 @@ include Log4r
 		@@log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
 	end
 ---- footer
-
-parser = BibTeX::Parser.new
-s = <<-EOF
-%% A BibTeX File
-%% name@host.com
-
-Everything outside an object is treated as a comment
- @ <-- technically this isn't allowed, but I'm assuming all
-objects start at the beginning of a line. Therefore, the `@'
-symbol can occur in comments.
-
-{ Here are just a few strings }
-@string{ bar = 'foo bar' }
-
-# One more comment:
-
-@string {foo=  "barr"}
-
-Some \emph{famous} last words?
-I didn't think so.
-EOF
-puts "Trying to parse:\n----\n%s\n-----" % s
-puts parser.parse(s).inspect
