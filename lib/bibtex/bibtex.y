@@ -11,31 +11,26 @@
 #
 class BibTeX::Parser
 rule
-	target : space { result = [] }
-	       | space objects space { result = val[1] }
+	target : { result = Bibliography.new }
+         | objects { result = Bibliography.new(val[0]) }
 
   objects : object { result = [val[0]] }
-          | objects space object { result << val[2] }
+          | objects object { result << val[1] }
 
-  object : AT space at_object { result = val[2] }
+  object : AT at_object { result = val[1] }
 
   at_object : string { result = val[0] }
 						
-  string : STRING space LBRACE space assignment space RBRACE { result = BibTeX::String.new(val[4][0],val[4][1]); }
+  string : STRING LBRACE string_assignment RBRACE { result = BibTeX::String.new(val[2][0],val[2][1]); }
 
-  assignment : NAME space EQ space value { result = [val[0].downcase.to_sym, val[4]] }
+  string_assignment : NAME EQ string_value { result = [val[0].downcase.to_sym, val[2]] }
 
-  value : string { result = val[0] }
+  string_value : string_literal { result = [val[0]] }
+               | string_value SHARP string_literal { result << val[2] }
 
-  string : literal { result = [val[0]] }
-         | string space SHARP space literal { result << val[4] }
+  string_literal : NAME { result = val[0].downcase.to_sym }
+                 | STRING_LITERAL { result = val[0] }
 
-  literal : NAME { result = val[0] }
-          | LITERAL { result = val[0] }
-
-	space : /* empty */
-	      | space SPACE
-	
 end
 
 ---- header
@@ -52,7 +47,7 @@ require 'logger'
 
 	def initialize
 		super
-		@yydebug = false
+		@yydebug = true
     clear_state
   end
 
@@ -94,24 +89,21 @@ require 'logger'
 		until str.empty?
 			if bibtex_mode?
 				case str
-				when /\A[\t\s\n]+/o
-					push [:SPACE, $&]
+				when /\A@[\t\n\s]*/o
+					push [:AT, '@']
 					str = $'
-				when /\A\{/o
-					str = lbrace($')
-				when /\A\}/o
-					str = rbrace($')
-				when /\A=/o
-					push [:EQ, $&]
+				when /\A[\t\n\s]*\{[\t\n\s]*/o
+          str = lbrace($')
+				when /\A[\t\n\s]*\}[\t\n\s]*/o
+          str = rbrace($')
+				when /\A[\t\n\s]*=[\t\n\s]*/o
+					push [:EQ, '=']
 					str = $'
-				when /\A#/o
-					push [:SHARP, $&]
+				when /\A[\t\n\s]*,[\t\n\s]*/o
+					push [:COMMA, ',']
 					str = $'
-				when /\A@/o
-					push [:AT, $&]
-					str = $'
-				when /\A,/o
-					push [:COMMA, $&]
+				when /\A[\t\n\s]*#[\t\n\s]*/o
+					push [:SHARP, '#']
 					str = $'
 				when /\Astring/io
 					push [:STRING, $&]
@@ -129,7 +121,7 @@ require 'logger'
 					push [:NAME, $&]
 					str = $'
 				when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
-					push [:LITERAL, $&[1..-2]]
+					push [:STRING_LITERAL, $&[1..-2]]
 					str = $'
 				when /\A.|\n/o
 					s = $&
@@ -137,8 +129,7 @@ require 'logger'
 					str = $'
 				end
 			else
-				@@log.debug("In comment mode")
-				str = str.match(/.*^@/o) ? enter_object($') : ''
+				str = str.match(/.*^@[\t\n\s]*/o) ? enter_object($') : ''
 			end
 		end
 		push [false, '$end']

@@ -38,12 +38,17 @@ Rake::TestTask.new(:test_task) do |t|
 end
 
 task :default => ['racc']
+
+desc 'Generates the BibTeX parser'
 task :racc => ['lib/bibtex/parser.rb']
+
+desc 'Generates RDoc documentation for BibTeX-Ruby'
 task :rdoc => ['clean','racc','rdoc_task']
+
 task :test => ['racc','test_task']
 
 file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
-  sh 'racc -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
+  sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
 end
 
 CLEAN.include('lib/bibtex/parser.rb')

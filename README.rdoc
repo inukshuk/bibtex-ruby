@@ -1,1 +1,4 @@
-h1. bibtex-ruby
+= BibTeX-Ruby
+
+The BibTeX-Ruby package contains a parser for BibTeX
+bibliography files and a number of simple conversion tools.

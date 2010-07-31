@@ -1,13 +1,18 @@
 #
-# This module encompasses a parser for BibTeX files and
-# auxiliary classes and structs to model the serparate
-# BibTeX objects.
+# = BibTeX
 #
-# Author:: Sylvester Keil (http://sylvester.keil.or.at)
+# This module encompasses a parser for BibTeX files and
+# auxiliary classes and structs to model the individual
+# BibTeX objects: +String+, +Preamble+, +Comment+, and
+# +Entry+.
+#
+# Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
 # Copyright:: Copyright (c) 2010 Sylvester Keil
 # License:: GNU GPL 3.0
 #
 module BibTeX
+
+  VERSION = '0.0.1'
 
   #
   # +Struct+ to model BibTeX +string+ objects.
@@ -28,5 +33,6 @@ module BibTeX
   Preamble = Struct.new(:content)
 end
 
-require 'lib/bibtex/entry'
-require 'lib/bibtex/parser'
+require 'bibtex/entry'
+require 'bibtex/parser'
+require 'bibtex/bibliography'
