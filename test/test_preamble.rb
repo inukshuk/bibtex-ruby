@@ -2,7 +2,7 @@ require 'bibtex'
 require 'minitest/unit'
 require 'minitest/autorun'
 
-class TestComment < MiniTest::Unit::TestCase
+class TestPreamble < MiniTest::Unit::TestCase
   
   def setup
     @parser = BibTeX::Parser.new
@@ -18,7 +18,7 @@ class TestComment < MiniTest::Unit::TestCase
     assert_equal(BibTeX::Bibliography, bib.class)
     assert_equal(4, bib.data.length)
     assert_equal([BibTeX::Comment,BibTeX::String], bib.data.map(&:class).uniq)
-    assert_equal(["Thisbibliography was created \\today"], bib.data[0].content)
+    assert_equal(["This bibliography was created \\today"], bib.data[0].content)
     assert_equal(["Bib\\TeX"], bib.data[1].content)
     assert_equal(["Maintained by ",:maintainer], bib.data[3].content)
   end

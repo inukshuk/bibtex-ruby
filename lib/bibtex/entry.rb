@@ -1,16 +1,20 @@
 module BibTeX
   class Entry
     attr_reader :values
-    attr_accessor :id, :type
+    attr_accessor :key, :type
     
-    def initialize
-      @id = 0
-      @type = ''
+    def initialize(type, key)
+      @key = key
+      @type = type
       @values = {}
     end
     
+    def <<(value)
+      @values.merge{value}
+    end
+
     def to_s
-      "@#{type}{#{id}\n" + values.keys.map { |k| "#{k} = {#{values[k]}}" }.join(',\n') + "\n}"
+      "@#{type}{#{key}\n" + values.keys.map { |k| "#{k} = {#{values[k]}}" }.join(',\n') + "\n}"
     end
   end
 end

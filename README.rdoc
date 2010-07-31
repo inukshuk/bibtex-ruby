@@ -33,9 +33,17 @@ with an `@' symbol, typically at the beginning of a line. In other words,
 BibTeX-Ruby treats all text as a comment until it encounters an `@' a the
 start of a line (or as the first character on a line other than whitespace);
 at this point the parser switches to BibTeX mode.
-
 In this mode, one of the following objects is possible: +comment+, +string+,
 +preamble+, or a BibTeX entry.
+
+The individual objects are discussed in furter detail below. First, however,
+a number here are a number of important assumptions of BibTeX-Ruby:
+
+* String literals are expressed either by double or single quotes; both single
+  or double quotes can occur inside a string literal if escaped by a backslash.
+* Instead of string literals, values in BibTeX are commonly within braces. For
+  this reason, however, it is necessary that braces inside of a braced-out
+  expression are balanced; everything else will lead to a parse error.
 
 === @comment
 
