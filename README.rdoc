@@ -2,3 +2,23 @@
 
 The BibTeX-Ruby package contains a parser for BibTeX
 bibliography files and a number of simple conversion tools.
+
+== The BibTeX Format
+
+A BibTeX bibliography is typically stored in a file with the file
+extension `.bib'. This file may contain any number of BibTeX objects;
+everything that is not a BibTeX object is assumed to be a comment and
+ignored.
+
+The BibTeX-Ruby parser is therefore split into two modes: one for
+parsing comments, one for BibTeX objects.
+
+=== @comment
+
+BibTeX-Ruby assumes that curly braces inside a @comment are balanced.
+
+=== @string
+
+=== @preamble
+
+=== Entries

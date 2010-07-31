@@ -19,8 +19,14 @@ rule
 
   object : AT at_object { result = val[1] }
 
-  at_object : string { result = val[0] }
+  at_object : comment { result = val[0] }
+            | string { result = val[0] }
+
+  comment : COMMENT LBRACE comment_content RBRACE { result = BibTeX::Comment.new(val[2]) }
 						
+  comment_content : COMMENT_CONTENT { result = val[0] }
+                  | comment_content COMMENT_CONTENT { result << val[1] }
+  
   string : STRING LBRACE string_assignment RBRACE { result = BibTeX::String.new(val[2][0],val[2][1]); }
 
   string_assignment : NAME EQ string_value { result = [val[0].downcase.to_sym, val[2]] }
@@ -43,7 +49,11 @@ require 'logger'
 	
 	COMMENT_MODE = 0
 	BIBTEX_MODE = 1
-	
+
+  OBJECT_COMMENT = 0
+  OBJECT_STRING = 1
+  OBJECT_PREAMBLE = 2
+  OBJECT_ENTRY = 3
 
 	def initialize
 		super
@@ -55,6 +65,7 @@ require 'logger'
   def clear_state
     @stack = []
     @brace_level = 0
+    @current_object = nil
     @mode = COMMENT_MODE
 	end
 
@@ -69,6 +80,25 @@ require 'logger'
 		@brace_level = 0
 		@mode = BIBTEX_MODE
 		push [:AT,'@']
+
+    case post_match
+    when /\Astring/io
+      @current_object = OBJECT_STRING
+      push [:STRING, $&]
+      post_match = $'
+    when /\Apreamble/io
+      @current_object = OBJECT_PREAMBLE
+      push [:PREAMBLE, $&]
+      post_match = $'
+    when /\Acomment/io
+      @current_object = OBJECT_COMMENT
+      push [:COMMENT, $&]
+      post_match = $'
+    when /\A\w+/io
+      @current_object = OBJECT_ENTRY
+			push [:NAME, $&]
+      post_match = $'
+    end
 		post_match
 	end
 	
@@ -77,6 +107,7 @@ require 'logger'
 		@@log.debug("leaving object: switching to comment mode")
 		@brace_level = 0
 		@mode = COMMENT_MODE
+    @current_object = nil
 		push [:RBRACE,'}']
 	end
 	
@@ -84,48 +115,44 @@ require 'logger'
 		@mode == BIBTEX_MODE
 	end
 
+  def comment_mode?
+		@mode == comment_MODE
+  end
+
+  def is_comment?
+    @current_object == OBJECT_COMMENT
+  end
+
 	# lexical analysis
 	def parse(str)
 		until str.empty?
 			if bibtex_mode?
 				case str
-				when /\A@[\t\n\s]*/o
-					push [:AT, '@']
-					str = $'
 				when /\A[\t\n\s]*\{[\t\n\s]*/o
-          str = lbrace($')
+          str = lbrace($&,$')
 				when /\A[\t\n\s]*\}[\t\n\s]*/o
-          str = rbrace($')
+          str = rbrace($&,$')
 				when /\A[\t\n\s]*=[\t\n\s]*/o
-					push [:EQ, '=']
+					push is_comment? ? [:COMMENT_CONTENT,$&] : [:EQ, '=']
 					str = $'
 				when /\A[\t\n\s]*,[\t\n\s]*/o
-					push [:COMMA, ',']
+					push is_comment? ? [:COMMENT_CONTENT,$&] : [:COMMA, ',']
 					str = $'
 				when /\A[\t\n\s]*#[\t\n\s]*/o
-					push [:SHARP, '#']
-					str = $'
-				when /\Astring/io
-					push [:STRING, $&]
-					str = $'
-				when /\Apreamble/io
-					push [:PREAMBLE, $&]
-					str = $'
-				when /\Acomment/io
-					push [:COMMENT, $&]
+					push is_comment? ? [:COMMENT_CONTENT,$&] : [:SHARP, '#']
 					str = $'
 				when /\A\d+/o
-					push [:NUMBER, $&.to_i]
+					push is_comment? ? [:COMMENT_CONTENT,$&] : [:NUMBER, $&.to_i]
 					str = $'
 				when /\A\w+/o
-					push [:NAME, $&]
+					push is_comment? ? [:COMMENT_CONTENT,$&] : [:NAME, $&]
 					str = $'
 				when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
-					push [:STRING_LITERAL, $&[1..-2]]
+					push is_comment? ? [:COMMENT_CONTENT,$&] : [:STRING_LITERAL, $&[1..-2]]
 					str = $'
 				when /\A.|\n/o
 					s = $&
-					push [s,s]
+					push is_comment? ? [:COMMENT_CONTENT,s] : [s,s]
 					str = $'
 				end
 			else
@@ -142,7 +169,7 @@ require 'logger'
 	# Braces are balanced inside BibTeX objects with the exception of
 	# with the exception of braces occurring within string literals.
 	# 
-	def lbrace(post_match)
+	def lbrace(match, post_match)
 		raise(ParseError, 'Parsed left brace in comment mode') unless bibtex_mode?
 		
 		# check whether entering a new object or a braced string
@@ -150,7 +177,8 @@ require 'logger'
 			@brace_level += 1
 			push [:LBRACE,'{']
 		else
-			# TODO
+			@brace_level += 1
+			push is_comment? ? [:COMMENT_CONTENT,match] : [:LBRACE, '{']
 		end
 		post_match
 	end
@@ -160,13 +188,14 @@ require 'logger'
 	# Braces are balanced inside BibTeX objects with the exception of
 	# with the exception of braces occurring within string literals.
 	# 
-	def rbrace(post_match)
+	def rbrace(match, post_match)
 		raise(ParseError, 'Parsed right brace in comment mode') unless bibtex_mode?
 
 		if @brace_level == 1
 			leave_object
 		else
-			# TODO
+      @brace_level -= 1
+			push is_comment? ? [:COMMENT_CONTENT,match] : [:RBRACE, '}']
 		end
 		post_match
 	end
