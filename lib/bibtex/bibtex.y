@@ -21,12 +21,15 @@ rule
 
   at_object : comment { result = val[0] }
             | string { result = val[0] }
+            | preamble { result = val[0] }
 
   comment : COMMENT LBRACE comment_content RBRACE { result = BibTeX::Comment.new(val[2]) }
-						
+	
   comment_content : COMMENT_CONTENT { result = val[0] }
                   | comment_content COMMENT_CONTENT { result << val[1] }
   
+  preamble : PREAMBLE LBRACE string_value RBRACE { result = BibTeX::Comment.new(val[2]) }
+
   string : STRING LBRACE string_assignment RBRACE { result = BibTeX::String.new(val[2][0],val[2][1]); }
 
   string_assignment : NAME EQ string_value { result = [val[0].downcase.to_sym, val[2]] }
