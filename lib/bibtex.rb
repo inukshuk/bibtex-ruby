@@ -13,31 +13,20 @@
 module BibTeX
   require 'logger'
 
-  VERSION = '0.0.1'
+  # The current library version.
+  VERSION = '1.0.1'
 
+  #
+  # An instance of the Ruby core class +Logger+.
+  # Used for logging by BibTeX-Ruby.
+  #
   Log = Logger.new(STDERR)
   Log.level = Logger::DEBUG
   Log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
-  #
-  # +Struct+ to model BibTeX +string+ objects.
-  # The +Struct+ has two attributes: +key+ and +value+.
-  # 
-  String = Struct.new(:key,:value)
-
-  #
-  # +Struct+ to model BibTeX +comment+ objects.
-  # The +Struct+ has a single attribute: +content+.
-  #
-  Comment = Struct.new(:content)
-
-  #
-  # +Struct+ to model BibTeX +preamble+ objects.
-  # The +Struct+ has a single attribute: +content+.
-  #
-  Preamble = Struct.new(:content)
 end
 
+require 'bibtex/elements'
 require 'bibtex/entry'
 require 'bibtex/parser'
 require 'bibtex/bibliography'

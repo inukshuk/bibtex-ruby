@@ -18,6 +18,7 @@ rule
           | objects object { result << val[1] }
 
   object : AT at_object { result = val[1] }
+         | META_COMMENT { result = BibTeX::MetaComment.new(val[0]) }
 
   at_object : comment { result = val[0] }
             | string { result = val[0] }
@@ -29,7 +30,7 @@ rule
   content : /* empty */ { result = '' }
           | CONTENT { result = val[0] }
   
-  preamble : PREAMBLE LBRACE string_value RBRACE { result = BibTeX::Comment.new(val[2]) }
+  preamble : PREAMBLE LBRACE string_value RBRACE { result = BibTeX::Preamble.new(val[2]) }
 
   string : STRING LBRACE string_assignment RBRACE { result = BibTeX::String.new(val[2][0],val[2][1]); }
 
@@ -62,6 +63,8 @@ end
 
 ---- inner
 
+  attr_reader :options
+
 	COMMENT_MODE = 0
 	BIBTEX_MODE = 1
 	BRACES_MODE = 2
@@ -71,16 +74,21 @@ end
   OBJECT_PREAMBLE = 2
   OBJECT_ENTRY = 3
 
-	def initialize
-		super
-		@yydebug = true
+	def initialize(options={})
+    @options = {}.merge(options)
+		@options[:debug] = @options.has_key?(:debug) ? @options[:debug] : false
+		@options[:include] = @options.has_key?(:include) ? @options[:include] : []
+
+    @yydebug = @options[:debug]
     clear_state
   end
 
   # sets all internal variables to initial state
   def clear_state
+    @yydebug = @options[:debug]
     @stack = []
     @brace_level = 0
+    @current_object = nil
     @mode = COMMENT_MODE
 	end
 
@@ -95,7 +103,7 @@ end
 
 	# called when parser encounters a new BibTeX object
 	def enter_object(post_match)
-		Log.debug("Entering object: switching to BibTeX mode")
+		Log.debug("Parser: switching to BibTeX mode...")
 		@brace_level = 0
 		@mode = BIBTEX_MODE
 		push [:AT,'@']
@@ -123,7 +131,7 @@ end
 	
 	# called when parser leaves a BibTeX object
 	def leave_object
-		Log.debug("leaving object: switching to comment mode")
+		Log.debug("Parser: switching to comment mode...")
 		@brace_level = 0
 		@mode = COMMENT_MODE
     @current_object = nil
@@ -144,6 +152,7 @@ end
 
 	# lexical analysis
 	def parse(str)
+    Log.debug('Parser: beginning with lexical analysis')
 		until str.empty?
 			case @mode
       when BIBTEX_MODE
@@ -177,7 +186,12 @@ end
             $'
           end
 			when COMMENT_MODE
-				str = str.match(/.*^@[\t\n\s]*/o) ? enter_object($') : ''
+				str = if str.match(/.*^[\t ]*@[\t ]*/o)
+            push [:META_COMMENT,$`] if @options[:include].include?(:meta_comments)
+            enter_object($')
+          else
+            ''
+          end
       when BRACES_MODE
         str.match(/\{|\}/o)
         push [:CONTENT,$`]
@@ -189,7 +203,6 @@ end
 			end
 		end
 		push [false, '$end']
-		Log.debug("The Stack: %s" % @stack.inspect)
 		do_parse
 	end
 	
@@ -240,4 +253,5 @@ end
 		#raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
 		Log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
 	end
+
 ---- footer

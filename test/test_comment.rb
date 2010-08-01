@@ -5,7 +5,7 @@ require 'minitest/autorun'
 class TestComment < MiniTest::Unit::TestCase
   
   def setup
-    @parser = BibTeX::Parser.new
+    @parser = BibTeX::Parser.new(:debug => true)
   end
 
   def teardown
