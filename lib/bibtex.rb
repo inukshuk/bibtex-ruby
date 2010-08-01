@@ -11,8 +11,13 @@
 # License:: GNU GPL 3.0
 #
 module BibTeX
+  require 'logger'
 
   VERSION = '0.0.1'
+
+  Log = Logger.new(STDERR)
+  Log.level = Logger::DEBUG
+  Log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
   #
   # +Struct+ to model BibTeX +string+ objects.

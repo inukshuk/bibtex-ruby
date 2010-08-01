@@ -10,7 +10,8 @@ module BibTeX
     end
     
     def <<(value)
-      @values.merge{value}
+      @values.merge!(value)
+      self
     end
 
     def to_s

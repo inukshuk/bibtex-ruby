@@ -28,7 +28,6 @@ rule
 	
   content : /* empty */ { result = '' }
           | CONTENT { result = val[0] }
-          | content CONTENT { result << val[1] }
   
   preamble : PREAMBLE LBRACE string_value RBRACE { result = BibTeX::Comment.new(val[2]) }
 
@@ -44,12 +43,12 @@ rule
 
   entry : entry_head assignments RBRACE { result = val[0] << val[1] }
         | entry_head assignments COMMA RBRACE { result = val[0] << val[1] }
-        | entry_head assignements RBRACE { result = val[0] }
+        | entry_head RBRACE { result = val[0] }
 
   entry_head : NAME LBRACE NAME COMMA { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
 
   assignments : assignment { result = val[0] }
-              | assignments COMMA assignment { result.merge(val[2]) }
+              | assignments COMMA assignment { result.merge!(val[2]) }
 
   assignment : NAME EQ value { result = { val[0].downcase.to_sym => val[2] } }
 
@@ -60,13 +59,9 @@ rule
 end
 
 ---- header
-require 'logger'
 
 ---- inner
 
-	@@log = Logger.new(STDOUT)
-	@@log.level = Logger::DEBUG
-	
 	COMMENT_MODE = 0
 	BIBTEX_MODE = 1
 	BRACES_MODE = 2
@@ -91,12 +86,16 @@ require 'logger'
 
 	# pushes a value onto the parse stack
 	def push(value)
-		@stack.push(value)
+    if (value[0] == :CONTENT && @stack.last[0] == :CONTENT)
+      @stack.last[1] << value[1]
+    else
+      @stack.push(value)
+    end
 	end
-	
+
 	# called when parser encounters a new BibTeX object
 	def enter_object(post_match)
-		@@log.debug("Entering object: switching to BibTeX mode")
+		Log.debug("Entering object: switching to BibTeX mode")
 		@brace_level = 0
 		@mode = BIBTEX_MODE
 		push [:AT,'@']
@@ -124,7 +123,7 @@ require 'logger'
 	
 	# called when parser leaves a BibTeX object
 	def leave_object
-		@@log.debug("leaving object: switching to comment mode")
+		Log.debug("leaving object: switching to comment mode")
 		@brace_level = 0
 		@mode = COMMENT_MODE
     @current_object = nil
@@ -146,41 +145,51 @@ require 'logger'
 	# lexical analysis
 	def parse(str)
 		until str.empty?
-			unless comment_mode?
-				case str
-				when /\A[\t\n\s]*\{[\t\n\s]*/o
-          str = lbrace($&,$')
-				when /\A[\t\n\s]*\}[\t\n\s]*/o
-          str = rbrace($&,$')
-				when /\A[\t\n\s]*=[\t\n\s]*/o
-					push braces_mode? ? [:CONTENT,$&] : [:EQ, '=']
-					str = $'
-				when /\A[\t\n\s]*,[\t\n\s]*/o
-					push braces_mode? ? [:CONTENT,$&] : [:COMMA, ',']
-					str = $'
-				when /\A[\t\n\s]*#[\t\n\s]*/o
-					push braces_mode? ? [:CONTENT,$&] : [:SHARP, '#']
-					str = $'
-				when /\A\d+/o
-					push braces_mode? ? [:CONTENT,$&] : [:NUMBER, $&]
-					str = $'
-        when /\A[a-z\d:_!$%&*-]+/io
-					push braces_mode? ? [:CONTENT,$&] : [:NAME, $&]
-					str = $'
-				when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
-					push braces_mode? ? [:CONTENT,$&] : [:STRING_LITERAL, $&[1..-2]]
-					str = $'
-				when /\A.|\n/o
-					s = $&
-					push braces_mode? ? [:CONTENT,s] : [s,s]
-					str = $'
-				end
-			else
+			case @mode
+      when BIBTEX_MODE
+				str = case str
+          when /\A[\t\r\n\s]+/o
+            $'
+				  when /\A\{/o
+            lbrace($&,$')
+				  when /\A\}/o
+            rbrace($&,$')
+          when /\A=/o
+            push [:EQ,'=']
+            $'
+          when /\A,/o
+            push [:COMMA,',']
+            $'
+          when /\A#/o
+            push [:SHARP,'#']
+            $'
+          when /\A\d+/o
+            push [:NUMBER,$&]
+            $'
+          when /\A[a-z\d:_!$%&*-]+/io
+            push [:NAME,$&]
+            $'
+          when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
+            push [:STRING_LITERAL,$&[1..-2]]
+            $'
+          when /\A.|\n/o
+            push [$&,$&]
+            $'
+          end
+			when COMMENT_MODE
 				str = str.match(/.*^@[\t\n\s]*/o) ? enter_object($') : ''
+      when BRACES_MODE
+        str.match(/\{|\}/o)
+        push [:CONTENT,$`]
+        str = case $& 
+				  when '{' then lbrace($&,$')
+				  when '}' then rbrace($&,$')
+          else ''
+          end
 			end
 		end
 		push [false, '$end']
-		@@log.debug("The Stack: %s" % @stack.inspect)
+		Log.debug("The Stack: %s" % @stack.inspect)
 		do_parse
 	end
 	
@@ -229,6 +238,6 @@ require 'logger'
 	
 	def on_error(tid, val, vstack)
 		#raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
-		@@log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
+		Log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
 	end
 ---- footer
