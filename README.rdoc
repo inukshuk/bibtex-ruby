@@ -32,8 +32,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 == Installation
 
-TODO
-
+<pre>
+gem install racc
+git clone http://github.com/inukshuk/bibtex-ruby.git
+cd bibtex-ruby
+rake racc
+rake rdoc
+rake test
+</pre>
 
 == Requirements
 
