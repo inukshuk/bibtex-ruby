@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'bibtex'
 require 'minitest/unit'
 require 'minitest/autorun'
