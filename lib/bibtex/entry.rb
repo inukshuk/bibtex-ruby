@@ -42,7 +42,9 @@ module BibTeX
       :unpublished => [:author,:title,:note]
     })
 
-    def initialize(type, key)
+    # Creates a new instance of a given +type+ (e.g., :article, :book, etc.)
+    # identified by a +key+.
+    def initialize(type=:'', key='')
       self.key = key
       self.type = type
       @fields = {}
@@ -92,6 +94,7 @@ module BibTeX
       self
     end
 
+    # Returns true if the entry currently contains no field.
     def empty?
       @fields.empty?
     end
@@ -102,8 +105,14 @@ module BibTeX
       !@@RequiredFields[@type].map { |f| f.kind_of?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil? }.include?(false)
     end
 
+    # Returns a string of all the entry's fields.
     def content
-      "@#{type}{#{key},\n" + values.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k])}" }.join(",\n") + "\n}"
+      @fields.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k])}" }.join(",\n")
+    end
+
+    # Returns a string representation of the entry.
+    def to_s
+      ["@#{type}{#{key},",content.gsub(/^/,'  '),'}'].join("\n")
     end
   end
 end
