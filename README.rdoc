@@ -136,6 +136,6 @@ a concatenation of literals and constants.
 
 === Entries
 
-== Author
+== Credits
 
 The BibTeX-Ruby package was written by {Sylvester Keil}[http://sylvester.keil.or.at/].
