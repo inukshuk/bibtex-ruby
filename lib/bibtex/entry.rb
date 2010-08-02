@@ -21,7 +21,7 @@ module BibTeX
   # Represents a regular BibTeX entry.
   #
   class Entry < Element
-    attr_reader :key, :type, :values
+    attr_reader :key, :type, :fields
    
     # Hash containing the required fields of the standard entry types
     @@RequiredFields = Hash.new([])
@@ -45,36 +45,65 @@ module BibTeX
     def initialize(type, key)
       self.key = key
       self.type = type
-      @values = {}
+      @fields = {}
     end
 
+    # Sets the key of the entry
     def key=(key)
       raise(ArgumentError, "BibTeX::Entry key must be of type String; was: #{key.class.name}.") unless key.kind_of?(::String)
       @key = key
     end
 
+    # Sets the type of the entry.
     def type=(type)
       raise(ArgumentError, "BibTeX::Entry type must be of type Symbol; was: #{type.class.name}.") unless type.kind_of?(Symbol)
       @type = type
     end
     
-    def <<(value)
-      @values = @values.merge(value)
+    # Returns the value of the field with the given name.
+    def [](name)
+      @fields[name.to_sym]
+    end
+
+    # Adds a new field (name-value pair) to the entry.
+    # Returns the new value.
+    def []=(name,value)
+      add(name,value)
+    end
+
+    # Adds a new field (name-value pair) to the entry.
+    # Returns the new value.
+    def add(name,value)
+      raise(ArgumentError, "BibTeX::Entry field name must be of type Symbol; was: #{name.class.name}.") unless name.kind_of?(Symbol)
+      raise(ArgumentError, "BibTeX::Entry field value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
+      @fields[name] = value.kind_of?(Array) ? value : [value]
+    end
+
+    # Removes the field with a given name from the entry.
+    # Returns the value of the deleted field; nil if the field was not set.
+    def delete(name)
+      @fields.delete(name.to_sym)
+    end
+
+    # Adds all the fields contained in a given hash to the entry.
+    def <<(fields)
+      raise(ArgumentError, "BibTeX::Entry fields must be of type Hash; was: #{fields.class.name}.") unless fields.kind_of?(Hash)
+      fields.each { |n,v| add(n,v) }
       self
     end
 
     def empty?
-      @values.empty?
+      @fields.empty?
     end
 
     # Returns false if the entry is one of the standard entry types and does not have
     # definitions of all the required fields for that type.
     def valid?
-      !@@RequiredFields[@type].map { |f| f.kind_of?(Array) ? !(f & @values.keys).empty? : !@values[f].nil? }.include?(false)
+      !@@RequiredFields[@type].map { |f| f.kind_of?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil? }.include?(false)
     end
 
     def content
-      "@#{type}{#{key},\n" + values.keys.map { |k| "#{k} = #{StringReplacement.to_s(@values[k])}" }.join(",\n") + "\n}"
+      "@#{type}{#{key},\n" + values.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k])}" }.join(",\n") + "\n}"
     end
   end
 end

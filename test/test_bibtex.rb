@@ -27,10 +27,10 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert_equal([BibTeX::Entry,BibTeX::Comment,BibTeX::String,BibTeX::Preamble], bib.data.map(&:class).uniq)
     assert_equal('py03', bib.data[0].key)
     assert_equal(:article, bib.data[0].type)
-    assert_equal("{:author=>\"Xavier D\\\\'ecoret\", :title=>[\"PyBiTex\"], :year=>\"2003\"}", bib.data[0].values.inspect)
+    assert_equal("{:author=>[\"Xavier D\\\\'ecoret\"], :title=>[\"PyBiTex\"], :year=>[\"2003\"]}", bib.data[0].fields.inspect)
     assert_equal('key03', bib.data[1].key)
     assert_equal(:article, bib.data[1].type)
-    assert_equal("{:title=>[\"A {bunch {of} braces {in}} title\"]}", bib.data[1].values.inspect)
+    assert_equal("{:title=>[\"A {bunch {of} braces {in}} title\"]}", bib.data[1].fields.inspect)
     #TODO missing assertions
   end
 end
