@@ -27,8 +27,10 @@ end
 
 Rake::RDocTask.new(:rdoc_task) do |rd|
   rd.main = 'README.rdoc'
+  rd.title = "BibTeX-Ruby Documentation"
   rd.rdoc_files.include('README.rdoc',"lib/**/*.rb")
   rd.rdoc_dir = "doc/html"
+  rd.options << '--webcvs=http://github.com/inukshuk/bibtex-ruby/tree/master/'
 end
 
 Rake::TestTask.new(:test_task) do |t|

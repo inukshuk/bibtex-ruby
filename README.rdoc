@@ -1,7 +1,53 @@
 = BibTeX-Ruby
 
 The BibTeX-Ruby package contains a parser for BibTeX
-bibliography files and a number of simple conversion tools.
+bibliography files and a class structure to manage BibTeX objects in
+Ruby.
+
+== Quickstart
+
+<pre>
+require 'bibtex'
+bib = BibTeX::Bibliography.new('file.bib')
+</pre>
+
+== License
+
+BibTeX-Ruby
+Copyright (C) 2010  Sylvester Keil <sylvester.keil.or.at>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+== Installation
+
+TODO
+
+
+== Requirements
+
+The parser generator {+racc+}[http://i.loveruby.net/en/projects/racc/]
+is required to generate parser.
+
+== Usage
+
+TODO
+
+== The Parser
+
+The BibTeX-Ruby parser is generated using the wonderful
+{+racc+}[http://i.loveruby.net/en/projects/racc/] parser generator.
 
 == The BibTeX Format
 
@@ -18,49 +64,72 @@ even after consulting these documents, a number of issues remain.
 Therefore, it is the purpose of this section to deliver the rationale
 that went into some of the design decision in BibTeX-Ruby.
 
-The main motivation behind this package is to make the content of BibTeX
-bibliographies available to rubyists; for this reason the parser should
-not be particularly strict.
-
 A BibTeX bibliography is typically stored in a file with the file
 extension `.bib'. This file may contain any number of BibTeX objects;
 everything that is not a BibTeX object is assumed to be a comment and
 ignored.
 
-The BibTeX-Ruby parser is therefore split into two modes: one for
-parsing comments, one for BibTeX objects. A BibTeX object always starts
-with an `@' symbol, typically at the beginning of a line. In other words,
-BibTeX-Ruby treats all text as a comment until it encounters an `@' a the
-start of a line (or as the first character on a line other than whitespace);
-at this point the parser switches to BibTeX mode.
-In this mode, one of the following objects is possible: +comment+, +string+,
-+preamble+, or a BibTeX entry.
+The individual objects are discussed in furter detail below. First, however, a
+number of general remarks:
 
-The individual objects are discussed in furter detail below. First, however,
-a number here are a number of important assumptions of BibTeX-Ruby:
-
-* String literals are expressed either by double or single quotes; both single
-  or double quotes can occur inside a string literal if escaped by a backslash.
-* Instead of string literals, values in BibTeX are commonly within braces. For
-  this reason, however, it is necessary that braces inside of a braced-out
-  expression are balanced; everything else will lead to a parse error.
+* BibTeX-Ruby begins in comment-mode, treating all text it encounters as comments.
+  Normally these comments are ignored; however, if you wish the parser to include
+  them, you can do so by adding the symbol +:meta_comments+ to the +:include+ array
+  in the parser's options.
+* Note that string literals in BibTeX are either contained in quotes or braces;
+  nested quotes in a quoted literal are not escaped with a usual backslash but
+  must be placed inside braces. Nested braces must be balanced in literals, regardless
+  of whether they are surrounded by quotes or braces.
+* Quoted strings and string constants (which are defined by @string objects) can be
+  concatted by the `#' symbol. String literals in braces can not be concatted in
+  this way.
+* The `@' symbol may only occur in quoted string literals (not in braced out literals)
+  in the original BibTeX; note, however, that this is not true for BibTeX-Ruby (i.e.,
+  it will parse any string containing an `@').
 
 === @comment
 
 The purpose of the @comment object is not entirely clear, because everything
 outside of an object is treated as a comment anyway. Nicolas Markay argues that
 a @comment makes it possible to quickly comment out a number of consecutive
-objects; however, Xavier Decoret points out that this does not work with the
+objects; however, as Xavier Decoret points out that this does not work with the
 original +bibtex+ program (following a @comment, it simply ignores everything
-until the end of the line).
+until the end of the line). Indeed, on page 13 of {the original
+documentation}[http://www.ctan.org/get/biblio/bibtex/contrib/doc/btxdoc.pdf],
+Oren Patashnik explains that @comment objects are not really necessary; they
+exist only for _Scribe_ system compatibility.
 
-BibTeX-Ruby treats @comment objects as Nicolas Markay describes them:
-everything inside a @comment is treated as a comment and is ignored. Everything,
+Because they would be useless otherwise, BibTeX-Ruby treats @comment objects
+as Nicolas Markay describes them: thus, everything inside a @comment is treated
+as a comment and is ignored&mdash;everything,
 that is, until the object is closed. For this reason, BibTeX-Ruby assumes that
-curly braces inside a @comment are balanced!
+braces inside a @comment are balanced! Obviously, BibTeX-Ruby differs from
++bibtex+ in that respect; though, the gain is, that it is now possible to
+comment out a sequence of entries, without removing their respective `@' symbols.
 
 === @string
 
+The @string object defines a single string constant (for multiple constant
+assignments, it is necessary to define separate @string objects). These
+constants can be used within string assignments in other @string or @preamble
+objects, as well as in regular BibTeX entries. For example, this is a valid constant
+definition and usage:
+
+<pre>
+@string{ generator = "BibTeX-Ruby"}
+@preamble{ "This bibliography was generated by " # generator }
+</pre>
+
+
 === @preamble
 
+Typically, the purpose of @preamble objects is to define LaTeX statements, which
+will be put into the `.bbl' file by +bibtex+. A @preamble object may contain
+a single string literal, a single string constant (defined by a @string object), or
+a concatenation of literals and constants.
+
 === Entries
+
+== Author
+
+The BibTeX-Ruby package was written by {Sylvester Keil}[http://sylvester.keil.or.at/].
