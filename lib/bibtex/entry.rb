@@ -31,7 +31,7 @@ module BibTeX
     end
 
     def content
-      "@#{type}{#{key}\n" + values.keys.map { |k| "#{k} = {#{values[k]}}" }.join(",\n") + "\n}"
+      "@#{type}{#{key},\n" + values.keys.map { |k| "#{k} = #{StringReplacement.to_s(@values[k])}" }.join(",\n") + "\n}"
     end
   end
 end

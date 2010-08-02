@@ -18,8 +18,8 @@ class TestPreamble < MiniTest::Unit::TestCase
     assert_equal(BibTeX::Bibliography, bib.class)
     assert_equal(4, bib.data.length)
     assert_equal([BibTeX::Preamble,BibTeX::String], bib.data.map(&:class).uniq)
-    assert_equal(["This bibliography was created \\today"], bib.data[0].value.value)
-    assert_equal(["Bib\\TeX"], bib.data[1].value.value)
-    assert_equal(["Maintained by ",:maintainer], bib.data[3].value.value)
+    assert_equal(["This bibliography was created \\today"], bib.data[0].value)
+    assert_equal(["Bib\\TeX"], bib.data[1].value)
+    assert_equal(["Maintained by ",:maintainer], bib.data[3].value)
   end
 end

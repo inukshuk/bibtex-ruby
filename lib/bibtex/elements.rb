@@ -21,33 +21,13 @@ module BibTeX
 
   end
 
-  class RepString
-    attr_reader :value
-
-    def initialize(value=[])
-      self.value = value
+  module StringReplacement
+    def self.to_s(value)
+      value.map { |s| s.kind_of?(Symbol) ? s.to_s : s.inspect}.join(' # ')
     end
 
-    def value=(value)
-      raise(ArgumentError, "BibTeX::RepString value must be of type Array, Symbol, String, or RepString; was: #{value.class.name}.") unless [Array,::String,Symbol,RepString].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
-      @value = value.kind_of?(RepString) ? value.value : value.kind_of?(Array) ? value : [value]
-    end
-
-    def <<(value)
-      raise(ArgumentError, "BibTeX::RepString value can contain only instances of Symbol or String; was: #{value.class.name}.") unless [::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
-      @value << value
-    end
-
-    def replace(hsh)
-      @value.map { |s| s.kind_of?(Symbol) && hsh.has_key?(s) ? hsh[s] : s }
-    end
-
-    def replace!(hsh)
-      @value = replace(hsh)
-    end
-
-    def to_s
-      @value.map { |s| s.kind_of?(Symbol) ? s.to_s : s.inspect}.join(' # ')
+    def self.replace(value,hsh)
+      value.map { |s| s.kind_of?(Symbol) && hsh.has_key?(s) ? hsh[s] : s }
     end
   end
 
@@ -65,11 +45,25 @@ module BibTeX
     end
 
     def value=(value)
-      @value = RepString.new(value)
+      raise(ArgumentError, "BibTeX::String value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
+      @value = value.kind_of?(Array) ? value : [value]
+    end
+
+    def replace(hsh)
+      StringReplacement.replace(@value,hsh)
+    end
+
+    def replace!(hsh)
+      @value = replace(hsh)
+    end
+
+    def <<(value)
+      raise(ArgumentError, "BibTeX::String value can contain only instances of Symbol or String; was: #{value.class.name}.") unless [::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
+      @value << value
     end
 
     def content
-      [@key.to_s,' = ',@value.to_s].join
+      [@key.to_s,' = ',StringReplacement.to_s(@value)].join
     end
 
     def to_s
@@ -85,11 +79,20 @@ module BibTeX
     end
 
     def value=(value)
-      @value = RepString.new(value)
+      raise(ArgumentError, "BibTeX::Preamble value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
+      @value = value.kind_of?(Array) ? value : [value]
+    end
+
+    def replace(hsh)
+      StringReplacement.replace(@value,hsh)
+    end
+
+    def replace!(hsh)
+      @value = replace(hsh)
     end
 
     def content
-      @value.to_s
+      StringReplacement.to_s(@value)
     end
 
     def to_s
