@@ -1,1 +1,5 @@
+**/*.swp
 *.tmproj
+**/*~
+lib/bibtex/parser.rb
+lib/bibtex/parser.output
