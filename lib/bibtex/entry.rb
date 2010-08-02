@@ -22,7 +22,25 @@ module BibTeX
   #
   class Entry < Element
     attr_reader :key, :type, :values
-    
+   
+    # Hash containing the required fields of the standard entry types
+    @@RequiredFields = Hash.new([])
+    @@RequiredFields.merge!({
+      :article => [:author,:title,:journal,:year],
+      :book => [[:author,:editor],:title,:publisher,:year],
+      :booklet => [:title],
+      :conference => [:author,:title,:booktitle,:year],
+      :inbook => [[:author,:editor],:title,[:chapter,:pages],:publisher,:year],
+      :incollection => [:author,:title,:booktitle,:publisher,:year],
+      :inproceedings => [:author,:title,:booktitle,:year],
+      :manual => [:title],
+      :mastersthesis => [:author,:title,:school,:year],
+      :misc => [],
+      :phdthesis => [:author,:title,:school,:year],
+      :proceedings => [:title,:year],
+      :techreport => [:author,:title,:institution,:year],
+      :unpublished => [:author,:title,:note]
+    })
 
     def initialize(type, key)
       self.key = key
@@ -49,7 +67,10 @@ module BibTeX
       @values.empty?
     end
 
+    # Returns false if the entry is one of the standard entry types and does not have
+    # definitions of all the required fields for that type.
     def valid?
+      !@@RequiredFields[@type].map { |f| f.kind_of?(Array) ? !(f & @values.keys).empty? : !@values[f].nil? }.include?(false)
     end
 
     def content
