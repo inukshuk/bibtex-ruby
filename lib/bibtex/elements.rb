@@ -33,6 +33,15 @@ module BibTeX
       self.content
     end
 
+    # Called when the element was added to a bibliography.
+    def added_to_bibliography(bibliography)
+      self
+    end
+    
+    # Called when the element was removed from a bibliography.
+    def removed_from_bibliography(bibliography)
+      self
+    end
   end
 
   # This module contains functions to manipulate BibTeX
@@ -41,6 +50,7 @@ module BibTeX
 
     # Returns a string representation of the literal.
     def self.to_s(value,options={})
+      return if value.nil?
       #options[:delimiter] ||= ['"','"']
       options[:delimiter] ||= ['{','}']
 
@@ -53,6 +63,7 @@ module BibTeX
 
     # Replaces all string constants in +value+ which are defined in +hsh+.
     def self.replace(value,hsh)
+      return if value.nil?
       value.map { |s| s.kind_of?(Symbol) && hsh.has_key?(s) ? hsh[s] : s }
     end
   end
@@ -71,9 +82,9 @@ module BibTeX
     attr_reader :key, :value
 
     # Creates a new instance.
-    def initialize(key=:'',value=[])
-      self.key = key
-      self.value = value
+    def initialize(key=nil,value=nil)
+      self.key = key.to_sym unless key.nil?
+      self.value = value unless value.nil?
     end
 
     # Sets the string's key (i.e., the name of the constant)
@@ -121,6 +132,20 @@ module BibTeX
     def <<(value)
       raise(ArgumentError, "BibTeX::String value can contain only instances of Symbol or String; was: #{value.class.name}.") unless [::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
       @value << value
+    end
+
+    # Called when the element was added to a bibliography.
+    def added_to_bibliography(bibliography)
+      super(bibliography)
+      bibliography.strings[@key] = @value
+      self
+    end
+    
+    # Called when the element was removed from a bibliography.
+    def removed_from_bibliography(bibliography)
+      super(bibliography)
+      bibliography.strings[@key] = nil
+      self
     end
 
     # Returns a string representation of the @string's content.
@@ -210,6 +235,20 @@ module BibTeX
   class BadObject < Comment
     def to_s
       @content
+    end
+    
+    # Called when the element was added to a bibliography.
+    def added_to_bibliography(bibliography)
+      super(bibliography)
+      bibliography.errors << self
+      self
+    end
+    
+    # Called when the element was removed from a bibliography.
+    def removed_from_bibliography(bibliography)
+      super(bibliography)
+      bibliography.errors.delete(self)
+      self
     end
   end
 end

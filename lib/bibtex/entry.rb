@@ -44,9 +44,9 @@ module BibTeX
 
     # Creates a new instance of a given +type+ (e.g., :article, :book, etc.)
     # identified by a +key+.
-    def initialize(type=:'', key='')
-      self.key = key
-      self.type = type
+    def initialize(type=nil, key=nil)
+      self.key = key.to_s unless key.nil?
+      self.type = type.to_sym unless type.nil?
       @fields = {}
     end
 
@@ -102,7 +102,23 @@ module BibTeX
     # Returns false if the entry is one of the standard entry types and does not have
     # definitions of all the required fields for that type.
     def valid?
-      !@@RequiredFields[@type].map { |f| f.kind_of?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil? }.include?(false)
+      !@@RequiredFields[@type].map { |f|
+        f.kind_of?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil?
+      }.include?(false)
+    end
+
+    # Called when the element was added to a bibliography.
+    def added_to_bibliography(bibliography)
+      super(bibliography)
+      bibliography.strings[@key] = self
+      self
+    end
+    
+    # Called when the element was removed from a bibliography.
+    def removed_from_bibliography(bibliography)
+      super(bibliography)
+      bibliography.strings[@key] = nil
+      self
     end
 
     # Returns a string of all the entry's fields.

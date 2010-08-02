@@ -25,9 +25,9 @@
 class BibTeX::Parser
 rule
 	target : { result = Bibliography.new }
-         | objects { result = Bibliography.new(val[0]) }
+         | objects { result = val[0] }
 
-  objects : object { result = [val[0]] }
+  objects : object { result = Bibliography.new << val[0] }
           | objects object { result << val[1] }
 
   object : AT at_object { result = val[1] }
