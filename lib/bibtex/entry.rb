@@ -110,20 +110,20 @@ module BibTeX
     # Called when the element was added to a bibliography.
     def added_to_bibliography(bibliography)
       super(bibliography)
-      bibliography.strings[@key] = self
+      bibliography.entries[@key] = self
       self
     end
     
     # Called when the element was removed from a bibliography.
     def removed_from_bibliography(bibliography)
       super(bibliography)
-      bibliography.strings[@key] = nil
+      bibliography.entries[@key] = nil
       self
     end
 
     # Returns a string of all the entry's fields.
     def content
-      @fields.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k])}" }.join(",\n")
+      @fields.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k], :delimiter => ['{','}'])}" }.join(",\n")
     end
 
     # Returns a string representation of the entry.

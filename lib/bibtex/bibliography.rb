@@ -27,22 +27,24 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
-    def initialize(path=nil)
-      raise(ArgumentError, "BibTeX data must be of type Array, was: #{data.class}") unless data.kind_of? Array
+    def self.open(path)
+      BibTeX::Parser.new.parse(File.read(path))
+    end
+    
+    # Creates a new bibliography; empty if no path is specified, otherwise
+    # by parsing the file at the given path.
+    def initialize(data=[])
       @path = path
       @data = []
       @strings = {}
       @entries = {}
       @errors = []
-      self.open unless path.nil?
+      add(data)
     end
-
-    # Opens and parses the file at the given path; if no path is
-    # given, the current value of the instance variable @path is
-    # used instead.
-    def open(path=nil)
-      self.path = path unless path.nil?
-      @data = BibTeX::Parser.new.parse(File.read(path))
+    
+    def add(data)
+      data.each { |d| self << d }
+      self
     end
     
     # Saves the bibliography to the current path.
@@ -66,6 +68,11 @@ module BibTeX
     # if the object was not part of the bibliography.
     def delete(obj)
       @data.delete(obj.removed_from_bibliography(self))
+    end
+    
+    def delete_all
+      @data.each { |obj| obj.removed_from_bibliography(self) }
+      @data = []
     end
     
     # Returns all @preamble objects.

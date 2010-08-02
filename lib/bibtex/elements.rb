@@ -51,8 +51,8 @@ module BibTeX
     # Returns a string representation of the literal.
     def self.to_s(value,options={})
       return if value.nil?
-      #options[:delimiter] ||= ['"','"']
-      options[:delimiter] ||= ['{','}']
+      options[:delimiter] ||= ['"','"']
+      #options[:delimiter] ||= ['{','}']
 
       if value.empty? || (value.length == 1 && !value[0].kind_of?(Symbol))
         [options[:delimiter][0],value,options[:delimiter][1]].join
