@@ -38,7 +38,7 @@ module BibTeX
   # Used for logging by BibTeX-Ruby.
   #
   Log = Logger.new(STDERR)
-  Log.level = Logger::DEBUG
+  Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
   Log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
 end
