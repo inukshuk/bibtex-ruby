@@ -27,8 +27,8 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
-    def self.open(path)
-      BibTeX::Parser.new.parse(File.read(path))
+    def self.open(path, options={})
+      BibTeX::Parser.new(options).parse(File.read(path))
     end
     
     # Creates a new bibliography; empty if no path is specified, otherwise

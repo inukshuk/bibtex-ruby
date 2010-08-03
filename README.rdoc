@@ -7,7 +7,7 @@ Ruby.
 == Quickstart
 
 * require 'bibtex'
-* bib = BibTeX::Bibliography.new('file.bib')
+* bib = BibTeX::Bibliography.open('file.bib')
 
 == License
 
