@@ -41,8 +41,16 @@ module BibTeX
       @mode = :meta
       @active_object = nil
       @src = StringScanner.new(src)
+      @line_breaks = []
+      @line_breaks << @src.pos until @src.scan_until(/\n|$/).empty?
+      @src.reset
   	end
 
+    # Returns the line number at a given position in the source.
+    def line_number_at(index)
+      @line_breaks.find_index { |n| n >= index }
+    end
+    
     # Returns the next token from the parse stack.
     def next_token
       @stack.shift
@@ -91,11 +99,12 @@ module BibTeX
     
   	# Pushes a value onto the parse stack.
   	def push(value)
+  	  value[1] = [value[1], line_number_at(@src.pos)]
   	  case
   	  when ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
-        @stack.last[1] << value[1]
+        @stack.last[1][0] << value[1][0]
       when value[0] == :ERROR
-        self.pop_until(:AT).each { |t| value[1] << t }
+        self.pop_until(:AT).each { |t| value[1][0] << t }
         @stack.push(value)
       else
         @stack.push(value)
