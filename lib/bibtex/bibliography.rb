@@ -34,6 +34,7 @@ module BibTeX
     # The options argument is passed on to BibTeX::Parser.new.
     #
     def self.open(path, options={})
+      Log.debug('Opening file ' + path.to_s)
       BibTeX::Parser.new(options).parse(File.read(path))
     end
     

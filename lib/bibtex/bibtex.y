@@ -78,15 +78,19 @@ end
 
   attr_reader :options
 
-	COMMENT_MODE = 0
-	BIBTEX_MODE = 1
-	BRACES_MODE = 2
-	LITERAL_MODE = 3
+	MODE = {
+		:comment => 'comment mode',
+		:bibtex => 'BibTeX mode',
+		:braces => 'braces mode',
+		:literal => 'literal mode'
+	}
 
-  OBJECT_COMMENT = 0
-  OBJECT_STRING = 1
-  OBJECT_PREAMBLE = 2
-  OBJECT_ENTRY = 3
+	OBJECT = {
+		:comment => '@comment',
+		:string => '@string',
+		:preamble => '@preamble',
+		:entry => 'BibTeX entry'
+	}
 
 	def initialize(options={})
     @options = {}.merge(options)
@@ -102,13 +106,23 @@ end
     @yydebug = @options[:debug]
     @stack = []
     @brace_level = 0
-    @current_object = nil
-    @mode = COMMENT_MODE
+    self.object = nil
+    self.mode = :comment
+	end
+
+	def mode=(mode)
+		Log.debug("Parser: switching to #{MODE[mode]}...")
+		@mode = mode
+	end
+	
+	def object=(object)
+		Log.debug("Parser: trying to parse a #{OBJECT[object]} object...") unless object.nil?
+		@object = object
 	end
 
 	# pushes a value onto the parse stack
 	def push(value)
-    if (value[0] == :CONTENT && @stack.last[0] == :CONTENT)
+		if ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
       @stack.last[1] << value[1]
     else
       @stack.push(value)
@@ -117,26 +131,25 @@ end
 
 	# called when parser encounters a new BibTeX object
 	def enter_object(post_match)
-		Log.debug("Parser: switching to BibTeX mode...")
 		@brace_level = 0
-		@mode = BIBTEX_MODE
+		self.mode = :bibtex
 		push [:AT,'@']
 
     case post_match
     when /\Astring/io
-      @current_object = OBJECT_STRING
+      self.object = :string
       push [:STRING, $&]
       post_match = $'
     when /\Apreamble/io
-      @current_object = OBJECT_PREAMBLE
+      self.object = :preamble
       push [:PREAMBLE, $&]
       post_match = $'
     when /\Acomment/io
-      @current_object = OBJECT_COMMENT
+      self.object = :comment
       push [:COMMENT, $&]
       post_match = $'
     when /\A[a-z\d:_!$%&*-]+/io
-      @current_object = OBJECT_ENTRY
+      self.object = :entry
 			push [:NAME, $&]
       post_match = $'
     end
@@ -145,31 +158,50 @@ end
 	
 	# called when parser leaves a BibTeX object
 	def leave_object
-		Log.debug("Parser: switching to comment mode...")
+		self.mode = :comment
 		@brace_level = 0
-		@mode = COMMENT_MODE
-    @current_object = nil
+    self.object = nil
 		push [:RBRACE,'}']
 	end
 	
 	def bibtex_mode?
-		@mode == BIBTEX_MODE
+		@mode == :bibtex
 	end
 
   def comment_mode?
-		@mode == COMMENT_MODE
+		@mode == :comment
   end
 
   def braces_mode?
-		@mode == BRACES_MODE
+		@mode == :braces
   end
 
+  def literal_mode?
+		@mode == :literal
+  end
+
+	def is_comment?
+		@object == :comment
+	end
+
+	def is_string?
+		@object == :string
+	end
+
+	def is_preamble?
+		@object == :preamble
+	end
+
+	def is_entry?
+		@object == :entry
+	end
+	
 	# lexical analysis
 	def parse(str)
     Log.debug('Parser: beginning with lexical analysis')
 		until str.empty?
-			case @mode
-      when BIBTEX_MODE
+			case
+      when self.bibtex_mode?
 				str = case str
           when /\A[\t\r\n\s]+/o
             $'
@@ -192,21 +224,21 @@ end
           when /\A[a-z\d:_!$%&*-]+/io
             push [:NAME,$&]
             $'
-          when /\A"(\\.|[^\\"])*"|'(\\.|[^\\'])*'/o
-            push [:STRING_LITERAL,$&[1..-2]]
-            $'
+          when /\A"/o
+						self.mode = :literal
+						$'
           when /\A.|\n/o
             push [$&,$&]
             $'
           end
-			when COMMENT_MODE
+			when self.comment_mode?
 				str = if str.match(/.*^[\t ]*@[\t ]*/o)
             push [:META_COMMENT,$`] if @options[:include].include?(:meta_comments)
             enter_object($')
           else
             ''
           end
-      when BRACES_MODE
+      when self.braces_mode?
         str.match(/\{|\}/o)
         push [:CONTENT,$`]
         str = case $& 
@@ -214,9 +246,27 @@ end
 				  when '}' then rbrace($&,$')
           else ''
           end
+			when self.literal_mode?
+				str.match(/[\{\}"]/o)
+        push [:STRING_LITERAL,$`]
+				str = case $&
+					when '{'
+						@brace_level += 1
+						push [:STRING_LITERAL,$&]
+		      	$'
+					when '}'
+						@brace_level -= 1
+						push [:STRING_LITERAL,$&]
+		      	$'
+					when '"'
+						if @brace_level == 1 then self.mode = :bibtex else push [:STRING_LITERAL,$&] end
+						$'
+					else ''
+					end
 			end
 		end
 		push [false, '$end']
+		Log.debug('Parser: lexical analysis finished; ' + self.to_s)
 		do_parse
 	end
 	
@@ -230,11 +280,11 @@ end
 		if @brace_level == 0		
 			@brace_level += 1
 			push [:LBRACE,'{']
-      @mode = BRACES_MODE if @current_object == OBJECT_COMMENT
+      self.mode = :braces if self.is_comment?
 		else
 			@brace_level += 1
-			push braces_mode? ? [:CONTENT,match] : [:LBRACE, '{']
-      @mode = BRACES_MODE if @brace_level == 2 && @current_object == OBJECT_ENTRY
+			push self.braces_mode? ? [:CONTENT,match] : [:LBRACE, '{']
+      self.mode = :braces if @brace_level == 2 && self.is_entry?
 		end
 		post_match
 	end
@@ -249,8 +299,8 @@ end
 			leave_object
 		else
       @brace_level -= 1
-      @mode = BIBTEX_MODE if @brace_level == 1 && @current_object == OBJECT_ENTRY
-			push braces_mode? ? [:CONTENT,match] : [:RBRACE, '}']
+      self.mode = :bibtex if @brace_level == 1 && self.is_entry?
+			push self.braces_mode? ? [:CONTENT,match] : [:RBRACE, '}']
 		end
 		post_match
 	end
@@ -260,7 +310,7 @@ end
 	end
 	
 	def to_s
-		"Stack #{@stack.inspect}; Brace Level #{@brace_level}"
+		"Stack #{@stack.inspect}; Brace Level #{@brace_level}; #{MODE[@mode]}"
 	end
 	
 	def on_error(tid, val, vstack)

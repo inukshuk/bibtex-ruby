@@ -6,15 +6,13 @@ require 'minitest/autorun'
 class TestString < MiniTest::Unit::TestCase
   
   def setup
-    @parser = BibTeX::Parser.new(:debug => true)
   end
 
   def teardown
-    @parser.clear_state
   end
 
   def test_simple
-    bib = @parser.parse(File.open('test/bib/02_string.bib').read)
+    bib = BibTeX::Bibliography.open('test/bib/02_string.bib', :debug => true)
     refute_nil(bib)
     assert(bib.kind_of? BibTeX::Bibliography)
     refute(bib.empty?)
@@ -25,7 +23,7 @@ class TestString < MiniTest::Unit::TestCase
   end
 
   def test_assignment
-    bib = @parser.parse(File.open('test/bib/03_string.bib').read)
+    bib = BibTeX::Bibliography.open('test/bib/03_string.bib', :debug => true)
     refute_nil(bib)
     assert(bib.kind_of? BibTeX::Bibliography)
     refute(bib.empty?)
@@ -33,16 +31,16 @@ class TestString < MiniTest::Unit::TestCase
     assert_equal(bib.data.map(&:class).uniq, [BibTeX::String]) 
     assert_equal(bib.data.map(&:key).uniq, [:foo]) 
     (0..10).each { |i| assert_equal(bib.data[i].value, ['bar']) }
-    assert_equal(bib.data[11].value, ['\\\'bar\\\''])
-    assert_equal(bib.data[12].value, ['"bar"'])
+    assert_equal(bib.data[11].value, ['\'bar\''])
+    assert_equal(bib.data[12].value, ['{"}bar{"}'])
     assert_equal(bib.data[13].value, ['@bar@'])
     assert_equal(bib.data[14].value, ['\'bar\''])
-    assert_equal(bib.data[15].value, ['\\"bar\\"'])
+    assert_equal(bib.data[15].value, ['{"}bar{"}'])
     assert_equal(bib.data[16].value, ['{bar}'])
   end
 
   def test_replacement
-    bib = @parser.parse(File.open('test/bib/04_string_replacement.bib').read)
+    bib = BibTeX::Bibliography.open('test/bib/04_string_replacement.bib', :debug => true)
     refute_nil(bib)
     assert(bib.kind_of?(BibTeX::Bibliography))
     refute(bib.empty?)

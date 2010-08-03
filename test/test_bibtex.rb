@@ -6,22 +6,20 @@ require 'minitest/autorun'
 class TestBibtex < MiniTest::Unit::TestCase
   
   def setup
-    @parser = BibTeX::Parser.new(:debug => true)
   end
 
   def teardown
-    @parser.clear_state
   end
 
   def test_empty
-    bib = @parser.parse(File.open('test/bib/00_empty.bib').read)
+    bib = BibTeX::Bibliography.open('test/bib/00_empty.bib', :debug => true)
     refute_nil(bib)
     assert_equal(BibTeX::Bibliography, bib.class)
     assert(bib.empty?)
   end
 
   def test_decoret
-    bib = @parser.parse(File.open('test/bib/08_decoret.bib').read)
+    bib = BibTeX::Bibliography.open('test/bib/08_decoret.bib', :debug => true)
     refute_nil(bib)
     assert_equal(BibTeX::Bibliography, bib.class)
     assert_equal(15, bib.length)
