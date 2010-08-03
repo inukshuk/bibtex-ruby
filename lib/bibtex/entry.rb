@@ -121,6 +121,11 @@ module BibTeX
       self
     end
 
+    # Replaces all constants in this string's value which are defined in +hsh+.
+    def replace!(hsh)
+      @fields.keys.each { |k| @fields[k] = StringReplacement.replace(@fields[k],hsh) }
+    end
+
     # Returns a string of all the entry's fields.
     def content
       @fields.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k], :delimiter => ['{','}'])}" }.join(",\n")

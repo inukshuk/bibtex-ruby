@@ -8,3 +8,9 @@
 @string{ foobar = foo # "bar" }
 @string{ foobarfoo = foobar # foo }
 @string{ barfoobar = bar # "foo" # bar }
+
+@preamble { "foo" # foo # foobarfoo # "bar" }
+
+@manual {manual:1,
+	title = "foo" # barfoobar
+}

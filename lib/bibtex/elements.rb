@@ -23,6 +23,12 @@ module BibTeX
   #
   class Element
 
+    attr_reader :bibliography
+    
+    def initialize
+      @bibliography = nil
+    end
+    
     # Returns a string containing the object's content.
     def content
       ""
@@ -35,11 +41,13 @@ module BibTeX
 
     # Called when the element was added to a bibliography.
     def added_to_bibliography(bibliography)
+      @bibliography = bibliography
       self
     end
     
     # Called when the element was removed from a bibliography.
     def removed_from_bibliography(bibliography)
+      @bibliography = nil
       self
     end
   end
@@ -64,7 +72,7 @@ module BibTeX
     # Replaces all string constants in +value+ which are defined in +hsh+.
     def self.replace(value,hsh)
       return if value.nil?
-      value.map { |s| s.kind_of?(Symbol) && hsh.has_key?(s) ? hsh[s] : s }
+      value.map { |s| s.kind_of?(Symbol) && hsh.has_key?(s) ? hsh[s] : s }.flatten
     end
   end
 
@@ -125,6 +133,7 @@ module BibTeX
     # => "@string{ foobar = "foo" # "bar"}"
     def replace!(hsh)
       @value = replace(hsh)
+      @bibliography.strings[@key] = value unless @bibliography.nil?
     end
 
     # Adds either a string constant or literal to the current value. The
@@ -184,6 +193,7 @@ module BibTeX
 
     def replace!(hsh)
       @value = replace(hsh)
+      @bibliography.strings[@key] = @value unless @bibliography.nil?
     end
 
     # Returns a string representation of the @preamble's content.

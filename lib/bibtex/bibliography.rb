@@ -107,13 +107,31 @@ module BibTeX
     end
 
     # Replaces all string constants which are defined in the bibliography.
+    #
+    # By default constants in @string, @preamble and entries are defined; this
+    # behaviour can be changed using the options argument by setting
+    # the :include option to a list of types.
+    #
+    # Note that strings are replaced in the order in which they occur in the
+    # bibliography.
+    #
+    # call-seq:
+    # replace_strings
+    # replace_strings({ :include => [BibTeX::String,BibTeX::Preamble]})
+    #
     def replace_strings(options={})
-      
+      options[:include] ||= [BibTeX::String, BibTeX::Preamble, BibTeX::Entry]
+      find_by_type(options[:include]).each { |e| e.replace!(@strings) if e.respond_to?(:replace!)}
     end
 
     # Returns true if the bibliography is currently empty.
     def empty?
       @data.empty?
+    end
+    
+    # Returns the number of objects in the bibliography (including meta comments).
+    def length
+      @data.length
     end
 
     # Returns a string representation of the bibliography.
