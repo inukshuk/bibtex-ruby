@@ -39,8 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 == Requirements
 
-The parser generator {+racc+}[http://i.loveruby.net/en/projects/racc/]
+* The parser generator {+racc+}[http://i.loveruby.net/en/projects/racc/]
 is required to generate parser.
+* The +minitest+ gem is required to run the tests in older Ruby versions (prior to 1.9).
 
 == Usage
 
