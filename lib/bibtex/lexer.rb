@@ -16,6 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'strscan'
+
+
 module BibTeX
   
   #
@@ -23,7 +26,7 @@ module BibTeX
   #
   class Lexer
 
-    attr_reader :src, :options
+    attr_reader :src, :options, :stack
     
   	def initialize(options={})
       @options = options
@@ -37,7 +40,7 @@ module BibTeX
       @brace_level = 0
       @mode = :meta
       @active_object = nil
-      @src = src
+      @src = StringScanner.new(src)
   	end
 
     # Returns the next token from the parse stack.
@@ -88,8 +91,12 @@ module BibTeX
     
   	# Pushes a value onto the parse stack.
   	def push(value)
-  		if ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
+  	  case
+  	  when ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
         @stack.last[1] << value[1]
+      when value[0] == :ERROR
+        self.pop_until(:AT).each { |t| value[1] << t }
+        @stack.push(value)
       else
         @stack.push(value)
       end
@@ -101,74 +108,57 @@ module BibTeX
   	  raise(ArgumentError, 'Lexer: failed to start analysis: no source given!') if src.nil? && @src.nil?
       Log.debug('Lexer: starting lexical analysis...')
   	  
-  	  self.src = src unless src.nil?
-  	  data = self.src
+  	  self.src = src || @src.string
+  	  self.src.reset
   	  
-  	  # main analysis loop
-  		until data.empty?
+  		until self.src.eos?
   			case
         when self.bibtex_mode?
-  				data = case data
-            when /\A[\t\r\n\s]+/o
-              $'
-  				  when /\A\{/o
-              lbrace($&,$')
-  				  when /\A\}/o
-              rbrace($&,$')
-            when /\A=/o
-              push [:EQ,'=']
-              $'
-            when /\A,/o
-              push [:COMMA,',']
-              $'
-            when /\A#/o
-              push [:SHARP,'#']
-              $'
-            when /\A\d+/o
-              push [:NUMBER,$&]
-              $'
-            when /\A[a-z\d:_!$%&*-]+/io
-              push [:NAME,$&]
-              $'
-            when /\A"/o
-  						self.mode = :literal
-  						$'
-            when /\A.|\n/o
-              push [$&,$&]
-              $'
-            end
+  				case
+          when self.src.scan(/[\t\r\n\s]+/o)
+				  when self.src.scan(/\{/o) then lbrace
+				  when self.src.scan(/\}/o) then rbrace
+          when self.src.scan( /=/o) then push [:EQ,'=']
+          when self.src.scan(/,/o) then push [:COMMA,',']
+          when self.src.scan(/#/o) then push [:SHARP,'#']
+          when self.src.scan(/\d+/o) then push [:NUMBER,self.src.matched]
+          when self.src.scan(/[a-z\d:_!$%&*-]+/io) then push [:NAME,self.src.matched]
+          when self.src.scan(/"/o) then self.mode = :literal
+          when self.src.scan(/.|\n/o) then push [self.src.matched,self.src.matched]
+          end
   			when self.meta_mode?
-  				data = if data.match(/.*^[\t ]*@[\t ]*/o)
-              push [:META_COMMENT,$`] if @options[:include].include?(:meta_comments)
-              enter_object($')
-            else
-              ''
-            end
+  				data = self.src.scan_until(/(^|\n)[\t ]*@[\t ]*/o)
+  				unless data.nil?
+            push [:META_COMMENT,data.chop] if @options[:include].include?(:meta_comments)
+            enter_object
+          else
+            push [:META_COMMENT,self.src.rest] if @options[:include].include?(:meta_comments)
+            self.src.terminate
+          end
         when self.braces_mode?
-          data.match(/\{|\}/o)
-          push [:CONTENT,$`]
-          data = case $& 
-  				  when '{' then lbrace($&,$')
-  				  when '}' then rbrace($&,$')
-            else ''
-            end
+          data = self.src.scan_until(/\{|\}/o)
+          unless data.nil?
+            push [:CONTENT,data.chop]
+            self.src.matched == '{' ? lbrace : rbrace
+          else
+            Log.warn("Lexer: unterminated braces at position #{self.src.pos}.")
+            push [:ERROR,[[:ERROR,self.src.rest]]]
+            self.src.terminate
+          end
   			when self.literal_mode?
-  				data.match(/[\{\}"]/o)
-          push [:STRING_LITERAL,$`]
-  				data = case $&
-  					when '{'
-  						@brace_level += 1
-  						push [:STRING_LITERAL,$&]
-  		      	$'
-  					when '}'
-  						@brace_level -= 1
-  						push [:STRING_LITERAL,$&]
-  		      	$'
-  					when '"'
-  						if @brace_level == 1 then self.mode = :bibtex else push [:STRING_LITERAL,$&] end
-  						$'
-  					else ''
+  				data = self.src.scan_until(/[\{\}"]/o)
+  				unless data.nil?
+            push [:STRING_LITERAL,data.chop]
+  				  case self.src.matched
+  					when '{' then lbrace
+  					when '}' then rbrace
+  					when '"' then if @brace_level == 1 then self.mode = :bibtex else push [:STRING_LITERAL,self.src.matched] end
   					end
+  				else
+            Log.warn("Lexer: unterminated string literal at position #{self.src.pos}.")
+            push [:ERROR,[[:ERROR,self.src.rest]]]
+            self.src.terminate
+          end
   			end
   		end
   		
@@ -178,27 +168,25 @@ module BibTeX
 
 
   	# Called when the lexer encounters a new BibTeX object.
-  	def enter_object(post_match)
+  	def enter_object
   		@brace_level = 0
   		self.mode = :bibtex
   		push [:AT,'@']
 
-      case post_match
-      when /\Astring/io
+      case
+      when self.src.scan(/string/io)
         self.mode = :string
-        push [:STRING, $&]
-      when /\Apreamble/io
+        push [:STRING, self.src.matched]
+      when self.src.scan(/preamble/io)
         self.mode = :preamble
-        push [:PREAMBLE, $&]
-      when /\Acomment/io
+        push [:PREAMBLE, self.src.matched]
+      when self.src.scan(/comment/io)
         self.mode = :comment
-        push [:COMMENT, $&]
-      when /\A[a-z\d:_!$%&*-]+/io
+        push [:COMMENT, self.src.matched]
+      when self.src.scan(/[a-z\d:_!$%&*-]+/io)
         self.mode = :entry
-  			push [:NAME, $&]
+  			push [:NAME, self.src.matched]
       end
-      
-  		return $'
   	end
 
   	# Called when parser leaves a BibTeX object.
@@ -212,18 +200,20 @@ module BibTeX
   	# Handles opening braces.
   	# Braces must be balanced inside BibTeX objects.
   	#
-  	def lbrace(match, post_match)
-  		# check whether entering a new object or a braced string
-  		if @brace_level == 0		
-  			@brace_level += 1
-  			push [:LBRACE,'{']
-        self.mode = :braces if is_active?(:comment)
-  		else
-  			@brace_level += 1
-  			push self.braces_mode? ? [:CONTENT,match] : [:LBRACE, '{']
-        self.mode = :braces if @brace_level == 2 && is_active?(:entry)
-  		end
-  		post_match
+  	def lbrace
+  	  @brace_level += 1
+  	  if self.literal_mode?
+				push [:STRING_LITERAL,self.src.matched]
+  	  else
+    		# check whether entering a new object or a braced string
+    		if @brace_level == 1
+    			push [:LBRACE,'{']
+          self.mode = :braces if is_active?(:comment)
+    		else
+    			push self.braces_mode? ? [:CONTENT,self.src.matched] : [:LBRACE, '{']
+          self.mode = :braces if @brace_level == 2 && is_active?(:entry)
+    		end
+    	end
   	end
 
   	# handles closing brace
@@ -231,19 +221,34 @@ module BibTeX
   	# Braces are balanced inside BibTeX objects with the exception of
   	# with the exception of braces occurring within string literals.
   	# 
-  	def rbrace(match, post_match)
-  		if @brace_level == 1
-  			leave_object
-  		else
-        @brace_level -= 1
-        self.mode = :bibtex if @brace_level == 1 && is_active?(:entry)
-  			push self.braces_mode? ? [:CONTENT,match] : [:RBRACE, '}']
-  		end
-  		post_match
+  	def rbrace
+  	  if self.literal_mode?
+    	  @brace_level -= 1
+  			push [:STRING_LITERAL,self.src.matched]
+			else
+    		if @brace_level == 1
+    			leave_object
+    		else
+          @brace_level -= 1
+          self.mode = :bibtex if @brace_level == 1 && is_active?(:entry)
+    			push self.braces_mode? ? [:CONTENT,self.src.matched] : [:RBRACE, '}']
+    		end
+    	end
   	end
 
   	def to_s
   	  [self.class,10*'+-',"Stack: #{@stack.inspect}","@brace_level #{@brace_level}; Mode: #{@mode.inspect}"].join("\n")
+  	end
+  	
+  	private
+  	
+  	def pop_until(token)
+  	  bt = []
+  	  last_token = nil
+  	  while !@stack.empty? && last_token != token do
+  	    last_token = bt.unshift(@stack.pop)[0][0]
+  	  end
+  	  return bt
   	end
 
   end

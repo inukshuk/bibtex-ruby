@@ -23,9 +23,8 @@
 
 class BibTeX::Parser
 
-token AT COMMA COMMENT CONTENT EQ LBRACE META_COMMENT
-      NAME PREAMBLE RBRACE SHARP STRING STRING_LITERAL
-      NUMBER
+token AT COMMA COMMENT CONTENT ERROR EQ LBRACE META_COMMENT
+      NAME NUMBER PREAMBLE RBRACE SHARP STRING STRING_LITERAL
 
 expect 0
 
@@ -39,6 +38,7 @@ rule
 
   object : AT at_object                            { result = val[1] }
          | META_COMMENT                            { result = BibTeX::MetaComment.new(val[0]) }
+         | ERROR                                   { result = BibTeX::Error.new(val[0]) }
 
   at_object : comment                              { result = val[0] }
             | string                               { result = val[0] }

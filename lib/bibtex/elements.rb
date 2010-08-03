@@ -219,7 +219,7 @@ module BibTeX
     end
   end
 
-  class BadObject < Comment
+  class Error < Comment
     def to_s
       @content
     end
