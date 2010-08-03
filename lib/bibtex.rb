@@ -43,6 +43,7 @@ module BibTeX
 
 end
 
+require 'bibtex/string_replacement'
 require 'bibtex/elements'
 require 'bibtex/entry'
 require 'bibtex/parser'
