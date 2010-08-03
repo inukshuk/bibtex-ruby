@@ -24,51 +24,51 @@
 #
 class BibTeX::Parser
 rule
-	target : { result = Bibliography.new }
-         | objects { result = val[0] }
+	target : /* empty */                             { result = Bibliography.new }
+         | objects                                 { result = val[0] }
 
-  objects : object { result = Bibliography.new << val[0] }
-          | objects object { result << val[1] }
+  objects : object                                 { result = Bibliography.new << val[0] }
+          | objects object                         { result << val[1] }
 
-  object : AT at_object { result = val[1] }
-         | META_COMMENT { result = BibTeX::MetaComment.new(val[0]) }
+  object : AT at_object                            { result = val[1] }
+         | META_COMMENT                            { result = BibTeX::MetaComment.new(val[0]) }
 
-  at_object : comment { result = val[0] }
-            | string { result = val[0] }
-            | preamble { result = val[0] }
-            | entry { result = val[0] }
+  at_object : comment                              { result = val[0] }
+            | string                               { result = val[0] }
+            | preamble                             { result = val[0] }
+            | entry                                { result = val[0] }
 
-  comment : COMMENT LBRACE content RBRACE { result = BibTeX::Comment.new(val[2]) }
+  comment : COMMENT LBRACE content RBRACE          { result = BibTeX::Comment.new(val[2]) }
 	
-  content : /* empty */ { result = '' }
-          | CONTENT { result = val[0] }
+  content : /* empty */                            { result = '' }
+          | CONTENT                                { result = val[0] }
   
-  preamble : PREAMBLE LBRACE string_value RBRACE { result = BibTeX::Preamble.new(val[2]) }
+  preamble : PREAMBLE LBRACE string_value RBRACE   { result = BibTeX::Preamble.new(val[2]) }
 
-  string : STRING LBRACE string_assignment RBRACE { result = BibTeX::String.new(val[2][0],val[2][1]); }
+  string : STRING LBRACE string_assignment RBRACE  { result = BibTeX::String.new(val[2][0],val[2][1]); }
 
-  string_assignment : NAME EQ string_value { result = [val[0].downcase.to_sym, val[2]] }
+  string_assignment : NAME EQ string_value         { result = [val[0].downcase.to_sym, val[2]] }
 
-  string_value : string_literal { result = [val[0]] }
+  string_value : string_literal                    { result = [val[0]] }
                | string_value SHARP string_literal { result << val[2] }
 
-  string_literal : NAME { result = val[0].downcase.to_sym }
-                 | STRING_LITERAL { result = val[0] }
+  string_literal : NAME                            { result = val[0].downcase.to_sym }
+                 | STRING_LITERAL                  { result = val[0] }
 
-  entry : entry_head assignments RBRACE { result = val[0] << val[1] }
-        | entry_head assignments COMMA RBRACE { result = val[0] << val[1] }
-        | entry_head RBRACE { result = val[0] }
+  entry : entry_head assignments RBRACE            { result = val[0] << val[1] }
+        | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
+        | entry_head RBRACE                        { result = val[0] }
 
-  entry_head : NAME LBRACE NAME COMMA { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
+  entry_head : NAME LBRACE NAME COMMA              { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
 
-  assignments : assignment { result = val[0] }
-              | assignments COMMA assignment { result.merge!(val[2]) }
+  assignments : assignment                         { result = val[0] }
+              | assignments COMMA assignment       { result.merge!(val[2]) }
 
-  assignment : NAME EQ value { result = { val[0].downcase.to_sym => val[2] } }
+  assignment : NAME EQ value                       { result = { val[0].downcase.to_sym => val[2] } }
 
-  value : string_value { result = val[0] }
-        | NUMBER { result = val[0] }
-        | LBRACE content RBRACE { result = val[1] }
+  value : string_value                             { result = val[0] }
+        | NUMBER                                   { result = val[0] }
+        | LBRACE content RBRACE                    { result = val[1] }
 
 end
 
@@ -81,6 +81,7 @@ end
 	COMMENT_MODE = 0
 	BIBTEX_MODE = 1
 	BRACES_MODE = 2
+	LITERAL_MODE = 3
 
   OBJECT_COMMENT = 0
   OBJECT_STRING = 1
