@@ -27,12 +27,20 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
+    #
+    # Opens and parses the `.bib' file at the given +path+. Returns
+    # a new Bibliography instance corresponding to the file.
+    #
+    # The options argument is passed on to BibTeX::Parser.new.
+    #
     def self.open(path, options={})
       BibTeX::Parser.new(options).parse(File.read(path))
     end
     
+    #
     # Creates a new bibliography; empty if no path is specified, otherwise
     # by parsing the file at the given path.
+    #
     def initialize(data=[])
       @path = path
       @data = []
@@ -42,6 +50,7 @@ module BibTeX
       add(data)
     end
     
+    # Adds a new element, or a list of new elements to the bibliography.
     def add(data)
       raise(ArgumentError,'BibTeX::Bibliography.add data expected to be enumerable or of type BibTeX::Element; was: ' + data.class.name) unless data.respond_to?(:each) || data.kind_of?(Element)
       data.kind_of?(Element) ? self << data : data.each { |d| self << d }
