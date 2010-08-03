@@ -43,7 +43,8 @@ module BibTeX
     end
     
     def add(data)
-      data.each { |d| self << d }
+      raise(ArgumentError,'BibTeX::Bibliography.add data expected to be enumerable or of type BibTeX::Element; was: ' + data.class.name) unless data.respond_to?(:each) || data.kind_of?(Element)
+      data.kind_of?(Element) ? self << data : data.each { |d| self << d }
       self
     end
     
@@ -84,7 +85,7 @@ module BibTeX
     def [](key)
       @entries[key.to_s]
     end
-    
+
     # Returns all @comment objects.
     def comments
       find_by_type(BibTeX::Comment)
@@ -107,6 +108,7 @@ module BibTeX
 
     # Replaces all string constants which are defined in the bibliography.
     def replace_strings(options={})
+      
     end
 
     # Returns true if the bibliography is currently empty.
@@ -122,7 +124,7 @@ module BibTeX
     private
 
     def find_by_type(type)
-      @data.find_all { |x| x.kind_of?(type) }
+      @data.find_all { |x| type.respond_to?(:inject) ? type.inject(false) { |s,n| s || x.kind_of?(n) } : x.kind_of?(type) }
     end
     
     def find_entry(key)
