@@ -30,7 +30,7 @@ expect 0
 
 rule
 
-	bibliography : /* empty */                       { result = Bibliography.new }
+  bibliography : /* empty */                       { result = Bibliography.new }
                | objects                           { result = val[0] }
 
   objects : object                                 { result = Bibliography.new << val[0] }
@@ -46,7 +46,7 @@ rule
             | entry                                { result = val[0] }
 
   comment : COMMENT LBRACE content RBRACE          { result = BibTeX::Comment.new(val[2]) }
-	
+  
   content : /* empty */                            { result = '' }
           | CONTENT                                { result = val[0] }
   
@@ -68,8 +68,8 @@ rule
 
   entry_head : NAME LBRACE key COMMA               { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
 
-	key : NAME                                       { result = val[0] }
-	    | NUMBER                                     { result = val[0] }
+  key : NAME                                       { result = val[0] }
+      | NUMBER                                     { result = val[0] }
 
   assignments : assignment                         { result = val[0] }
               | assignments COMMA assignment       { result.merge!(val[2]) }
@@ -87,43 +87,43 @@ require 'bibtex/lexer'
 
 ---- inner
 
-	attr_reader :lexer
-	
-	def initialize(options={})
-		@options = options
-		@options[:include] ||= [:errors]
-		@lexer = Lexer.new(options)
-	end
+  attr_reader :lexer
+  
+  def initialize(options={})
+    @options = options
+    @options[:include] ||= [:errors]
+    @lexer = Lexer.new(options)
+  end
 
-	def parse(input)
-		@yydebug = self.debug?
-		
-		self.lexer.src = input
-		self.lexer.analyse
-		
-		do_parse
-	end
-	
-	def next_token
-		token = self.lexer.next_token
-		if token[0] == :ERROR
-			self.include_errors? ? token : next_token
-		else
-			[token[0],token[1][0]]
-		end
-	end
-	
-	def debug?
-		@options[:debug] == true || ENV['DEBUG'] == true
-	end
-	
-	def include_errors?
-		@options[:include].include?(:errors)
-	end
-	
-	def on_error(tid, val, vstack)
-		#raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
-		Log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
-	end
+  def parse(input)
+    @yydebug = self.debug?
+    
+    self.lexer.src = input
+    self.lexer.analyse
+    
+    do_parse
+  end
+  
+  def next_token
+    token = self.lexer.next_token
+    if token[0] == :ERROR
+      self.include_errors? ? token : next_token
+    else
+      [token[0],token[1][0]]
+    end
+  end
+  
+  def debug?
+    @options[:debug] == true || ENV['DEBUG'] == true
+  end
+  
+  def include_errors?
+    @options[:include].include?(:errors)
+  end
+  
+  def on_error(tid, val, vstack)
+    #raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
+    Log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
+  end
 
 # -*- racc -*-

@@ -40,11 +40,11 @@ module BibTeX
     #   objects; for a more lenient lexer set to false and objects are
     #   expected to start after a new line (leading white space is permitted).
     #
-  	def initialize(options={})
+    def initialize(options={})
       @options = options
-  		@options[:include] ||= [:errors]
-  		@options[:strict] = true unless @options.has_key?(:strict)
-  		@src = nil
+      @options[:include] ||= [:errors]
+      @options[:strict] = true unless @options.has_key?(:strict)
+      @src = nil
     end
 
     # Sets the source for the lexical analysis and resets the internal state.
@@ -57,7 +57,7 @@ module BibTeX
       @line_breaks = []
       @line_breaks << @src.pos until @src.scan_until(/\n|$/).empty?
       @src.reset
-  	end
+    end
 
     # Returns the line number at a given position in the source.
     def line_number_at(index)
@@ -69,21 +69,21 @@ module BibTeX
       @stack.shift
     end
 
-  	def mode=(mode)
-  		Log.debug("Lexer: switching to #{mode} mode...")
+    def mode=(mode)
+      Log.debug("Lexer: switching to #{mode} mode...")
 
-  		@active_object = case
-  		  when [:comment,:string,:preamble,:entry].include?(mode) then mode
-  		  when mode == :meta then nil
-  		  else @active_object
-  		end
+      @active_object = case
+        when [:comment,:string,:preamble,:entry].include?(mode) then mode
+        when mode == :meta then nil
+        else @active_object
+      end
 
-  		@mode = mode
-  	end
-  	
-  	def mode
-  	  @mode
-  	end
+      @mode = mode
+    end
+    
+    def mode
+      @mode
+    end
 
     # Returns true if the lexer is currenty parsing a BibTeX object.
     def bibtex_mode?
@@ -110,17 +110,17 @@ module BibTeX
       @active_object == object
     end
     
-  	# Pushes a value onto the parse stack.
-  	def push(value)
-  	  case
-  	  when ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
+    # Pushes a value onto the parse stack.
+    def push(value)
+      case
+      when ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
         @stack.last[1][0] << value[1]
         @stack.last[1][1] = line_number_at(@src.pos)
       when value[0] == :ERROR
         @stack.push(value) if @options[:include].include?(:errors)
         leave_object
-  	  when value[0] == :META_COMMENT
-  	    if @options[:include].include?(:meta_comments)
+      when value[0] == :META_COMMENT
+        if @options[:include].include?(:meta_comments)
           value[1] = [value[1], line_number_at(@src.pos)]
           @stack.push(value)
         end
@@ -129,47 +129,47 @@ module BibTeX
         @stack.push(value)
       end
       return self
-  	end
+    end
 
-  	# Start the lexical analysis.
-  	def analyse(src=nil)
-  	  raise(ArgumentError, 'Lexer: failed to start analysis: no source given!') if src.nil? && @src.nil?
+    # Start the lexical analysis.
+    def analyse(src=nil)
+      raise(ArgumentError, 'Lexer: failed to start analysis: no source given!') if src.nil? && @src.nil?
       Log.debug('Lexer: starting lexical analysis...')
-  	  
-  	  self.src = src || @src.string
-  	  self.src.reset
-  	  
-  		until self.src.eos?
-  			case
+      
+      self.src = src || @src.string
+      self.src.reset
+      
+      until self.src.eos?
+        case
         when self.bibtex_mode?
           parse_bibtex
-  			when self.meta_mode?
-  			  parse_meta
+        when self.meta_mode?
+          parse_meta
         when self.content_mode?
           parse_content
-  			when self.literal_mode?
-  			  parse_literal
-  			end
-  		end
-  		
-  		Log.debug('Lexer: finished lexical analysis.')
-  		push [false, '$end']
-  	end
+        when self.literal_mode?
+          parse_literal
+        end
+      end
+      
+      Log.debug('Lexer: finished lexical analysis.')
+      push [false, '$end']
+    end
 
     def parse_bibtex
       case
       when self.src.scan(/[\t\r\n\s]+/o)
-		  when self.src.scan(/\{/o)
-    	  @brace_level += 1
-    		push [:LBRACE,'{']
+      when self.src.scan(/\{/o)
+        @brace_level += 1
+        push [:LBRACE,'{']
         if (@brace_level == 1 && is_active?(:comment)) || (@brace_level == 2 && is_active?(:entry))
           self.mode = :content
         end
-		  when self.src.scan(/\}/o)
-  	    return error_unbalanced_braces if @brace_level < 1
-      	@brace_level -= 1
-    	  push [:RBRACE,'}']
-      	leave_object if @brace_level == 0
+      when self.src.scan(/\}/o)
+        return error_unbalanced_braces if @brace_level < 1
+        @brace_level -= 1
+        push [:RBRACE,'}']
+        leave_object if @brace_level == 0
       when self.src.scan( /=/o)
         push [:EQ,'=']
       when self.src.scan(/,/o)
@@ -192,8 +192,8 @@ module BibTeX
     end
     
     def parse_meta
-			match = self.src.scan_until(@options[:strict] ? /@[\t ]*/o : /(^|\n)[\t ]*@[\t ]*/o)
-			unless self.src.matched.nil?
+      match = self.src.scan_until(@options[:strict] ? /@[\t ]*/o : /(^|\n)[\t ]*@[\t ]*/o)
+      unless self.src.matched.nil?
         push [:META_COMMENT, match.chop]
         enter_object
       else
@@ -206,25 +206,25 @@ module BibTeX
       match = self.src.scan_until(/\{|\}/o)
       case self.src.matched
       when '{'
-			  @brace_level += 1
+        @brace_level += 1
         push [:CONTENT,match]
       when '}'
-    	  @brace_level -= 1
-    	  case
-    	  when @brace_level < 0
+        @brace_level -= 1
+        case
+        when @brace_level < 0
           push [:CONTENT,match.chop]
           error_unbalanced_braces
-    	  when @brace_level == 0
+        when @brace_level == 0
           push [:CONTENT,match.chop]
-      	  push [:RBRACE,'}']
+          push [:RBRACE,'}']
           leave_object
         when @brace_level == 1 && is_active?(:entry)
           push [:CONTENT,match.chop]
-      	  push [:RBRACE,'}']
-      	  self.mode = :bibtex
+          push [:RBRACE,'}']
+          self.mode = :bibtex
         else
           push [:CONTENT, match]
-      	end
+        end
       else
         push [:CONTENT,self.src.rest]
         self.src.terminate
@@ -233,41 +233,41 @@ module BibTeX
     end
     
     def parse_literal
-			match = self.src.scan_until(/[\{\}"\n]/o)
-			case self.src.matched
-			when '{'
-			  @brace_level += 1
+      match = self.src.scan_until(/[\{\}"\n]/o)
+      case self.src.matched
+      when '{'
+        @brace_level += 1
         push [:STRING_LITERAL,match]
-			when '}'
-    	  @brace_level -= 1
-    	  if @brace_level < 1
-  			  push [:STRING_LITERAL,match.chop]
+      when '}'
+        @brace_level -= 1
+        if @brace_level < 1
+          push [:STRING_LITERAL,match.chop]
           error_unbalanced_braces
         else
           push [:STRING_LITERAL,match]
         end
-			when '"'
-			  if @brace_level == 1
+      when '"'
+        if @brace_level == 1
           push [:STRING_LITERAL,match.chop]
-			    self.mode = :bibtex
-			  else
+          self.mode = :bibtex
+        else
           push [:STRING_LITERAL,match]
-			  end
-			when "\n"
+        end
+      when "\n"
         push [:STRING_LITERAL,match.chop]
         error_unterminated_string
-			else
+      else
         push [:STRING_LITERAL,self.src.rest]
         self.src.terminate
-			  error_unterminated_string
-			end
+        error_unterminated_string
+      end
     end
     
-  	# Called when the lexer encounters a new BibTeX object.
-  	def enter_object
-  		@brace_level = 0
-  		self.mode = :bibtex
-  		push [:AT,'@']
+    # Called when the lexer encounters a new BibTeX object.
+    def enter_object
+      @brace_level = 0
+      self.mode = :bibtex
+      push [:AT,'@']
 
       case
       when self.src.scan(/string/io)
@@ -281,19 +281,19 @@ module BibTeX
         push [:COMMENT, self.src.matched]
       when self.src.scan(/[a-z\d:_!\.$%&*-]+/io)
         self.mode = :entry
-  			push [:NAME, self.src.matched]
+        push [:NAME, self.src.matched]
       end
-  	end
+    end
 
-  	# Called when parser leaves a BibTeX object.
-  	def leave_object
-  		self.mode = :meta
-  		@brace_level = 0
-  	end
+    # Called when parser leaves a BibTeX object.
+    def leave_object
+      self.mode = :meta
+      @brace_level = 0
+    end
 
 
     def error_unbalanced_braces
-		  n = line_number_at(self.src.pos)
+      n = line_number_at(self.src.pos)
       Log.warn("Lexer: unbalanced braces on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
       backtrace [:E_UNBALANCED_BRACES, [self.src.matched,n]]
     end
