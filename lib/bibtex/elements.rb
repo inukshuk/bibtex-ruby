@@ -219,9 +219,19 @@ module BibTeX
     end
   end
 
-  class Error < Comment
+  class Error
+    
+    def initialize(content=[])
+      self.content = content
+    end
+
+    def content=(content)
+      raise(ArgumentError, "BibTeX::Error content must be of type Array; was: #{content.class.name}.") unless content.kind_of?(Array)
+      @content = content
+    end
+    
     def to_s
-      @content
+      @content.map { |e| e[1] }.join
     end
     
     # Called when the element was added to a bibliography.
