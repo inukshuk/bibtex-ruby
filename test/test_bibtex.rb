@@ -40,5 +40,10 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert_equal(['A {bunch {of} braces {in}} title'], bib['key03'][:title])
     #TODO missing assertions
   end
+  
+  def test_errors
+    bib = BibTeX::Bibliography.open('test/bib/09_errors.bib', :debug => true)
+    #refute_nil(bib)
+  end
 end
 

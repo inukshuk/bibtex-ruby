@@ -46,5 +46,6 @@ end
 require 'bibtex/string_replacement'
 require 'bibtex/elements'
 require 'bibtex/entry'
+require 'bibtex/error'
 require 'bibtex/parser'
 require 'bibtex/bibliography'

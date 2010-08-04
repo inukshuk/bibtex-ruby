@@ -66,7 +66,10 @@ rule
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
         | entry_head RBRACE                        { result = val[0] }
 
-  entry_head : NAME LBRACE NAME COMMA              { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
+  entry_head : NAME LBRACE key COMMA               { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
+
+	key : NAME                                       { result = val[0] }
+	    | NUMBER                                     { result = val[0] }
 
   assignments : assignment                         { result = val[0] }
               | assignments COMMA assignment       { result.merge!(val[2]) }
@@ -88,6 +91,7 @@ require 'bibtex/lexer'
 	
 	def initialize(options={})
 		@options = options
+		@options[:include] ||= [:errors]
 		@lexer = Lexer.new(options)
 	end
 
@@ -102,11 +106,19 @@ require 'bibtex/lexer'
 	
 	def next_token
 		token = self.lexer.next_token
-		token[0] == :ERROR ? token : [token[0],token[1][0]]
+		if token[0] == :ERROR
+			self.include_errors? ? token : next_token
+		else
+			[token[0],token[1][0]]
+		end
 	end
 	
 	def debug?
 		@options[:debug] == true || ENV['DEBUG'] == true
+	end
+	
+	def include_errors?
+		@options[:include].include?(:errors)
 	end
 	
 	def on_error(tid, val, vstack)

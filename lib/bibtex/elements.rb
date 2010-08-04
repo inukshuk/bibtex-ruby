@@ -219,33 +219,4 @@ module BibTeX
     end
   end
 
-  class Error
-    
-    def initialize(content=[])
-      self.content = content
-    end
-
-    def content=(content)
-      raise(ArgumentError, "BibTeX::Error content must be of type Array; was: #{content.class.name}.") unless content.kind_of?(Array)
-      @content = content
-    end
-    
-    def to_s
-      @content.map { |e| e[1] }.join
-    end
-    
-    # Called when the element was added to a bibliography.
-    def added_to_bibliography(bibliography)
-      super(bibliography)
-      bibliography.errors << self
-      self
-    end
-    
-    # Called when the element was removed from a bibliography.
-    def removed_from_bibliography(bibliography)
-      super(bibliography)
-      bibliography.errors.delete(self)
-      self
-    end
-  end
 end

@@ -32,7 +32,7 @@ module BibTeX
     # Creates a new instance. Possible options and their respective
     # default values are:
     #
-    # - :include => [] A list that may contain :meta_comments, and
+    # - :include => [:errors] A list that may contain :meta_comments, and
     #   :errors; depending on whether or not these are present, the respective
     #   tokens are included in the parse tree.
     # - :strict => true In strict mode objects can start anywhere; therefore
@@ -117,7 +117,7 @@ module BibTeX
         @stack.last[1][0] << value[1]
         @stack.last[1][1] = line_number_at(@src.pos)
       when value[0] == :ERROR
-        @stack.push(value)
+        @stack.push(value) if @options[:include].include?(:errors)
         leave_object
   	  when value[0] == :META_COMMENT
   	    if @options[:include].include?(:meta_comments)
@@ -178,7 +178,7 @@ module BibTeX
         push [:SHARP,'#']
       when self.src.scan(/\d+/o)
         push [:NUMBER,self.src.matched]
-      when self.src.scan(/[a-z\d:_!$%&*-]+/io)
+      when self.src.scan(/[a-z\d:_!$\.%&*-]+/io)
         push [:NAME,self.src.matched]
       when self.src.scan(/"/o)
         self.mode = :literal
@@ -218,9 +218,12 @@ module BibTeX
           push [:CONTENT,match.chop]
       	  push [:RBRACE,'}']
           leave_object
+        when @brace_level == 1 && is_active?(:entry)
+          push [:CONTENT,match.chop]
+      	  push [:RBRACE,'}']
+      	  self.mode = :bibtex
         else
           push [:CONTENT, match]
-      	  self.mode = :bibtex if @brace_level == 1 && is_active?(:entry)
       	end
       else
         push [:CONTENT,self.src.rest]
@@ -276,7 +279,7 @@ module BibTeX
       when self.src.scan(/comment/io)
         self.mode = :comment
         push [:COMMENT, self.src.matched]
-      when self.src.scan(/[a-z\d:_!$%&*-]+/io)
+      when self.src.scan(/[a-z\d:_!\.$%&*-]+/io)
         self.mode = :entry
   			push [:NAME, self.src.matched]
       end
@@ -292,41 +295,33 @@ module BibTeX
     def error_unbalanced_braces
 		  n = line_number_at(self.src.pos)
       Log.warn("Lexer: unbalanced braces on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
-      push [:ERROR, [self.src.matched,n]]
+      backtrace [:E_UNBALANCED_BRACES, [self.src.matched,n]]
     end
     
     def error_unterminated_string
       n = line_number_at(self.src.pos)
       Log.warn("Lexer: unterminated string on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
-      push [:ERROR, [self.src.matched,n]]
+      backtrace [:E_UNTERMINATED_STRING, [self.src.matched,n]]
     end
 
     def error_unterminated_content
       n = line_number_at(self.src.pos)
       Log.warn("Lexer: unterminated content on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
-      push [:ERROR, [self.src.matched,n]]
+      backtrace [:E_UNTERMINATED_CONTENT, [self.src.matched,n]]
     end
     
     def error_unexpected_token
       n = line_number_at(self.src.pos)
       Log.warn("Lexer: unexpected token `#{self.src.matched}' on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
-      push [:ERROR, [self.src.matched,n]]
+      backtrace [:E_UNEXPECTED_TOKEN, [self.src.matched,n]]
     end
     
     def backtrace(error)
-      trace = self.pop_until(:AT)
+      trace = []
+      trace.unshift(@stack.pop) until @stack.empty? || (!trace.empty? && [:AT,:META_COMMENT].include?(trace[0][0]))
       trace << error
-      push [:ERROR,trace] if @options[:include].include?(:errors)
+      push [:ERROR,trace]
     end
-    
-  	def pop_until(token)
-  	  bt = []
-  	  last_token = nil
-  	  while !@stack.empty? && last_token != token do
-  	    last_token = bt.unshift(@stack.pop)[0][0]
-  	  end
-  	  return bt
-  	end
 
   end
   
