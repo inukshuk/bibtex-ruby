@@ -28,9 +28,22 @@ module BibTeX
 
     attr_reader :src, :options, :stack
     
+    #
+    # Creates a new instance. Possible options and their respective
+    # default values are:
+    #
+    # - :include => [:errors] A list that may contain :meta_comments, and
+    #   :errors; depending on whether or not these are present, the respective
+    #   tokens are included in the parse tree.
+    # - :strict => true In strict mode objects can start anywhere; therefore
+    #   the `@' symbol is not possible except inside literals or @comment
+    #   objects; for a more lenient lexer set to false and objects are
+    #   expected to start after a new line (leading white space is permitted).
+    #
   	def initialize(options={})
       @options = options
-  		@options[:include] ||= []
+  		@options[:include] ||= [:errors]
+  		@options[:strict] = true unless @options.has_key?(:strict)
   		@src = nil
     end
 
@@ -83,8 +96,8 @@ module BibTeX
     end
 
     # Returns true if the lexer is currently parsing a braced-out expression.
-    def braces_mode?
-      self.mode == :braces
+    def content_mode?
+      self.mode == :content
     end
 
     # Returns true if the lexer is currently parsing a string literal.
@@ -99,14 +112,14 @@ module BibTeX
     
   	# Pushes a value onto the parse stack.
   	def push(value)
-  	  value[1] = [value[1], line_number_at(@src.pos)]
   	  case
   	  when ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
-        @stack.last[1][0] << value[1][0]
+        @stack.last[1][0] << value[1]
       when value[0] == :ERROR
-        self.pop_until(:AT).each { |t| value[1][0] << t }
+        self.pop_until(:AT).each { |t| value[1] << t }
         @stack.push(value)
       else
+        value[1] = [value[1], line_number_at(@src.pos)]
         @stack.push(value)
       end
       return self
@@ -123,51 +136,13 @@ module BibTeX
   		until self.src.eos?
   			case
         when self.bibtex_mode?
-  				case
-          when self.src.scan(/[\t\r\n\s]+/o)
-				  when self.src.scan(/\{/o) then lbrace
-				  when self.src.scan(/\}/o) then rbrace
-          when self.src.scan( /=/o) then push [:EQ,'=']
-          when self.src.scan(/,/o) then push [:COMMA,',']
-          when self.src.scan(/#/o) then push [:SHARP,'#']
-          when self.src.scan(/\d+/o) then push [:NUMBER,self.src.matched]
-          when self.src.scan(/[a-z\d:_!$%&*-]+/io) then push [:NAME,self.src.matched]
-          when self.src.scan(/"/o) then self.mode = :literal
-          when self.src.scan(/.|\n/o) then push [self.src.matched,self.src.matched]
-          end
+          parse_bibtex
   			when self.meta_mode?
-  				data = self.src.scan_until(/(^|\n)[\t ]*@[\t ]*/o)
-  				unless data.nil?
-            push [:META_COMMENT,data.chop] if @options[:include].include?(:meta_comments)
-            enter_object
-          else
-            push [:META_COMMENT,self.src.rest] if @options[:include].include?(:meta_comments)
-            self.src.terminate
-          end
-        when self.braces_mode?
-          data = self.src.scan_until(/\{|\}/o)
-          unless data.nil?
-            push [:CONTENT,data.chop]
-            self.src.matched == '{' ? lbrace : rbrace
-          else
-            Log.warn("Lexer: unterminated braces at position #{self.src.pos}.")
-            push [:ERROR,[[:ERROR,self.src.rest]]]
-            self.src.terminate
-          end
+  			  parse_meta
+        when self.content_mode?
+          parse_content
   			when self.literal_mode?
-  				data = self.src.scan_until(/[\{\}"]/o)
-  				unless data.nil?
-            push [:STRING_LITERAL,data.chop]
-  				  case self.src.matched
-  					when '{' then lbrace
-  					when '}' then rbrace
-  					when '"' then if @brace_level == 1 then self.mode = :bibtex else push [:STRING_LITERAL,self.src.matched] end
-  					end
-  				else
-            Log.warn("Lexer: unterminated string literal at position #{self.src.pos}.")
-            push [:ERROR,[[:ERROR,self.src.rest]]]
-            self.src.terminate
-          end
+  			  parse_literal
   			end
   		end
   		
@@ -175,7 +150,71 @@ module BibTeX
   		push [false, '$end']
   	end
 
+    def parse_bibtex
+      case
+      when self.src.scan(/[\t\r\n\s]+/o)
+		  when self.src.scan(/\{/o)
+		    lbrace
+		  when self.src.scan(/\}/o)
+		    rbrace
+      when self.src.scan( /=/o)
+        push [:EQ,'=']
+      when self.src.scan(/,/o)
+        push [:COMMA,',']
+      when self.src.scan(/#/o)
+        push [:SHARP,'#']
+      when self.src.scan(/\d+/o)
+        push [:NUMBER,self.src.matched]
+      when self.src.scan(/[a-z\d:_!$%&*-]+/io)
+        push [:NAME,self.src.matched]
+      when self.src.scan(/"/o)
+        self.mode = :literal
+      when self.src.scan(/.|\n/o)
+        push [self.src.matched,self.src.matched]
+      end
+    end
+    
+    def parse_meta
+			m = self.src.scan_until(@options[:strict] ? /@[\t ]*/o : /(^|\n)[\t ]*@[\t ]*/o)
+			unless m.nil?
+        push [:META_COMMENT,m.chop] if @options[:include].include?(:meta_comments)
+        enter_object
+      else
+        push [:META_COMMENT,self.src.rest] if @options[:include].include?(:meta_comments)
+        self.src.terminate
+      end
+    end
 
+    def parse_content
+      m = self.src.scan_until(/\{|\}/o)
+      unless m.nil?
+        push [:CONTENT,m.chop]
+        self.src.matched == '{' ? lbrace : rbrace
+      else
+        n = line_number_at(self.src.pos)
+        Log.warn("Lexer: unterminated braces on line #{n}.")
+        push [:ERROR,[[:ERROR,[self.src.rest,n]]]] if @options[:include].include?(:errors)
+        self.src.terminate
+      end
+    end
+    
+    def parse_literal
+			m = self.src.scan_until(/[\{\}"]/o)
+			unless m.nil?
+        push [:STRING_LITERAL,m.chop]
+			  case self.src.matched
+				when '{' then lbrace
+				when '}' then rbrace
+				when '"' then if @brace_level == 1 then self.mode = :bibtex else push [:STRING_LITERAL,self.src.matched] end
+				end
+			else
+        n = line_number_at(self.src.pos)
+        Log.warn("Lexer: unterminated string literal at position #{n}.")
+        push [:ERROR,[[:ERROR,[self.src.rest,n]]]] if @options[:include].include?(:errors)
+        self.src.terminate
+      end
+    end
+    
   	# Called when the lexer encounters a new BibTeX object.
   	def enter_object
   		@brace_level = 0
@@ -217,10 +256,10 @@ module BibTeX
     		# check whether entering a new object or a braced string
     		if @brace_level == 1
     			push [:LBRACE,'{']
-          self.mode = :braces if is_active?(:comment)
+          self.mode = :content if is_active?(:comment)
     		else
-    			push self.braces_mode? ? [:CONTENT,self.src.matched] : [:LBRACE, '{']
-          self.mode = :braces if @brace_level == 2 && is_active?(:entry)
+    			push self.content_mode? ? [:CONTENT,self.src.matched] : [:LBRACE, '{']
+          self.mode = :content if @brace_level == 2 && is_active?(:entry)
     		end
     	end
   	end
@@ -240,7 +279,7 @@ module BibTeX
     		else
           @brace_level -= 1
           self.mode = :bibtex if @brace_level == 1 && is_active?(:entry)
-    			push self.braces_mode? ? [:CONTENT,self.src.matched] : [:RBRACE, '}']
+    			push self.content_mode? ? [:CONTENT,self.src.matched] : [:RBRACE, '}']
     		end
     	end
   	end

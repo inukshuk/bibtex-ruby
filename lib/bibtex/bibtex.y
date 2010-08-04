@@ -102,7 +102,7 @@ require 'bibtex/lexer'
 	
 	def next_token
 		token = self.lexer.next_token
-		[token[0],token[1][0]]
+		token[0] == :ERROR ? token : [token[0],token[1][0]]
 	end
 	
 	def debug?

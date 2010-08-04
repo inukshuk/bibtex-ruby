@@ -18,6 +18,13 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert(bib.empty?)
   end
 
+  def test_no_bibtex
+    bib = BibTeX::Bibliography.open('test/bib/01_no_bibtex.bib', :debug => true)
+    refute_nil(bib)
+    assert_equal(BibTeX::Bibliography, bib.class)
+    assert(bib.empty?)
+  end
+
   def test_decoret
     bib = BibTeX::Bibliography.open('test/bib/08_decoret.bib', :debug => true)
     refute_nil(bib)
