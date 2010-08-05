@@ -1,6 +1,6 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010  Sylvester Keil <sylvester.keil.or.at>
+# Copyright (C) 2010	Sylvester Keil <sylvester.keil.or.at>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
 #
 # = BibTeX
@@ -28,24 +28,25 @@
 # License:: GNU GPL 3.0
 #
 module BibTeX
-  require 'logger'
+	require 'logger'
+  require 'yaml'
 
-  # The current library version.
-  VERSION = '0.0.1'
+	# The current library version.
+	VERSION = '0.0.1'
 
-  #
-  # An instance of the Ruby core class +Logger+.
-  # Used for logging by BibTeX-Ruby.
-  #
-  Log = Logger.new(STDERR)
-  Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
-  Log.datetime_format = "%Y-%m-%d %H:%M:%S"
+	#
+	# An instance of the Ruby core class +Logger+.
+	# Used for logging by BibTeX-Ruby.
+	#
+	Log = Logger.new(STDERR)
+	Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
+	Log.datetime_format = "%Y-%m-%d %H:%M:%S"
+
+  require 'bibtex/string_replacement'
+  require 'bibtex/elements'
+  require 'bibtex/entry'
+  require 'bibtex/error'
+  require 'bibtex/parser'
+  require 'bibtex/bibliography'
 
 end
-
-require 'bibtex/string_replacement'
-require 'bibtex/elements'
-require 'bibtex/entry'
-require 'bibtex/error'
-require 'bibtex/parser'
-require 'bibtex/bibliography'

@@ -149,6 +149,10 @@ module BibTeX
       @data.map(&:to_s).join
     end
     
+    def to_yaml
+      @data.map(&:to_yaml).join
+    end
+    
     private
 
     def find_by_type(type)
