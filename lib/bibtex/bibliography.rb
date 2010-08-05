@@ -153,6 +153,15 @@ module BibTeX
       @data.map(&:to_yaml).join
     end
     
+    def to_xml
+      xml = REXML::Document.new
+      xml << REXML::XMLDecl.new('1.0','UTF-8')
+      root = REXML::Element.new('bibliography')
+      @data.each { |e| root.add_element(e.to_xml) }
+      xml << root
+      xml
+    end
+    
     private
 
     def find_by_type(type)

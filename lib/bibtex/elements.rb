@@ -16,6 +16,9 @@
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'json'
+require 'rexml/document'
+require 'yaml'
 
 module BibTeX
 
@@ -40,11 +43,22 @@ module BibTeX
 			self.content
 		end
 		
-		def to_yaml
-		  { self.class.name => content }
+		def to_hash
+		  { self.class.name.downcase => content }
+	  end
+	  
+	  def to_yaml
+	    self.to_hash.to_yaml
+	  end
+	  
+	  def to_json
+	    self.to_hash.to_json
 	  end
 	  
 	  def to_xml
+	    xml = REXML::Element.new(self.class.name.downcase)
+	    xml.text = self.content
+	    xml
 	  end
 
 		# Called when the element was added to a bibliography.
@@ -152,11 +166,17 @@ module BibTeX
 			['@string{ ',content,'}'].join
 		end
 		
-		def to_yaml
-		  { :string => { @key => @value } }.to_yaml
+		def to_hash
+		  { 'string' => { @key.to_s => StringReplacement.to_s(@value) } }
 		end
 		
 		def to_xml
+		  xml = REXML::Element.new('string')
+		  key = REXML::Element.new('key')
+		  val = REXML::Element.new('value')
+		  key.text = @key.to_s
+		  val.text = @value.to_s
+		  xml
 		end
 	end
 
@@ -197,6 +217,10 @@ module BibTeX
 		def to_s
 			['@preamble{ ',content,'}'].join
 		end
+		
+		def to_hash
+		  { 'preamble' => StringReplacement.to_s(@value) }
+		end
 	end
 
 	# Represents a @comment object.
@@ -218,6 +242,7 @@ module BibTeX
 		def to_s
 			['@comment{ ',content,'}'].join
 		end
+		
 	end
 
 	# Represents text in a `.bib' file, but outside of an

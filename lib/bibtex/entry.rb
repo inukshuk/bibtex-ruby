@@ -136,11 +136,19 @@ module BibTeX
 			["@#{type}{#{key},",content.gsub(/^/,'  '),"}\n"].join("\n")
 		end
 		
-		def to_yaml
+		def to_hash
 		  { @type.to_s => @fields.keys.map { |k| { k.to_s => StringReplacement.to_s(@fields[k], :delimiter => ['{','}']) } }.inject({ 'key' => @key }) { |sum,n| sum.merge(n) } }.to_yaml
 		end
 		
 		def to_xml
+  		xml = REXML::Element.new(@type.to_s)
+  		xml.attributes['key'] = @key
+      @fields.each do |k,v|
+        e = REXML::Element.new(k.to_s)
+        e.text = StringReplacement.to_s(v, :delimiter => ['',''])
+        xml.add_element(e)
+      end
+      xml
 		end
 	end
 end

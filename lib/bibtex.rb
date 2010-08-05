@@ -29,7 +29,6 @@
 #
 module BibTeX
 	require 'logger'
-  require 'yaml'
 
 	# The current library version.
 	VERSION = '0.0.1'
