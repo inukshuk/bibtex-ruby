@@ -2,7 +2,10 @@
 
 The BibTeX-Ruby package contains a parser for BibTeX
 bibliography files and a class structure to manage BibTeX objects in
-Ruby.
+Ruby. It is designed to support all BibTeX objects (including @comment and
+string-replacements via @string) and handles all content outside of BibTeX
+objects as `meta comments' which may be included in post-processing.
+
 
 == Quickstart
 
@@ -33,9 +36,11 @@ Or, alternatively, fork the (project on github)[http://github.com/inukshuk/bibte
 * The parser generator {+racc+}[http://i.loveruby.net/en/projects/racc/] is required to generate parser.
 * The +minitest+ gem is required to run the tests in older Ruby versions (prior to 1.9).
 
+
 == Usage
 
-TODO
+Look at the `examples' directory for a simple BibTeX to HTML converter.
+
 
 == The Parser
 
@@ -121,7 +126,8 @@ a concatenation of literals and constants.
 
 === Entries
 
-TODO
+These represent proper BibTeX objects (e.g., @book, @collection, etc.).
+
 
 == Credits
 

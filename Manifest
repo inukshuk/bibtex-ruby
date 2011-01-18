@@ -3,9 +3,8 @@ LICENSE
 Manifest
 README.rdoc
 Rakefile
-bibtex-ruby.gemspec
-example/bib2html.rb
-example/example.bib
+examples/bib2html.rb
+examples/markdown.bib
 lib/bibtex.rb
 lib/bibtex/bibliography.rb
 lib/bibtex/bibtex.y
@@ -27,7 +26,7 @@ test/bib/06_preamble.bib
 test/bib/07_entry.bib
 test/bib/08_decoret.bib
 test/bib/09_errors.bib
-test/bib/10_bibtex.bib
+test/bib/10_bibdesk.bib
 test/test_bibtex.rb
 test/test_comment.rb
 test/test_entry.rb

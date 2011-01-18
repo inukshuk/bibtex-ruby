@@ -7,7 +7,7 @@ require 'rake/rdoctask'
 require 'rake/testtask'
 require 'echoe'
 
-Echoe.new('bibtex-ruby', '0.0.1') do |p|
+Echoe.new('bibtex-ruby', '1.0.0') do |p|
   p.description    = "A BibTeX parser written in Ruby"
   p.url            = "http://github.com/inukshuk/bibtex-ruby"
   p.author         = "Sylvester Keil"
