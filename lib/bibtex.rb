@@ -31,7 +31,7 @@ module BibTeX
 	require 'logger'
 
 	# The current library version.
-	VERSION = '0.0.1'
+	VERSION = '1.0.0'
 
 	#
 	# An instance of the Ruby core class +Logger+.
