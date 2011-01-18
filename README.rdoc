@@ -9,26 +9,14 @@ Ruby.
 * require 'bibtex'
 * bib = BibTeX::Bibliography.open('file.bib')
 
-== License
-
-BibTeX-Ruby
-Copyright (C) 2010 {Sylvester Keil}[http://sylvester.keil.or.at]
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 
 == Installation
+
+If you just want to use it:
+
+* gem install bibtex-ruby
+
+If you want to work with the sources:
 
 * gem install racc
 * git clone http://github.com/inukshuk/bibtex-ruby.git
@@ -36,6 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 * rake racc
 * rake rdoc
 * rake test
+
+Or, alternatively, fork the (project on github)[http://github.com/inukshuk/bibtex-ruby.git].
+
 
 == Requirements
 
@@ -71,7 +62,7 @@ extension `.bib'. This file may contain any number of BibTeX objects;
 everything that is not a BibTeX object is assumed to be a comment and
 ignored.
 
-The individual objects are discussed in furter detail below. First, however, a
+The individual objects are discussed in further detail below. First, however, a
 number of general remarks:
 
 * BibTeX-Ruby begins in comment-mode, treating all text it encounters as comments.
@@ -135,3 +126,21 @@ TODO
 == Credits
 
 The BibTeX-Ruby package was written by {Sylvester Keil}[http://sylvester.keil.or.at/].
+
+== License
+
+BibTeX-Ruby
+Copyright (C) 2010-2011 {Sylvester Keil}[http://sylvester.keil.or.at]
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

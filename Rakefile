@@ -1,28 +1,21 @@
+# -*- ruby -*-
+
 require 'rubygems'
 require 'rake'
 require 'rake/clean'
 require 'rake/rdoctask'
 require 'rake/testtask'
-require 'rake/gempackagetask'
+require 'echoe'
 
-spec = Gem::Specification.new do |s|
-  s.name = "bibtex-ruby"
-  s.summary = "Parse BibTeX files"
-  s.description = File.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
-  s.requirements << 'racc (for parser generation)'
-  s.version = '0.0.1'
-  s.author = "Sylvester Keil"
-  s.email = "sylvester@keil.or.at"
-  s.homepage = "http://sylvester.keil.or.at"
-  s.platform = Gem::Platform::RUBY
-  s.required_ruby_version = '>= 1.8.1'
-  s.files = Dir['**/**']
-  s.test_files = Dir['test/test*.rb']
-  s.has_rdoc = true
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.need_tar_bz2
+Echoe.new('bibtex-ruby', '0.0.1') do |p|
+  p.description    = "A BibTeX parser written in Ruby"
+  p.url            = "http://github.com/inukshuk/bibtex-ruby"
+  p.author         = "Sylvester Keil"
+  p.email          = "http://sylvester.keil.or.at"
+  p.ignore_pattern = []
+  p.development_dependencies = [['racc', '>=1.4.6']]
+  p.need_tgz       = true
+  p.rdoc_options   = ["--line-numbers", "--inline-source", "--title", "BibTeX-Ruby Documentation", "--main", "README.rdoc"]
 end
 
 Rake::RDocTask.new(:rdoc_task) do |rd|
@@ -56,3 +49,6 @@ end
 CLEAN.include('lib/bibtex/parser.rb')
 CLEAN.include('lib/bibtex/parser.output')
 CLEAN.include('doc/html')
+
+
+# vim: syntax=ruby

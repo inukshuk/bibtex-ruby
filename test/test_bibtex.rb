@@ -45,5 +45,14 @@ class TestBibtex < MiniTest::Unit::TestCase
     bib = BibTeX::Bibliography.open('test/bib/09_errors.bib', :debug => true)
     #refute_nil(bib)
   end
+  
+  def test_bibdesk
+    bib = BibTeX::Bibliography.open('test/bib/10_bibdesk.bib', :debug => true)
+    refute_nil(bib)
+    assert_equal(BibTeX::Bibliography, bib.class)
+    assert_equal(3, bib.length)
+    assert_equal('rails', bib.data[0].key)
+    assert_equal(['2010-08-05 10:06:32 +0200'], bib[:dragon]['date-modified'])
+  end
 end
 
