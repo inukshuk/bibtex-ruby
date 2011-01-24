@@ -1,5 +1,4 @@
-require 'rubygems'
-require 'bibtex'
+require File.expand_path('../../lib/bibtex.rb', __FILE__)
 require 'minitest/unit'
 require 'minitest/autorun'
 
