@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
-#
+
+$:.unshift(File.dirname(__FILE__)) unless
+  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
+
+
 # = BibTeX
 #
 # This module encompasses a parser for BibTeX files and
@@ -31,7 +35,7 @@ module BibTeX
 	require 'logger'
 
 	# The current library version.
-	VERSION = '1.0.0'
+	VERSION = '1.1.0'
 
 	#
 	# An instance of the Ruby core class +Logger+.

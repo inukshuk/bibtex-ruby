@@ -137,7 +137,7 @@ module BibTeX
 		end
 		
 		def to_hash
-		  { @type.to_s => @fields.keys.map { |k| { k.to_s => StringReplacement.to_s(@fields[k], :delimiter => ['{','}']) } }.inject({ 'key' => @key }) { |sum,n| sum.merge(n) } }.to_yaml
+		  @fields.keys.map { |k| { k.to_s => StringReplacement.to_s(@fields[k], :delimiter => ['{','}']) } }.inject({ 'key' => @key, 'type' => @type.to_s }) { |sum,n| sum.merge(n) }
 		end
 		
 		def to_xml

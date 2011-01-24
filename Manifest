@@ -4,10 +4,10 @@ Manifest
 README.rdoc
 Rakefile
 examples/bib2html.rb
+examples/bib2yaml.rb
 examples/markdown.bib
 lib/bibtex.rb
 lib/bibtex/bibliography.rb
-lib/bibtex/bibtex.y
 lib/bibtex/elements.rb
 lib/bibtex/entry.rb
 lib/bibtex/error.rb
@@ -15,7 +15,6 @@ lib/bibtex/lexer.rb
 lib/bibtex/parser.output
 lib/bibtex/parser.rb
 lib/bibtex/string_replacement.rb
-lib/extensions/core.rb
 test/bib/00_empty.bib
 test/bib/01_no_bibtex.bib
 test/bib/02_string.bib
@@ -30,5 +29,6 @@ test/bib/10_bibdesk.bib
 test/test_bibtex.rb
 test/test_comment.rb
 test/test_entry.rb
+test/test_export.rb
 test/test_preamble.rb
 test/test_string.rb

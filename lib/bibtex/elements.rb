@@ -16,7 +16,6 @@
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require 'json'
 require 'rexml/document'
 require 'yaml'
 
@@ -52,6 +51,7 @@ module BibTeX
 	  end
 	  
 	  def to_json
+	    require 'json'
 	    self.to_hash.to_json
 	  end
 	  

@@ -149,10 +149,11 @@ module BibTeX
       @data.map(&:to_s).join
     end
     
+    # Returns a YAML representation of the bibliography. Only BibTeX entries are exported.
     def to_yaml
-      @data.map(&:to_yaml).join
+      @entries.values.map(&:to_hash).to_yaml
     end
-    
+        
     def to_xml
       xml = REXML::Document.new
       xml << REXML::XMLDecl.new('1.0','UTF-8')

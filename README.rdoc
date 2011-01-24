@@ -11,6 +11,7 @@ objects as `meta comments' which may be included in post-processing.
 
 * require 'bibtex'
 * bib = BibTeX::Bibliography.open('file.bib')
+* bib.to_yaml
 
 
 == Installation
@@ -35,11 +36,12 @@ Or, alternatively, fork the (project on github)[http://github.com/inukshuk/bibte
 
 * The parser generator {+racc+}[http://i.loveruby.net/en/projects/racc/] is required to generate parser.
 * The +minitest+ gem is required to run the tests in older Ruby versions (prior to 1.9).
+* The +json+ gem is required on older ruby versions for JSON export.
 
 
 == Usage
 
-Look at the `examples' directory for a simple BibTeX to HTML converter.
+Look at the `examples' directory for a simple BibTeX to YAML and BibTeX to HTML converter.
 
 
 == The Parser
