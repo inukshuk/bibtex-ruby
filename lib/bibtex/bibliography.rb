@@ -158,12 +158,13 @@ module BibTeX
     def to_json
       @entries.values.map(&:to_hash).to_json
     end
-        
+    
+    # Returns an XML representation of the bibliography. Only BibTeX entries are exported.
     def to_xml
       xml = REXML::Document.new
       xml << REXML::XMLDecl.new('1.0','UTF-8')
       root = REXML::Element.new('bibliography')
-      @data.each { |e| root.add_element(e.to_xml) }
+      @entries.values.each { |e| root.add_element(e.to_xml) }
       xml << root
       xml
     end
