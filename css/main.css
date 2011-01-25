@@ -1,0 +1,90 @@
+body {
+	background-color: black;
+	background-image: url('../assets/tile.png');
+	background-position: top left;
+	background-repeat: repeat;
+	font-family: Georgia, serif;
+	color: black;
+}
+
+#container {
+	position: relative;
+	margin: 5em auto;
+	padding: 80px 20px 20px 20px;
+	background-color: white;
+	max-width: 660px;
+	-webkit-border-radius:  7px 7px 7px 7px;
+	-moz-border-radius:  7px 7px 7px 7px;
+	border-radius:  7px 7px 7px 7px;
+}
+#container {
+	-webkit-box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
+	box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
+}
+
+#ribbon {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: 0;
+}
+
+#download {
+	float: right;
+}
+
+#download a img:hover {
+	opacity: 0.65;
+}
+
+
+h1 {
+  margin: 80px 0 40px 0;
+  font-size: 40px;
+}
+
+h1 em {
+	font-style: normal;
+	font-size: 15px;
+}
+
+h2 {
+  margin: 40px 0 15px 0;
+  padding-top: 20px;
+  border: 0;
+  border-top: 1px solid #aaa;
+  font-size: 20px;
+}
+
+h3 {
+	color: black;
+	margin: 20px 0 10px 0;
+}
+
+p {
+	margin: 1em 0 1em 0;
+}
+
+pre {
+	background: black;
+	color: white;
+	padding: 15px;
+	font-size: 90%;
+	white-space: pre-wrap;
+	-webkit-border-radius:  7px 7px 7px 7px;
+	-moz-border-radius:  7px 7px 7px 7px;
+	border-radius:  7px 7px 7px 7px;
+}
+
+hr {
+	border: 0;
+	width: 80%;
+	border-bottom: 1px solid #aaa
+}
+
+.footer {
+	text-align: center;
+	padding-top: 30px;
+	font-style: italic;
+}
