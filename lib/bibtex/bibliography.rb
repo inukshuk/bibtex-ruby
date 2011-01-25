@@ -153,6 +153,11 @@ module BibTeX
     def to_yaml
       @entries.values.map(&:to_hash).to_yaml
     end
+    
+    # Returns a JSON representation of the bibliography. Only BibTeX entries are exported.
+    def to_json
+      @entries.values.map(&:to_hash).to_json
+    end
         
     def to_xml
       xml = REXML::Document.new
