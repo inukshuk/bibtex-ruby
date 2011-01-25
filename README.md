@@ -12,9 +12,23 @@ be included in post-processing.
 Quickstart
 ----------
 
-* require 'bibtex'
-* bib = BibTeX::Bibliography.open('file.bib')
-* bib.to_yaml
+		$ irb
+		> require 'bibtex'
+		 => true
+		> bib = BibTeX::Bibliography.open('./ruby.bib')
+		 => book{pickaxe,
+		  address  {Raleigh, North Carolina},
+		  author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+		  date-added  {2010-08-05 09:54:07 0200},
+		  date-modified  {2010-08-05 10:07:01 0200},
+		  keywords  {ruby},
+		  publisher  {The Pragmatic Bookshelf},
+		  series  {The Facets of Ruby},
+		  title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
+		  year  {2009}
+		}
+		> bib[:pickaxe][:author]
+		 => ["Thomas, Dave, and Fowler, Chad, and Hunt, Andy"]
 
 
 Installation
@@ -55,17 +69,17 @@ regular BibTeX elements; however, if you wish to include everything, simply add
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
 For example, if your bibliography object `bib` contained the following entry:
 
-		@book[pickaxe,
-		  address = [Raleigh, North Carolina],
-		  author = [Thomas, Dave, and Fowler, Chad, and Hunt, Andy],
-		  date-added = [2010-08-05 09:54:07 +0200],
-		  date-modified = [2010-08-05 10:07:01 +0200],
-		  keywords = [ruby],
-		  publisher = [The Pragmatic Bookshelf],
-		  series = [The Facets of Ruby],
-		  title = [Programming Ruby 1.9: The Pragmatic Programmer's Guide],
-		  year = [2009]
-		]
+		@book{pickaxe,
+		  address = {Raleigh, North Carolina},
+		  author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+		  date-added = {2010-08-05 09:54:07 +0200},
+		  date-modified = {2010-08-05 10:07:01 +0200},
+		  keywords = {ruby},
+		  publisher = {The Pragmatic Bookshelf},
+		  series = {The Facets of Ruby},
+		  title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+		  year = {2009}
+		}
 		
 You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]`;
 you also have easy access to individual fields, for example: `bib[:pickaxe](:author)`.

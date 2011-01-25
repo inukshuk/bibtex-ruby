@@ -1,3 +1,8 @@
+=== 1.1.1 / 2011-01-25
+
+* Improved JSON and XML export.
+* Added more examples to README.
+
 === 1.1.0 / 2011-01-24
 
 * Improved YAML export.
@@ -8,4 +13,4 @@
 
 === 1.0.0 / 2011-01-17
 
-* Initial Release. See README.rdoc for further details.
+* Initial Release. See README.md for further details.
