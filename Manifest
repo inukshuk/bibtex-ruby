@@ -3,7 +3,6 @@ LICENSE
 Manifest
 README.md
 Rakefile
-bin
 examples
 examples/bib2html.rb
 examples/bib2yaml.rb
