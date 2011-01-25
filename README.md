@@ -1,55 +1,107 @@
-= BibTeX-Ruby
+BibTeX-Ruby
+===========
 
 The BibTeX-Ruby package contains a parser for BibTeX
 bibliography files and a class structure to manage BibTeX objects in
-Ruby. It is designed to support all BibTeX objects (including @comment and
-string-replacements via @string) and handles all content outside of BibTeX
-objects as `meta comments' which may be included in post-processing.
+Ruby. It is designed to support all BibTeX objects (including @comment,
+string-replacements via @string, as well as string concatenation using `#')
+and handles all content outside of BibTeX objects as `meta comments' which may
+be included in post-processing.
 
 
-== Quickstart
+Quickstart
+----------
 
 * require 'bibtex'
 * bib = BibTeX::Bibliography.open('file.bib')
 * bib.to_yaml
 
 
-== Installation
+Installation
+------------
 
 If you just want to use it:
 
-* gem install bibtex-ruby
+		$ [sudo] gem install bibtex-ruby
 
 If you want to work with the sources:
 
-* gem install racc
-* git clone http://github.com/inukshuk/bibtex-ruby.git
-* cd bibtex-ruby
-* rake racc
-* rake rdoc
-* rake test
+		$ [sudo] gem install racc
+		$ git clone http://github.com/inukshuk/bibtex-ruby.git
+		$ cd bibtex-ruby
+		$ rake racc
+		$ rake rdoc
+		$ rake test
 
-Or, alternatively, fork the (project on github)[http://github.com/inukshuk/bibtex-ruby.git].
+Or, alternatively, fork the {project on github}[http://github.com/inukshuk/bibtex-ruby.git].
 
 
-== Requirements
+Requirements
+------------
 
 * The parser generator {+racc+}[http://i.loveruby.net/en/projects/racc/] is required to generate parser.
 * The +minitest+ gem is required to run the tests in older Ruby versions (prior to 1.9).
 * The +json+ gem is required on older ruby versions for JSON export.
 
 
-== Usage
+Usage
+-----
+
+It is very easy to use BibTeX-Ruby. You can use the class method +BibTeX::Bibliography.open+
+to open a `.bib' file. Normally, BibTeX-Ruby will discard all content outside of
+regular BibTeX elements; however, if you wish to include everything, simply add
++:include => [:meta_comments]+ to your invocation of +BibTeX::Bibliography.open+.
+
+Once BibTeX-Ruby has parsed your `.bib' file, you can easily access individual entries.
+For example, if your bibliography object +bib+ contained the following entry:
+
+		@book{pickaxe,
+		  address = {Raleigh, North Carolina},
+		  author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+		  date-added = {2010-08-05 09:54:07 +0200},
+		  date-modified = {2010-08-05 10:07:01 +0200},
+		  keywords = {ruby},
+		  publisher = {The Pragmatic Bookshelf},
+		  series = {The Facets of Ruby},
+		  title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+		  year = {2009}
+		}
+		
+You could easily access it, using the entry's key, `pickaxe', like so: +bib[:pickaxe]+;
+you also have easy access to individual fields, for example: +bib[:pickaxe][:author]+.
+
+If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
+replace the strings for you. You have access to a bibliography's strings via
++BibTeX::Bibliography#strings+ and you can replace the strings of an entry using
+the +BibTeX::Entry#replace!+ method. Thus, to replace all strings defined in your
+bibliography object +bib+ your could use this code:
+
+		bib.entries.each do |entry|
+			entry.replace!(bib.strings)
+		end
+
+Furthermore, BibTeX-Ruby allows you to export your bibliography for processing
+by other tools. Currently supported formats include YAML, JSON, and XML.
+Of course, you can also export your bibliography back to BibTeX; if you include
++:meta_comments+, your export should be identical to the original `.bib' file,
+except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
+all keys).
+
+In order to export your bibliography use +#to_s+, +#to_yaml+, +#to_json+, or
++#to_xml+, respectively.
 
 Look at the `examples' directory for a simple BibTeX to YAML and BibTeX to HTML converter.
 
 
-== The Parser
+The Parser
+----------
 
 The BibTeX-Ruby parser is generated using the wonderful
 {+racc+}[http://i.loveruby.net/en/projects/racc/] parser generator.
 
-== The BibTeX Format
+
+The BibTeX Format
+_________________
 
 At first glance, the BibTeX file format seems very clear and simple;
 however, there are a number of peculiarities which warrant some
@@ -87,7 +139,8 @@ number of general remarks:
   in the original BibTeX; note, however, that this is not true for BibTeX-Ruby (i.e.,
   it will parse any string containing an `@').
 
-=== @comment
+@comment
+________
 
 The purpose of the @comment object is not entirely clear, because everything
 outside of an object is treated as a comment anyway. Nicolas Markay argues that
@@ -107,7 +160,8 @@ braces inside a @comment are balanced! Obviously, BibTeX-Ruby differs from
 +bibtex+ in that respect; though, the gain is, that it is now possible to
 comment out a sequence of entries, without removing their respective `@' symbols.
 
-=== @string
+@string
+_______
 
 The @string object defines a single string constant (for multiple constant
 assignments, it is necessary to define separate @string objects). These
@@ -119,23 +173,27 @@ definition and usage:
 * @preamble{ "This bibliography was generated by " # generator }
 
 
-=== @preamble
+@preamble
+_________
 
 Typically, the purpose of @preamble objects is to define LaTeX statements, which
 will be put into the `.bbl' file by +bibtex+. A @preamble object may contain
 a single string literal, a single string constant (defined by a @string object), or
 a concatenation of literals and constants.
 
-=== Entries
+Entries
+_______
 
 These represent proper BibTeX objects (e.g., @book, @collection, etc.).
 
 
-== Credits
+Credits
+-------
 
 The BibTeX-Ruby package was written by {Sylvester Keil}[http://sylvester.keil.or.at/].
 
-== License
+License
+-------
 
 BibTeX-Ruby
 Copyright (C) 2010-2011 {Sylvester Keil}[http://sylvester.keil.or.at]
