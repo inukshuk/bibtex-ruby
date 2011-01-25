@@ -39,21 +39,21 @@ Or, alternatively, fork the [project on github](http://github.com/inukshuk/bibte
 Requirements
 ------------
 
-* The parser generator [`racc'](http://i.loveruby.net/en/projects/racc/) is required to generate parser.
-* The `minitest' gem is required to run the tests in older Ruby versions (prior to 1.9).
-* The `json' gem is required on older ruby versions for JSON export.
+* The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is required to generate parser.
+* The minitest gem is required to run the tests in older Ruby versions (prior to 1.9).
+* The json gem is required on older ruby versions for JSON export.
 
 
 Usage
 -----
 
-It is very easy to use BibTeX-Ruby. You can use the class method `BibTeX::Bibliography.open'
+It is very easy to use BibTeX-Ruby. You can use the class method `BibTeX::Bibliography.open`
 to open a '.bib' file. Normally, BibTeX-Ruby will discard all content outside of
 regular BibTeX elements; however, if you wish to include everything, simply add
-`:include => [:meta_comments]' to your invocation of `BibTeX::Bibliography.open'.
+`:include => [:meta_comments]` to your invocation of `BibTeX::Bibliography.open`.
 
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
-For example, if your bibliography object `bib' contained the following entry:
+For example, if your bibliography object `bib` contained the following entry:
 
 		@book[pickaxe,
 		  address = [Raleigh, North Carolina],
@@ -67,14 +67,14 @@ For example, if your bibliography object `bib' contained the following entry:
 		  year = [2009]
 		]
 		
-You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]';
-you also have easy access to individual fields, for example: `bib[:pickaxe](:author)'.
+You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]`;
+you also have easy access to individual fields, for example: `bib[:pickaxe](:author)`.
 
 If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
 replace the strings for you. You have access to a bibliography's strings via
-`BibTeX::Bibliography#strings' and you can replace the strings of an entry using
-the `BibTeX::Entry#replace!' method. Thus, to replace all strings defined in your
-bibliography object `bib' your could use this code:
+`BibTeX::Bibliography#strings` and you can replace the strings of an entry using
+the `BibTeX::Entry#replace!` method. Thus, to replace all strings defined in your
+bibliography object `bib` your could use this code:
 
 		bib.entries.each do |entry|
 			entry.replace!(bib.strings)
@@ -87,8 +87,8 @@ Of course, you can also export your bibliography back to BibTeX; if you include
 except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
 all keys).
 
-In order to export your bibliography use `#to_s', `#to_yaml', `#to_json', or
-`#to_xml', respectively.
+In order to export your bibliography use `#to_s`, `#to_yaml`, `#to_json`, or
+`#to_xml`, respectively.
 
 Look at the 'examples' directory for a simple BibTeX to YAML and BibTeX to HTML converter.
 
@@ -97,7 +97,7 @@ The Parser
 ----------
 
 The BibTeX-Ruby parser is generated using the wonderful
-[`racc'](http://i.loveruby.net/en/projects/racc/) parser generator.
+[racc](http://i.loveruby.net/en/projects/racc/) parser generator.
 
 
 The BibTeX Format
@@ -106,12 +106,12 @@ _________________
 At first glance, the BibTeX file format seems very clear and simple;
 however, there are a number of peculiarities which warrant some
 explanation. The best place to start reading is probably at [your closest
-ctan server][http://www.ctan.org/get/biblio/bibtex/] where
-the original `bibtex' from 1988 still lives. Additionally, Xavier Decoret
+ctan server](http://www.ctan.org/get/biblio/bibtex/) where
+the original `bibtex` from 1988 still lives. Additionally, Xavier Decoret
 has written
 [a great summary](http://artis.imag.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html)
-of the format; another invaluable source of information is Nicolas Markey's
-website[http://www.lsv.ens-cachan.fr/~markey/bibla.php]. Unfortunately,
+of the format; another invaluable source of information is [Nicolas Markey's
+website](http://www.lsv.ens-cachan.fr/~markey/bibla.php). Unfortunately,
 even after consulting these documents, a number of issues remain.
 Therefore, it is the purpose of this section to deliver the rationale
 that went into some of the design decision in BibTeX-Ruby.
@@ -157,7 +157,7 @@ as Nicolas Markay describes them: thus, everything inside a @comment is treated
 as a comment and is ignored&mdash;everything,
 that is, until the object is closed. For this reason, BibTeX-Ruby assumes that
 braces inside a @comment are balanced! Obviously, BibTeX-Ruby differs from
-`bibtex' in that respect; though, the gain is, that it is now possible to
+`bibtex` in that respect; though, the gain is, that it is now possible to
 comment out a sequence of entries, without removing their respective '@' symbols.
 
 @string
@@ -169,15 +169,15 @@ constants can be used within string assignments in other @string or @preamble
 objects, as well as in regular BibTeX entries. For example, this is a valid constant
 definition and usage:
 
-* @string[ generator = "BibTeX-Ruby"]
-* @preamble[ "This bibliography was generated by " # generator ]
+		@string[ generator = "BibTeX-Ruby"]
+		@preamble[ "This bibliography was generated by " # generator ]
 
 
 @preamble
 _________
 
 Typically, the purpose of @preamble objects is to define LaTeX statements, which
-will be put into the '.bbl' file by `bibtex'. A @preamble object may contain
+will be put into the '.bbl' file by `bibtex`. A @preamble object may contain
 a single string literal, a single string constant (defined by a @string object), or
 a concatenation of literals and constants.
 
