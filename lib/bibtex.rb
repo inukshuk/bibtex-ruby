@@ -32,10 +32,8 @@ $:.unshift(File.dirname(__FILE__)) unless
 # License:: GNU GPL 3.0
 #
 module BibTeX
+  require 'bibtex/version'
 	require 'logger'
-
-	# The current library version.
-	VERSION = '1.1.0'
 
 	#
 	# An instance of the Ruby core class +Logger+.
