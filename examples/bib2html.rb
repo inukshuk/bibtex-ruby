@@ -13,7 +13,7 @@ content = bib.data.map do |d|
   
   if d.class == BibTeX::Entry
     d.replace!(bib.strings)
-    result = [d[:author], '. ', d[:title], '. ', d[:publisher], ': ', d[:address], ', ', d[:year], '.'].join
+    result = [d.author, '. ', d.title, '. ', d.publisher, ': ', d.address, ', ', d.year, '.'].join
   end
   
   if d.class == BibTeX::MetaComment

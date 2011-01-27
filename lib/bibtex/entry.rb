@@ -63,7 +63,7 @@ module BibTeX
 		end
 		
 		def method_missing(name, *args)
-		  return @fields[name]if @fields.has_key?(name)
+		  return @fields[name] if @fields.has_key?(name)
 		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.match(/=$/)		  
 		  super
 		end
