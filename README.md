@@ -57,8 +57,8 @@ Requirements
 ------------
 
 * The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is required to generate parser.
-* The minitest gem is required to run the tests in older Ruby versions (prior to 1.9).
-* The json gem is required on older ruby versions for JSON export.
+* The *minitest* gem is required to run the tests in older Ruby versions (prior to 1.9).
+* The *json* gem is required on older ruby versions for JSON export (prior to 1.9).
 
 
 Usage
@@ -114,11 +114,11 @@ The Parser
 ----------
 
 The BibTeX-Ruby parser is generated using the wonderful
-[racc](http://i.loveruby.net/en/projects/racc/) parser generator.
+[racc](http://i.loveruby.net/en/projects/racc/) parser generator. You can take
+look at the grammar definition in the file `lib/bibtex/bibtex.y`.
 
 
-The BibTeX Format
-_________________
+### The BibTeX Format
 
 At first glance, the BibTeX file format seems very clear and simple;
 however, there are a number of peculiarities which warrant some
