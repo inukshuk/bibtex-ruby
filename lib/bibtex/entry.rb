@@ -62,6 +62,16 @@ module BibTeX
 			@type = type
 		end
 		
+		def method_missing(name, *args)
+		  return @fields[name]if @fields.has_key?(name)
+		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.match(/=$/)		  
+		  super
+		end
+		
+		def respond_to?(method)
+		  @fields.has_key?(method.to_sym) || method.match(/=$/) || super
+		end
+		
 		# Returns the value of the field with the given name.
 		def [](name)
 			@fields[name.to_sym]

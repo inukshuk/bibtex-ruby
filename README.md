@@ -1,12 +1,11 @@
 BibTeX-Ruby
 ===========
 
-The BibTeX-Ruby package contains a parser for BibTeX
-bibliography files and a class structure to manage BibTeX objects in
-Ruby. It is designed to support all BibTeX objects (including @comment,
-string-replacements via @string, as well as string concatenation using '#')
-and handles all content outside of BibTeX objects as 'meta comments' which may
-be included in post-processing.
+The BibTeX-Ruby package contains a parser for BibTeX bibliography files and a
+class structure to manage BibTeX objects in Ruby. It is designed to support all
+BibTeX objects (including @comment, string-replacements via @string, as well
+as string concatenation using '#') and handles all content outside of BibTeX
+objects as 'meta comments' which may or may not be included in post-processing.
 
 
 Quickstart
@@ -29,6 +28,10 @@ Quickstart
 		}
 		> bib[:pickaxe][:author]
 		 => ["Thomas, Dave, and Fowler, Chad, and Hunt, Andy"]
+		> bib[:pickaxe].author
+		 => ["Thomas, Dave, and Fowler, Chad, and Hunt, Andy"]
+		> bib[:pickaxe].author = ['Thomas, D., Fowler, C., and Hunt, A.']
+		 => ["Thomas, D., and Fowler, C., and Hunt, A."]
 
 
 Installation
