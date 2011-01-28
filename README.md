@@ -143,7 +143,7 @@ number of general remarks:
 
 * BibTeX-Ruby begins in comment-mode, treating all text it encounters as comments.
   Normally these comments are ignored; however, if you wish the parser to include
-  them, you can do so by adding the symbol `:meta_comments`` to the `:include`` array
+  them, you can do so by adding the symbol `:meta_comments` to the `:include` array
   in the parser's options.
 * Note that string literals in BibTeX are either contained in quotes or braces;
   nested quotes in a quoted literal are not escaped with a usual backslash but
