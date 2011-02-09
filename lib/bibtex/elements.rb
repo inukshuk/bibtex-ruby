@@ -16,9 +16,6 @@
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require 'rexml/document'
-require 'yaml'
-
 module BibTeX
 
 	#
@@ -47,7 +44,8 @@ module BibTeX
 	  end
 	  
 	  def to_yaml
-	    self.to_hash.to_yaml
+	    require 'yaml'
+      self.to_hash.to_yaml
 	  end
 	  
 	  def to_json
@@ -56,6 +54,7 @@ module BibTeX
 	  end
 	  
 	  def to_xml
+	    require 'rexml/document'
 	    xml = REXML::Element.new(self.class.name.downcase)
 	    xml.text = self.content
 	    xml

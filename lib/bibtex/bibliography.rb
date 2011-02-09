@@ -39,7 +39,7 @@ module BibTeX
     end
     
     #
-    # Creates a new bibliography; empty if no path is specified, otherwise
+    # Creates a new bibliography; empty if no data attribute is specified, otherwise
     # by parsing the file at the given path.
     #
     def initialize(data=[])
