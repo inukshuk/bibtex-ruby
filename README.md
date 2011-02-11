@@ -12,6 +12,7 @@ post-processing.
 Quickstart
 ----------
 
+		$ [sudo] gem install bibtex-ruby
 		$ irb
 		> require 'bibtex'
 		 => true
@@ -69,6 +70,7 @@ of the *StringScanner* class, however, this has been fixed in SVN (see
 [#1](https://github.com/inukshuk/bibtex-ruby/issues/closed#issue/1) for details).
 
 
+
 Usage
 -----
 
@@ -116,6 +118,7 @@ In order to export your bibliography use `#to_s`, `#to_yaml`, `#to_json`, or
 `#to_xml`, respectively.
 
 Look at the 'examples' directory for a simple BibTeX to YAML and BibTeX to HTML converter.
+
 
 
 The Parser
