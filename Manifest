@@ -1,8 +1,11 @@
+Gemfile
+Gemfile.lock
 History.txt
 LICENSE
 Manifest
 README.md
 Rakefile
+bibtex-ruby.gemspec
 examples
 examples/bib2html.rb
 examples/bib2yaml.rb

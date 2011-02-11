@@ -1,62 +1,13 @@
 # -*- ruby -*-
+$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 
 require 'rubygems'
 require 'rake'
 require 'rake/clean'
 require 'rake/testtask'
 require 'rake/rdoctask'
-require 'rake/gempackagetask'
 
-require './lib/bibtex/version.rb'
-
-
-spec = Gem::Specification.new do |s|
-  s.platform          = Gem::Platform::RUBY
-  s.name              = 'bibtex-ruby'
-  s.rubyforge_project = s.name
-  s.version           = BibTeX::Version::STRING
-  s.summary           = "A BibTeX parser written in Ruby"
-  s.description       = "A (fairly complete) BibTeX parser written in Ruby. Supports regular BibTeX entries, @comments, string replacement via @string, and simple export formats (e.g. YAML)."
-  s.homepage          = 'http://inukshuk.github.com/bibtex-ruby'
-  s.authors           = ["Sylvester Keil"]
-  s.email             = 'http://sylvester.keil.or.at'
-  s.cert_chain        = ["/Users/sylvester/.gem/keys/gem-public_cert.pem"]
-  s.signing_key       = '/Users/sylvester/.gem/keys/gem-private_key.pem'
-  s.has_rdoc          = true
-  s.rdoc_options      = ["--line-numbers", "--inline-source", "--title", "BibTeX-Ruby Documentation", "--main", "README.rdoc"]
-  s.extra_rdoc_files  = ["README.md"]
-  s.files             = File.open('Manifest').readlines.map(&:chomp)
-  s.test_files        = FileList['test/test*.rb']
-  s.require_paths     = ["lib"]
-  s.date              = Time.now
-  s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
-  
-  if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 3
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency('racc', [">= 1.4.6"])
-      s.add_development_dependency('minitest', [">= 2.0.2"])
-      s.add_development_dependency('json', [">= 1.5.0"])
-    else
-      s.add_dependency('racc', [">= 1.4.6"])
-      s.add_dependency('minitest', [">= 2.0.2"])
-      s.add_dependency('json', [">= 1.5.0"])
-    end
-  else
-    s.add_dependency('racc', [">= 1.4.6"])
-    s.add_dependency('minitest', [">= 2.0.2"])
-    s.add_dependency('json', [">= 1.5.0"])
-  end
-  
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.need_zip = true
-  pkg.need_tar = true
-  pkg.package_dir = 'build'
-end
+require 'bibtex/version'
 
 Rake::RDocTask.new(:rdoc_task) do |rd|
   rd.main = 'README.md'
@@ -94,11 +45,19 @@ task :manifest => ['clean', 'racc'] do
   m.close
 end
 
+desc 'Builds the gem file'
+task :build => ['manifest'] do
+  system 'gem build bibtex-ruby.gemspec'
+end
+
+desc 'Pushes the gem file to rubygems.org'
+task :release => ['build'] do
+  system "gem push bibtex-ruby-#{BibTeX::Version::STRING}"
+end
 
 CLEAN.include('lib/bibtex/parser.rb')
 CLEAN.include('lib/bibtex/parser.output')
 CLEAN.include('doc/html')
-CLEAN.include('build')
-
+CLEAN.include('*.gem')
 
 # vim: syntax=ruby

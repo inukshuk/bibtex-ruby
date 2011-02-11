@@ -2,10 +2,11 @@ BibTeX-Ruby
 ===========
 
 The BibTeX-Ruby package contains a parser for BibTeX bibliography files and a
-class structure to manage BibTeX objects in Ruby. It is designed to support all
-BibTeX objects (including @comment, string-replacements via @string, as well
-as string concatenation using '#') and handles all content outside of BibTeX
-objects as 'meta comments' which may or may not be included in post-processing.
+class structure to manage or convert BibTeX objects in Ruby. It is designed to
+support all BibTeX objects (including @comment, string-replacements via @string,
+as well as string concatenation using '#') and handles all content outside of
+BibTeX objects as 'meta comments' which may or may not be included in
+post-processing.
 
 
 Quickstart
@@ -43,22 +44,29 @@ If you just want to use it:
 
 If you want to work with the sources:
 
-		$ [sudo] gem install racc
 		$ git clone http://github.com/inukshuk/bibtex-ruby.git
 		$ cd bibtex-ruby
+		$ [sudo] bundle install
 		$ rake racc
 		$ rake rdoc
 		$ rake test
 
-Or, alternatively, fork the [project on github](http://github.com/inukshuk/bibtex-ruby.git).
+Or, alternatively, fork the [project on GitHub](http://github.com/inukshuk/bibtex-ruby.git).
 
 
 Requirements
 ------------
 
-* The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is required to generate parser.
-* The *minitest* gem is required to run the tests in older Ruby versions (prior to 1.9).
-* The *json* gem is required on older ruby versions for JSON export (prior to 1.9).
+* The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
+  required to generate parser.
+* The *minitest* gem is required to run the tests in older Ruby versions.
+* The *json* gem is required on older Ruby versions for JSON export.
+
+The bibtex-ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
+been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java. It
+does not work with MacRuby 0.8 because of a bug in MacRuby's implementation
+of the *StringScanner* class, however, this has been fixed in SVN (see
+[#1](https://github.com/inukshuk/bibtex-ruby/issues/closed#issue/1) for details).
 
 
 Usage
