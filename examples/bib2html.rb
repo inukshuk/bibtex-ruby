@@ -3,7 +3,7 @@ require 'bibtex'
 
 
 # Open a bibliography file
-bib = BibTeX::Bibliography.open(File.expand_path('../markdown.bib',__FILE__),
+bib = BibTeX.open(File.expand_path('../markdown.bib',__FILE__),
   :include => [:meta_comments])
 
 

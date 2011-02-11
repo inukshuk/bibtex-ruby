@@ -16,7 +16,7 @@ Quickstart
 		$ irb
 		> require 'bibtex'
 		 => true
-		> bib = BibTeX::Bibliography.open('./ruby.bib')
+		> bib = BibTeX.open('./ruby.bib')
 		 => book{pickaxe,
 		  address  {Raleigh, North Carolina},
 		  author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
@@ -28,12 +28,12 @@ Quickstart
 		  title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
 		  year  {2009}
 		}
-		> bib[:pickaxe][:author]
-		 => ["Thomas, Dave, and Fowler, Chad, and Hunt, Andy"]
-		> bib[:pickaxe].author
-		 => ["Thomas, Dave, and Fowler, Chad, and Hunt, Andy"]
-		> bib[:pickaxe].author = ['Thomas, D., Fowler, C., and Hunt, A.']
-		 => ["Thomas, D., and Fowler, C., and Hunt, A."]
+		> bib[:pickaxe].year
+		 => "2009"
+		> bib[:pickaxe][:title]
+		 => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+		> bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
+		 => "Thomas, D., and Fowler, C., and Hunt, A."
 
 
 Installation
@@ -74,10 +74,11 @@ of the *StringScanner* class, however, this has been fixed in SVN (see
 Usage
 -----
 
-It is very easy to use BibTeX-Ruby. You can use the class method `BibTeX::Bibliography.open`
-to open a '.bib' file. Normally, BibTeX-Ruby will discard all content outside of
-regular BibTeX elements; however, if you wish to include everything, simply add
-`:include => [:meta_comments]` to your invocation of `BibTeX::Bibliography.open`.
+It is very easy to use BibTeX-Ruby. You can use the top level utility methods
+`BibTeX.open` and `BibTeX.parse` to open a '.bib' file or to parse a string
+containing BibTeX contents. Normally, BibTeX-Ruby will discard all text outside
+of regular BibTeX elements; however, if you wish to include everything, simply add
+`:include => [:meta_comments]` to your invocation of `BibTeX.open` or `BibTeX.parse`.
 
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
 For example, if your bibliography object `bib` contained the following entry:
@@ -95,7 +96,12 @@ For example, if your bibliography object `bib` contained the following entry:
 		}
 		
 You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]`;
-you also have easy access to individual fields, for example: `bib[:pickaxe](:author)`.
+you also have easy access to individual fields, for example: `bib[:pickaxe][:author]`.
+For convenience, BibTeX-Ruby accepts ghost methods to access an entry's fields,
+similar to +ActiveRecord::Base+. Therefore, it is also possible to access the
+'author' field above as `bib[:pickaxe].author`.
+
+### String Replacement
 
 If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
 replace the strings for you. You have access to a bibliography's strings via
@@ -107,6 +113,9 @@ bibliography object `bib` your could use this code:
 			entry.replace!(bib.strings)
 		end
 
+
+### Conversions
+
 Furthermore, BibTeX-Ruby allows you to export your bibliography for processing
 by other tools. Currently supported formats include YAML, JSON, and XML.
 Of course, you can also export your bibliography back to BibTeX; if you include
@@ -115,9 +124,13 @@ except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
 all keys).
 
 In order to export your bibliography use `#to_s`, `#to_yaml`, `#to_json`, or
-`#to_xml`, respectively.
+`#to_xml`, respectively. For example, the following line constitutes a simple
+BibTeX to YAML converter:
 
-Look at the 'examples' directory for a simple BibTeX to YAML and BibTeX to HTML converter.
+    BibTeX.open('example.bib').to_yaml
+
+Look at the 'examples' directory for more elaborate examples of a BibTeX to YAML
+and a BibTeX to HTML converter.
 
 
 
