@@ -111,11 +111,17 @@ module BibTeX
       @errors
     end
 
-    # Returns true if there are object which could not be parsed.
+    # Returns true if there are object which could not be parse.
     def errors?
       !errors.empty?
     end
 
+    # Returns true if the +Bibliography+ contains no errors and only
+    # valid BibTeX objects (meta comments are ignored).
+    def valid?
+      !errors? && !@entries.values.map(&:valid?).uniq.include?(false)
+    end
+    
     # Replaces all string constants which are defined in the bibliography.
     #
     # By default constants in @string, @preamble and entries are defined; this

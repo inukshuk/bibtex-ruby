@@ -49,5 +49,6 @@ module BibTeX
   require 'bibtex/error'
   require 'bibtex/parser'
   require 'bibtex/bibliography'
+  require 'bibtex/utilities'
 
 end
