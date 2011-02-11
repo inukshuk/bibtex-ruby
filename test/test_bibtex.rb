@@ -30,11 +30,11 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert_equal([BibTeX::Entry,BibTeX::Comment,BibTeX::String,BibTeX::Preamble], bib.data.map(&:class).uniq)
     assert_equal('py03', bib.data[0].key)
     assert_equal(:article, bib['py03'].type)
-    assert_equal(['Xavier D\\\'ecoret'], bib['py03'][:author])
-    assert_equal(['PyBiTex'], bib['py03'][:title])
-    assert_equal(['2003'], bib['py03'][:year])
+    assert_equal('Xavier D\\\'ecoret', bib['py03'][:author])
+    assert_equal('PyBiTex', bib['py03'][:title])
+    assert_equal('2003', bib['py03'][:year])
     assert_equal(:article, bib['key03'].type)
-    assert_equal(['A {bunch {of} braces {in}} title'], bib['key03'][:title])
+    assert_equal('A {bunch {of} braces {in}} title', bib['key03'][:title])
     #TODO missing assertions
   end
   
@@ -49,7 +49,7 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert_equal(BibTeX::Bibliography, bib.class)
     assert_equal(3, bib.length)
     assert_equal('rails', bib.data[0].key)
-    assert_equal(['2010-08-05 10:06:32 +0200'], bib[:dragon]['date-modified'])
+    assert_equal('2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified'])
   end
 end
 

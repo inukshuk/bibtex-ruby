@@ -34,9 +34,9 @@ class TestEntry < MiniTest::Unit::TestCase
     bib = BibTeX::Bibliography.open('test/bib/07_entry.bib', :debug => true)
     refute_nil(bib)
     assert_equal(BibTeX::Bibliography, bib.class)
-    assert_equal(['Poe, Edgar A.'], bib.data[0].author)
+    assert_equal('Poe, Edgar A.', bib.data[0].author)
     
-    expected = ['Poe, Edgar Allen']
+    expected = 'Poe, Edgar Allen'
     bib.data[0].author = expected
     
     assert_equal(expected, bib.data[0].author)

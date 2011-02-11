@@ -63,7 +63,7 @@ module BibTeX
 		end
 		
 		def method_missing(name, *args)
-		  return @fields[name] if @fields.has_key?(name)
+		  return self[name] if @fields.has_key?(name)
 		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.match(/=$/)		  
 		  super
 		end
@@ -74,13 +74,14 @@ module BibTeX
 		
 		# Returns the value of the field with the given name.
 		def [](name)
-			@fields[name.to_sym]
+			v = @fields[name.to_sym]
+			v.kind_of?(Array) && v.length == 1 ? v[0] : v
 		end
 
 		# Adds a new field (name-value pair) to the entry.
 		# Returns the new value.
-		def []=(name,value)
-			add(name,value)
+		def []=(name, value)
+			add(name.to_sym, value)
 		end
 
 		# Adds a new field (name-value pair) to the entry.
