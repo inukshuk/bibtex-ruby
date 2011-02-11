@@ -43,7 +43,7 @@ module BibTeX
 	Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
 	Log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
-  require 'bibtex/string_replacement'
+  require 'bibtex/extensions'
   require 'bibtex/elements'
   require 'bibtex/entry'
   require 'bibtex/error'

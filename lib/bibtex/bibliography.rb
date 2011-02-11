@@ -53,8 +53,8 @@ module BibTeX
     
     # Adds a new element, or a list of new elements to the bibliography.
     def add(data)
-      raise(ArgumentError,'BibTeX::Bibliography.add data expected to be enumerable or of type BibTeX::Element; was: ' + data.class.name) unless data.respond_to?(:each) || data.kind_of?(Element)
-      data.kind_of?(Element) ? self << data : data.each { |d| self << d }
+      raise(ArgumentError,'BibTeX::Bibliography.add data expected to be enumerable or of type BibTeX::Element; was: ' + data.class.name) unless data.respond_to?(:each) || data.is_a?(Element)
+      data.is_a?(Element) ? self << data : data.each { |d| self << d }
       self
     end
     
@@ -70,7 +70,7 @@ module BibTeX
     
     # Add an object to the bibliography. Returns the bibliography.
     def <<(obj)
-      raise(ArgumentError, 'A BibTeX::Bibliography can contain only BibTeX::Elements; was: ' + obj.class.name) unless obj.kind_of?(Element)
+      raise(ArgumentError, 'A BibTeX::Bibliography can contain only BibTeX::Elements; was: ' + obj.class.name) unless obj.is_a?(Element)
       @data << obj.added_to_bibliography(self)
       self
     end
@@ -111,7 +111,7 @@ module BibTeX
       @errors
     end
 
-    # Returns true if there are object which could not be parse.
+    # Returns true if there are object which could not be parsed.
     def errors?
       !errors.empty?
     end
@@ -140,6 +140,11 @@ module BibTeX
       find_by_type(options[:include]).each { |e| e.replace!(@strings) if e.respond_to?(:replace!)}
     end
 
+    def join_strings(options={})
+      options[:include] ||= [BibTeX::String, BibTeX::Preamble, BibTeX::Entry]
+      find_by_type(options[:include]).each { |e| e.join! if e.respond_to?(:join!)}
+    end
+    
     # Returns true if the bibliography is currently empty.
     def empty?
       @data.empty?
@@ -178,9 +183,9 @@ module BibTeX
     private
 
     def find_by_type(type)
-      @data.find_all { |x| type.respond_to?(:inject) ? type.inject(false) { |s,n| s || x.kind_of?(n) } : x.kind_of?(type) }
+      @data.find_all { |x| type.respond_to?(:inject) ? type.inject(false) { |s,n| s || x.is_a?(n) } : x.is_a?(type) }
     end
-    
+
     def find_entry(key)
       entries.find { |e| e.key == key.to_s }
     end

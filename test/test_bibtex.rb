@@ -30,7 +30,7 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert_equal([BibTeX::Entry,BibTeX::Comment,BibTeX::String,BibTeX::Preamble], bib.data.map(&:class).uniq)
     assert_equal('py03', bib.data[0].key)
     assert_equal(:article, bib['py03'].type)
-    assert_equal('Xavier D\\\'ecoret', bib['py03'][:author])
+    assert_equal("Xavier D\\'ecoret", bib['py03'][:author])
     assert_equal('PyBiTex', bib['py03'][:title])
     assert_equal('2003', bib['py03'][:year])
     assert_equal(:article, bib['key03'].type)
@@ -39,7 +39,7 @@ class TestBibtex < MiniTest::Unit::TestCase
   end
   
   def test_errors
-    bib = BibTeX::Bibliography.open('test/bib/09_errors.bib', :debug => true)
+    bib = BibTeX.open('test/bib/09_errors.bib', :debug => true)
     #refute_nil(bib)
   end
   

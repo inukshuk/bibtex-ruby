@@ -34,4 +34,5 @@ module BibTeX
       Bibliography.open(file).valid?
     end
   end
+
 end

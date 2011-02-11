@@ -20,14 +20,14 @@ class TestEntry < MiniTest::Unit::TestCase
     assert_equal(:book, bib.data[0].type)
     assert_equal(:article, bib.data[1].type)
     assert_equal(:article, bib.data[2].type)
-    assert_equal(['Poe, Edgar A.'], bib.data[0].fields[:author])
-    assert_equal(['Hawthorne, Nathaniel'], bib.data[1].fields[:author])
-    assert_equal(['2003'], bib.data[0].fields[:year])
-    assert_equal(['2001'], bib.data[1].fields[:year])
-    assert_equal(['American Library'], bib.data[0].fields[:publisher])
-    assert_equal(['American Library'], bib.data[1].fields[:publisher])
-    assert_equal(['Selected \\emph{Poetry} and `Tales\''], bib.data[0].fields[:title])
-    assert_equal(['Tales and Sketches'], bib.data[1].fields[:title])
+    assert_equal('Poe, Edgar A.', bib.data[0][:author])
+    assert_equal('Hawthorne, Nathaniel', bib.data[1][:author])
+    assert_equal('2003', bib.data[0][:year])
+    assert_equal('2001', bib.data[1][:year])
+    assert_equal('American Library', bib.data[0][:publisher])
+    assert_equal('American Library', bib.data[1][:publisher])
+    assert_equal('Selected \\emph{Poetry} and `Tales\'', bib.data[0].title)
+    assert_equal('Tales and Sketches', bib.data[1].title)
   end
   
   def test_ghost_methods

@@ -21,6 +21,7 @@ module BibTeX
 	# Represents a regular BibTeX entry.
 	#
 	class Entry < Element
+	  
 		attr_reader :key, :type, :fields
 	 
 		# Hash containing the required fields of the standard entry types
@@ -52,13 +53,13 @@ module BibTeX
 
 		# Sets the key of the entry
 		def key=(key)
-			raise(ArgumentError, "BibTeX::Entry key must be of type String; was: #{key.class.name}.") unless key.kind_of?(::String)
+			raise(ArgumentError, "BibTeX::Entry key must be of type String; was: #{key.class.name}.") unless key.is_a?(::String)
 			@key = key
 		end
 
 		# Sets the type of the entry.
 		def type=(type)
-			raise(ArgumentError, "BibTeX::Entry type must be of type Symbol; was: #{type.class.name}.") unless type.kind_of?(Symbol)
+			raise(ArgumentError, "BibTeX::Entry type must be of type Symbol; was: #{type.class.name}.") unless type.is_a?(Symbol)
 			@type = type
 		end
 		
@@ -74,8 +75,7 @@ module BibTeX
 		
 		# Returns the value of the field with the given name.
 		def [](name)
-			v = @fields[name.to_sym]
-			v.kind_of?(Array) && v.length == 1 ? v[0] : v
+			@fields[name.to_sym].to_s
 		end
 
 		# Adds a new field (name-value pair) to the entry.
@@ -86,10 +86,10 @@ module BibTeX
 
 		# Adds a new field (name-value pair) to the entry.
 		# Returns the new value.
-		def add(name,value)
-			raise(ArgumentError, "BibTeX::Entry field name must be of type Symbol; was: #{name.class.name}.") unless name.kind_of?(Symbol)
-			raise(ArgumentError, "BibTeX::Entry field value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
-			@fields[name] = value.kind_of?(Array) ? value : [value]
+		def add(name, value)
+			raise(ArgumentError, "BibTeX::Entry field name must be of type Symbol; was: #{name.class.name}.") unless name.is_a?(Symbol)
+			raise(ArgumentError, "BibTeX::Entry field value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
+			@fields[name] = Extensions.string_replacement(value.is_a?(Array) ? value : [value])
 		end
 
 		# Removes the field with a given name from the entry.
@@ -100,7 +100,7 @@ module BibTeX
 
 		# Adds all the fields contained in a given hash to the entry.
 		def <<(fields)
-			raise(ArgumentError, "BibTeX::Entry fields must be of type Hash; was: #{fields.class.name}.") unless fields.kind_of?(Hash)
+			raise(ArgumentError, "BibTeX::Entry fields must be of type Hash; was: #{fields.class.name}.") unless fields.is_a?(Hash)
 			fields.each { |n,v| add(n,v) }
 			self
 		end
@@ -114,7 +114,7 @@ module BibTeX
 		# definitions of all the required fields for that type.
 		def valid?
 			!@@RequiredFields[@type].map { |f|
-				f.kind_of?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil?
+				f.is_a?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil?
 			}.include?(false)
 		end
 
@@ -132,14 +132,18 @@ module BibTeX
 			self
 		end
 
-		# Replaces all constants in this entry's field values which are defined in +hsh+.
-		def replace!(hsh)
-			@fields.keys.each { |k| @fields[k] = StringReplacement.replace(@fields[k],hsh) }
+		# Replaces all constants in this entry's field values which are defined in +hash+.
+		def replace!(hash)
+			@fields.keys.each { |k| @fields[k] = @fields[k].replace_strings(hash) }
 		end
+
+    def join!
+			@fields.keys.each { |k| @fields[k] = @fields[k].join_strings }
+    end
 
 		# Returns a string of all the entry's fields.
 		def content
-			@fields.keys.map { |k| "#{k} = #{StringReplacement.to_s(@fields[k], :delimiter => ['{','}'])}" }.join(",\n")
+			@fields.keys.map { |k| "#{k} = #{ @fields[k].to_s(:quotes => %w({})) }" }.join(",\n")
 		end
 
 		# Returns a string representation of the entry.
@@ -147,8 +151,9 @@ module BibTeX
 			["@#{type}{#{key},",content.gsub(/^/,'  '),"}\n"].join("\n")
 		end
 		
-		def to_hash
-		  @fields.keys.map { |k| { k.to_s => StringReplacement.to_s(@fields[k], :delimiter => ['{','}']) } }.inject({ 'key' => @key, 'type' => @type.to_s }) { |sum,n| sum.merge(n) }
+		def to_hash(options={})
+		  options[:quotes] ||= %w({ })
+		  @fields.keys.map { |k| { k.to_s => @fields[k].to_s(options) } }.inject({ 'key' => @key, 'type' => @type.to_s }) { |sum,n| sum.merge(n) }
 		end
 		
 		def to_xml
@@ -156,7 +161,7 @@ module BibTeX
   		xml.attributes['key'] = @key
       @fields.each do |k,v|
         e = REXML::Element.new(k.to_s)
-        e.text = StringReplacement.to_s(v, :delimiter => ['',''])
+        e.text = v.to_s
         xml.add_element(e)
       end
       xml

@@ -84,8 +84,8 @@ module BibTeX
 	# @string and @preamble objects, as well as in field values
 	# of regular entries.
 	#
-	class String < Element
-		attr_reader :key, :value
+	class String < Element	  
+		attr_reader :key
 
 		# Creates a new instance.
 		def initialize(key=nil,value=nil)
@@ -95,28 +95,32 @@ module BibTeX
 
 		# Sets the string's key (i.e., the name of the constant)
 		def key=(key)
-			raise(ArgumentError, "BibTeX::String key must be of type Symbol; was: #{key.class.name}.") unless key.kind_of?(Symbol)
+			raise(ArgumentError, "BibTeX::String key must be of type Symbol; was: #{key.class.name}.") unless key.is_a?(Symbol)
 			@key = key
 		end
 
 		# Sets the string's value (i.e., the string literal defined by the constant)
 		def value=(value)
-			raise(ArgumentError, "BibTeX::String value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
-			@value = value.kind_of?(Array) ? value : [value]
+			raise(ArgumentError, "BibTeX::String value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
+			@value = Extensions.string_replacement(value.is_a?(Array) ? value : [value])
 		end
-
-		# Replaces all constants in this string's value which are defined in +hsh+.
+    
+    def value
+      @value.to_s(:quotes => %w(" "))
+    end
+    
+		# Replaces all constants in this string's value which are defined in +hash+.
 		# Returns the new value (the @string object itself remains unchanged).
 		#
 		# call-seq:
 		# s.to_s
 		# => "@string{ foobar = foo # "bar"}"
-		# s.replace({:foo => 'foo'})
-		# => ["foo","bar"]
+		# s.replace({:foo => 'bar'})
+		# => "\"bar\" # \"bar\""
 		# s.to_s
 		# => "@string{ foobar = foo # "bar"}"
-		def replace(hsh)
-			StringReplacement.replace(@value,hsh)
+		def replace(hash)
+		  @value.replace_strings(hash)
 		end
 
 		# Replaces all constants in this string's value which are defined in +hsh+.
@@ -125,19 +129,24 @@ module BibTeX
 		# call-seq:
 		# s.to_s
 		# => "@string{ foobar = foo # "bar"}"
-		# s.replace({:foo => 'foo'})
-		# => ["foo","bar"]
+		# s.replace({:foo => 'bar'})
+		# => ["bar","bar"]
 		# s.to_s
-		# => "@string{ foobar = "foo" # "bar"}"
-		def replace!(hsh)
-			@value = replace(hsh)
-			@bibliography.strings[@key] = value unless @bibliography.nil?
+		# => "@string{ foobar = "bar" # "bar"}"
+		def replace!(hash)
+			@value = @value.replace_strings(hash)
+			@bibliography.strings[@key] = @value unless @bibliography.nil?
 		end
+
+    def join!
+			@value = @value.join_strings
+			@bibliography.strings[@key] = @value unless @bibliography.nil?      
+    end
 
 		# Adds either a string constant or literal to the current value. The
 		# values will be concatenated using the `#' symbol.
 		def <<(value)
-			raise(ArgumentError, "BibTeX::String value can contain only instances of Symbol or String; was: #{value.class.name}.") unless [::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
+			raise(ArgumentError, "BibTeX::String value can contain only instances of Symbol or String; was: #{value.class.name}.") unless [::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
 			@value << value
 		end
 
@@ -157,16 +166,16 @@ module BibTeX
 
 		# Returns a string representation of the @string's content.
 		def content
-			[@key.to_s,' = ',StringReplacement.to_s(@value)].join
+			[@key.to_s, value].join(' = ')
 		end
 
 		# Returns a string representation of the @string object.
 		def to_s
-			['@string{ ',content,'}'].join
+			"@string{ #{content} }"
 		end
 		
 		def to_hash
-		  { 'string' => { @key.to_s => StringReplacement.to_s(@value) } }
+		  { 'string' => { @key.to_s => @value.to_s(:quotes => %w(" ")) } }
 		end
 		
 		def to_xml
@@ -174,7 +183,7 @@ module BibTeX
 		  key = REXML::Element.new('key')
 		  val = REXML::Element.new('value')
 		  key.text = @key.to_s
-		  val.text = @value.to_s
+		  val.text = @value.to_s(:quotes => %w(" "))
 		  xml
 		end
 	end
@@ -186,40 +195,43 @@ module BibTeX
 	# a single constant, or a concatenation of string literals and
 	# constants.
 	class Preamble < Element
-		attr_reader :value
-
+    
 		# Creates a new instance.
 		def initialize(value=[])
 			self.value = value
 		end
 
 		def value=(value)
-			raise(ArgumentError, "BibTeX::Preamble value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.kind_of?(k) }.inject { |sum,n| sum || n }
-			@value = value.kind_of?(Array) ? value : [value]
+			raise(ArgumentError, "BibTeX::Preamble value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
+			@value = Extensions.string_replacement(value.is_a?(Array) ? value : [value])
 		end
 
-		def replace(hsh)
-			StringReplacement.replace(@value,hsh)
+		def replace(hash)
+			@value.replace_strings(hash)
 		end
 
-		def replace!(hsh)
-			@value = replace(hsh)
-			@bibliography.strings[@key] = @value unless @bibliography.nil?
+		def replace!(hash)
+			@value = @value.replace_strings(hash)
 		end
 
+    def join!
+      @value = @value.join_strings
+    end
+
+    def value
+      content
+    end
+    
 		# Returns a string representation of the @preamble's content.
 		def content
-			StringReplacement.to_s(@value)
+			@value.to_s(:quotes => %w(" "))
 		end
 
 		# Returns a string representation of the @preamble object
 		def to_s
-			['@preamble{ ',content,'}'].join
+			"@preamble{ #{ content } }"
 		end
 		
-		def to_hash
-		  { 'preamble' => StringReplacement.to_s(@value) }
-		end
 	end
 
 	# Represents a @comment object.
@@ -230,7 +242,7 @@ module BibTeX
 		end
 
 		def content=(content)
-			raise(ArgumentError, "BibTeX::#{self.class.name} content must be of type String; was: #{content.class.name}.") unless content.kind_of?(::String)
+			raise(ArgumentError, "BibTeX::#{self.class.name} content must be of type String; was: #{content.class.name}.") unless content.is_a?(::String)
 			@content = content
 		end
 
