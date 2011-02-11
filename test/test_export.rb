@@ -1,7 +1,5 @@
-require File.expand_path('../../lib/bibtex.rb', __FILE__)
-require 'rubygems'
-require 'minitest/unit'
-require 'minitest/autorun'
+require 'helper.rb'
+
 require 'yaml'
 require 'json'
 
