@@ -75,13 +75,13 @@ Usage
 -----
 
 It is very easy to use BibTeX-Ruby. You can use the top level utility methods
-`BibTeX.open` and `BibTeX.parse` to open a '.bib' file or to parse a string
++BibTeX.open+ and +BibTeX.parse+ to open a '.bib' file or to parse a string
 containing BibTeX contents. Normally, BibTeX-Ruby will discard all text outside
 of regular BibTeX elements; however, if you wish to include everything, simply add
-`:include => [:meta_comments]` to your invocation of `BibTeX.open` or `BibTeX.parse`.
+`:include => [:meta_comments]` to your invocation of +BibTeX.open+ or +BibTeX.parse+.
 
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
-For example, if your bibliography object `bib` contained the following entry:
+For example, if your bibliography object +bib+ contained the following entry:
 
 		@book{pickaxe,
 		  address = {Raleigh, North Carolina},
@@ -97,17 +97,17 @@ For example, if your bibliography object `bib` contained the following entry:
 		
 You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]`;
 you also have easy access to individual fields, for example: `bib[:pickaxe][:author]`.
-For convenience, BibTeX-Ruby accepts ghost methods to access an entry's fields,
-similar to +ActiveRecord::Base+. Therefore, it is also possible to access the
+Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry's fields,
+similar to +ActiveRecord::Base+. Therefore, it is equally possible to access the
 'author' field above as `bib[:pickaxe].author`.
 
 ### String Replacement
 
 If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
 replace the strings for you. You have access to a bibliography's strings via
-`BibTeX::Bibliography#strings` and you can replace the strings of an entry using
-the `BibTeX::Entry#replace!` method. Thus, to replace all strings defined in your
-bibliography object `bib` your could use this code:
++BibTeX::Bibliography#strings+ and you can replace the strings of an entry using
+the +BibTeX::Entry#replace!+ method. Thus, to replace all strings defined in your
+bibliography object +bib+ your could use this code:
 
 		bib.entries.each do |entry|
 			entry.replace!(bib.strings)
@@ -123,8 +123,8 @@ Of course, you can also export your bibliography back to BibTeX; if you include
 except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
 all keys).
 
-In order to export your bibliography use `#to_s`, `#to_yaml`, `#to_json`, or
-`#to_xml`, respectively. For example, the following line constitutes a simple
+In order to export your bibliography use +#to_s+, +#to_yaml+, +#to_json+, or
++#to_xml+, respectively. For example, the following line constitutes a simple
 BibTeX to YAML converter:
 
     BibTeX.open('example.bib').to_yaml
