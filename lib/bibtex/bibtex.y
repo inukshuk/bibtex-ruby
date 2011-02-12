@@ -66,7 +66,7 @@ rule
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
         | entry_head RBRACE                        { result = val[0] }
 
-  entry_head : NAME LBRACE key COMMA               { result = BibTeX::Entry.new(val[0].downcase.to_sym,val[2]) }
+  entry_head : NAME LBRACE key COMMA               { result = BibTeX::Entry.new(:type => val[0].downcase.to_sym, :key => val[2]) }
 
   key : NAME                                       { result = val[0] }
       | NUMBER                                     { result = val[0] }

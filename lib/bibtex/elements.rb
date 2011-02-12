@@ -25,6 +25,11 @@ module BibTeX
 
 		attr_reader :bibliography
 		
+		# Returns an array of BibTeX elements.
+    def self.parse(string, options={})
+      BibTeX::Parser.new(options).parse(string).to_a
+    end
+    
 		def initialize
 			@bibliography = nil
 		end

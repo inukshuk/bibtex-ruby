@@ -17,10 +17,11 @@ lib/bibtex/bibtex.y
 lib/bibtex/elements.rb
 lib/bibtex/entry.rb
 lib/bibtex/error.rb
+lib/bibtex/extensions.rb
 lib/bibtex/lexer.rb
 lib/bibtex/parser.output
 lib/bibtex/parser.rb
-lib/bibtex/string_replacement.rb
+lib/bibtex/utilities.rb
 lib/bibtex/version.rb
 lib/bibtex.rb
 test
@@ -36,9 +37,12 @@ test/bib/07_entry.bib
 test/bib/08_decoret.bib
 test/bib/09_errors.bib
 test/bib/10_bibdesk.bib
+test/bib/11_roundtrip.bib
+test/helper.rb
 test/test_bibtex.rb
 test/test_comment.rb
 test/test_entry.rb
 test/test_export.rb
 test/test_preamble.rb
 test/test_string.rb
+test/test_utilities.rb

@@ -51,5 +51,58 @@ class TestBibtex < MiniTest::Unit::TestCase
     assert_equal('rails', bib.data[0].key)
     assert_equal('2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified'])
   end
+  
+  def test_roundtrip
+    file = File.read('test/bib/11_roundtrip.bib')
+    bib = BibTeX.parse(file, :debug => true)
+    refute_nil(bib)
+    assert_equal(BibTeX::Bibliography, bib.class)
+    assert_equal(1, bib.length)
+    assert_equal(file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, ''))
+  end
+  
+  def test_construct
+    file = File.read('test/bib/11_roundtrip.bib')
+    bib = BibTeX::Bibliography.new
+    bib << BibTeX::Entry.new({
+      :type => :book,
+      :key => 'rails',
+      :address => 'Raleigh, North Carolina',
+      :author => 'Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier',
+      :booktitle => 'Agile Web Development with Rails',
+      :edition => 'third',
+      :keywords => 'ruby, rails',
+      :publisher => 'The Pragmatic Bookshelf',
+      :series => 'The Facets of Ruby',
+      :title => 'Agile Web Development with Rails',
+      :year => '2009'
+    })
+    assert_equal(file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, ''))    
+  end
+  
+  def test_parse
+    file = File.read('test/bib/11_roundtrip.bib')
+    bib = BibTeX::Bibliography.new
+    bib.add(BibTeX::Element.parse(%q( @string{ pragprog = "The Pragmatic Booksehlf" } )))
+    bib.add(BibTeX::Element.parse(<<-END
+    @book{rails,
+      address = {Raleigh, North Carolina},
+      author = {Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier},
+      booktitle = {Agile Web Development with Rails},
+      edition = {third},
+      keywords = {ruby, rails},
+      publisher = {The Pragmatic Bookshelf},
+      series = {The Facets of Ruby},
+      title = {Agile Web Development with Rails},
+      year = {2009}
+    }    
+    END
+    ))
+    
+    assert_equal(2, bib.length)
+    refute_nil(bib[:rails])
+    bib.replace_strings
+    assert_equal(file.gsub(/[\s]+/, ''), bib[:rails].to_s.gsub(/[\s]+/, ''))
+  end
 end
 

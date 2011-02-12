@@ -95,7 +95,7 @@ module BibTeX
     def [](key)
       @entries[key.to_s]
     end
-
+          
     # Returns all @comment objects.
     def comments
       find_by_type(BibTeX::Comment)
@@ -155,6 +155,11 @@ module BibTeX
       @data.length
     end
 
+    # Returns the bibliography as an array of +BibTeX::Element+
+    def to_a
+      @data
+    end
+    
     # Returns a string representation of the bibliography.
     def to_s
       @data.map(&:to_s).join

@@ -43,12 +43,14 @@ module BibTeX
 			:unpublished => [:author,:title,:note]
 		})
 
-		# Creates a new instance of a given +type+ (e.g., :article, :book, etc.)
-		# identified by a +key+.
-		def initialize(type=nil, key=nil)
-			self.key = key.to_s unless key.nil?
-			self.type = type.to_sym unless type.nil?
+		# Creates a new instance. If a hash is given, the entry is populated accordingly.
+		def initialize(hash={})
 			@fields = {}
+		  
+		  self.type = hash.delete(:type) if hash.has_key?(:type)
+		  self.key = hash.delete(:key) if hash.has_key?(:key)
+						
+			hash.each { |k, v| add(k.to_sym, v) }
 		end
 
 		# Sets the key of the entry
@@ -143,7 +145,7 @@ module BibTeX
 
 		# Returns a string of all the entry's fields.
 		def content
-			@fields.keys.map { |k| "#{k} = #{ @fields[k].to_s(:quotes => %w({})) }" }.join(",\n")
+			@fields.keys.map { |k| "#{k} = #{ @fields[k].to_s(:quotes => %w({ })) }" }.join(",\n")
 		end
 
 		# Returns a string representation of the entry.
