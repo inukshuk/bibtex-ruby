@@ -43,10 +43,9 @@ module BibTeX
 	Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
 	Log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
-  if Log.level == Logger::DEBUG
-    require 'ruby-debug'
-    Debugger.start
-  end
+  # Load debugger
+  # require 'ruby-debug'
+  # Debugger.start
 
   require 'bibtex/extensions'
   require 'bibtex/elements'
