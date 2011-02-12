@@ -19,7 +19,7 @@ class TestPreamble < MiniTest::Unit::TestCase
     assert_equal('"Maintained by " # maintainer', @bib.data[3].content)
   end
   
-  def teset_roundtrip
+  def test_roundtrip
     assert_equal(%q[@preamble{ "This bibliography was created \today" }], @bib.data[0].to_s)
     assert_equal(%q[@preamble{ "Bib\TeX" }], @bib.data[1].to_s)
     assert_equal(%q[@string{ maintainer = "Myself" }], @bib.data[2].to_s)
