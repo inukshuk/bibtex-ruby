@@ -12,28 +12,28 @@ post-processing.
 Quickstart
 ----------
 
-		$ [sudo] gem install bibtex-ruby
-		$ irb
-		> require 'bibtex'
-		 => true
-		> bib = BibTeX.open('./ruby.bib')
-		 => book{pickaxe,
-		  address  {Raleigh, North Carolina},
-		  author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-		  date-added  {2010-08-05 09:54:07 0200},
-		  date-modified  {2010-08-05 10:07:01 0200},
-		  keywords  {ruby},
-		  publisher  {The Pragmatic Bookshelf},
-		  series  {The Facets of Ruby},
-		  title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
-		  year  {2009}
-		}
-		> bib[:pickaxe].year
-		 => "2009"
-		> bib[:pickaxe][:title]
-		 => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
-		> bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
-		 => "Thomas, D., and Fowler, C., and Hunt, A."
+    $ [sudo] gem install bibtex-ruby
+    $ irb
+    > require 'bibtex'
+     => true
+    > bib = BibTeX.open('./ruby.bib')
+     => book{pickaxe,
+      address  {Raleigh, North Carolina},
+      author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+      date-added  {2010-08-05 09:54:07 0200},
+      date-modified  {2010-08-05 10:07:01 0200},
+      keywords  {ruby},
+      publisher  {The Pragmatic Bookshelf},
+      series  {The Facets of Ruby},
+      title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
+      year  {2009}
+    }
+    > bib[:pickaxe].year
+     => "2009"
+    > bib[:pickaxe][:title]
+     => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+    > bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
+     => "Thomas, D., and Fowler, C., and Hunt, A."
 
 
 Installation
@@ -41,16 +41,16 @@ Installation
 
 If you just want to use it:
 
-		$ [sudo] gem install bibtex-ruby
+    $ [sudo] gem install bibtex-ruby
 
 If you want to work with the sources:
 
-		$ git clone http://github.com/inukshuk/bibtex-ruby.git
-		$ cd bibtex-ruby
-		$ [sudo] bundle install
-		$ rake racc
-		$ rake rdoc
-		$ rake test
+    $ git clone http://github.com/inukshuk/bibtex-ruby.git
+    $ cd bibtex-ruby
+    $ [sudo] bundle install
+    $ rake racc
+    $ rake rdoc
+    $ rake test
 
 Or, alternatively, fork the [project on GitHub](http://github.com/inukshuk/bibtex-ruby.git).
 
@@ -81,25 +81,50 @@ of regular BibTeX elements; however, if you wish to include everything, simply a
 `:include => [:meta_comments]` to your invocation of **BibTeX.open** or **BibTeX.parse**.
 
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
-For example, if your bibliography object **bib** contained the following entry:
+For example, if you set up your bibliography as follows:
 
-		@book{pickaxe,
-		  address = {Raleigh, North Carolina},
-		  author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-		  date-added = {2010-08-05 09:54:07 +0200},
-		  date-modified = {2010-08-05 10:07:01 +0200},
-		  keywords = {ruby},
-		  publisher = {The Pragmatic Bookshelf},
-		  series = {The Facets of Ruby},
-		  title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
-		  year = {2009}
-		}
-		
+    bib = BibTeX.parse <<-END
+    @book{pickaxe,
+      address = {Raleigh, North Carolina},
+      author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+      date-added = {2010-08-05 09:54:07 +0200},
+      date-modified = {2010-08-05 10:07:01 +0200},
+      keywords = {ruby},
+      publisher = {The Pragmatic Bookshelf},
+      series = {The Facets of Ruby},
+      title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+      year = {2009}
+    }
+    END
+    
 You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]`;
 you also have easy access to individual fields, for example: `bib[:pickaxe][:author]`.
 Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry's fields,
 similar to **ActiveRecord::Base**. Therefore, it is equally possible to access the
 'author' field above as `bib[:pickaxe].author`.
+
+Instead of parsing strings you can also create BibTeX elements by using Ruby:
+
+    > bib = BibTeX::Bibliography.new
+    > bib << BibTeX::Entry.new({
+    >   :type => :book,
+    >   :key => 'rails',
+    >   :address => 'Raleigh, North Carolina',
+    >   :author => 'Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier',
+    >   :booktitle => 'Agile Web Development with Rails',
+    >   :edition => 'third',
+    >   :keywords => 'ruby, rails',
+    >   :publisher => 'The Pragmatic Bookshelf',
+    >   :series => 'The Facets of Ruby',
+    >   :title => 'Agile Web Development with Rails',
+    >   :year => '2009'
+    > })
+    > book = BibTeX::Entry.new
+    > book.type = :book
+    > book.key = 'mybook'
+    > bib << book
+
+
 
 ### String Replacement
 
@@ -109,10 +134,39 @@ replace the strings for you. You have access to a bibliography's strings via
 the **BibTeX::Entry#replace!** method. Thus, to replace all strings defined in your
 bibliography object **bib** your could use this code:
 
-		bib.entries.each do |entry|
-			entry.replace!(bib.strings)
-		end
+    bib.entries.each do |entry|
+      entry.replace!(bib.strings)
+    end
+    
+A shorthand version for replacing all strings in a given bibliography is the
+`Bibliography#replace_strings` method. Similarly, you can use the
+`Bibliography#join_strings` method to join individual strings together. For instance:
 
+    > bib = BibTeX::Bibliography.new
+    > bib.add BibTeX::Element.parse '@string{ foo = "foo" }'
+    > bib.add BibTeX::Element.parse '@string{ bar = "bar" }'
+    > bib.add BibTeX::Element.parse <<-END
+    >  @book{abook,
+    >    author = foo # "Author",
+    >    title = foo # bar
+    >  }
+    > END
+    > puts bib[:abook].to_s
+    @book{abook,
+      author = foo # "Author",
+      title = foo # bar
+    }
+    > bib.replace_strings
+    > puts bib[:abook].to_s
+    @book{abook,
+      author = "foo" # "Author",
+      title = "foo" # "bar"
+    }
+    > bib.join_strings
+    @book{abook,
+      author = {fooAuthor},
+      title = {foobar}
+    }
 
 ### Conversions
 
@@ -209,8 +263,8 @@ constants can be used within string assignments in other @string or @preamble
 objects, as well as in regular BibTeX entries. For example, this is a valid constant
 definition and usage:
 
-		@string{ generator = "BibTeX-Ruby"}
-		@preamble{ "This bibliography was generated by " # generator }
+    @string{ generator = "BibTeX-Ruby"}
+    @preamble{ "This bibliography was generated by " # generator }
 
 
 ### @preamble
