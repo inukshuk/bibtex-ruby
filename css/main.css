@@ -1,27 +1,107 @@
+html, body {
+  height: 100%; }
+
 body {
-	background-color: black;
-	background-image: url('../assets/tile.png');
-	background-position: top left;
-	background-repeat: repeat;
-	font-family: Georgia, serif;
-	color: black;
-}
+  background-color: black;
+  background-image: url("../assets/tile.png");
+  background-position: top left;
+  background-repeat: repeat;
+  font-family: "Lucida Grande", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1.38em;
+  text-align: center;
+  color: #444444; }
 
 #container {
+  position: relative;
+  margin: 2em auto 0 auto;
+  width: 880px;
+  text-align: left; }
+
+#main {
 	position: relative;
-	margin: 5em auto;
-	padding: 80px 20px 20px 20px;
-	background-color: white;
-	max-width: 660px;
-	-webkit-border-radius:  7px 7px 7px 7px;
-	-moz-border-radius:  7px 7px 7px 7px;
-	border-radius:  7px 7px 7px 7px;
-}
-#container {
-	-webkit-box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
-	-moz-box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
-	box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
-}
+  -moz-border-radius: 7px 7px 7px 7px;
+  -webkit-border-radius: 7px 7px 7px 7px;
+  border-radius: 7px 7px 7px 7px;
+  -moz-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.25) inset, 0 0 10px 5px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.25) inset, 0 0 10px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.25) inset, 0 0 10px 5px rgba(0, 0, 0, 0.5);
+  padding: 7px 0;
+  background-color: white;
+  width: 640px; }
+
+.post {
+  padding: 20px 50px 0 50px; }
+  .post h2 {
+    font-size: 1.235em;
+    font-weight: normal;
+    margin-top: 2em;
+    margin-bottom: 1.2em; }
+  .post h1 {
+    margin-bottom: 1.5em;
+    font-size: 1.7em;
+    line-height: 30px; }
+  .post h1, .post h1 a {
+    font-weight: normal;
+    text-decoration: none;
+    color: #444444; }
+  .post p {
+    margin-bottom: 1.2em; }
+  .post .meta {
+    font-size: 0.85em;
+    font-weight: normal; }
+    .post .meta p {
+      margin-bottom: 0; }
+  .post .meta.top {
+    display: block;
+    width: 180px;
+    float: left;
+    margin-left: -200px;
+    text-align: right; }
+  .post .meta.bottom {
+    padding-bottom: 2em; }
+
+#sidebar {
+  float: right;
+  width: 198px;
+  padding-top: 67px; }
+  #sidebar .box {
+    -moz-border-radius: 7px 7px 7px 7px;
+    -webkit-border-radius: 7px 7px 7px 7px;
+    border-radius: 7px 7px 7px 7px;
+    -moz-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.25) inset, 0 0 10px 5px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.25) inset, 0 0 10px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.25) inset, 0 0 10px 5px rgba(0, 0, 0, 0.5);
+    font-size: 0.85em;
+    font-weight: normal;
+    padding: 7px 7px;
+    margin-bottom: 3.5em;
+    background-color: white; }
+    #sidebar .box h3 {
+			margin-top: 1em;
+      font-size: 1em;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal; }
+  #sidebar .box.hud {
+    background-color: #111;
+    opacity: 0.7;
+    color: white; }
+
+#gradient {
+  background-color: transparent;
+  background: -moz-linear-gradient(top, transparent 80%, rgba(0, 0, 0, 0.75) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(80%, transparent), color-stop(100%, rgba(0, 0, 0, 0.75)));
+  min-height: 100%; }
+
+footer {
+  padding: 1.2em 0 3em 0;
+  width: 640px;
+  text-align: center;
+  font-size: 80%;
+  clear: both; }
+
 
 #ribbon {
 	position: absolute;
@@ -39,52 +119,19 @@ body {
 }
 
 
-h1 {
-  margin: 80px 0 40px 0;
-  font-size: 40px;
-}
-
-h1 em {
-	font-style: normal;
-	font-size: 15px;
-}
-
-h2 {
-  margin: 40px 0 15px 0;
-  padding-top: 20px;
-  border: 0;
-  border-top: 1px solid #aaa;
-  font-size: 20px;
-}
-
-h3 {
-	color: black;
-	margin: 20px 0 10px 0;
-}
-
-p {
-	margin: 1em 0 1em 0;
-}
-
 pre {
-	background: black;
-	color: white;
+	background: #EEE;
 	padding: 15px;
 	font-size: 90%;
 	white-space: pre-wrap;
-	-webkit-border-radius:  7px 7px 7px 7px;
-	-moz-border-radius:  7px 7px 7px 7px;
-	border-radius:  7px 7px 7px 7px;
+	-webkit-border-radius:  4px 4px 4px 4px;
+	-moz-border-radius:  4px 4px 4px 4px;
+	border-radius:  4px 4px 4px 4px;
+	margin-bottom: 1em;
 }
 
 hr {
 	border: 0;
 	width: 80%;
 	border-bottom: 1px solid #aaa
-}
-
-.footer {
-	text-align: center;
-	padding-top: 30px;
-	font-style: italic;
 }

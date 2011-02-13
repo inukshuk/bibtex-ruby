@@ -13,235 +13,333 @@
 </head>
 
 <body>
+<div id="gradient">
 
   <div id="container">
-    <a href="http://github.com/inukshuk/bibtex-ruby"><img id="ribbon" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-    <div id="download">
-      <a href="http://github.com/inukshuk/bibtex-ruby/downloads">
-        <img src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/inukshuk/bibtex-ruby/downloads">
-        <img src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
+		<div id="sidebar">
+	    <div class="box">
+				<h3>Downloads</h3>
+				<ul>
+	      <li><a href="http://github.com/inukshuk/bibtex-ruby/downloads">Sources from GitHub</a></li>
+	      <li><a href="http://rubygems.org/bibtex-ruby/">The Ruby Gem</a></li>
+				</ul>
+				
+				<h3>BibTeX Resources</h3>
+				<ul>
+					<li><a href="http://www.ctan.org/get/biblio/bibtex/">The original BibTeX at CTAN</a></li>
+					<li><a href="http://artis.imag.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html">BibTeX overview by Xavier Decoret</a></li>
+					<li><a href="http://www.lsv.ens-cachan.fr/~markey/bibla.php">Resources by Nicolas Markey</a></li>
+				</ul>
+	    </div>
+		</div>
 
-    <h1>BibTeX-Ruby</h1>
+		<div id="main">
+	    <a id="ribbon" href="http://github.com/inukshuk/bibtex-ruby"><img src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+		
+			<div class="post">
 
-    <p>The BibTeX-Ruby package contains a parser for BibTeX
-    bibliography files and a class structure to manage BibTeX objects in
-    Ruby. It is designed to support all BibTeX objects (including @comment,
-    string-replacements via @string, as well as string concatenation using '#')
-    and handles all content outside of BibTeX objects as 'meta comments' which may
-    be included in post-processing.</p>
+				<h1>BibTeX-Ruby</h1>
 
-    <h2>Quickstart</h2>
+				<p>The BibTeX-Ruby package contains a parser for BibTeX bibliography files and a
+				class structure to manage or convert BibTeX objects in Ruby. It is designed to
+				support all BibTeX objects (including @comment, string-replacements via @string,
+				as well as string concatenation using '#') and handles all content outside of
+				BibTeX objects as 'meta comments' which may or may not be included in
+				post-processing.</p>
 
-    <pre><code>    $ irb
-    &gt; require 'bibtex'
-     =&gt; true
-    &gt; bib = BibTeX::Bibliography.open('./ruby.bib')
-     =&gt; book{pickaxe,
-      address  {Raleigh, North Carolina},
-      author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-      date-added  {2010-08-05 09:54:07 0200},
-      date-modified  {2010-08-05 10:07:01 0200},
-      keywords  {ruby},
-      publisher  {The Pragmatic Bookshelf},
-      series  {The Facets of Ruby},
-      title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
-      year  {2009}
-     }
-    &gt; bib[:pickaxe][:author]
-     =&gt; ["Thomas, Dave, and Fowler, Chad, and Hunt, Andy"]
-    </code></pre>
+				<h2>Quickstart</h2>
 
-    <h2>Installation</h2>
+				<pre><code>$ [sudo] gem install bibtex-ruby
+$ irb
+&gt; require 'bibtex'
+ =&gt; true
 
-    <p>If you just want to use it:</p>
+&gt; bib = BibTeX.open('./ruby.bib')
+ =&gt; book{pickaxe,
+  address  {Raleigh, North Carolina},
+  author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+  date-added  {2010-08-05 09:54:07 0200},
+  date-modified  {2010-08-05 10:07:01 0200},
+  keywords  {ruby},
+  publisher  {The Pragmatic Bookshelf},
+  series  {The Facets of Ruby},
+  title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
+  year  {2009}
+}
+&gt; bib[:pickaxe].year
+ =&gt; "2009"
+&gt; bib[:pickaxe][:title]
+ =&gt; "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+&gt; bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
+ =&gt; "Thomas, D., and Fowler, C., and Hunt, A."</code></pre>
 
-    <pre><code>    $ [sudo] gem install bibtex-ruby
-    </code></pre>
+				<h2>Installation</h2>
 
-    <p>If you want to work with the sources:</p>
+				<p>If you just want to use it:</p>
 
-    <pre><code>    $ [sudo] gem install racc
-    $ git clone http://github.com/inukshuk/bibtex-ruby.git
-    $ cd bibtex-ruby
-    $ rake racc
-    $ rake rdoc
-    $ rake test
-    </code></pre>
+				<pre><code>$ [sudo] gem install bibtex-ruby</code></pre>
 
-    <p>Or, alternatively, fork the <a href="http://github.com/inukshuk/bibtex-ruby.git">project on github</a>.</p>
+				<p>If you want to work with the sources:</p>
 
+				<pre><code>$ git clone http://github.com/inukshuk/bibtex-ruby.git
+$ cd bibtex-ruby
+$ [sudo] bundle install
+$ rake racc
+$ rake rdoc
+$ rake test</code></pre>
 
-    <h2>Requirements</h2>
+				<p>Or, alternatively, fork the <a href="http://github.com/inukshuk/bibtex-ruby.git">project on GitHub</a>.</p>
 
-    <ul>
-    <li>The parser generator <a href="http://i.loveruby.net/en/projects/racc/">racc</a> is required to generate parser.</li>
-    <li>The minitest gem is required to run the tests in older Ruby versions (prior to 1.9).</li>
-    <li>The json gem is required on older ruby versions for JSON export.</li>
+				<h2>Requirements</h2>
 
-    </ul><h2>Usage</h2>
+				<ul>
+				<li>The parser generator <a href="http://i.loveruby.net/en/projects/racc/">racc</a> is
+				required to generate parser.</li>
+				<li>The <em>minitest</em> gem is required to run the tests in older Ruby versions.</li>
+				<li>The <em>json</em> gem is required on older Ruby versions for JSON export.</li>
 
-    <p>It is very easy to use BibTeX-Ruby. You can use the class method <code>BibTeX::Bibliography.open</code>
-    to open a '.bib' file. Normally, BibTeX-Ruby will discard all content outside of
-    regular BibTeX elements; however, if you wish to include everything, simply add
-    <code>:include =&gt; [:meta_comments]</code> to your invocation of <code>BibTeX::Bibliography.open</code>.</p>
+				</ul><p>The bibtex-ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
+				been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java. It
+				does not work with MacRuby 0.8 because of a bug in MacRuby's implementation
+				of the <em>StringScanner</em> class, however, this has been fixed in SVN (see
+				<a href="https://github.com/inukshuk/bibtex-ruby/issues/closed#issue/1">#1</a> for details).</p>
 
-    <p>Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
-    For example, if your bibliography object <code>bib</code> contained the following entry:</p>
+				<h2>Usage</h2>
 
-    <pre><code>    @book{pickaxe,
-      address = {Raleigh, North Carolina},
-      author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-      date-added = {2010-08-05 09:54:07 +0200},
-      date-modified = {2010-08-05 10:07:01 +0200},
-      keywords = {ruby},
-      publisher = {The Pragmatic Bookshelf},
-      series = {The Facets of Ruby},
-      title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
-      year = {2009}
-    }
-    </code></pre>
+				<p>It is very easy to use BibTeX-Ruby. You can use the top level utility methods
+				<strong>BibTeX.open</strong> and <strong>BibTeX.parse</strong> to open a '.bib' file or to parse a string
+				containing BibTeX contents. Normally, BibTeX-Ruby will discard all text outside
+				of regular BibTeX elements; however, if you wish to include everything, simply add
 
-    <p>You could easily access it, using the entry's key, 'pickaxe', like so: <code>bib[:pickaxe]</code>;
-    you also have easy access to individual fields, for example: <code>bib[:pickaxe](:author)</code>.</p>
+				<code>:include =&gt; [:meta_comments]</code> to your invocation of <strong>BibTeX.open</strong> or <strong>BibTeX.parse</strong>.</p>
 
-    <p>If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
-    replace the strings for you. You have access to a bibliography's strings via
-    <code>BibTeX::Bibliography#strings</code> and you can replace the strings of an entry using
-    the <code>BibTeX::Entry#replace!</code> method. Thus, to replace all strings defined in your
-    bibliography object <code>bib</code> your could use this code:</p>
+				<p>Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
+				For example, if you set up your bibliography as follows:</p>
 
-    <pre><code>    bib.entries.each do |entry|
-      entry.replace!(bib.strings)
-    end
-    </code></pre>
+				<pre><code>bib = BibTeX.parse &lt;&lt;-END
+@book{pickaxe,
+  address = {Raleigh, North Carolina},
+  author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+  date-added = {2010-08-05 09:54:07 +0200},
+  date-modified = {2010-08-05 10:07:01 +0200},
+  keywords = {ruby},
+  publisher = {The Pragmatic Bookshelf},
+  series = {The Facets of Ruby},
+  title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+  year = {2009}
+}
+END</code></pre>
 
-    <p>Furthermore, BibTeX-Ruby allows you to export your bibliography for processing
-    by other tools. Currently supported formats include YAML, JSON, and XML.
-    Of course, you can also export your bibliography back to BibTeX; if you include
-    `:meta_comments', your export should be identical to the original '.bib' file,
-    except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
-    all keys).</p>
+				<p>You could easily access it, using the entry's key, 'pickaxe', like so: <code>bib[:pickaxe]</code>;
+				you also have easy access to individual fields, for example: <code>bib[:pickaxe][:author]</code>.
+				Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry's fields,
+				similar to <strong>ActiveRecord::Base</strong>. Therefore, it is equally possible to access the
+				'author' field above as <code>bib[:pickaxe].author</code>.</p>
 
-    <p>In order to export your bibliography use <code>#to_s</code>, <code>#to_yaml</code>, <code>#to_json</code>, or
-    <code>#to_xml</code>, respectively.</p>
+				<p>Instead of parsing strings you can also create BibTeX elements by using Ruby:</p>
 
-    <p>Look at the 'examples' directory for a simple BibTeX to YAML and BibTeX to HTML converter.</p>
+				<pre><code>&gt; bib = BibTeX::Bibliography.new
+					
+&gt; bib &lt;&lt; BibTeX::Entry.new({
+&gt;   :type =&gt; :book,
+&gt;   :key =&gt; 'rails',
+&gt;   :address =&gt; 'Raleigh, North Carolina',
+&gt;   :author =&gt; 'Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier',
 
-    <h2>The Parser</h2>
+&gt;   :booktitle =&gt; 'Agile Web Development with Rails',
+&gt;   :edition =&gt; 'third',
+&gt;   :keywords =&gt; 'ruby, rails',
+&gt;   :publisher =&gt; 'The Pragmatic Bookshelf',
+&gt;   :series =&gt; 'The Facets of Ruby',
 
-    <p>The BibTeX-Ruby parser is generated using the wonderful
-    <a href="http://i.loveruby.net/en/projects/racc/">racc</a> parser generator.</p>
+&gt;   :title =&gt; 'Agile Web Development with Rails',
+&gt;   :year =&gt; '2009'
+&gt; })
+&gt; book = BibTeX::Entry.new
+&gt; book.type = :book
+&gt; book.key = 'mybook'
+&gt; bib &lt;&lt; book</code></pre>
 
-    <h3>The BibTeX Format</h3>
+				<h3>String Replacement</h3>
 
-    <p>At first glance, the BibTeX file format seems very clear and simple;
-    however, there are a number of peculiarities which warrant some
-    explanation. The best place to start reading is probably at <a href="http://www.ctan.org/get/biblio/bibtex/">your closest
-    ctan server</a> where
-    the original <code>bibtex</code> from 1988 still lives. Additionally, Xavier Decoret
-    has written
+				<p>If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
+				replace the strings for you. You have access to a bibliography's strings via
+				<strong>BibTeX::Bibliography#strings</strong> and you can replace the strings of an entry using
+				the <strong>BibTeX::Entry#replace!</strong> method. Thus, to replace all strings defined in your
+				bibliography object <strong>bib</strong> your could use this code:</p>
 
-    <a href="http://artis.imag.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html">a great summary</a>
-    of the format; another invaluable source of information is <a href="http://www.lsv.ens-cachan.fr/~markey/bibla.php">Nicolas Markey's
-    website</a>. Unfortunately,
-    even after consulting these documents, a number of issues remain.
-    Therefore, it is the purpose of this section to deliver the rationale
-    that went into some of the design decision in BibTeX-Ruby.</p>
+				<pre><code>bib.entries.each do |entry|
+  entry.replace!(bib.strings)
+end</code></pre>
 
-    <p>A BibTeX bibliography is typically stored in a file with the file
-    extension '.bib'. This file may contain any number of BibTeX objects;
-    everything that is not a BibTeX object is assumed to be a comment and
-    ignored.</p>
+				<p>A shorthand version for replacing all strings in a given bibliography is the
+				<code>Bibliography#replace_strings</code> method. Similarly, you can use the
+				<code>Bibliography#join_strings</code> method to join individual strings together. For instance:</p>
 
-    <p>The individual objects are discussed in further detail below. First, however, a
-    number of general remarks:</p>
+				<pre><code>&gt; bib = BibTeX::Bibliography.new
+&gt; bib.add BibTeX::Element.parse '@string{ foo = "foo" }'
+&gt; bib.add BibTeX::Element.parse '@string{ bar = "bar" }'
 
-    <ul>
-    <li>BibTeX-Ruby begins in comment-mode, treating all text it encounters as comments.
-    Normally these comments are ignored; however, if you wish the parser to include
-    them, you can do so by adding the symbol <code>:meta_comments</code> to the<code>:include</code> array
-    in the parser's options.</li>
+&gt; bib.add BibTeX::Element.parse &lt;&lt;-END
+&gt;  @book{abook,
+&gt;    author = foo # "Author",
+&gt;    title = foo # bar
+&gt;  }
+&gt; END
+&gt; puts bib[:abook].to_s
+@book{abook,
+  author = foo # "Author",
+  title = foo # bar
+}
+&gt; bib.replace_strings
 
-    <li>Note that string literals in BibTeX are either contained in quotes or braces;
-    nested quotes in a quoted literal are not escaped with a usual backslash but
-    must be placed inside braces. Nested braces must be balanced in literals, regardless
-    of whether they are surrounded by quotes or braces.</li>
-    <li>Quoted strings and string constants (which are defined by @string objects) can be
-    concatted by the '#' symbol. String literals in braces can not be concatted in
-    this way.</li>
-    <li>The '@' symbol may only occur in quoted string literals (not in braced out literals)
-    in the original BibTeX; note, however, that this is not true for BibTeX-Ruby (i.e.,
-    it will parse any string containing an '@').</li>
-    </ul><h3>@comment</h3>
+&gt; puts bib[:abook].to_s
+@book{abook,
+  author = "foo" # "Author",
+  title = "foo" # "bar"
+}
+&gt; bib.join_strings
+@book{abook,
+  author = {fooAuthor},
+  title = {foobar}
+}</code></pre>
 
-    <p>The purpose of the @comment object is not entirely clear, because everything
-    outside of an object is treated as a comment anyway. Nicolas Markay argues that
-    a @comment makes it possible to quickly comment out a number of consecutive
-    objects; however, as Xavier Decoret points out that this does not work with the
-    original `bibtex' program (following a @comment, it simply ignores everything
-    until the end of the line). Indeed, on page 13 of <a href="http://www.ctan.org/get/biblio/bibtex/contrib/doc/btxdoc.pdf">the original
-    documentation</a>,
-    Oren Patashnik explains that @comment objects are not really necessary; they
-    exist only for <em>Scribe</em> system compatibility.</p>
+				<h3>Conversions</h3>
 
-    <p>Because they would be useless otherwise, BibTeX-Ruby treats @comment objects
-    as Nicolas Markay describes them: thus, everything inside a @comment is treated
-    as a comment and is ignored -- everything,
-    that is, until the object is closed. For this reason, BibTeX-Ruby assumes that
-    braces inside a @comment are balanced! Obviously, BibTeX-Ruby differs from
-    <code>bibtex</code> in that respect; though, the gain is, that it is now possible to
-    comment out a sequence of entries, without removing their respective '@' symbols.</p>
+				<p>Furthermore, BibTeX-Ruby allows you to export your bibliography for processing
+				by other tools. Currently supported formats include YAML, JSON, and XML.
+				Of course, you can also export your bibliography back to BibTeX; if you include
+				`:meta_comments', your export should be identical to the original '.bib' file,
+				except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
+				all keys).</p>
 
-    <h3>@string</h3>
+				<p>In order to export your bibliography use <strong>#to_s</strong>, <strong>#to_yaml</strong>, <strong>#to_json</strong>, or
 
-    <p>The @string object defines a single string constant (for multiple constant
-    assignments, it is necessary to define separate @string objects). These
-    constants can be used within string assignments in other @string or @preamble
-    objects, as well as in regular BibTeX entries. For example, this is a valid constant
-    definition and usage:</p>
+				<strong>#to_xml</strong>, respectively. For example, the following line constitutes a simple
+				BibTeX to YAML converter:</p>
 
-    <pre><code>    @string{ generator = "BibTeX-Ruby"}
-    @preamble{ "This bibliography was generated by " # generator }
-    </code></pre>
+				<pre><code>BibTeX.open('example.bib').to_yaml</code></pre>
 
-    <h3>@preamble</h3>
+				<p>Look at the 'examples' directory for more elaborate examples of a BibTeX to YAML
+				and a BibTeX to HTML converter.</p>
 
-    <p>Typically, the purpose of @preamble objects is to define LaTeX statements, which
-    will be put into the '.bbl' file by <code>bibtex</code>. A @preamble object may contain
-    a single string literal, a single string constant (defined by a @string object), or
-    a concatenation of literals and constants.</p>
+				<h2>The Parser</h2>
 
-    <h3>Entries</h3>
+				<p>The BibTeX-Ruby parser is generated using the wonderful
+				<a href="http://i.loveruby.net/en/projects/racc/">racc</a> parser generator. You can take
+				look at the grammar definition in the file <code>lib/bibtex/bibtex.y</code>.</p>
 
-    <p>These represent proper BibTeX objects (e.g., @book, @collection, etc.).</p>
+				<h3>The BibTeX Format</h3>
 
-    <h2>Credits</h2>
+				<p>At first glance, the BibTeX file format seems very clear and simple;
+				however, there are a number of peculiarities which warrant some
+				explanation. The best place to start reading is probably at <a href="http://www.ctan.org/get/biblio/bibtex/">your closest
+				ctan server</a> where
+				the original <code>bibtex</code> from 1988 still lives. Additionally, Xavier Decoret
+				has written
+				<a href="http://artis.imag.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html">a great summary</a>
+				of the format; another invaluable source of information is <a href="http://www.lsv.ens-cachan.fr/~markey/bibla.php">Nicolas Markey's
+				website</a>. Unfortunately,
+				even after consulting these documents, a number of issues remain.
+				Therefore, it is the purpose of this section to deliver the rationale
+				that went into some of the design decision in BibTeX-Ruby.</p>
 
-    <p>The BibTeX-Ruby package was written by <a href="http://sylvester.keil.or.at/">Sylvester Keil</a>.</p>
+				<p>A BibTeX bibliography is typically stored in a file with the file
+				extension '.bib'. This file may contain any number of BibTeX objects;
+				everything that is not a BibTeX object is assumed to be a comment and
+				ignored.</p>
 
-    <h2>License</h2>
+				<p>The individual objects are discussed in further detail below. First, however, a
+				number of general remarks:</p>
 
-    <p>BibTeX-Ruby
-    Copyright &copy; 2010-2011 <a href="http://sylvester.keil.or.at">Sylvester Keil</a></p>
+				<ul>
+				<li>BibTeX-Ruby begins in comment-mode, treating all text it encounters as comments.
+				Normally these comments are ignored; however, if you wish the parser to include
+				them, you can do so by adding the symbol <code>:meta_comments</code> to the <code>:include</code> array
+				in the parser's options.</li>
+				<li>Note that string literals in BibTeX are either contained in quotes or braces;
+				nested quotes in a quoted literal are not escaped with a usual backslash but
+				must be placed inside braces. Nested braces must be balanced in literals, regardless
+				of whether they are surrounded by quotes or braces.</li>
 
-    <p>This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.</p>
+				<li>Quoted strings and string constants (which are defined by @string objects) can be
+				concatted by the '#' symbol. String literals in braces can not be concatted in
+				this way.</li>
+				<li>The '@' symbol may only occur in quoted string literals (not in braced out literals)
+				in the original BibTeX; note, however, that this is not true for BibTeX-Ruby (i.e.,
+				it will parse any string containing an '@').</li>
+				</ul><h3>@comment</h3>
 
-    <p>This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.</p>
+				<p>The purpose of the @comment object is not entirely clear, because everything
+				outside of an object is treated as a comment anyway. Nicolas Markay argues that
+				a @comment makes it possible to quickly comment out a number of consecutive
+				objects; however, as Xavier Decoret points out that this does not work with the
+				original `bibtex' program (following a @comment, it simply ignores everything
+				until the end of the line). Indeed, on page 13 of <a href="http://www.ctan.org/get/biblio/bibtex/contrib/doc/btxdoc.pdf">the original
+				documentation</a>,
+				Oren Patashnik explains that @comment objects are not really necessary; they
+				exist only for <em>Scribe</em> system compatibility.</p>
 
-    <p>You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+				<p>Because they would be useless otherwise, BibTeX-Ruby treats @comment objects
+				as Nicolas Markay describes them: thus, everything inside a @comment is treated
+				as a comment and is ignored -- everything,
+				that is, until the object is closed. For this reason, BibTeX-Ruby assumes that
+				braces inside a @comment are balanced! Obviously, BibTeX-Ruby differs from
+				<code>bibtex</code> in that respect; though, the gain is, that it is now possible to
+				comment out a sequence of entries, without removing their respective '@' symbols.</p>
 
+				<h3>@string</h3>
+
+				<p>The @string object defines a single string constant (for multiple constant
+				assignments, it is necessary to define separate @string objects). These
+				constants can be used within string assignments in other @string or @preamble
+				objects, as well as in regular BibTeX entries. For example, this is a valid constant
+				definition and usage:</p>
+
+				<pre><code>@string{ generator = "BibTeX-Ruby"}
+@preamble{ "This bibliography was generated by " # generator }</code></pre>
+
+				<h3>@preamble</h3>
+
+				<p>Typically, the purpose of @preamble objects is to define LaTeX statements, which
+				will be put into the '.bbl' file by <code>bibtex</code>. A @preamble object may contain
+				a single string literal, a single string constant (defined by a @string object), or
+				a concatenation of literals and constants.</p>
+
+				<h3>Entries</h3>
+
+				<p>These represent proper BibTeX objects (e.g., @book, @collection, etc.).</p>
+
+				<h2>Credits</h2>
+
+				<p>The BibTeX-Ruby package was written by <a href="http://sylvester.keil.or.at/">Sylvester Keil</a>.</p>
+
+				<h2>License</h2>
+
+				<p>BibTeX-Ruby
+				Copyright (C) 2010-2011 <a href="http://sylvester.keil.or.at">Sylvester Keil</a></p>
+
+				<p>This program is free software: you can redistribute it and/or modify
+				it under the terms of the GNU General Public License as published by
+				the Free Software Foundation, either version 3 of the License, or
+				(at your option) any later version.</p>
+
+				<p>This program is distributed in the hope that it will be useful,
+				but WITHOUT ANY WARRANTY; without even the implied warranty of
+				MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+				GNU General Public License for more details.</p>
+
+				<p>You should have received a copy of the GNU General Public License
+				along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+			</div>
+  	</div>
+		
+		<footer>
+			<p>Copyright © 2010-2011 Sylvester Keil. Some rights reserved.</p>
+		</footer>
+				
   </div>
-
-  
+</div>  
 </body>
 </html>
