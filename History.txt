@@ -1,3 +1,12 @@
+=== 1.2.0 / 2011-02-12
+
+* Switched to using bundler.
+* Improved BibTeX::Entry constructor (supports hashes for intuitive assignments).
+* Added top-level methods BibTeX.parse, BibTeX.open, BibTeX.valid? and
+  BibTeX::Entry.parse.
+* Rewrote StringReplacement extensions to use monkey patching of Arrays.
+* See README.md or unit tests for updated code examples.
+
 === 1.1.2 / 2011-01-27
 
 * Added dynamic ghost methods to BibTeX::Entry for more convenient access
