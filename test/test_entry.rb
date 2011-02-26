@@ -80,4 +80,19 @@ class TestEntry < MiniTest::Unit::TestCase
     assert_equal(expected, entry.to_s)
   end
   
+  def test_sorting
+    entries = []
+    entries << BibTeX::Entry.new({ :type => 'book', :key => 'raven3', :author => 'Poe, Edgar A.', :title => 'The Raven'})
+    entries << BibTeX::Entry.new({ :type => 'book', :key => 'raven2', :author => 'Poe, Edgar A.', :title => 'The Raven'})
+    entries << BibTeX::Entry.new({ :type => 'book', :key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Raven'})
+    entries << BibTeX::Entry.new({ :type => 'book', :key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Aven'})
+    
+    entries.sort!
+    
+    assert_equal(%w{ raven1 raven1 raven2 raven3 }, entries.map(&:key))
+    assert_equal([ 'The Aven', 'The Raven' ], entries.map(&:title)[0,2])
+
+  end
+  
+  
 end

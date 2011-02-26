@@ -170,5 +170,10 @@ module BibTeX
       end
       xml
 		end
+		
+		def <=>(other)
+		  self.type != other.type ? self.type <=> other.type : self.key != other.key ? self.key <=> other.key : self.to_s <=> other.to_s
+		end
+		
 	end
 end
