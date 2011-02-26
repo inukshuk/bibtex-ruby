@@ -24,8 +24,8 @@ module BibTeX
 	module Extensions
 		
 		def self.string_replacement(obj)
-		  raise(ArgumentError, "StringReplacement should only be injected into instances of Array, not #{obj.class}.") unless obj.is_a?(Array)
-		  class << obj; include StringReplacement end
+		  raise(ArgumentError, "StringReplacement should only be injected into instances of Array, not #{obj.class}.") unless obj.is_a?(::Array)
+		  class << obj; include ::BibTeX::Extensions::StringReplacement end
 		  obj
 		end
 		
@@ -36,16 +36,16 @@ module BibTeX
         
         options[:quotes] ||= [nil,nil]
         
-        if self.length == 1 && !self[0].is_a?(Symbol)
+        if self.length == 1 && !self[0].is_a?(::Symbol)
           [options[:quotes][0], self[0], options[:quotes][1]].join
         else
-          self.map { |s| s.is_a?(Symbol) ? s.to_s : %Q("#{ s }") }.join(' # ')
+          self.map { |s| s.is_a?(::Symbol) ? s.to_s : %Q("#{ s }") }.join(' # ')
         end
       end
 
       # Replaces all string constants which are defined in +hash+.
       def replace_strings(hash)
-        Extensions.string_replacement(self.map { |s| s.is_a?(Symbol) && hash.has_key?(s) ? hash[s] : s }.flatten)
+        Extensions.string_replacement(self.map { |s| s.is_a?(::Symbol) && hash.has_key?(s) ? hash[s] : s }.flatten)
       end
       
       # Joins consecutive strings separated by '#'.
