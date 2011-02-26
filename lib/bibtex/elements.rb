@@ -22,7 +22,8 @@ module BibTeX
 	# The base class for BibTeX objects.
 	#
 	class Element
-
+    include Comparable
+    
 		attr_reader :bibliography
 		
 		# Returns an array of BibTeX elements.
@@ -76,6 +77,11 @@ module BibTeX
 			@bibliography = nil
 			self
 		end
+		
+		def <=>(other)
+		  (type_comparison = self.class.name <=> other.class.name) == 0 ? self.to_s <=> other.to_s : type_comparison
+		end
+		
 	end
 
  
