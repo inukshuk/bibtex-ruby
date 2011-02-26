@@ -42,4 +42,42 @@ class TestEntry < MiniTest::Unit::TestCase
     assert_equal(expected, bib.data[0].author)
   end
   
+  def test_creation_simple
+    expected = "@book{raven,\n  author = {Poe, Edgar A.},\n  title = {The Raven}\n}\n"
+    
+    entry = BibTeX::Entry.new
+    entry.type = :book
+    entry.key = 'raven'
+    entry.author = 'Poe, Edgar A.'
+    entry.title = 'The Raven'
+    
+    assert_equal(expected, entry.to_s)
+  end
+
+  def test_creation_from_hash
+    expected = "@book{raven,\n  author = {Poe, Edgar A.},\n  title = {The Raven}\n}\n"
+    
+    entry = BibTeX::Entry.new({
+      :type => 'book',
+      :key => 'raven',
+      :author => 'Poe, Edgar A.',
+      :title => 'The Raven'
+    })
+    
+    assert_equal(expected, entry.to_s)
+  end
+
+  def test_creation_from_block
+    expected = "@book{raven,\n  author = {Poe, Edgar A.},\n  title = {The Raven}\n}\n"
+    
+    entry = BibTeX::Entry.new do |e|
+      e.type = :book
+      e.key = 'raven'
+      e.author = 'Poe, Edgar A.'
+      e.title = 'The Raven'
+    end
+    
+    assert_equal(expected, entry.to_s)
+  end
+  
 end

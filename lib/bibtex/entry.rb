@@ -51,6 +51,8 @@ module BibTeX
 		  self.key = hash.delete(:key) if hash.has_key?(:key)
 						
 			hash.each { |k, v| add(k.to_sym, v) }
+			
+			yield self if block_given?
 		end
 
 		# Sets the key of the entry
@@ -61,8 +63,8 @@ module BibTeX
 
 		# Sets the type of the entry.
 		def type=(type)
-			raise(ArgumentError, "BibTeX::Entry type must be of type Symbol; was: #{type.class.name}.") unless type.is_a?(Symbol)
-			@type = type
+			raise(ArgumentError, "BibTeX::Entry type must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
+			@type = type.to_sym
 		end
 		
 		def method_missing(name, *args)
