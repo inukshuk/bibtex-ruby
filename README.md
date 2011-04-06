@@ -282,7 +282,9 @@ These represent proper BibTeX objects (e.g., @book, @collection, etc.).
 Credits
 -------
 
-The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/).
+The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/),
+with contributions by [Frank Fischer](https://github.com/lyro).
+
 
 License
 -------

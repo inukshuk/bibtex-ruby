@@ -1,6 +1,7 @@
 === 1.2.1 / 2011-02-26
 
 * Fixed several MacRuby compliancy issues.
+* Fixed compatibility issues and BibTeX parsing of Name tokens (by lyro)
 
 === 1.2.0 / 2011-02-12
 
