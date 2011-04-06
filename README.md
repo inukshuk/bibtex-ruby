@@ -18,15 +18,15 @@ Quickstart
      => true
     > bib = BibTeX.open('./ruby.bib')
      => book{pickaxe,
-      address  {Raleigh, North Carolina},
-      author  {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-      date-added  {2010-08-05 09:54:07 0200},
-      date-modified  {2010-08-05 10:07:01 0200},
-      keywords  {ruby},
-      publisher  {The Pragmatic Bookshelf},
-      series  {The Facets of Ruby},
-      title  {Programming Ruby 1.9: The Pragmatic Programmers Guide},
-      year  {2009}
+      address = {Raleigh, North Carolina},
+      author  = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+      date-added = {2010-08-05 09:54:07 0200},
+      date-modified = {2010-08-05 10:07:01 0200},
+      keywords = {ruby},
+      publisher = {The Pragmatic Bookshelf},
+      series = {The Facets of Ruby},
+      title = {Programming Ruby 1.9: The Pragmatic Programmers Guide},
+      year = {2009}
     }
     > bib[:pickaxe].year
      => "2009"

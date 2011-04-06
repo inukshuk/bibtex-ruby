@@ -1,3 +1,7 @@
+=== 1.2.1 / 2011-02-26
+
+* Fixed several MacRuby compliancy issues.
+
 === 1.2.0 / 2011-02-12
 
 * Switched to using bundler.

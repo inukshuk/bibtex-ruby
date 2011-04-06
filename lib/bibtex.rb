@@ -20,6 +20,9 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 
+require 'bibtex/version'
+require 'logger'
+
 # = BibTeX
 #
 # This module encompasses a parser for BibTeX files and
@@ -32,8 +35,6 @@ $:.unshift(File.dirname(__FILE__)) unless
 # License:: GNU GPL 3.0
 #
 module BibTeX
-  require 'bibtex/version'
-	require 'logger'
 
 	#
 	# An instance of the Ruby core class +Logger+.
@@ -43,16 +44,17 @@ module BibTeX
 	Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
 	Log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
-  # Load debugger
-  # require 'ruby-debug'
-  # Debugger.start
-
-  require 'bibtex/extensions'
-  require 'bibtex/elements'
-  require 'bibtex/entry'
-  require 'bibtex/error'
-  require 'bibtex/parser'
-  require 'bibtex/bibliography'
-  require 'bibtex/utilities'
-
+  def self.log; BibTeX::Log end
 end
+
+# Load debugger
+# require 'ruby-debug'
+# Debugger.start
+
+require 'bibtex/extensions'
+require 'bibtex/elements'
+require 'bibtex/entry'
+require 'bibtex/error'
+require 'bibtex/parser'
+require 'bibtex/bibliography'
+require 'bibtex/utilities'
