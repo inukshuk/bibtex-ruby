@@ -178,7 +178,7 @@ module BibTeX
 				push [:SHARP,'#']
 			when self.src.scan(/\d+/o)
 				push [:NUMBER,self.src.matched]
-			when self.src.scan(/[a-z\d:_!$\.%&*-]+/io)
+			when self.src.scan(/[a-z\d\/:_!$\.%&*-]+/io)
 				push [:NAME,self.src.matched]
 			when self.src.scan(/"/o)
 				self.mode = :literal
