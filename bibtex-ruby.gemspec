@@ -6,7 +6,7 @@ require 'bibtex/version'
 
 Gem::Specification.new do |s|
   s.name              = 'bibtex-ruby'
-  s.version           = BibTeX::Version::STRING
+  s.version           = BibTeX::Version::STRING.dup
   s.platform          = Gem::Platform::RUBY
   s.authors           = ['Sylvester Keil']
   s.email             = 'http://sylvester.keil.or.at'
