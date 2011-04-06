@@ -69,12 +69,12 @@ module BibTeX
 		
 		def method_missing(name, *args)
 		  return self[name] if @fields.has_key?(name)
-		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.match(/=$/)		  
+		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.to_s.match(/=$/)		  
 		  super
 		end
 		
 		def respond_to?(method)
-		  @fields.has_key?(method.to_sym) || method.match(/=$/) || super
+		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || super
 		end
 		
 		# Returns the value of the field with the given name.

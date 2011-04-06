@@ -65,7 +65,9 @@ module BibTeX
     
     # Saves the bibliography to a file at the given path.
     def save_to(path)
-      File.write(path,to_s)
+      File.open(path, "w") do |f|
+        f.write to_s
+      end
     end
     
     # Add an object to the bibliography. Returns the bibliography.
