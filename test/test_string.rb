@@ -10,7 +10,7 @@ module BibTeX
     end
 
     def test_simple
-      bib = BibTeX::Bibliography.open(Test.fixtures(:string), :debug => true)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:string), :debug => false)
       refute_nil(bib)
       assert(bib.kind_of? BibTeX::Bibliography)
       refute(bib.empty?)
@@ -22,7 +22,7 @@ module BibTeX
     end
 
     def test_assignment
-      bib = BibTeX::Bibliography.open(Test.fixtures(:strings), :debug => true)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:strings), :debug => false)
       refute_nil(bib)
       assert(bib.kind_of? BibTeX::Bibliography)
       refute(bib.empty?)
@@ -39,7 +39,7 @@ module BibTeX
     end
 
     def test_replacement
-      bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => true)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => false)
       refute_nil(bib)
       assert(bib.kind_of?(BibTeX::Bibliography))
       refute(bib.empty?)

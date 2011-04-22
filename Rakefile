@@ -18,7 +18,7 @@ Rake::RDocTask.new(:rdoc_task) do |rd|
 end
 
 Rake::TestTask.new(:test_task) do |t|
-  t.libs << "test"
+  t.libs << 'lib' << 'test'
   t.test_files = FileList['test/test_*.rb']
   t.verbose = true
 end

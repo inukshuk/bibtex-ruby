@@ -31,7 +31,7 @@ require 'logger'
 # +Entry+.
 #
 # Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
-# Copyright:: Copyright (c) 2010 Sylvester Keil
+# Copyright:: Copyright (c) 2010-2011 Sylvester Keil
 # License:: GNU GPL 3.0
 #
 module BibTeX

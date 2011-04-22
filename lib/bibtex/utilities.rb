@@ -20,12 +20,12 @@ module BibTeX
 
   class << self
     # Opens a BibTeX file and returns a corresponding +Bibliography+ object.
-    def open(file, options={})
+    def open(file, options = {})
       Bibliography.open(file, options)
     end
   
     # Parses the given string and returns a corresponding +Bibliography+ object.
-    def parse(string, options={})
+    def parse(string, options = {})
       BibTeX::Parser.new(options).parse(string)
     end
   

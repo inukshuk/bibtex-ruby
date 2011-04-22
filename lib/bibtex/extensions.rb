@@ -31,7 +31,7 @@ module BibTeX
 		
 		module StringReplacement
       # Returns a string representation of the literal.
-      def to_s(options={})
+      def to_s(options = {})
         return '' if self.empty?
         
         options[:quotes] ||= [nil,nil]

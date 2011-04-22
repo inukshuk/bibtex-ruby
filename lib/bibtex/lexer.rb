@@ -40,7 +40,7 @@ module BibTeX
 		#		objects; for a more lenient lexer set to false and objects are
 		#		expected to start after a new line (leading white space is permitted).
 		#
-		def initialize(options={})
+		def initialize(options = {})
 			@options = options
 			@options[:include] ||= [:errors]
 			@options[:strict] = true unless @options.has_key?(:strict)
