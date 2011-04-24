@@ -18,9 +18,10 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = '>= 1.3.6'
   s.rubyforge_project = s.name
 
-  s.add_development_dependency('racc', ['>= 1.4.6'])
-  s.add_development_dependency('minitest', ['>= 2.0.2'])
-  s.add_development_dependency('json', ['>= 1.5.0'])
+  s.add_development_dependency('racc', ['>= 1.4'])
+  s.add_development_dependency('minitest', ['>= 2.0'])
+  s.add_development_dependency('shoulda', ['>= 2.11'])
+  s.add_development_dependency('json', ['>= 1.5'])
 
   s.files             = File.open('Manifest').readlines.map(&:chomp)
   s.test_files        = Dir.glob('test/test*.rb')
