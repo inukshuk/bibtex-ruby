@@ -50,6 +50,7 @@ module BibTeX
     end
     
     # Adds a new element, or a list of new elements to the bibliography.
+    # Returns the Bibliography for chainability.
     def add(data)
       raise(ArgumentError,'BibTeX::Bibliography.add data expected to be enumerable or of type BibTeX::Element; was: ' + data.class.name) unless data.respond_to?(:each) || data.is_a?(Element)
       data.is_a?(Element) ? self << data : data.each { |d| self << d }
@@ -165,14 +166,20 @@ module BibTeX
       @data.map(&:to_s).join
     end
     
+    
+    # Returns a Ruby hash representation of the bibliography.
+    def to_hash
+      @entries.values.map(&:to_hash)
+    end
+    
     # Returns a YAML representation of the bibliography. Only BibTeX entries are exported.
     def to_yaml
-      @entries.values.map(&:to_hash).to_yaml
+      to_hash.to_yaml
     end
     
     # Returns a JSON representation of the bibliography. Only BibTeX entries are exported.
     def to_json
-      @entries.values.map(&:to_hash).to_json
+      to_hash.to_json
     end
     
     # Returns an XML representation of the bibliography. Only BibTeX entries are exported.
