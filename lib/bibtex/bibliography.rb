@@ -33,17 +33,15 @@ module BibTeX
     #
     # The options argument is passed on to BibTeX::Parser.new.
     #
-    def self.open(path, options={})
-      Log.debug('Opening file ' + path.to_s)
+    def self.open(path, options = {})
+      BibTeX.log.debug("Opening file #{path}")
       BibTeX::Parser.new(options).parse(File.read(path))
     end
     
     #
-    # Creates a new bibliography; empty if no data attribute is specified, otherwise
-    # by parsing the file at the given path.
+    # Creates a new bibliography; empty if no data attribute is specified.
     #
-    def initialize(data=[])
-      @path = path
+    def initialize(data = [])
       @data = []
       @strings = {}
       @entries = {}
