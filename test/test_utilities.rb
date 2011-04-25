@@ -5,7 +5,7 @@ module BibTeX
   class TestBibtex < MiniTest::Unit::TestCase
   
     def test_empty?
-      bib = BibTeX.open(Test.fixtures(:empty), :debug => true)
+      bib = BibTeX.open(Test.fixtures(:empty), :debug => false)
       refute_nil(bib)
       assert_equal(BibTeX::Bibliography, bib.class)
       assert(bib.empty?)

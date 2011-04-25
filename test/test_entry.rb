@@ -10,7 +10,7 @@ module BibTeX
     end
 
     def test_simple
-      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => true)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
       refute_nil(bib)
       assert_equal(BibTeX::Bibliography, bib.class)
       assert_equal(3, bib.data.length)
@@ -32,7 +32,7 @@ module BibTeX
     end
   
     def test_ghost_methods
-      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => true)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
       refute_nil(bib)
       assert_equal(BibTeX::Bibliography, bib.class)
       assert_equal('Poe, Edgar A.', bib.data[0].author)

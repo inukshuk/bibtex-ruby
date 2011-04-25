@@ -75,7 +75,7 @@ module BibTeX
     end
   
     def test_roundtrip
-      bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => true)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => false)
       refute_nil(bib)
       assert_equal('@string{ foo = "foo" }', bib.data[0].to_s)
       assert_equal('@string{ bar = "bar" }', bib.data[1].to_s)

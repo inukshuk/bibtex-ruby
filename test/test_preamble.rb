@@ -4,7 +4,7 @@ module BibTeX
   class TestPreamble < MiniTest::Unit::TestCase
   
     def setup
-      @bib = BibTeX::Bibliography.open(Test.fixtures(:preamble), :debug => true, :strict => false)
+      @bib = BibTeX::Bibliography.open(Test.fixtures(:preamble), :debug => false, :strict => false)
     end
 
     def teardown
@@ -28,7 +28,7 @@ module BibTeX
     end
   
     def test_replacement
-      bib = BibTeX::Bibliography.open(Test.fixtures(:preamble), :debug => true, :strict => false)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:preamble), :debug => false, :strict => false)
       refute_nil(bib)
       assert_equal(%q[@preamble{ "Maintained by " # maintainer }], bib.data[3].to_s)
       bib.replace_strings
