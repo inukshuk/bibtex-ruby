@@ -3,6 +3,7 @@ require File.expand_path('../../lib/bibtex.rb', __FILE__)
 require 'rubygems'
 require 'mini_shoulda'
 require 'minitest/autorun'
+require 'redgreen'
 
 module BibTeX
   module Test
