@@ -309,4 +309,4 @@ Credits
 -------
 
 The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/);
-kudos and thanks to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)!.
+kudos and thanks to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)!
