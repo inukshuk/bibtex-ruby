@@ -49,4 +49,8 @@ Feature: Searching in BibTeX bibliographies
 		Then there should be exactly 2 matches
 		When I search for "@book[year=2007]"
 		Then there should be exactly 1 match
+		When I search for "@book[year=2009, keywords=ruby]"
+		Then there should be exactly 1 match
+		When I search for "@book[year=2009, keywords=yacc]"
+		Then there should be exactly 0 matches
 		

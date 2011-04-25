@@ -202,6 +202,8 @@ module BibTeX
         [type].flatten.any? { |t| element.has_type?(t) }
       end
     end
+    
+    alias :find_by_types :find_by_type
 
     # Returns all elements who match the given pattern.
     def match(pattern)

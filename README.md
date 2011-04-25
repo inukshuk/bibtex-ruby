@@ -2,11 +2,11 @@ BibTeX-Ruby
 ===========
 
 The BibTeX-Ruby package contains a parser for BibTeX bibliography files and a
-class structure to manage or convert BibTeX objects in Ruby. It is designed to
-support all BibTeX objects (including @comment, string-replacements via @string,
-as well as string concatenation using '#') and handles all content outside of
-BibTeX objects as 'meta comments' which may or may not be included in
-post-processing.
+class structure to manage, search, or convert BibTeX objects in Ruby. It is
+designed to support all BibTeX objects (including @comment,
+string-replacements via @string, as well as string concatenation using '#')
+and handles all content outside of BibTeX objects as 'meta comments' which may
+or may not be included in post-processing.
 
 
 Quickstart
@@ -14,10 +14,10 @@ Quickstart
 
     $ [sudo] gem install bibtex-ruby
     $ irb
-    > require 'bibtex'
-     => true
+    >> require 'bibtex'
+    => true
     > bib = BibTeX.open('./ruby.bib')
-     => book{pickaxe,
+    => book{pickaxe,
       address = {Raleigh, North Carolina},
       author  = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
       date-added = {2010-08-05 09:54:07 0200},
@@ -28,12 +28,20 @@ Quickstart
       title = {Programming Ruby 1.9: The Pragmatic Programmers Guide},
       year = {2009}
     }
-    > bib[:pickaxe].year
-     => "2009"
-    > bib[:pickaxe][:title]
-     => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
-    > bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
-     => "Thomas, D., and Fowler, C., and Hunt, A."
+    >> bib[:pickaxe].year
+    => "2009"
+    >> bib[:pickaxe][:title]
+    => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+    >> bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
+    => "Thomas, D., and Fowler, C., and Hunt, A."
+    >> bib['@book'].length
+    => 1
+    >> bib['@article'].length
+    => 0
+    >> bib['@book[year=2009]'].length
+    => 1
+    >> bib['@book[year=2011]'].length
+    => 0
 
 
 Installation
@@ -124,6 +132,26 @@ Instead of parsing strings you can also create BibTeX elements by using Ruby:
     > book.key = 'mybook'
     > bib << book
 
+
+### Queries
+
+BibTeX-Ruby implements a simple query language to search Bibliographies. For
+instance:
+
+    >> bib[:key]
+    => Returns entries with key 'key'
+    >> bib['key']
+    => Returns entries with key 'key'
+    >> bib['@article']
+    => Returns all entries of type 'article'
+    >> bib['@preamble']
+    => Returns all preamble objects. This is the same as Bibliography#preambles.
+    >> bib[/ruby/]
+    => Returns all objects that match 'ruby' anywhere.
+    >> bib['/ruby/']
+    => Same as above.
+    >> bib['@book[keywords=ruby]']
+    => Returns all book entries whose keywords attribute equals 'ruby'.
 
 
 ### String Replacement
