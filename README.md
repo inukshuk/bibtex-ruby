@@ -50,6 +50,7 @@ If you want to work with the sources:
     $ [sudo] bundle install
     $ rake racc
     $ rake rdoc
+    $ rake features
     $ rake test
 
 Or, alternatively, fork the [project on GitHub](http://github.com/inukshuk/bibtex-ruby.git).
@@ -60,8 +61,7 @@ Requirements
 
 * The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
   required to generate parser.
-* The *minitest* gem is required to run the tests in older Ruby versions.
-* The *json* gem is required on older Ruby versions for JSON export.
+* The **json** gem is required on older Ruby versions for JSON export.
 
 The bibtex-ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
 been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java. It
@@ -282,25 +282,5 @@ These represent proper BibTeX objects (e.g., @book, @collection, etc.).
 Credits
 -------
 
-The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/),
-with contributions by [Frank Fischer](https://github.com/lyro).
-
-
-License
--------
-
-BibTeX-Ruby
-Copyright (C) 2010-2011 [Sylvester Keil](http://sylvester.keil.or.at)
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/);
+kudos and thanks to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)!.

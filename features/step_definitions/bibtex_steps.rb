@@ -4,7 +4,8 @@ end
 
 Then /^my bibliography should contain the following objects:$/ do |table|
   @bibliography.each_with_index do |object, index|
-    assert_equal object.type, table.hashes[index][:type]
-    assert_equal object.content, table.hashes[index][:content]
+    table.hashes[index].each_pair do |key, value|
+      assert_equal value, object.send(key)
+    end
   end
 end
