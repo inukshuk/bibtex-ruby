@@ -40,6 +40,11 @@ module BibTeX
 			""
 		end
 
+    # Returns the BibTeX type (if applicable) or the normalized class name.
+    def type
+      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase
+    end
+    
 		# Returns a string representation of the object.
 		def to_s
 			self.content
@@ -235,12 +240,12 @@ module BibTeX
     
 		# Returns a string representation of the @preamble's content.
 		def content
-			@value.to_s(:quotes => %w(" "))
+			@value.to_s(:quotes => [])
 		end
 
 		# Returns a string representation of the @preamble object
 		def to_s
-			"@preamble{ #{ content } }"
+			"@preamble{ #{ @value.to_s(:quotes => %w[" "]) } }"
 		end
 		
 	end

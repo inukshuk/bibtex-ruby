@@ -16,7 +16,7 @@ module BibTeX
       assert_equal 'Poe, Edgar Allen', bib[:id].author
     end
       
-    def test_validate
+    def test_validation
       log_level = BibTeX.log.level
       BibTeX.log.level = Logger::ERROR
       
