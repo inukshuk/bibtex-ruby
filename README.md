@@ -72,10 +72,9 @@ Requirements
 * The **json** gem is required on older Ruby versions for JSON export.
 
 The bibtex-ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
-been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java. It
-does not work with MacRuby 0.8 because of a bug in MacRuby's implementation
-of the *StringScanner* class, however, this has been fixed in SVN (see
-[#1](https://github.com/inukshuk/bibtex-ruby/issues/closed#issue/1) for details).
+been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java;
+however, there have been some [issues](https://github.com/inukshuk/bibtex-ruby/issues)
+with MacRuby implementations.
 
 
 
@@ -111,7 +110,7 @@ Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry
 similar to **ActiveRecord::Base**. Therefore, it is equally possible to access the
 'author' field above as `bib[:pickaxe].author`.
 
-Instead of parsing strings you can also create BibTeX elements by using Ruby:
+Instead of parsing strings you can also create BibTeX elements directly in Ruby:
 
     > bib = BibTeX::Bibliography.new
     > bib << BibTeX::Entry.new({
@@ -135,24 +134,23 @@ Instead of parsing strings you can also create BibTeX elements by using Ruby:
 
 ### Queries
 
-BibTeX-Ruby implements a simple query language to search Bibliographies. For
-instance:
+Since version 1.3 BibTeX-Ruby implements a simple query language to search
+Bibliographies. For instance:
 
     >> bib[:key]
     => Returns entries with key 'key'
     >> bib['key']
-    => Returns entries with key 'key'
+    => Same as above
     >> bib['@article']
     => Returns all entries of type 'article'
     >> bib['@preamble']
-    => Returns all preamble objects. This is the same as Bibliography#preambles.
+    => Returns all preamble objects (this is the same as Bibliography#preambles)
     >> bib[/ruby/]
-    => Returns all objects that match 'ruby' anywhere.
+    => Returns all objects that match 'ruby' anywhere
     >> bib['/ruby/']
-    => Same as above.
+    => Same as above
     >> bib['@book[keywords=ruby]']
-    => Returns all book entries whose keywords attribute equals 'ruby'.
-
+    => Returns all book entries whose keywords attribute equals 'ruby'
 
 ### String Replacement
 
