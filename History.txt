@@ -1,5 +1,6 @@
 === 1.3.0
 
+* Implemented query language to search in bibliographies
 * Improved testing environment
 * Added cucumber features
 

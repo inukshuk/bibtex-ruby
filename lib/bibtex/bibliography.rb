@@ -31,8 +31,8 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
-    def_delegators :@data, :length, :size, :each
-    
+    def_delegators :@data, :length, :size, :each, :empty?
+        
     #
     # Opens and parses the `.bib' file at the given +path+. Returns
     # a new Bibliography instance corresponding to the file.
@@ -95,22 +95,26 @@ module BibTeX
     
     # Returns all @preamble objects.
     def preambles
-      find_by_type(BibTeX::Preamble)
+      find_by_type(:preamble)
     end
     
     # Returns the first entry with a given key.
     def [](key)
       @entries[key.to_s]
     end
-          
+    
+    # %w{ article book journal comment meta_comment }.each do |type|
+    #   define_method "#{type}s"
+    # end
+    
     # Returns all @comment objects.
     def comments
-      find_by_type(BibTeX::Comment)
+      find_by_type(:comment)
     end
 
     # Returns all meta comments, i.e., all text outside of BibTeX objects.
     def meta_comments
-      find_by_type(BibTeX::MetaComment)
+      find_by_type('meta_comment')
     end
 
     # Returns all objects which could not be parsed successfully.
@@ -126,7 +130,7 @@ module BibTeX
     # Returns true if the +Bibliography+ contains no errors and only
     # valid BibTeX objects (meta comments are ignored).
     def valid?
-      !errors? && !@entries.values.map(&:valid?).uniq.include?(false)
+      !errors? && @entries.values.all?(&:valid?)
     end
     
     # Replaces all string constants which are defined in the bibliography.
@@ -140,23 +144,18 @@ module BibTeX
     #
     # call-seq:
     # replace_strings
-    # replace_strings({ :include => [BibTeX::String,BibTeX::Preamble]})
+    # replace_strings({ :filter => [:string, :preamble]})
     #
-    def replace_strings(options={})
-      options[:include] ||= [BibTeX::String, BibTeX::Preamble, BibTeX::Entry]
-      find_by_type(options[:include]).each { |e| e.replace!(@strings) if e.respond_to?(:replace!)}
+    def replace_strings(options = {})
+      options[:filter] ||= %w{ string preamble entry }
+      find_by_type(options[:filter]).each { |e| e.replace!(@strings) if e.respond_to?(:replace!)}
     end
 
     def join_strings(options={})
-      options[:include] ||= [BibTeX::String, BibTeX::Preamble, BibTeX::Entry]
-      find_by_type(options[:include]).each { |e| e.join! if e.respond_to?(:join!)}
+      options[:filter] ||= %w{ string preamble entry }
+      find_by_type(options[:filter]).each { |e| e.join! if e.respond_to?(:join!)}
     end
-    
-    # Returns true if the bibliography is currently empty.
-    def empty?
-      @data.empty?
-    end
-    
+        
     # Returns the bibliography as an array of +BibTeX::Element+
     def to_a
       @data
@@ -192,12 +191,24 @@ module BibTeX
       xml << root
       xml
     end
+
+    def find(query = nil)
+      @data.select { |element| element.matches?(query) }
+    end
+    
+    def find_by_type(type)
+      return @data if type.nil? || type.to_s.match(/^all$/i) || type.respond_to?(:empty?) && type.empty?
+      @data.select do |element|
+        [type].flatten.any? { |t| element.has_type?(t) }
+      end
+    end
+
+    # Returns all elements who match the given pattern.
+    def match(pattern)
+      @data.select { |element| element.match(pattern) }
+    end
     
     private
-
-    def find_by_type(type)
-      @data.find_all { |x| type.respond_to?(:inject) ? type.inject(false) { |s,n| s || x.instance_of?(n) } : x.instance_of?(type) }
-    end
 
     def find_entry(key)
       entries.find { |e| e.key == key.to_s }

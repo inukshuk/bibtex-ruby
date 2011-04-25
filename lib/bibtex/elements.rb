@@ -27,7 +27,7 @@ module BibTeX
 		attr_reader :bibliography
 		
 		# Returns an array of BibTeX elements.
-    def self.parse(string, options={})
+    def self.parse(string, options = {})
       BibTeX::Parser.new(options).parse(string).to_a
     end
     
@@ -37,13 +37,53 @@ module BibTeX
 		
 		# Returns a string containing the object's content.
 		def content
-			""
+			''
 		end
 
+    # Returns the element's id.
+    def id; object_id.to_sym; end
+    
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
       self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase
     end
+  
+    def has_type?(type)
+      self.type == type.to_s || defined?(type) == 'constant' && is_a?(type)
+    end
+    
+    # Returns true if the element matches the given query.
+    def matches?(query)
+      return true if query.nil? || query.respond_to?(:empty?) && query.empty?
+      
+      case query
+      when Symbol
+        id == query
+      when Regexp
+        to_s.match(query)
+      when /^\/(.+)\/$/
+        to_s.match(Regexp.new($1))
+      when /^@(\w+)$/
+        has_type?($1)
+      when /^@(\w+)\[([^\]]*)\]$/
+        has_type?($1) && meets?($2.split(/,\s*/))
+      else
+        id == query.to_sym
+      end      
+    end
+    
+    alias :=== :matches?
+    alias :match? :matches?
+    
+    # Returns true if the element meets all of the given conditions.
+    def meets?(conditions)
+      [conditions].flatten.all? do |condition|
+        property, value = condition.split(/\s*=\s*/)
+        property.nil? || send(property).to_s == value
+      end
+    end
+    
+    alias :meet? :meets?
     
 		# Returns a string representation of the object.
 		def to_s
@@ -84,7 +124,7 @@ module BibTeX
 		end
 		
 		def <=>(other)
-		  (type_comparison = self.class.name <=> other.class.name) == 0 ? self.to_s <=> other.to_s : type_comparison
+		  [type, to_s] <=> [other.type, other.to_s]
 		end
 		
 	end

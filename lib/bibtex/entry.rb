@@ -23,7 +23,7 @@ module BibTeX
 	class Entry < Element
 	  
 		attr_reader :key, :type, :fields
-	 
+
 		# Hash containing the required fields of the standard entry types
 		REQUIRED_FIELDS = Hash.new([]).merge({
 			:article       => [:author,:title,:journal,:year],
@@ -59,6 +59,8 @@ module BibTeX
 			raise(ArgumentError, "BibTeX::Entry key must be of type String; was: #{key.class.name}.") unless key.is_a?(::String)
 			@key = key
 		end
+		
+		def id; key.to_sym; end
 
 		# Sets the type of the entry.
 		def type=(type)
@@ -66,6 +68,10 @@ module BibTeX
 			@type = type.to_sym
 		end
 		
+		def has_type?(type)
+      type.to_s.match(/^entry$/i) || self.type == type.to_sym || super
+    end
+    
 		def method_missing(name, *args)
 		  return self[name] if @fields.has_key?(name)
 		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.to_s.match(/=$/)		  
