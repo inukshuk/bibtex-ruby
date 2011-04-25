@@ -27,22 +27,37 @@ module BibTeX
   class Bibliography
     extend Forwardable
     include Enumerable
-    
+        
+    class << self    
+      #
+      # Opens and parses the `.bib' file at the given +path+. Returns
+      # a new Bibliography instance corresponding to the file.
+      #
+      # The options argument is passed on to BibTeX::Parser.new.
+      #
+      def open(path, options = {})
+        BibTeX.log.debug("Opening file #{path}")
+        Parser.new(options).parse(File.read(path))
+      end
+      
+      #
+      # Defines a new accessor that selects elements by type.
+      #
+      def attr_by_type(*arguments)
+        arguments.each do |type|
+          method_id = "#{type}s"
+          define_method(method_id) { find_by_type(type) } unless respond_to?(method_id)
+        end
+      end
+    end
+  
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
+    attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_comment
+    
     def_delegators :@data, :length, :size, :each, :empty?
-        
-    #
-    # Opens and parses the `.bib' file at the given +path+. Returns
-    # a new Bibliography instance corresponding to the file.
-    #
-    # The options argument is passed on to BibTeX::Parser.new.
-    #
-    def self.open(path, options = {})
-      BibTeX.log.debug("Opening file #{path}")
-      BibTeX::Parser.new(options).parse(File.read(path))
-    end
+
     
     #
     # Creates a new bibliography; empty if no data attribute is specified.
@@ -57,11 +72,15 @@ module BibTeX
     
     # Adds a new element, or a list of new elements to the bibliography.
     # Returns the Bibliography for chainability.
-    def add(data)
-      raise(ArgumentError,'BibTeX::Bibliography.add data expected to be enumerable or of type BibTeX::Element; was: ' + data.class.name) unless data.respond_to?(:each) || data.is_a?(Element)
-      data.is_a?(Element) ? self << data : data.each { |d| self << d }
+    def add(*arguments)
+      arguments.flatten.each do |element|
+        raise(ArgumentError, "Failed to add #{ element.inspect } to Bibliography; instance of BibTeX::Element expected.") unless element.is_a?(Element)
+        @data << element.added_to_bibliography(self)
+      end
       self
     end
+    
+    alias :<< :add
     
     # Saves the bibliography to the current path.
     def save
@@ -70,51 +89,31 @@ module BibTeX
     
     # Saves the bibliography to a file at the given path.
     def save_to(path)
-      File.open(path, "w") do |f|
-        f.write to_s
-      end
+      File.open(path, "w") { |f| f.write(to_s) }
     end
     
-    # Add an object to the bibliography. Returns the bibliography.
-    def <<(obj)
-      raise(ArgumentError, 'A BibTeX::Bibliography can contain only BibTeX::Elements; was: ' + obj.class.name) unless obj.is_a?(Element)
-      @data << obj.added_to_bibliography(self)
-      self
-    end
-    
-    # Delete an object from the bibliography. Returns the object, or nil
+    #
+    # Deletes an object, or a list of objects from the bibliography.
+    # If a list of objects is to be deleted, you can either supply the list
+    # of objects or use a query or block to define the list.
+    #
+    # Returns the object (or the list of objects) that were deleted; nil
     # if the object was not part of the bibliography.
-    def delete(obj)
-      @data.delete(obj.removed_from_bibliography(self))
+    #
+    def delete(*arguments, &block)
+      objects = select(*arguments, &block)
+      objects.each { |object| object.removed_from_bibliography(self) }
+      @data = @data - objects
+      objects.length == 1 ? objects[0] : objects
     end
     
-    def delete_all
-      @data.each { |obj| obj.removed_from_bibliography(self) }
-      @data = []
-    end
-    
-    # Returns all @preamble objects.
-    def preambles
-      find_by_type(:preamble)
-    end
+    alias :remove :delete
     
     # Returns the first entry with a given key.
-    def [](key)
-      @entries[key.to_s]
-    end
-    
-    # %w{ article book journal comment meta_comment }.each do |type|
-    #   define_method "#{type}s"
-    # end
-    
-    # Returns all @comment objects.
-    def comments
-      find_by_type(:comment)
-    end
-
-    # Returns all meta comments, i.e., all text outside of BibTeX objects.
-    def meta_comments
-      find_by_type('meta_comment')
+    def [](*arguments)
+      return @data[*arguments] if arguments.length > 1 || arguments[0].is_a?(Numeric)
+      # find(arguments[0])
+      @entries[arguments[0].to_s]
     end
 
     # Returns all objects which could not be parsed successfully.
@@ -192,28 +191,26 @@ module BibTeX
       xml
     end
 
-    def find(query = nil)
+    def select(query = nil)
       @data.select { |element| element.matches?(query) }
     end
     
-    def find_by_type(type)
+    alias :find :select
+    
+    def select_by_type(type)
       return @data if type.nil? || type.to_s.match(/^all$/i) || type.respond_to?(:empty?) && type.empty?
       @data.select do |element|
         [type].flatten.any? { |t| element.has_type?(t) }
       end
     end
     
-    alias :find_by_types :find_by_type
+    alias :find_by_type :select_by_type
+    alias :find_by_types :select_by_type
 
     # Returns all elements who match the given pattern.
     def match(pattern)
-      @data.select { |element| element.match(pattern) }
+      @data.select { |element| element.to_s.match(pattern) }
     end
     
-    private
-
-    def find_entry(key)
-      entries.find { |e| e.key == key.to_s }
-    end
   end
 end

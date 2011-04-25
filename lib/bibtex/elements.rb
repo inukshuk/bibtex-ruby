@@ -24,6 +24,7 @@ module BibTeX
 	class Element
     include Comparable
     
+    attr_writer :id
 		attr_reader :bibliography
 		
 		# Returns an array of BibTeX elements.
@@ -41,7 +42,7 @@ module BibTeX
 		end
 
     # Returns the element's id.
-    def id; object_id.to_sym; end
+    def id; @id ||= object_id.to_s.intern; end
     
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
@@ -57,6 +58,8 @@ module BibTeX
       return true if query.nil? || query.respond_to?(:empty?) && query.empty?
       
       case query
+      when Element
+        self == query
       when Symbol
         id == query
       when Regexp

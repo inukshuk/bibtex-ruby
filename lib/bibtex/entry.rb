@@ -60,6 +60,8 @@ module BibTeX
 			@key = key
 		end
 		
+		alias :id= key=
+		
 		def id; key.to_sym; end
 
 		# Sets the type of the entry.
