@@ -21,10 +21,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency('racc', ['>= 1.4'])
   s.add_development_dependency('mini_shoulda', ['>= 0.3'])
   s.add_development_dependency('mynyml-redgreen', ['>= 0.7'])
+  s.add_development_dependency('autowatchr', ['>= 0.1'])
   s.add_development_dependency('json', ['>= 1.5'])
 
   s.files             = File.open('Manifest').readlines.map(&:chomp)
-  s.test_files        = Dir.glob('test/test*.rb')
+  s.test_files        = Dir.glob('test/**/test*.rb')
   s.executables       = []
   s.require_path      = 'lib'
 

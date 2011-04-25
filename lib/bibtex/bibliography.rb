@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'forwardable'
+
 module BibTeX
 
   #
@@ -23,10 +25,14 @@ module BibTeX
   # typically, it corresponds to a `.bib' file.
   #
   class Bibliography
-
+    extend Forwardable
+    include Enumerable
+    
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
+    def_delegators :@data, :length, :size, :each
+    
     #
     # Opens and parses the `.bib' file at the given +path+. Returns
     # a new Bibliography instance corresponding to the file.
@@ -88,7 +94,7 @@ module BibTeX
     end
     
     # Returns all @preamble objects.
-    def preamble
+    def preambles
       find_by_type(BibTeX::Preamble)
     end
     
@@ -151,11 +157,6 @@ module BibTeX
       @data.empty?
     end
     
-    # Returns the number of objects in the bibliography (including meta comments).
-    def length
-      @data.length
-    end
-
     # Returns the bibliography as an array of +BibTeX::Element+
     def to_a
       @data
@@ -195,7 +196,7 @@ module BibTeX
     private
 
     def find_by_type(type)
-      @data.find_all { |x| type.respond_to?(:inject) ? type.inject(false) { |s,n| s || x.is_a?(n) } : x.is_a?(type) }
+      @data.find_all { |x| type.respond_to?(:inject) ? type.inject(false) { |s,n| s || x.instance_of?(n) } : x.instance_of?(type) }
     end
 
     def find_entry(key)

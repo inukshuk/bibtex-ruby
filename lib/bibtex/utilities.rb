@@ -25,8 +25,9 @@ module BibTeX
     end
   
     # Parses the given string and returns a corresponding +Bibliography+ object.
+    # Delegates to BibTeX.open if the string is a filename.
     def parse(string, options = {})
-      BibTeX::Parser.new(options).parse(string)
+      File.exists?(string) ? open(string, options) : BibTeX::Parser.new(options).parse(string)
     end
   
     # Returns true if the given file is a valid BibTeX bibliography.

@@ -25,23 +25,22 @@ module BibTeX
 		attr_reader :key, :type, :fields
 	 
 		# Hash containing the required fields of the standard entry types
-		@@RequiredFields = Hash.new([])
-		@@RequiredFields.merge!({
-			:article => [:author,:title,:journal,:year],
-			:book => [[:author,:editor],:title,:publisher,:year],
-			:booklet => [:title],
-			:conference => [:author,:title,:booktitle,:year],
-			:inbook => [[:author,:editor],:title,[:chapter,:pages],:publisher,:year],
-			:incollection => [:author,:title,:booktitle,:publisher,:year],
+		REQUIRED_FIELDS = Hash.new([]).merge({
+			:article       => [:author,:title,:journal,:year],
+			:book          => [[:author,:editor],:title,:publisher,:year],
+			:booklet       => [:title],
+			:conference    => [:author,:title,:booktitle,:year],
+			:inbook        => [[:author,:editor],:title,[:chapter,:pages],:publisher,:year],
+			:incollection  => [:author,:title,:booktitle,:publisher,:year],
 			:inproceedings => [:author,:title,:booktitle,:year],
-			:manual => [:title],
+			:manual        => [:title],
 			:mastersthesis => [:author,:title,:school,:year],
-			:misc => [],
-			:phdthesis => [:author,:title,:school,:year],
-			:proceedings => [:title,:year],
-			:techreport => [:author,:title,:institution,:year],
-			:unpublished => [:author,:title,:note]
-		})
+			:misc          => [],
+			:phdthesis     => [:author,:title,:school,:year],
+			:proceedings   => [:title,:year],
+			:techreport    => [:author,:title,:institution,:year],
+			:unpublished   => [:author,:title,:note]
+		}).freeze
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
 		def initialize(hash={})
@@ -117,9 +116,9 @@ module BibTeX
 		# Returns false if the entry is one of the standard entry types and does not have
 		# definitions of all the required fields for that type.
 		def valid?
-			!@@RequiredFields[@type].map { |f|
+			REQUIRED_FIELDS[@type].all? { |f|
 				f.is_a?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil?
-			}.include?(false)
+			}
 		end
 
 		# Called when the element was added to a bibliography.
@@ -155,7 +154,7 @@ module BibTeX
 			["@#{type}{#{key},",content.gsub(/^/,'  '),"}\n"].join("\n")
 		end
 		
-		def to_hash(options={})
+		def to_hash(options = {})
 		  options[:quotes] ||= %w({ })
 		  @fields.keys.map { |k| { k.to_s => @fields[k].to_s(options) } }.inject({ 'key' => @key, 'type' => @type.to_s }) { |sum,n| sum.merge(n) }
 		end

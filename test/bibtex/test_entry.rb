@@ -1,12 +1,12 @@
 require 'helper.rb'
 
 module BibTeX
-  class TestEntry < MiniTest::Unit::TestCase
-  
-    def setup
-    end
+  class EntryTest < MiniTest::Spec
 
-    def teardown
+    context 'a new Entry' do
+      should 'not be nil' do
+        assert Entry.new
+      end
     end
 
     def test_simple

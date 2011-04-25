@@ -50,7 +50,7 @@ module BibTeX
       assert_equal([:foo, "bar"], bib.strings[:foobar])
       assert_equal([:foobar, :foo], bib.strings[:foobarfoo])
       assert_equal([:bar, "foo", :bar], bib.strings[:barfoobar])
-      assert_equal('"foo" # foo # foobarfoo # "bar"', bib.preamble[0].content)
+      assert_equal('"foo" # foo # foobarfoo # "bar"', bib.preambles[0].content)
       assert_equal('"foo" # barfoobar', bib['manual:1'].title)
 
       bib.replace_strings({ :include => [BibTeX::Preamble]})
@@ -59,18 +59,18 @@ module BibTeX
       assert_equal([:foo, "bar"], bib.strings[:foobar])
       assert_equal([:foobar, :foo], bib.strings[:foobarfoo])
       assert_equal([:bar, "foo", :bar], bib.strings[:barfoobar])
-      assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preamble[0].content)
+      assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preambles[0].content)
       assert_equal('"foo" # barfoobar', bib['manual:1'].title)
     
       bib.replace_strings({ :include => [BibTeX::String]})
       assert_equal(['foo','bar'], bib.strings[:foobar])
       assert_equal(['foo', 'bar','foo'], bib.strings[:foobarfoo])
       assert_equal(['bar','foo','bar'], bib.strings[:barfoobar])
-      assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preamble[0].content)
+      assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preambles[0].content)
       assert_equal('"foo" # barfoobar', bib['manual:1'].title)
 
       bib.replace_strings({ :include => [BibTeX::Preamble,BibTeX::Entry]})
-      assert_equal('"foo" # "foo" # "foo" # "bar" # "foo" # "bar"', bib.preamble[0].content)
+      assert_equal('"foo" # "foo" # "foo" # "bar" # "foo" # "bar"', bib.preambles[0].content)
       assert_equal('"foo" # "bar" # "foo" # "bar"', bib['manual:1'].title)
     end
   
