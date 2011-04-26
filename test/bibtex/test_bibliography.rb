@@ -60,6 +60,12 @@ module BibTeX
         refute_nil @bib[:rails]
         assert_nil @bib[:ruby]
       end
+
+      should 'support queries by symbol key and selector' do
+        assert_equal 1, @bib.q(:all, :rails).length
+        refute_nil @bib.q(:first, :rails)
+        assert_nil @bib.q(:first, :railss)
+      end
       
       should 'support queries by string key' do
         assert_equal 1, @bib['rails'].length
@@ -71,6 +77,16 @@ module BibTeX
         assert_equal 1, @bib['@article'].length
         assert_equal 0, @bib['@collection'].length
       end
+
+      should 'support queries by type string and selector' do
+        assert_equal 2, @bib.q(:all, '@book').length
+        refute_nil @bib.q(:first, '@book')
+        assert_equal 1, @bib.q(:all, '@article').length
+        refute_nil @bib.q(:first, '@article')
+        assert_equal 0, @bib.q(:all, '@collection').length
+        assert_nil @bib.q(:first, '@collection')
+      end
+
 
       should 'support queries by pattern' do
         assert_equal 0, @bib[/reilly/].length
@@ -93,6 +109,10 @@ module BibTeX
         assert_equal 1, @bib[entry].length
         entry.year = '2006'
         assert_equal 0, @bib[entry].length
+      end
+      
+      should 'support query and additional block' do
+        assert_equal 1, @bib.q('@book') { |e| e.keywords.split(/,/).length > 1 }.length
       end
     
     end

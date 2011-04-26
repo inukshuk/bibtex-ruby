@@ -197,10 +197,9 @@ module BibTeX
     def query(*arguments, &block)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)") unless arguments.length.between?(0,2)
 
-      query, selector = arguments.reverse
-      filter = Proc.new do |element|
-        element.matches?(query)
-      end
+      q, selector = arguments.reverse
+      filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } : Proc.new { |e| e.match?(q) }
+
       send(query_handler(selector), &filter)
     end
     
