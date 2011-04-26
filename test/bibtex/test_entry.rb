@@ -15,9 +15,9 @@ module BibTeX
       assert_equal(BibTeX::Bibliography, bib.class)
       assert_equal(3, bib.data.length)
       assert_equal([BibTeX::Entry], bib.data.map(&:class).uniq)
-      assert_equal('key:0', bib.data[0].key)
-      assert_equal('key:1', bib.data[1].key)
-      assert_equal('foo', bib.data[2].key)
+      assert_equal(:'key:0', bib.data[0].key)
+      assert_equal(:'key:1', bib.data[1].key)
+      assert_equal(:'foo', bib.data[2].key)
       assert_equal(:book, bib.data[0].type)
       assert_equal(:article, bib.data[1].type)
       assert_equal(:article, bib.data[2].type)
@@ -33,14 +33,13 @@ module BibTeX
   
     def test_ghost_methods
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
-      refute_nil(bib)
-      assert_equal(BibTeX::Bibliography, bib.class)
-      assert_equal('Poe, Edgar A.', bib.data[0].author)
+
+      assert_equal 'Poe, Edgar A.', bib[0].author
     
       expected = 'Poe, Edgar Allen'
       bib.data[0].author = expected
     
-      assert_equal(expected, bib.data[0].author)
+      assert_equal expected, bib[0].author
     end
   
     def test_creation_simple
@@ -48,11 +47,11 @@ module BibTeX
     
       entry = BibTeX::Entry.new
       entry.type = :book
-      entry.key = 'raven'
+      entry.key = :raven
       entry.author = 'Poe, Edgar A.'
       entry.title = 'The Raven'
     
-      assert_equal(expected, entry.to_s)
+      assert_equal expected, entry.to_s
     end
 
     def test_creation_from_hash
@@ -60,12 +59,12 @@ module BibTeX
     
       entry = BibTeX::Entry.new({
         :type => 'book',
-        :key => 'raven',
+        :key => :raven,
         :author => 'Poe, Edgar A.',
         :title => 'The Raven'
       })
     
-      assert_equal(expected, entry.to_s)
+      assert_equal expected, entry.to_s
     end
 
     def test_creation_from_block
@@ -73,12 +72,12 @@ module BibTeX
     
       entry = BibTeX::Entry.new do |e|
         e.type = :book
-        e.key = 'raven'
+        e.key = :raven
         e.author = 'Poe, Edgar A.'
         e.title = 'The Raven'
       end
     
-      assert_equal(expected, entry.to_s)
+      assert_equal expected, entry.to_s
     end
   
     def test_sorting
@@ -90,8 +89,8 @@ module BibTeX
     
       entries.sort!
     
-      assert_equal(%w{ raven1 raven1 raven2 raven3 }, entries.map(&:key))
-      assert_equal([ 'The Aven', 'The Raven' ], entries.map(&:title)[0,2])
+      assert_equal [:raven1, :raven1, :raven2, :raven3], entries.map(&:key)
+      assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0,2]
 
     end
   

@@ -43,8 +43,6 @@ Feature: Searching in BibTeX bibliographies
 		Then there should be exactly 2 matches
 		When I search for /@book/
 		Then there should be exactly 3 matches
-		When I search for "/@book/"
-		Then there should be exactly 3 matches
 		When I search for "@book[]"
 		Then there should be exactly 2 matches
 		When I search for "@book[year=2007]"

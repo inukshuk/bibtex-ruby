@@ -22,7 +22,7 @@ module BibTeX
 	#
 	class Entry < Element
 	  
-		attr_reader :key, :type, :fields
+		attr_reader :type, :fields
 
 		# Hash containing the required fields of the standard entry types
 		REQUIRED_FIELDS = Hash.new([]).merge({
@@ -43,7 +43,7 @@ module BibTeX
 		}).freeze
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
-		def initialize(hash={})
+		def initialize(hash = {})
 			@fields = {}
 		  
 		  self.type = hash.delete(:type) if hash.has_key?(:type)
@@ -56,14 +56,16 @@ module BibTeX
 
 		# Sets the key of the entry
 		def key=(key)
-			raise(ArgumentError, "BibTeX::Entry key must be of type String; was: #{key.class.name}.") unless key.is_a?(::String)
-			@key = key
+			@key = key.to_sym
 		end
 		
-		alias :id= key=
-		
-		def id; key.to_sym; end
+		def key
+		  @key ||= default_key
+		end
 
+		alias :id :key		
+		alias :id= :key=
+		
 		# Sets the type of the entry.
 		def type=(type)
 			raise(ArgumentError, "BibTeX::Entry type must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
@@ -180,6 +182,12 @@ module BibTeX
 		
 		def <=>(other)
 		  self.type != other.type ? self.type <=> other.type : self.key != other.key ? self.key <=> other.key : self.to_s <=> other.to_s
+		end
+		
+		protected
+		
+		def default_key
+		  object_id.to_s.to_sym
 		end
 		
 	end

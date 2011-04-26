@@ -51,7 +51,7 @@ module BibTeX
       assert_equal([:foobar, :foo], bib.strings[:foobarfoo])
       assert_equal([:bar, "foo", :bar], bib.strings[:barfoobar])
       assert_equal('"foo" # foo # foobarfoo # "bar"', bib.preambles[0].content)
-      assert_equal('"foo" # barfoobar', bib['manual:1'].title)
+      assert_equal('"foo" # barfoobar', bib[:'manual:1'].title)
 
       bib.replace_strings({ :filter => [:preamble]})
       assert_equal(["foo"], bib.strings[:foo])
@@ -60,18 +60,18 @@ module BibTeX
       assert_equal([:foobar, :foo], bib.strings[:foobarfoo])
       assert_equal([:bar, "foo", :bar], bib.strings[:barfoobar])
       assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preambles[0].content)
-      assert_equal('"foo" # barfoobar', bib['manual:1'].title)
+      assert_equal('"foo" # barfoobar', bib[:'manual:1'].title)
     
       bib.replace_strings({ :filter => [:string]})
       assert_equal(['foo','bar'], bib.strings[:foobar])
       assert_equal(['foo', 'bar','foo'], bib.strings[:foobarfoo])
       assert_equal(['bar','foo','bar'], bib.strings[:barfoobar])
       assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preambles[0].content)
-      assert_equal('"foo" # barfoobar', bib['manual:1'].title)
+      assert_equal('"foo" # barfoobar', bib[:'manual:1'].title)
 
       bib.replace_strings({ :filter => [:preamble,:entry]})
       assert_equal('"foo" # "foo" # "foo" # "bar" # "foo" # "bar"', bib.preambles[0].content)
-      assert_equal('"foo" # "bar" # "foo" # "bar"', bib['manual:1'].title)
+      assert_equal('"foo" # "bar" # "foo" # "bar"', bib[:'manual:1'].title)
     end
   
     def test_roundtrip

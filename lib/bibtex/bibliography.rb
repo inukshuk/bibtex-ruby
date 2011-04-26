@@ -26,7 +26,9 @@ module BibTeX
   #
   class Bibliography
     extend Forwardable
+    
     include Enumerable
+    include Comparable
         
     class << self    
       #
@@ -54,9 +56,10 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
+    alias :to_a :data
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_comment
     
-    def_delegators :@data, :length, :size, :each, :empty?
+    def_delegators :@data, :length, :size, :each, :empty?, :select, :detect, :find, :find_all, :sort
 
     
     #
@@ -66,7 +69,6 @@ module BibTeX
       @data = []
       @strings = {}
       @entries = {}
-      @errors = []
       add(data)
     end
     
@@ -111,14 +113,21 @@ module BibTeX
     
     # Returns the first entry with a given key.
     def [](*arguments)
-      return @data[*arguments] if arguments.length > 1 || arguments[0].is_a?(Numeric)
-      # find(arguments[0])
-      @entries[arguments[0].to_s]
+      raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
+
+      case
+      when !([Range, Numeric] & arguments[0].class.ancestors).empty?
+        @data[*arguments] 
+      when arguments.length == 1 && arguments[0].is_a?(Symbol)
+        @entries[arguments[0]]
+      else
+        query(*arguments)
+      end
     end
 
     # Returns all objects which could not be parsed successfully.
     def errors
-      @errors
+      @errors ||= []
     end
 
     # Returns true if there are object which could not be parsed.
@@ -154,19 +163,13 @@ module BibTeX
       options[:filter] ||= %w{ string preamble entry }
       find_by_type(options[:filter]).each { |e| e.join! if e.respond_to?(:join!)}
     end
-        
-    # Returns the bibliography as an array of +BibTeX::Element+
-    def to_a
-      @data
-    end
     
     # Returns a string representation of the bibliography.
     def to_s
       @data.map(&:to_s).join
     end
-    
-    
-    # Returns a Ruby hash representation of the bibliography.
+
+    # Returns a Ruby hash representation of the bibliography. Only BibTeX entries are exported.
     def to_hash
       @entries.values.map(&:to_hash)
     end
@@ -191,25 +194,35 @@ module BibTeX
       xml
     end
 
-    def select(query = nil)
-      @data.select { |element| element.matches?(query) }
+    def query(*arguments, &block)
+      raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)") unless arguments.length.between?(0,2)
+
+      query, selector = arguments.reverse
+      filter = Proc.new do |element|
+        element.matches?(query)
+      end
+      send(query_handler(selector), &filter)
     end
     
-    alias :find :select
-    
-    def select_by_type(type)
-      return @data if type.nil? || type.to_s.match(/^all$/i) || type.respond_to?(:empty?) && type.empty?
+    alias :q :query
+        
+    def find_by_type(type)
+      return @data if type.nil? || type.respond_to?(:empty?) && type.empty?
       @data.select do |element|
         [type].flatten.any? { |t| element.has_type?(t) }
       end
     end
     
-    alias :find_by_type :select_by_type
-    alias :find_by_types :select_by_type
+    alias :find_by_types :find_by_type
 
-    # Returns all elements who match the given pattern.
-    def match(pattern)
-      @data.select { |element| element.to_s.match(pattern) }
+    def <=>(other)
+      other.respond_to?(:to_a) ? other.to_a <=> to_a : nil
+    end
+    
+    private
+    
+    def query_handler(selector)
+      selector && selector.match(/first|distinct|detect/i) ? :detect : :select
     end
     
   end

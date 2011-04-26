@@ -25,17 +25,15 @@ module BibTeX
 
     def test_decoret
       bib = BibTeX::Bibliography.open(Test.fixtures(:decoret), :debug => false)
-      refute_nil(bib)
-      assert_equal(BibTeX::Bibliography, bib.class)
       assert_equal(15, bib.length)
       assert_equal([BibTeX::Entry,BibTeX::Comment,BibTeX::String,BibTeX::Preamble], bib.data.map(&:class).uniq)
-      assert_equal('py03', bib.data[0].key)
-      assert_equal(:article, bib['py03'].type)
-      assert_equal("Xavier D\\'ecoret", bib['py03'][:author])
-      assert_equal('PyBiTex', bib['py03'][:title])
-      assert_equal('2003', bib['py03'][:year])
-      assert_equal(:article, bib['key03'].type)
-      assert_equal('A {bunch {of} braces {in}} title', bib['key03'][:title])
+      assert_equal(:py03, bib.data[0].key)
+      assert_equal(:article, bib[:py03].type)
+      assert_equal("Xavier D\\'ecoret", bib[:py03][:author])
+      assert_equal('PyBiTex', bib[:py03][:title])
+      assert_equal('2003', bib[:py03][:year])
+      assert_equal(:article, bib[:key03].type)
+      assert_equal('A {bunch {of} braces {in}} title', bib[:key03][:title])
       #TODO missing assertions
     end
   
@@ -46,11 +44,9 @@ module BibTeX
   
     def test_bibdesk
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
-      refute_nil(bib)
-      assert_equal(BibTeX::Bibliography, bib.class)
-      assert_equal(3, bib.length)
-      assert_equal('rails', bib.data[0].key)
-      assert_equal('2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified'])
+      assert_equal 3, bib.length
+      assert_equal :rails, bib[0].key
+      assert_equal '2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified']
     end
   
     def test_roundtrip
@@ -69,7 +65,7 @@ module BibTeX
         :type => :book,
         :key => 'rails',
         :address => 'Raleigh, North Carolina',
-        :author => 'Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier',
+        :author => 'Ruby, Sam, and Thomas, Dave, and Hansson Heinemeier, David',
         :booktitle => 'Agile Web Development with Rails',
         :edition => 'third',
         :keywords => 'ruby, rails',
@@ -85,10 +81,10 @@ module BibTeX
       file = File.read(Test.fixtures(:roundtrip))
       bib = BibTeX::Bibliography.new
       bib.add(BibTeX::Element.parse(%q( @string{ pragprog = "The Pragmatic Booksehlf" } )))
-      bib.add(BibTeX::Element.parse(<<-END
+      bib.add(BibTeX::Element.parse(<<-END))
       @book{rails,
         address = {Raleigh, North Carolina},
-        author = {Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier},
+        author = {Ruby, Sam, and Thomas, Dave, and Hansson Heinemeier, David},
         booktitle = {Agile Web Development with Rails},
         edition = {third},
         keywords = {ruby, rails},
@@ -98,7 +94,6 @@ module BibTeX
         year = {2009}
       }    
       END
-      ))
     
       assert_equal(2, bib.length)
       refute_nil(bib[:rails])

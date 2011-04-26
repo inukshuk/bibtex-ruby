@@ -147,8 +147,6 @@ Bibliographies. For instance:
     => Returns all preamble objects (this is the same as Bibliography#preambles)
     >> bib[/ruby/]
     => Returns all objects that match 'ruby' anywhere
-    >> bib['/ruby/']
-    => Same as above
     >> bib['@book[keywords=ruby]']
     => Returns all book entries whose keywords attribute equals 'ruby'
 

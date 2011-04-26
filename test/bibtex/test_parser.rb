@@ -18,7 +18,7 @@ module BibTeX
       end
       
       should 'parse the key values' do
-        assert_equal %w{ key:0 key:1 foo }, @bib.map(&:key)
+        assert_equal %w{ key:0 key:1 foo }.map(&:to_sym), @bib.map(&:key)
       end
 
       should 'parse the entry types' do
@@ -26,17 +26,17 @@ module BibTeX
       end
       
       should 'parse all values correctly' do
-        assert_equal 'Poe, Edgar A.', @bib['key:0'].author
-        assert_equal 'Hawthorne, Nathaniel', @bib['key:1'].author
+        assert_equal 'Poe, Edgar A.', @bib[:'key:0'].author
+        assert_equal 'Hawthorne, Nathaniel', @bib[:'key:1'].author
         
-        assert_equal '2003', @bib['key:0'].year
-        assert_equal '2001', @bib['key:1'].year
+        assert_equal '2003', @bib[:'key:0'].year
+        assert_equal '2001', @bib[:'key:1'].year
 
-        assert_equal 'American Library', @bib['key:0'].publisher
-        assert_equal 'American Library', @bib['key:1'].publisher
+        assert_equal 'American Library', @bib[:'key:0'].publisher
+        assert_equal 'American Library', @bib[:'key:1'].publisher
         
-        assert_equal %q[Selected \emph{Poetry} and `Tales'], @bib['key:0'].title
-        assert_equal 'Tales and Sketches', @bib['key:1'].title
+        assert_equal %q[Selected \emph{Poetry} and `Tales'], @bib[:'key:0'].title
+        assert_equal 'Tales and Sketches', @bib[:'key:1'].title
       end     
     end
     

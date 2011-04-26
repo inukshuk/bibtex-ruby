@@ -4,8 +4,7 @@ module BibTeX
   
   class BibliographyTest < MiniTest::Spec
     
-    context 'a new Bibliography' do
-
+    context 'when newly created' do
       should 'not be nil' do
         assert Bibliography.new
       end
@@ -13,8 +12,90 @@ module BibTeX
       should 'be empty' do
         assert Bibliography.new.empty?
       end
-
     end
 
+    context 'given a populated biliography' do
+      setup do
+        @bib = BibTeX.parse <<-END
+        @book{rails,
+          address = {Raleigh, North Carolina},
+          author = {Ruby, Sam, and Thomas, Dave, and Hansson Heinemeier, David},
+          booktitle = {Agile Web Development with Rails},
+          edition = {third},
+          keywords = {ruby, rails},
+          publisher = {The Pragmatic Bookshelf},
+          series = {The Facets of Ruby},
+          title = {Agile Web Development with Rails},
+          year = {2009}
+        }
+        @book{flanagan2008,
+          title={{The ruby programming language}},
+          author={Flanagan, D. and Matsumoto, Y.},
+          keywords = {ruby},
+          year={2008},
+          publisher={O'Reilly}
+        }
+        @article{segaran2007,
+          title={{Programming collective intelligence}},
+          author={Segaran, T.},
+          year={2007},
+          publisher={O'Reilly}
+        }
+        END
+      end
+      
+      should 'support access by index' do
+        assert_equal 'ruby', @bib[1].keywords 
+      end
+      
+      should 'support access by range' do
+        assert_equal %w{2008 2007}, @bib[1..2].map(&:year)
+      end
+
+      should 'support access by index and offset' do
+        assert_equal %w{2008 2007}, @bib[1,2].map(&:year)
+      end
+      
+      should 'support queries by symbol key' do
+        refute_nil @bib[:rails]
+        assert_nil @bib[:ruby]
+      end
+      
+      should 'support queries by string key' do
+        assert_equal 1, @bib['rails'].length
+        assert_equal 0, @bib['ruby'].length
+      end
+
+      should 'support queries by type string' do
+        assert_equal 2, @bib['@book'].length
+        assert_equal 1, @bib['@article'].length
+        assert_equal 0, @bib['@collection'].length
+      end
+
+      should 'support queries by pattern' do
+        assert_equal 0, @bib[/reilly/].length
+        assert_equal 2, @bib[/reilly/i].length
+      end
+      
+      should 'support queries by type string and conditions' do
+        assert_equal 1, @bib['@book[keywords=ruby]'].length
+      end
+
+      should 'support queries by bibtex element' do
+        entry = Entry.parse(<<-END).first
+        @article{segaran2007,
+          title = {{Programming collective intelligence}},
+          author = {Segaran, T.},
+          year = {2007},
+          publisher = {O'Reilly}
+        }
+        END
+        assert_equal 1, @bib[entry].length
+        entry.year = '2006'
+        assert_equal 0, @bib[entry].length
+      end
+    
+    end
+    
   end
 end
