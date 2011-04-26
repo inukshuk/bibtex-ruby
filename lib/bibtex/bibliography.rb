@@ -110,8 +110,32 @@ module BibTeX
     end
     
     alias :remove :delete
-    
-    # Returns the first entry with a given key.
+
+    #
+    # call-seq:
+    # >> bib[-1]
+    # => Returns the last element of the Bibliography or nil
+    # >> bib[1,2]
+    # => Returns the second and third elements or nil
+    # >> bib[1..2]
+    # >> Same as above
+    # >> bib[:key]
+    # => Returns the first entry with key 'key' or nil
+    # >> bib['key']
+    # => Returns all entries with key 'key' or []
+    # >> bib['@article']
+    # => Returns all entries of type 'article' or []
+    # >> bib['@preamble']
+    # => Returns all preamble objects (this is the same as Bibliography#preambles) or []
+    # >> bib[/ruby/]
+    # => Returns all objects that match 'ruby' anywhere or []
+    # >> bib['@book[keywords=ruby]']
+    # => Returns all books whose keywords attribute equals 'ruby' or []
+    #
+    # Returns an element or a list of elements according to the given index,
+    # range, or query. Contrary to the Bibliography#query this method does
+    # not yield to a block for additional refinement of the query.
+    #
     def [](*arguments)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
 

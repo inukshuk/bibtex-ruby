@@ -135,20 +135,31 @@ Instead of parsing strings you can also create BibTeX elements directly in Ruby:
 ### Queries
 
 Since version 1.3 BibTeX-Ruby implements a simple query language to search
-Bibliographies. For instance:
+Bibliographies via the `Bibliography#query` (or `Bibliography#q`). Additionally,
+you can access individual elements or groups of elements via their index using
+`Bibliography#[]`; this accessor also exposes some of the query functionality
+with the exception of yielding to a block. For instance:
 
+    >> bib[-1]
+    => Returns the last element of the Bibliography or nil
+    >> bib[1,2]
+    => Returns the second and third elements or nil
+    >> bib[1..2]
+    >> Same as above
     >> bib[:key]
-    => Returns entries with key 'key'
+    => Returns the first entry with key 'key' or nil
     >> bib['key']
-    => Same as above
+    => Returns all entries with key 'key' or []
     >> bib['@article']
-    => Returns all entries of type 'article'
+    => Returns all entries of type 'article' or []
     >> bib['@preamble']
-    => Returns all preamble objects (this is the same as Bibliography#preambles)
+    => Returns all preamble objects (this is the same as Bibliography#preambles) or []
     >> bib[/ruby/]
-    => Returns all objects that match 'ruby' anywhere
+    => Returns all objects that match 'ruby' anywhere or []
     >> bib['@book[keywords=ruby]']
-    => Returns all book entries whose keywords attribute equals 'ruby'
+    => Returns all books whose keywords attribute equals 'ruby' or []
+    >> bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }
+    => Returns all book entries with two or more keywords or []
 
 ### String Replacement
 
