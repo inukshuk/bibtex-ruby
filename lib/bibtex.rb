@@ -52,6 +52,7 @@ end
 # Debugger.start
 
 require 'bibtex/extensions'
+require 'bibtex/value'
 require 'bibtex/elements'
 require 'bibtex/entry'
 require 'bibtex/error'

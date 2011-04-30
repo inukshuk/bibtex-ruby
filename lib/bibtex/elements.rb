@@ -168,6 +168,10 @@ module BibTeX
       @value.to_s(:quotes => %w(" "))
     end
     
+    def [](key)
+      @key == key ? value : nil
+    end
+    
 		# Replaces all constants in this string's value which are defined in +hash+.
 		# Returns the new value (the @string object itself remains unchanged).
 		#

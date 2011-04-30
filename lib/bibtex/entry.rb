@@ -1,6 +1,6 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010	Sylvester Keil <sylvester.keil.or.at>
+# Copyright (C) 2010-2011	Sylvester Keil <sylvester.keil.or.at>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,13 +16,15 @@
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'forwardable'
+
 module BibTeX
 	#
 	# Represents a regular BibTeX entry.
 	#
 	class Entry < Element
-	  
-		attr_reader :type, :fields
+	  extend Forwardable	  
+	  include Enumerable
 
 		# Hash containing the required fields of the standard entry types
 		REQUIRED_FIELDS = Hash.new([]).merge({
@@ -41,6 +43,12 @@ module BibTeX
 			:techreport    => [:author,:title,:institution,:year],
 			:unpublished   => [:author,:title,:note]
 		}).freeze
+
+	  
+		attr_reader :type, :fields
+
+    def_delegators :@fields, :empty?, :each
+
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
 		def initialize(hash = {})
@@ -119,11 +127,6 @@ module BibTeX
 			self
 		end
 
-		# Returns true if the entry currently contains no field.
-		def empty?
-			@fields.empty?
-		end
-
 		# Returns false if the entry is one of the standard entry types and does not have
 		# definitions of all the required fields for that type.
 		def valid?
@@ -182,7 +185,7 @@ module BibTeX
 		end
 		
 		def <=>(other)
-		  self.type != other.type ? self.type <=> other.type : self.key != other.key ? self.key <=> other.key : self.to_s <=> other.to_s
+		  type != other.type ? type <=> other.type : key != other.key ? key <=> other.key : to_s <=> other.to_s
 		end
 		
 		protected
