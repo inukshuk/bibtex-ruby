@@ -49,13 +49,14 @@ module BibTeX
 		  self.type = hash.delete(:type) if hash.has_key?(:type)
 		  self.key = hash.delete(:key) if hash.has_key?(:key)
 						
-			hash.each { |k, v| add(k.to_sym, v) }
+			hash.each { |k,v| add(k.to_sym, v) }
 			
 			yield self if block_given?
 		end
 
 		# Sets the key of the entry
 		def key=(key)
+			raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
 			@key = key.to_sym
 		end
 		
@@ -68,7 +69,7 @@ module BibTeX
 		
 		# Sets the type of the entry.
 		def type=(type)
-			raise(ArgumentError, "BibTeX::Entry type must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
+			raise(ArgumentError, "types must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
 			@type = type.to_sym
 		end
 		
@@ -126,22 +127,22 @@ module BibTeX
 		# Returns false if the entry is one of the standard entry types and does not have
 		# definitions of all the required fields for that type.
 		def valid?
-			REQUIRED_FIELDS[@type].all? { |f|
+			REQUIRED_FIELDS[@type].all? do |f|
 				f.is_a?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil?
-			}
+			end
 		end
 
 		# Called when the element was added to a bibliography.
 		def added_to_bibliography(bibliography)
-			super(bibliography)
-			bibliography.entries[@key] = self
+			super
+			bibliography.entries[key] = self
 			self
 		end
 		
 		# Called when the element was removed from a bibliography.
 		def removed_from_bibliography(bibliography)
-			super(bibliography)
-			bibliography.entries[@key] = nil
+			super
+			bibliography.entries[key] = nil
 			self
 		end
 

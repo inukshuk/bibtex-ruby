@@ -103,8 +103,7 @@ module BibTeX
     # if the object was not part of the bibliography.
     #
     def delete(*arguments, &block)
-      objects = select(*arguments, &block)
-      objects.each { |object| object.removed_from_bibliography(self) }
+      objects = q(*arguments, &block).map { |o| o.removed_from_bibliography(self) }
       @data = @data - objects
       objects.length == 1 ? objects[0] : objects
     end

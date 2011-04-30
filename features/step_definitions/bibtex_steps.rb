@@ -26,6 +26,14 @@ Then /^my bibliography should contain the following objects:$/ do |table|
   end
 end
 
+Then /^my bibliography should contain these (\w+):$/ do |type, table|
+  @bibliography.q("@#{type.chomp!('s')}").zip(table.hashes).each do |object, expected|
+    expected.each_pair do |key, value|
+      assert_equal value, object.send(key).to_s
+    end
+  end
+end
+
 Then /^my bibliography should contain the following numbers of elements:$/ do |table|
   counts = table.hashes.first
   counts[[]] = counts.delete('total') if counts.has_key?('total')
@@ -44,4 +52,13 @@ end
 
 Then /^there should be exactly (\d+) match(?:es)?$/ do |matches|
   assert_equal matches.to_i, @result.length
+end
+
+
+Then /^my bibliography should contain (\d+) (\w+) published in (\d+)$/ do |count, type, year|
+  assert_equal @bibliography.q("@#{type.chomp!('s')}[year=#{year}]").length, count.to_i
+end
+
+Then /^my bibliography should contain an? (\w+) with id "([^"]*)"$/ do |type, id|
+  assert_equal @bibliography[id.to_sym].type, type.to_sym
 end
