@@ -27,11 +27,11 @@ module BibTeX
       end
 
       should 'support string replacement of preamble contents' do
-        assert_equal %q["Maintained by " # maintainer], @preambles[2].content
+        assert_equal %q["Maintained by " # maintainer], @preambles[2].value.to_s
         @bib.replace_strings
-        assert_equal %q["Maintained by " # "Myself"], @preambles[2].content
+        assert_equal %q["Maintained by " # "Myself"], @preambles[2].value.to_s
         @bib.join_strings
-        assert_equal '"Maintained by Myself"', @preambles[2].content
+        assert_equal 'Maintained by Myself', @preambles[2].value.to_s
       end
     end
 

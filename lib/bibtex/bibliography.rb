@@ -179,10 +179,10 @@ module BibTeX
     #
     def replace_strings(options = {})
       options[:filter] ||= %w{ string preamble entry }
-      find_by_type(options[:filter]).each { |e| e.replace!(@strings) if e.respond_to?(:replace!)}
+      find_by_type(options[:filter]).each { |e| e.replace!(@strings.values) if e.respond_to?(:replace!)}
     end
 
-    def join_strings(options={})
+    def join_strings(options = {})
       options[:filter] ||= %w{ string preamble entry }
       find_by_type(options[:filter]).each { |e| e.join! if e.respond_to?(:join!)}
     end

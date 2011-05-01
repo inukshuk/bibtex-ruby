@@ -69,9 +69,9 @@ module BibTeX
       end
       
       should 'parse all contents' do
-        assert_equal 'This bibliography was created \\today', @bib.preambles[0].content
-        assert_equal 'Bib\\TeX', @bib.preambles[1].content
-        assert_equal '"Maintained by " # maintainer', @bib.preambles[2].content
+        assert_equal 'This bibliography was created \\today', @bib.preambles[0].value.to_s
+        assert_equal 'Bib\\TeX', @bib.preambles[1].value.to_s
+        assert_equal '"Maintained by " # maintainer', @bib.preambles[2].value.to_s
       end
     end
     

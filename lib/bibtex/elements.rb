@@ -1,6 +1,6 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010	Sylvester Keil <sylvester.keil.or.at>
+# Copyright (C) 2010-2011	Sylvester Keil <sylvester.keil.or.at>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -144,92 +144,48 @@ module BibTeX
 	# of regular entries.
 	#
 	class String < Element	  
+    include Replaceable
+    
 		attr_reader :key
 
 		# Creates a new instance.
-		def initialize(key=nil,value=nil)
-			self.key = key.to_sym unless key.nil?
-			self.value = value unless value.nil?
+		def initialize(key = nil, value = nil)
+		  @key, @value = key.to_sym, Value.new(value)
+			yield self if block_given?
 		end
 
-		# Sets the string's key (i.e., the name of the constant)
+		# Sets the string's key (i.e., the symbol identifying the constant).
 		def key=(key)
-			raise(ArgumentError, "BibTeX::String key must be of type Symbol; was: #{key.class.name}.") unless key.is_a?(Symbol)
-			@key = key
+      unless bibliography.nil?
+  			bibliography.strings[@key] = nil
+  			bibliography.strings[key.to_sym] = self
+  		end
+			@key = key.to_sym
 		end
 
-		# Sets the string's value (i.e., the string literal defined by the constant)
-		def value=(value)
-			raise(ArgumentError, "BibTeX::String value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
-			@value = Extensions.string_replacement(value.is_a?(Array) ? value : [value])
-		end
-    
-    def value
-      @value.to_s(:quotes => %w(" "))
-    end
-    
+    # Retuns the string's value if parameter matches the key; nil otherwise.
     def [](key)
-      @key == key ? value : nil
+      @key == key ? @value : nil
     end
     
-		# Replaces all constants in this string's value which are defined in +hash+.
-		# Returns the new value (the @string object itself remains unchanged).
-		#
-		# call-seq:
-		# s.to_s
-		# => "@string{ foobar = foo # "bar"}"
-		# s.replace({:foo => 'bar'})
-		# => "\"bar\" # \"bar\""
-		# s.to_s
-		# => "@string{ foobar = foo # "bar"}"
-		def replace(hash)
-		  @value.replace_strings(hash)
-		end
-
-		# Replaces all constants in this string's value which are defined in +hsh+.
-		# Returns the new value (the @string object itself is changed as well).
-		#
-		# call-seq:
-		# s.to_s
-		# => "@string{ foobar = foo # "bar"}"
-		# s.replace({:foo => 'bar'})
-		# => ["bar","bar"]
-		# s.to_s
-		# => "@string{ foobar = "bar" # "bar"}"
-		def replace!(hash)
-			@value = @value.replace_strings(hash)
-			@bibliography.strings[@key] = @value unless @bibliography.nil?
-		end
-
-    def join!
-			@value = @value.join_strings
-			@bibliography.strings[@key] = @value unless @bibliography.nil?      
-    end
-
-		# Adds either a string constant or literal to the current value. The
-		# values will be concatenated using the `#' symbol.
-		def <<(value)
-			raise(ArgumentError, "BibTeX::String value can contain only instances of Symbol or String; was: #{value.class.name}.") unless [::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
-			@value << value
-		end
 
 		# Called when the element was added to a bibliography.
 		def added_to_bibliography(bibliography)
-			super(bibliography)
-			bibliography.strings[@key] = @value
+			super
+			bibliography.strings[@key] = self
 			self
 		end
 		
 		# Called when the element was removed from a bibliography.
 		def removed_from_bibliography(bibliography)
-			super(bibliography)
+			super
 			bibliography.strings[@key] = nil
 			self
 		end
 
 		# Returns a string representation of the @string's content.
 		def content
-			[@key.to_s, value].join(' = ')
+			[@key, @value.to_s(:quotes => '"')].join(' = ')
 		end
 
 		# Returns a string representation of the @string object.
@@ -238,7 +194,7 @@ module BibTeX
 		end
 		
 		def to_hash
-		  { 'string' => { @key.to_s => @value.to_s(:quotes => %w(" ")) } }
+		  { 'string' => { @key.to_s => @value.to_s(:quotes => '"') } }
 		end
 		
 		def to_xml
@@ -258,34 +214,12 @@ module BibTeX
 	# a single constant, or a concatenation of string literals and
 	# constants.
 	class Preamble < Element
+	  include Replaceable
 
 		# Creates a new instance.
 		def initialize(value = '')
       @value = Value.new(value)
 		end
-
-		def value=(value)
-		  @value = Value.new(value)
-		end
-
-		def replace(*arguments)
-			@value.replace(*arguments)
-			self
-		end
-
-    def join
-      @value.join
-      self
-    end
-
-    alias :join! :join
-    alias :replace! :replace
-    
-    def value
-      @value.to_s
-    end
-    
-    alias :v :value
     
 		# Returns a string representation of the @preamble's content.
 		def content
@@ -296,7 +230,6 @@ module BibTeX
 		def to_s
 			"@preamble{ #{ content } }"
 		end
-		
 	end
 
 	# Represents a @comment object.

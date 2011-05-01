@@ -28,7 +28,7 @@ module BibTeX
     alias :to_a :tokens
     
     def_delegators :to_s, :<=>, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
-    def_delegators :@tokens, :push
+    def_delegators :@tokens, :<<, :push
     
     def initialize(*arguments)
       @tokens = []
@@ -52,13 +52,13 @@ module BibTeX
     end
     
     def replace(*arguments)
-      return self unless symbol?
+      return self unless has_symbol?
       arguments.flatten.each do |argument|
         case argument
-        when ::String # simulate Ruby's String#replace
+        when ::String # simulates Ruby's String#replace
           @tokens = [argument]
         when String
-          @tokens = @tokens.map { |v| argument[v] || v }
+          @tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
         when Hash
           @tokens = @tokens.map { |v| argument[v] || v }
         end
@@ -95,7 +95,7 @@ module BibTeX
     # Value.new('foo', 'bar').to_s                #=> "\"foo\" # \"bar\""
     #
     def to_s(options = {})
-      return value.to_s unless options.has_key?(:quotes) && !atomic?
+      return value.to_s unless options.has_key?(:quotes) && atomic?
       *q = options[:quotes]
       [q[0], value, q[-1]].join
     end
@@ -137,7 +137,7 @@ module BibTeX
       @tokens.detect { |v| v.is_a?(Symbol) }
     end
     
-    alias :is_symbol? :symbol?
+    alias :has_symbol? :symbol?
     
     # Returns all symbols contained in the Value.
     def symbols
@@ -145,5 +145,5 @@ module BibTeX
     end
     
   end
-  
+
 end

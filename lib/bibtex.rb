@@ -53,6 +53,7 @@ end
 
 require 'bibtex/extensions'
 require 'bibtex/value'
+require 'bibtex/replaceable'
 require 'bibtex/elements'
 require 'bibtex/entry'
 require 'bibtex/error'

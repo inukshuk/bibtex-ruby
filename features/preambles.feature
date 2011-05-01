@@ -20,7 +20,7 @@ Feature: Parse BibTeX preambles
 		@preamble { "Maintained by " # maintainer }
 		"""
 		Then my bibliography should contain the following objects:
-			| type     | content                               |
+			| type     | value                                 |
 			| preamble | This bibliography was created \\today |
 			| preamble | Bib\\TeX                              |
 			| string   | maintainer = "Myself"                 |
