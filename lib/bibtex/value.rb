@@ -24,74 +24,124 @@ module BibTeX
     extend Forwardable
     include Comparable
     
-    attr_reader :value
+    attr_reader :tokens
+    alias :to_a :tokens
     
     def_delegators :to_s, :<=>, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
-    def_delegators :@value, :push
+    def_delegators :@tokens, :push
     
     def initialize(*arguments)
-      @value = arguments.flatten
-    end
-    
-    def initialize_copy(other)
-      @value = other.value.dup
-    end
-    
-    def replace(*arguments)
-      return self unless variable?
+      @tokens = []
       
       arguments.flatten.each do |argument|
         case argument
+        when Value
+          @tokens += argument.tokens.dup
         when ::String
-          @value = [argument]
-        when String
-          @value = @value.map { |v| argument[v] || v }
-        when Hash
-          @value = @value.map { |v| argument[v] || v }
+          @tokens << argument
+        when Symbol
+          @tokens << argument
+        else
+          raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
         end
       end
-      # if string @values = [string]
-      # variables.each do |string, replacement|
-      #   
-      # end
+    end
+    
+    def initialize_copy(other)
+      @tokens = other.tokens.dup
+    end
+    
+    def replace(*arguments)
+      return self unless symbol?
+      arguments.flatten.each do |argument|
+        case argument
+        when ::String # simulate Ruby's String#replace
+          @tokens = [argument]
+        when String
+          @tokens = @tokens.map { |v| argument[v] || v }
+        when Hash
+          @tokens = @tokens.map { |v| argument[v] || v }
+        end
+      end
       self
     end
 
+
+    # Returns the Value instance with all consecutive String tokens joined.
+    #
+    # call-seq:
+    # Value.new('foo', 'bar').join #=> <'foobar'>
+    # Value.new(:foo, 'bar').join  #=> <:foo, 'bar'>
+    #
     def join
-      @value = @value.inject([]) do |a,b|
+      @tokens = @tokens.inject([]) do |a,b|
         a[-1].is_a?(::String) && b.is_a?(::String) ? a[-1] += b : a << b; a
       end
       self
     end
     
-    def to_s(apply_join = false)
-      join if apply_join
-      atomic? ? @value[0].to_s : @value.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(" # ")
+    # Returns a the Value as a string. @see #value; the only difference is
+    # that single symbols are returned as String, too.
+    # If the Value is atomic and the option :quotes is given, the string
+    # will be quoted using the quote symbols specified.
+    #
+    # call-seq:
+    # Value.new('foo').to_s                       #=> "foo"
+    # Value.new(:foo).to_s                        #=> "foo"
+    # Value.new('foo').to_s(:quotes => '"')       #=> "\"foo\""
+    # Value.new('foo').to_s(:quotes => ['"','"']) #=> "\"foo\""
+    # Value.new('foo').to_s(:quotes => ['{','}']) #=> "{foo}"
+    # Value.new(:foo, 'bar').to_s                 #=> "foo # \"bar\""
+    # Value.new('foo', 'bar').to_s                #=> "\"foo\" # \"bar\""
+    #
+    def to_s(options = {})
+      return value.to_s unless options.has_key?(:quotes) && !atomic?
+      *q = options[:quotes]
+      [q[0], value, q[-1]].join
     end
 
-    def atomic?
-      @value.length < 2
+    # Returns the Value as a string or, if it consists of a single symbol, as
+    # a Symbol instance. If the Value contains multiple tokens, they will be
+    # joined by a '#', additionally, all string tokens will be turned into
+    # string literals (i.e., delimitted by quotes).
+    def value
+      atomic? ? @tokens[0] : @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
     end
     
+    alias :v :value
+
+    def inspect
+      '<' + @tokens.map(&:inspect).join(', ') + '>'
+    end
+    
+    # Returns true if the Value is empty or consists of a single token.
+    def atomic?
+      @tokens.length < 2
+    end
+    
+    # Returns true if the Value looks like a BibTeX name value.
     def name?
     end
     
     alias :is_name? :name?
     
+    # Returns true if the Value's content is numeric.
     def numeric?
       to_s =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
     end
     
     alias :is_numeric? :numeric?
     
-    def variable?
-      @value.detect { |v| v.is_a?(Symbol) }
+    # Returns true if the Value contains at least one symbol.
+    def symbol?
+      @tokens.detect { |v| v.is_a?(Symbol) }
     end
     
-    alias :is_variable? :variable?
+    alias :is_symbol? :symbol?
     
-    def variables
-      @value.select { |v| v.is_a?(Symbol) }
+    # Returns all symbols contained in the Value.
+    def symbols
+      @tokens.select { |v| v.is_a?(Symbol) }
     end
     
   end

@@ -258,41 +258,43 @@ module BibTeX
 	# a single constant, or a concatenation of string literals and
 	# constants.
 	class Preamble < Element
-    
+
 		# Creates a new instance.
-		def initialize(value=[])
-			self.value = value
+		def initialize(value = '')
+      @value = Value.new(value)
 		end
 
 		def value=(value)
-			raise(ArgumentError, "BibTeX::Preamble value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
-			@value = Extensions.string_replacement(value.is_a?(Array) ? value : [value])
+		  @value = Value.new(value)
 		end
 
-		def replace(hash)
-			@value.replace_strings(hash)
+		def replace(*arguments)
+			@value.replace(*arguments)
+			self
 		end
 
-		def replace!(hash)
-			@value = @value.replace_strings(hash)
-		end
-
-    def join!
-      @value = @value.join_strings
+    def join
+      @value.join
+      self
     end
 
+    alias :join! :join
+    alias :replace! :replace
+    
     def value
-      content
+      @value.to_s
     end
+    
+    alias :v :value
     
 		# Returns a string representation of the @preamble's content.
 		def content
-			@value.to_s(:quotes => [])
+			@value.to_s(:quotes => '"')
 		end
 
 		# Returns a string representation of the @preamble object
 		def to_s
-			"@preamble{ #{ @value.to_s(:quotes => %w[" "]) } }"
+			"@preamble{ #{ content } }"
 		end
 		
 	end

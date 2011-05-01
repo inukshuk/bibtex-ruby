@@ -31,7 +31,7 @@ module BibTeX
         @bib.replace_strings
         assert_equal %q["Maintained by " # "Myself"], @preambles[2].content
         @bib.join_strings
-        assert_equal "Maintained by Myself", @preambles[2].content
+        assert_equal '"Maintained by Myself"', @preambles[2].content
       end
     end
 
