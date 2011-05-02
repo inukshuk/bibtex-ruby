@@ -18,6 +18,16 @@ When /^I search for \/(.+)\/$/ do |query|
   @result = @bibliography.query(Regexp.new(query))
 end
 
+When /^I (replace|join) all strings(?: in my bibliography)$/ do |method|
+  @bibliography.send("#{method}_strings")
+end
+
+When /^I replace and join all strings(?: in my bibliography)$/ do
+  @bibliography.replace_strings.join_strings
+end
+
+
+
 Then /^my bibliography should contain the following objects:$/ do |table|
   @bibliography.each_with_index do |object, index|
     table.hashes[index].each_pair do |key, value|
@@ -26,7 +36,7 @@ Then /^my bibliography should contain the following objects:$/ do |table|
   end
 end
 
-Then /^my bibliography should contain these (\w+):$/ do |type, table|
+Then /^my bibliography should contain th(?:ese|is) (\w+):$/ do |type, table|
   @bibliography.q("@#{type.chomp!('s')}").zip(table.hashes).each do |object, expected|
     expected.each_pair do |key, value|
       assert_equal value, object.send(key).to_s

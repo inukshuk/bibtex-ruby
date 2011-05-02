@@ -21,23 +21,6 @@ module BibTeX
       end
     end
 
-    # context ''
-    # def test_assignment
-    #   bib = BibTeX::Bibliography.open(Test.fixtures(:strings), :debug => false)
-    #   refute_nil(bib)
-    #   assert(bib.kind_of? BibTeX::Bibliography)
-    #   refute(bib.empty?)
-    #   assert_equal(17, bib.data.length)
-    #   assert_equal(bib.data.map(&:class).uniq, [BibTeX::String]) 
-    #   assert_equal(bib.data.map(&:key).uniq, [:foo]) 
-    #   (0..10).each { |i| assert_equal( '"bar"', bib.data[i].value) }
-    #   assert_equal(bib.data[11].value, '"\'bar\'"')
-    #   assert_equal(bib.data[12].value, '"{"}bar{"}"')
-    #   assert_equal(bib.data[13].value, '"@bar@"')
-    #   assert_equal(bib.data[14].value, '"\'bar\'"')
-    #   assert_equal(bib.data[15].value, '"{"}bar{"}"')
-    #   assert_equal(bib.data[16].value, '"{bar}"')
-    # end
     # 
     # def test_replacement
     #   bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => false)

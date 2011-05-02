@@ -23,5 +23,5 @@ Feature: Parse BibTeX preambles
 			| type     | value                                 |
 			| preamble | This bibliography was created \\today |
 			| preamble | Bib\\TeX                              |
-			| string   | maintainer = "Myself"                 |
+			| string   | Myself                                |
 			| preamble | "Maintained by " # maintainer         |

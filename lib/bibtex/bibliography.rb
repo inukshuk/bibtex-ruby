@@ -180,11 +180,13 @@ module BibTeX
     def replace_strings(options = {})
       options[:filter] ||= %w{ string preamble entry }
       find_by_type(options[:filter]).each { |e| e.replace!(@strings.values) if e.respond_to?(:replace!)}
+      self
     end
 
     def join_strings(options = {})
       options[:filter] ||= %w{ string preamble entry }
       find_by_type(options[:filter]).each { |e| e.join! if e.respond_to?(:join!)}
+      self
     end
     
     # Returns a string representation of the bibliography.
