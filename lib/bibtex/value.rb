@@ -27,7 +27,7 @@ module BibTeX
     attr_reader :tokens
     alias :to_a :tokens
     
-    def_delegators :to_s, :<=>, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
+    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
     def_delegators :@tokens, :<<, :push
     
     def initialize(*arguments)
@@ -142,6 +142,14 @@ module BibTeX
     # Returns all symbols contained in the Value.
     def symbols
       @tokens.select { |v| v.is_a?(Symbol) }
+    end
+    
+    def ===(other)
+      to_s <=> other.to_s      
+    end
+
+    def <=>(other)
+      to_s <=> other.to_s
     end
     
   end
