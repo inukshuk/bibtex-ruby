@@ -17,6 +17,7 @@
 #++
 
 require 'forwardable'
+require 'open-uri'
 
 module BibTeX
 
@@ -39,7 +40,7 @@ module BibTeX
       #
       def open(path, options = {})
         BibTeX.log.debug("Opening file #{path}")
-        Parser.new(options).parse(File.read(path))
+        Parser.new(options).parse(Kernel.open(path).read)
       end
       
       #

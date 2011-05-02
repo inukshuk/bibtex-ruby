@@ -63,6 +63,12 @@ module BibTeX
 		# Sets the key of the entry
 		def key=(key)
 			raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
+
+      unless @bibliography.nil?
+  			@bibliography.entries.delete(@key)
+  			@bibliography.entries[key] = self
+      end
+
 			@key = key.to_sym
 		end
 		

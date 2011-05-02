@@ -51,4 +51,6 @@ Feature: Searching in BibTeX bibliographies
 		Then there should be exactly 1 match
 		When I search for "@book[year=2009, keywords=yacc]"
 		Then there should be exactly 0 matches
+		When I search for "@book, @article"
+		Then there should be exactly 3 matches
 		

@@ -1,5 +1,8 @@
 === 1.3.0
 
+* Refactored and cleaned up API and export
+* Added cucumber features
+* Re-implemented string handling using dedicated Value objects
 * Implemented query language to search in bibliographies
 * Improved testing environment
 * Added cucumber features

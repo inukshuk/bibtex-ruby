@@ -162,10 +162,13 @@ module BibTeX
 
 		# Sets the string's key (i.e., the symbol identifying the constant).
 		def key=(key)
-      unless bibliography.nil?
-  			bibliography.strings[@key] = nil
-  			bibliography.strings[key.to_sym] = self
+		  raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
+			
+      unless @bibliography.nil?
+  			@bibliography.strings.delete(@key)
+  			@bibliography.strings[key.to_sym] = self
   		end
+  		
 			@key = key.to_sym
 		end
 
