@@ -57,7 +57,7 @@ module BibTeX
     attr_reader :data, :strings, :entries, :errors
 
     alias :to_a :data
-    attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_comment
+    attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
     
     def_delegators :@data, :length, :size, :each, :empty?, :select, :detect, :find, :find_all, :sort
 
@@ -159,7 +159,7 @@ module BibTeX
     end
 
     # Returns true if the +Bibliography+ contains no errors and only
-    # valid BibTeX objects (meta comments are ignored).
+    # valid BibTeX objects (meta content is ignored).
     def valid?
       !errors? && @entries.values.all?(&:valid?)
     end

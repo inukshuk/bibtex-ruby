@@ -32,7 +32,7 @@ module BibTeX
 		# Creates a new instance. Possible options and their respective
 		# default values are:
 		#
-		# - :include => [:errors] A list that may contain :meta_comments, and
+		# - :include => [:errors] A list that may contain :meta_content, and
 		#		:errors; depending on whether or not these are present, the respective
 		#		tokens are included in the parse tree.
 		# - :strict => true In strict mode objects can start anywhere; therefore
@@ -90,7 +90,7 @@ module BibTeX
 			[:bibtex,:comment,:string,:preamble,:entry].include?(self.mode)
 		end
 		
-		# Returns true if the lexer is currently parsing meta comments.
+		# Returns true if the lexer is currently parsing meta content.
 		def meta_mode?
 			self.mode == :meta
 		end
@@ -119,8 +119,8 @@ module BibTeX
 			when value[0] == :ERROR
 				@stack.push(value) if @options[:include].include?(:errors)
 				leave_object
-			when value[0] == :META_COMMENT
-				if @options[:include].include?(:meta_comments)
+			when value[0] == :META_CONTENT
+				if @options[:include].include?(:meta_content)
 					value[1] = [value[1], line_number_at(@src.pos)]
 					@stack.push(value)
 				end
@@ -194,10 +194,10 @@ module BibTeX
 		def parse_meta
 			match = self.src.scan_until(@options[:strict] ? /@[\t ]*/o : /(^|\n)[\t ]*@[\t ]*/o)
 			unless self.src.matched.nil?
-				push [:META_COMMENT, match.chop]
+				push [:META_CONTENT, match.chop]
 				enter_object
 			else
-				push [:META_COMMENT,self.src.rest]
+				push [:META_CONTENT,self.src.rest]
 				self.src.terminate
 			end
 		end
@@ -318,7 +318,7 @@ module BibTeX
 		
 		def backtrace(error)
 			trace = []
-			trace.unshift(@stack.pop) until @stack.empty? || (!trace.empty? && [:AT,:META_COMMENT].include?(trace[0][0]))
+			trace.unshift(@stack.pop) until @stack.empty? || (!trace.empty? && [:AT,:META_CONTENT].include?(trace[0][0]))
 			trace << error
 			push [:ERROR,trace]
 		end

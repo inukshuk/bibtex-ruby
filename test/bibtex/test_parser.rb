@@ -42,15 +42,15 @@ module BibTeX
     
     context 'given a set of explicit and implicit comments' do
       setup do
-        @bib = Parser.new(:debug => false, :include => [:meta_comments]).parse(File.read(Test.fixtures(:comment)))
+        @bib = Parser.new(:debug => false, :include => [:meta_content]).parse(File.read(Test.fixtures(:comment)))
       end
       
       should 'parses all @comments' do
         assert_equal 2, @bib.comments.length
       end
 
-      should 'parses all meta comments' do
-        assert_equal 3, @bib.meta_comments.length
+      should 'parses all meta content' do
+        assert_equal 3, @bib.meta_contents.length
       end
       
       should 'parse @comment content as string' do

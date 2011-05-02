@@ -228,44 +228,39 @@ module BibTeX
 
 		# Returns a string representation of the @preamble object
 		def to_s
-			"@preamble{ #{ content } }"
+			"@preamble{ #{content} }"
 		end
 	end
 
 	# Represents a @comment object.
 	class Comment < Element
-
-		def initialize(content='')
-			self.content = content
-		end
-
-		def content=(content)
-			raise(ArgumentError, "BibTeX::#{self.class.name} content must be of type String; was: #{content.class.name}.") unless content.is_a?(::String)
+    attr_accessor :content
+    
+		def initialize(content = '')
 			@content = content
 		end
 
-		def content
-			@content
-		end
-
 		def to_s
-			['@comment{ ',content,'}'].join
+			"@comment{ #@content }"
 		end
-		
 	end
 
 	# Represents text in a `.bib' file, but outside of an
 	# actual BibTeX object; typically, such text is treated
 	# as a comment and is ignored by the parser. 
 	# BibTeX-Ruby offers this class to allows for
-	# post-processing of this type of `meta' comment. If you
+	# post-processing of this type of `meta' content. If you
 	# want the parser to include +MetaComment+ objects, you
-	# need to add +:meta_comments+ to the parser's +:include+
+	# need to add +:meta_content+ to the parser's +:include+
 	# option.
-	class MetaComment < Comment
-		def to_s
-			@content
+	class MetaContent < Element
+	  attr_accessor :content
+	  
+		def initialize(content = '')
+			@content = content
 		end
+
+	  alias :to_s :content
 	end
 
 end
