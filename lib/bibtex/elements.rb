@@ -41,6 +41,12 @@ module BibTeX
 			''
 		end
 
+    # Invokes BibTeX string replacement on this element.
+    def replace(*arguments); self; end
+
+    # Invokes BibTeX string joining on this element.
+    def join; self; end
+    
     # Returns the element's id.
     def id; @id ||= object_id.to_s.intern; end
     
@@ -66,10 +72,10 @@ module BibTeX
         to_s.match(query)
       when /^\/(.+)\/$/
         to_s.match(Regexp.new($1))
-      when /^@(\w+)$/
-        has_type?($1)
-      when /^@(\w+)\[([^\]]*)\]$/
-        has_type?($1) && meets?($2.split(/,\s*/))
+      when /@(\w+)(?:\[([^\]]*)\])?/
+        query.scan(/@(\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
+          has_type?(type) && ( condition.nil? || meets?(condition.split(/,\s*/)) )
+        end
       else
         id == query.to_sym
       end      
@@ -79,8 +85,8 @@ module BibTeX
     alias :match? :matches?
     
     # Returns true if the element meets all of the given conditions.
-    def meets?(conditions)
-      [conditions].flatten.all? do |condition|
+    def meets?(*conditions)
+      conditions.flatten.all? do |condition|
         property, value = condition.split(/\s*=\s*/)
         property.nil? || send(property).to_s == value
       end

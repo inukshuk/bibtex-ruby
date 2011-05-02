@@ -21,7 +21,7 @@ Feature: BibTeX String Replacement
 
 		@preamble { "foo" # foo # foobarfoo # "bar" }
 
-		manual {manual:1,
+		@manual {manual:1,
 			title = "foo" # barfoobar
 		}
 		"""
@@ -35,9 +35,9 @@ Feature: BibTeX String Replacement
 		And my bibliography should contain these preambles:
 			| content                         |
 			| "foo" # foo # foobarfoo # "bar" |
-		# And my bibliography should contain these manuals:
-		# 	| title             |
-		# 	| "foo" # barfoobar |
+		And my bibliography should contain these manuals:
+			| title             |
+			| "foo" # barfoobar |
 		When I replace all strings in my bibliography
 		Then my bibliography should contain these strings:
 			| content                           |
@@ -49,6 +49,9 @@ Feature: BibTeX String Replacement
 		And my bibliography should contain these preambles:
 			| content                                       |
 			| "foo" # "foo" # "foo" # "bar" # "foo" # "bar" |
+		And my bibliography should contain these manuals:
+			| title                         |
+			| "foo" # "bar" # "foo" # "bar" |
 		When I join all strings in my bibliography
 		Then my bibliography should contain these strings:
 			| content                 |
@@ -60,3 +63,6 @@ Feature: BibTeX String Replacement
 		And my bibliography should contain these preambles:
 			| content              |
 			| "foofoofoobarfoobar" |
+		And my bibliography should contain these manuals:
+			| title        |
+			| foobarfoobar |

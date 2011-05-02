@@ -83,6 +83,7 @@ module BibTeX
     end
     
     alias :<< :add
+    alias :push :add
     
     # Saves the bibliography to the current path.
     def save
@@ -109,7 +110,12 @@ module BibTeX
     end
     
     alias :remove :delete
+    alias :rm :delete
 
+    #
+    # Returns an element or a list of elements according to the given index,
+    # range, or query. Contrary to the Bibliography#query this method does
+    # not yield to a block for additional refinement of the query.
     #
     # call-seq:
     # >> bib[-1]
@@ -130,10 +136,6 @@ module BibTeX
     # => Returns all objects that match 'ruby' anywhere or []
     # >> bib['@book[keywords=ruby]']
     # => Returns all books whose keywords attribute equals 'ruby' or []
-    #
-    # Returns an element or a list of elements according to the given index,
-    # range, or query. Contrary to the Bibliography#query this method does
-    # not yield to a block for additional refinement of the query.
     #
     def [](*arguments)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
@@ -164,30 +166,32 @@ module BibTeX
       !errors? && @entries.values.all?(&:valid?)
     end
     
-    # Replaces all string constants which are defined in the bibliography.
+    # Replaces all string symbols which are defined in the bibliography.
     #
-    # By default constants in @string, @preamble and entries are defined; this
-    # behaviour can be changed using the options argument by setting
-    # the :include option to a list of types.
+    # By default symbols in @string, @preamble and entries are replaced; this
+    # behaviour can be changed using the optional query parameter.
     #
     # Note that strings are replaced in the order in which they occur in the
     # bibliography.
     #
     # call-seq:
-    # replace_strings
-    # replace_strings({ :filter => [:string, :preamble]})
+    # bib.replace #=> replaces all symbols
+    # bib.replace('@string, @preamble')
+    # #=> replaces only symbols in @string and @preamble objects
     #
-    def replace_strings(options = {})
-      options[:filter] ||= %w{ string preamble entry }
-      find_by_type(options[:filter]).each { |e| e.replace!(@strings.values) if e.respond_to?(:replace!)}
+    def replace(filter = '')
+      q(filter) { |e| e.replace(@strings.values) }
       self
     end
+    
+    alias :replace_strings :replace
 
-    def join_strings(options = {})
-      options[:filter] ||= %w{ string preamble entry }
-      find_by_type(options[:filter]).each { |e| e.join! if e.respond_to?(:join!)}
+    def join(filter = '')
+      q(filter, &:join)
       self
     end
+    
+    alias :join_strings :join
     
     # Returns a string representation of the bibliography.
     def to_s
@@ -219,6 +223,23 @@ module BibTeX
       xml
     end
 
+    # Returns objects in the Bibliography which match the given selector and,
+    # optionally, the conditions specified in the given block.
+    #
+    # call-seq:
+    # bib.query()        #=> returns all objects
+    # bib.query(:all)    #=> returns all objects
+    # bib.query(:first)  #=> returns the first object
+    # bib.query('@book') #=> returns all books
+    # bib.query(:first, '@book, @article')
+    # #=> returns the first book or article
+    # bib.query('@book[year=2011], @article)
+    # #=> returns all books published in 2011 and all articles
+    # bib.query('@book, @article) { |o| o.year == '2011' }
+    # #=> returns all books and articles published in 2011
+    # bib.query('@book[year=2011], @article[year=2011])
+    # #=> same as above without using a block
+    #
     def query(*arguments, &block)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)") unless arguments.length.between?(0,2)
 
@@ -230,17 +251,14 @@ module BibTeX
     
     alias :q :query
         
-    def find_by_type(type)
-      return @data if type.nil? || type.respond_to?(:empty?) && type.empty?
-      @data.select do |element|
-        [type].flatten.any? { |t| element.has_type?(t) }
-      end
+    def find_by_type(*types, &block)
+      q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
     end
     
     alias :find_by_types :find_by_type
 
     def <=>(other)
-      other.respond_to?(:to_a) ? other.to_a <=> to_a : nil
+      other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
     
     private

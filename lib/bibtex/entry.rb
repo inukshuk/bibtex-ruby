@@ -46,18 +46,16 @@ module BibTeX
 
 	  
 		attr_reader :type, :fields
-
     def_delegators :@fields, :empty?, :each
 
-
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
-		def initialize(hash = {})
+		def initialize(attributes = {})
 			@fields = {}
 		  
-		  self.type = hash.delete(:type) if hash.has_key?(:type)
-		  self.key = hash.delete(:key) if hash.has_key?(:key)
-						
-			hash.each { |k,v| add(k.to_sym, v) }
+		  self.type = attributes.delete(:type) if attributes.has_key?(:type)
+		  self.key = attributes.delete(:key) if attributes.has_key?(:key)
+			
+			add(attributes)
 			
 			yield self if block_given?
 		end
@@ -106,25 +104,28 @@ module BibTeX
 			add(name.to_sym, value)
 		end
 
-		# Adds a new field (name-value pair) to the entry.
-		# Returns the new value.
-		def add(name, value)
-			raise(ArgumentError, "BibTeX::Entry field name must be of type Symbol; was: #{name.class.name}.") unless name.is_a?(Symbol)
-			raise(ArgumentError, "BibTeX::Entry field value must be of type Array, Symbol, or String; was: #{value.class.name}.") unless [Array,::String,Symbol].map { |k| value.is_a?(k) }.inject { |sum,n| sum || n }
-			@fields[name] = Extensions.string_replacement(value.is_a?(Array) ? value : [value])
+		# Adds a new field (name-value pair) or multiple fields to the entry.
+		# Returns the entry for chainability.
+		#
+		# call-seq:
+		# add(:author, "Edgar A. Poe")
+		# add(:author, "Edgar A. Poe", :title, "The Raven")
+		# add([:author, "Edgar A. Poe", :title, "The Raven"])
+		# add(:author => "Edgar A. Poe", :title => "The Raven")
+		#
+		def add(*arguments)
+		  Hash[*arguments.flatten].each do |name, value|
+			  @fields[name] = Value.new(value)
+			end
+			self
 		end
+		
+		alias :<< :add
 
 		# Removes the field with a given name from the entry.
 		# Returns the value of the deleted field; nil if the field was not set.
 		def delete(name)
 			@fields.delete(name.to_sym)
-		end
-
-		# Adds all the fields contained in a given hash to the entry.
-		def <<(fields)
-			raise(ArgumentError, "BibTeX::Entry fields must be of type Hash; was: #{fields.class.name}.") unless fields.is_a?(Hash)
-			fields.each { |n,v| add(n,v) }
-			self
 		end
 
 		# Returns false if the entry is one of the standard entry types and does not have
@@ -141,7 +142,7 @@ module BibTeX
 			bibliography.entries[key] = self
 			self
 		end
-		
+				
 		# Called when the element was removed from a bibliography.
 		def removed_from_bibliography(bibliography)
 			super
@@ -149,13 +150,14 @@ module BibTeX
 			self
 		end
 
-		# Replaces all constants in this entry's field values which are defined in +hash+.
-		def replace!(hash)
-			@fields.keys.each { |k| @fields[k] = @fields[k].replace_strings(hash) }
+		def replace(*arguments)
+			@fields.values.each { |v| v.replace(*arguments) }
+			self
 		end
 
-    def join!
-			@fields.keys.each { |k| @fields[k] = @fields[k].join_strings }
+    def join
+			@fields.values.each(&:join)
+      self
     end
 
 		# Returns a string of all the entry's fields.

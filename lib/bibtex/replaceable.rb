@@ -46,10 +46,6 @@ module BibTeX
 			self
 		end
 		
-		# deprecated
-    alias :join! :join
-    alias :replace! :replace
-        
     alias :v :value
     
   end
