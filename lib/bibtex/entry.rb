@@ -167,26 +167,29 @@ module BibTeX
     end
 
 		# Returns a string of all the entry's fields.
-		def content
-			@fields.keys.map { |k| "#{k} = #{ @fields[k].to_s(:quotes => %w({ })) }" }.join(",\n")
+		def content(options = {})
+			@fields.map { |k,v| "#{k} = #{ @fields[k].to_s(options) }" }.join(",\n")
 		end
 
 		# Returns a string representation of the entry.
-		def to_s
-			["@#{type}{#{key},",content.gsub(/^/,'  '),"}\n"].join("\n")
+		def to_s(options = {})
+		  options[:quotes] ||= %w({ })
+			["@#{type}{#{key},", content(options).gsub(/^/,'  '), "}\n"].join("\n")
 		end
 		
 		def to_hash(options = {})
 		  options[:quotes] ||= %w({ })
-		  @fields.keys.map { |k| { k.to_s => @fields[k].to_s(options) } }.inject({ 'key' => @key, 'type' => @type.to_s }) { |sum,n| sum.merge(n) }
+		  Hash[*([:key, key, :type, type] + @fields.map { |k,v| [k, v.to_s(options)] }.flatten)]
 		end
 		
-		def to_xml
-  		xml = REXML::Element.new(@type.to_s)
-  		xml.attributes['key'] = @key
+		def to_xml(options = {})
+		  require 'rexml/document'
+	    
+  		xml = REXML::Element.new(type)
+  		xml.attributes['key'] = key
       @fields.each do |k,v|
         e = REXML::Element.new(k.to_s)
-        e.text = v.to_s
+        e.text = v.to_s(options)
         xml.add_element(e)
       end
       xml

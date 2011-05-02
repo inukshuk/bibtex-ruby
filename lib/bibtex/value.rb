@@ -97,7 +97,7 @@ module BibTeX
     def to_s(options = {})
       return value.to_s unless options.has_key?(:quotes) && atomic?
       *q = options[:quotes]
-      [q[0], value, q[-1]].join
+      [q[0], value, q[-1]].compact.join
     end
 
     # Returns the Value as a string or, if it consists of a single symbol, as

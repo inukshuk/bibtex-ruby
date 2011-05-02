@@ -57,7 +57,6 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors
 
-    alias :to_a :data
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
     
     def_delegators :@data, :length, :size, :each, :empty?, :select, :detect, :find, :find_all, :sort
@@ -87,13 +86,14 @@ module BibTeX
     alias :push :add
     
     # Saves the bibliography to the current path.
-    def save
-      save_to(@path)
+    def save(options = {})
+      save_to(@path, options)
     end
     
     # Saves the bibliography to a file at the given path.
-    def save_to(path)
-      File.open(path, "w") { |f| f.write(to_s) }
+    def save_to(path, options = {})
+      options[:quotes] ||= %w({ })
+      File.open(path, "w") { |f| f.write(to_s(options)) }
     end
     
     #
@@ -195,31 +195,37 @@ module BibTeX
     alias :join_strings :join
     
     # Returns a string representation of the bibliography.
-    def to_s
-      @data.map(&:to_s).join
+    def to_s(options = {})
+      map { |o| o.to_s(options) }.join
     end
 
-    # Returns a Ruby hash representation of the bibliography. Only BibTeX entries are exported.
-    def to_hash
-      @entries.values.map(&:to_hash)
+    def to_a(options = {})
+      map { |o| o.to_hash(options) }
     end
     
-    # Returns a YAML representation of the bibliography. Only BibTeX entries are exported.
-    def to_yaml
-      to_hash.to_yaml
+    # Returns a Ruby hash representation of the bibliography.
+    def to_hash(options = {})
+      { :bibliography => map { |o| o.to_hash(options) } }
+    end
+    
+    # Returns a YAML representation of the bibliography.
+    def to_yaml(options = {})
+      to_a(options).to_yaml
     end
     
     # Returns a JSON representation of the bibliography. Only BibTeX entries are exported.
-    def to_json
-      to_hash.to_json
+    def to_json(options = {})
+      to_a(options).to_json
     end
     
     # Returns an XML representation of the bibliography. Only BibTeX entries are exported.
     def to_xml
+      require 'rexml/document'
+	    
       xml = REXML::Document.new
       xml << REXML::XMLDecl.new('1.0','UTF-8')
       root = REXML::Element.new('bibliography')
-      @entries.values.each { |e| root.add_element(e.to_xml) }
+      each { |e| root.add_element(e.to_xml) }
       xml << root
       xml
     end

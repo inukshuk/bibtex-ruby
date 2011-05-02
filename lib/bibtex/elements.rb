@@ -29,13 +29,9 @@ module BibTeX
 		
 		# Returns an array of BibTeX elements.
     def self.parse(string, options = {})
-      BibTeX::Parser.new(options).parse(string).to_a
+      BibTeX::Parser.new(options).parse(string).data
     end
     
-		def initialize
-			@bibliography = nil
-		end
-		
 		# Returns a string containing the object's content.
 		def content
 			''
@@ -52,11 +48,11 @@ module BibTeX
     
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
-      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase
+      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.intern
     end
   
     def has_type?(type)
-      self.type == type.to_s || defined?(type) == 'constant' && is_a?(type)
+      self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
     end
     
     # Returns true if the element matches the given query.
@@ -94,29 +90,26 @@ module BibTeX
     
     alias :meet? :meets?
     
-		# Returns a string representation of the object.
-		def to_s
-			self.content
-		end
+		alias :to_s :content
 		
-		def to_hash
-		  { self.class.name.downcase => content }
+		def to_hash(options = {})
+		  { type => content }
 	  end
 	  
-	  def to_yaml
+	  def to_yaml(options = {})
 	    require 'yaml'
-      self.to_hash.to_yaml
+      to_hash.to_yaml
 	  end
 	  
-	  def to_json
+	  def to_json(options = {})
 	    require 'json'
-	    self.to_hash.to_json
+	    to_hash.to_json
 	  end
 	  
-	  def to_xml
+	  def to_xml(options = {})
 	    require 'rexml/document'
-	    xml = REXML::Element.new(self.class.name.downcase)
-	    xml.text = self.content
+	    xml = REXML::Element.new(type)
+	    xml.text = content
 	    xml
 	  end
 
@@ -194,24 +187,26 @@ module BibTeX
 
 		# Returns a string representation of the @string's content.
 		def content
-			[@key, @value.to_s(:quotes => '"')].join(' = ')
+			"#@key = #{@value.to_s(:quotes => '"')}"
 		end
 
 		# Returns a string representation of the @string object.
-		def to_s
+		def to_s(options = {})
 			"@string{ #{content} }"
 		end
 		
-		def to_hash
-		  { 'string' => { @key.to_s => @value.to_s(:quotes => '"') } }
+		def to_hash(options = {})
+		  { :string => { @key => @value.to_s(:quotes => '"') } }
 		end
 		
-		def to_xml
-		  xml = REXML::Element.new('string')
-		  key = REXML::Element.new('key')
-		  val = REXML::Element.new('value')
+		def to_xml(options = {})
+		  require 'rexml/document'
+	    
+		  xml = REXML::Element.new(:string)
+		  key = REXML::Element.new(:key)
+		  val = REXML::Element.new(:value)
 		  key.text = @key.to_s
-		  val.text = @value.to_s(:quotes => %w(" "))
+		  val.text = @value.to_s(:quotes => '"')
 		  xml
 		end
 	end
@@ -236,7 +231,7 @@ module BibTeX
 		end
 
 		# Returns a string representation of the @preamble object
-		def to_s
+		def to_s(options = {})
 			"@preamble{ #{content} }"
 		end
 	end
@@ -249,7 +244,7 @@ module BibTeX
 			@content = content
 		end
 
-		def to_s
+		def to_s(options = {})
 			"@comment{ #@content }"
 		end
 	end
