@@ -30,10 +30,10 @@ expect 0
 
 rule
 
-  bibliography : /* empty */                       { result = Bibliography.new }
+  bibliography : /* empty */                       { result = BibTeX::Bibliography.new }
                | objects                           { result = val[0] }
 
-  objects : object                                 { result = Bibliography.new << val[0] }
+  objects : object                                 { result = BibTeX::Bibliography.new << val[0] }
           | objects object                         { result << val[1] }
 
   object : AT at_object                            { result = val[1] }
