@@ -1,4 +1,4 @@
-When /^I parse the name "([^"]*)"$/ do |string|
+When /^I parse the name "(.*)"$/ do |string|
   @name = BibTeX::Name.parse(string)
 end
 

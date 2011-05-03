@@ -13,7 +13,7 @@ Feature: BibTeX Names
 		# And the Last part should be "<last>"
 		# And the jr part should be "<jr>"
 			
-	Scenarios: decoret
+	Scenarios: Decoret test suite
 		| name            | first     | von       | last    | jr |
 		| AA BB           | AA        |           | BB      |    |
 		| AA              |           |           | AA      |    |
@@ -40,3 +40,17 @@ Feature: BibTeX Names
 		| bb CC,XX, AA    | AA        | bb        | CC      | XX |
 		| bb CC,xx, AA    | AA        | bb        | CC      | xx |
 		| BB,, AA         | AA        |           | BB      |    |
+		
+	Scenarios: Decoret further remarks
+		| name                              | first               | von            | last                   | jr |
+		| Paul \'Emile Victor               | Paul \'Emile        |                | Victor                 |    |
+		| Paul {\'E}mile Victor             | Paul {\'E}mile      |                | Victor                 |    |
+		| Paul \'emile Victor               | Paul \'emile        |                | Victor                 |    |
+		| Paul {\'e}mile Victor             | Paul {\'e}mile      |                | Victor                 |    |
+		| Victor, Paul \'Emile              | Paul \'Emile        |                | Victor                 |    |
+		| Victor, Paul {\'E}mile            | Paul {\'E}mile      |                | Victor                 |    |
+		| Victor, Paul \'emile              | Paul \'emile        |                | Victor                 |    |
+		| Victor, Paul {\'e}mile            | Paul {\'e}mile      |                | Victor                 |    |
+		| Dominique Galouzeau de Villepin   | Dominique Galouzeau | de             | Villepin               |    |
+		| Dominique {G}alouzeau de Villepin | Dominique           | {G}alouzeau de | Villepin               |    |
+		| Galouzeau de Villepin, Dominique  | Dominique           |                | Galouzeau de Villepin  |    |
