@@ -19,15 +19,18 @@
 module BibTeX
 
   class << self
-    # Opens a BibTeX file and returns a corresponding +Bibliography+ object.
-    def open(file, options = {})
-      Bibliography.open(file, options)
+    
+    # Opens a BibTeX file or URI and returns a corresponding +Bibliography+
+    # object or, if a block is given, yields the Bibliography to the block,
+    # ensuring that the file is saved.
+    def open(file, options = {}, &block)
+      Bibliography.open(file, options, &block)
     end
   
     # Parses the given string and returns a corresponding +Bibliography+ object.
     # Delegates to BibTeX.open if the string is a filename.
-    def parse(string, options = {})
-      File.exists?(string) ? open(string, options) : BibTeX::Parser.new(options).parse(string)
+    def parse(string, options = {}, &block)
+      File.exists?(string) ? open(string, options, &block) : Parser.new(options).parse(string)
     end
   
     # Returns true if the given file is a valid BibTeX bibliography.

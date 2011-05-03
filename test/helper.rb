@@ -4,6 +4,8 @@ require 'mini_shoulda'
 require 'minitest/autorun'
 require 'redgreen'
 
+require 'tempfile'
+
 module BibTeX
   module Test
     

@@ -8,12 +8,25 @@ module BibTeX
       should 'not be nil' do
         assert Bibliography.new
       end
-
       should 'be empty' do
         assert Bibliography.new.empty?
       end
     end
 
+    context '#open' do
+      should 'accept a block and save the file after execution' do
+        tmp = Tempfile.new('bibtex')
+        tmp.close
+        b = BibTeX.open(Test.fixtures(:bibdesk)).save_to(tmp.path)
+        
+        BibTeX.open(tmp.path) do |bib|
+          bib.delete(:rails)
+        end
+        
+        assert_equal b.length - 1, BibTeX.open(tmp.path).length
+      end
+    end
+    
     context 'given a populated biliography' do
       setup do
         @bib = BibTeX.parse <<-END
@@ -115,6 +128,13 @@ module BibTeX
         assert_equal 1, @bib.q('@book') { |e| e.keywords.split(/,/).length > 1 }.length
       end
     
+      should 'support saving the bibliography to a file' do
+        tmp = Tempfile.new('bibtex')
+        tmp.close
+        @bib.save_to(tmp.path)
+        assert_equal @bib, BibTeX.open(tmp.path)
+      end
+      
     end
     
   end

@@ -32,15 +32,30 @@ module BibTeX
     include Comparable
         
     class << self    
-      #
+
       # Opens and parses the `.bib' file at the given +path+. Returns
-      # a new Bibliography instance corresponding to the file.
+      # a new Bibliography instance corresponding to the file, or, if a block
+      # is given, yields the instance to the block, ensuring that the file
+      # is saved after the block's execution (use the :out option if you want
+      # to specify a save path other than the path from where the file is
+      # loaded).
       #
       # The options argument is passed on to BibTeX::Parser.new.
       #
       def open(path, options = {})
-        BibTeX.log.debug("Opening file #{path}")
-        Parser.new(options).parse(Kernel.open(path).read)
+        b = parse(Kernel.open(path).read, options)
+        return b unless block_given?
+
+        begin
+          yield b
+        ensure
+          b.save_to(options[:out] || path)
+        end
+      end
+
+      # Parses the given string and returns a corresponding Bibliography instance.
+      def parse(bibtex, options = {})
+        Parser.new(options).parse(bibtex)
       end
       
       #
@@ -59,7 +74,7 @@ module BibTeX
 
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
     
-    def_delegators :@data, :length, :size, :each, :empty?, :select, :detect, :find, :find_all, :sort
+    def_delegators :@data, :length, :size, :each, :empty?
 
     
     #
@@ -90,10 +105,11 @@ module BibTeX
       save_to(@path, options)
     end
     
-    # Saves the bibliography to a file at the given path.
+    # Saves the bibliography to a file at the given path. Returns the bibliography.
     def save_to(path, options = {})
       options[:quotes] ||= %w({ })
       File.open(path, "w") { |f| f.write(to_s(options)) }
+      self
     end
     
     #
@@ -271,7 +287,14 @@ module BibTeX
     private
     
     def query_handler(selector)
-      selector && selector.match(/first|distinct|detect/i) ? :detect : :select
+      case selector
+      when /first|distinct|detect/i
+        :detect
+      when /none|reject|not/i
+        :reject
+      else
+        :select
+      end
     end
     
   end
