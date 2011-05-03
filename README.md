@@ -135,10 +135,10 @@ Instead of parsing strings you can also create BibTeX elements directly in Ruby:
 ### Queries
 
 Since version 1.3 BibTeX-Ruby implements a simple query language to search
-Bibliographies via the `Bibliography#query` (or `Bibliography#q`). Additionally,
-you can access individual elements or groups of elements via their index using
-`Bibliography#[]`; this accessor also exposes some of the query functionality
-with the exception of yielding to a block. For instance:
+Bibliographies via the `Bibliography#query` (or `Bibliography#q`) methods.
+Additionally, you can access individual elements or groups of elements via
+their index using `Bibliography#[]`; this accessor also exposes some of the
+query functionality with the exception of yielding to a block. For instance:
 
     >> bib[-1]
     => Returns the last element of the Bibliography or nil
@@ -161,25 +161,45 @@ with the exception of yielding to a block. For instance:
     >> bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }
     => Returns all book entries with two or more keywords or []
 
+Queries offer syntactic sugar for common enumerator invocations:
+
+    >> bib.query(:all, '@book')
+    => same as bib.select { |b| b.has_type?(:book) }
+    >> bib.query('@book')
+    => same as above
+    >> bib.query(:first, '@book')
+    => same as bib.detect { |b| b.has_type?(:book) }
+    >> bib.query(:none, '@book')
+    => same as bib.reject { |b| b.has_type?(:book) }
+
+You can also use queries to delete entries in your bibliography:
+
+    >> bib.delete(/ruby/)
+    => deletes all object that match 'ruby' in their string representation
+    >> bib.delete('@comment')
+    => strips all BibTeX comments from the bibliography
+
+
 ### String Replacement
 
 If your bibliography contains BibTeX @string objects, you can let BibTeX-Ruby
 replace the strings for you. You have access to a bibliography's strings via
-**BibTeX::Bibliography#strings** and you can replace the strings of an entry using
-the **BibTeX::Entry#replace!** method. Thus, to replace all strings defined in your
-bibliography object **bib** your could use this code:
+**BibTeX::Bibliography#strings** or by using a '@string' query.
+You can replace the string symbols of an object by calling the object's
+the **replace** method. Thus, to replace all strings defined in bibliography
+b you could use the following code:
 
-    bib.entries.each do |entry|
-      entry.replace!(bib.strings)
+    b.each do |obj|
+      obj.replace(b.strings)
     end
     
 A shorthand version for replacing all strings in a given bibliography is the
-`Bibliography#replace_strings` method. Similarly, you can use the
-`Bibliography#join_strings` method to join individual strings together. For instance:
+`Bibliography#replace` method. Similarly, you can use the
+`Bibliography#join` method to join individual strings together. For instance:
 
     > bib = BibTeX::Bibliography.new
     > bib.add BibTeX::Element.parse '@string{ foo = "foo" }'
-    > bib.add BibTeX::Element.parse '@string{ bar = "bar" }'
+    > bib << BibTeX::Element.parse '@string{ bar = "bar" }'
     > bib.add BibTeX::Element.parse <<-END
     >  @book{abook,
     >    author = foo # "Author",
@@ -191,13 +211,13 @@ A shorthand version for replacing all strings in a given bibliography is the
       author = foo # "Author",
       title = foo # bar
     }
-    > bib.replace_strings
+    > bib.replace
     > puts bib[:abook].to_s
     @book{abook,
       author = "foo" # "Author",
       title = "foo" # "bar"
     }
-    > bib.join_strings
+    > bib.join
     @book{abook,
       author = {fooAuthor},
       title = {foobar}
@@ -216,11 +236,50 @@ In order to export your bibliography use **#to\_s**, **#to\_yaml**, **#to\_json*
 **#to\_xml**, respectively. For example, the following line constitutes a simple
 BibTeX to YAML converter:
 
-    BibTeX.open('example.bib').to_yaml
+    >> BibTeX.open('example.bib').to_yaml
 
 Look at the 'examples' directory for more elaborate examples of a BibTeX to YAML
 and a BibTeX to HTML converter.
 
+BibTeX-Ruby offers an API which lets you manipulate BibTeX objects (string
+replacement, name parsing etc.); however, sometimes you just want quick access
+to your bibliography's contents. In these cases the **to_hash** method is
+useful: it converts all objects into simple Ruby hashes made up of symbols
+and strings. Furthermore, often you would like to control what sort of quotes
+are used in an export;
+therefore, all conversion methods accept an options hash which lets you define
+what quotes to use (note that BibTeX-Ruby will always use regular double
+quotes if a value consists of more than one token, because these tokens will
+be concatenated using BibTeX's '#' operator).
+
+    >> BibTeX.parse(<<-END).to_hash # implies: :quotes => ['{','}']
+		@book{pickaxe,
+		  Address = {Raleigh, North Carolina},
+		  Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+		  Publisher = {The Pragmatic Bookshelf},
+		  Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+		  Year = {2009}
+		}
+		END
+		=> {:bibliography=>[{:key=>:pickaxe, :type=>:book,
+			:address=>"{Raleigh, North Carolina}",
+			:author=>"{Thomas, Dave, and Fowler, Chad, and Hunt, Andy}",
+			:publisher=>"{The Pragmatic Bookshelf}",
+			:title=>"{Programming Ruby 1.9: The Pragmatic Programmer's Guide}",
+			:year=>"{2009}"}]}
+
+For post-processing in Ruby most of the time you do not need any explicit
+quotes; therefore you can simply add the :quotes option with an empty string:
+
+		>> BibTeX.parse(<<-END).to_hash(:quotes => '')
+		...
+		END
+		=> {:bibliography=>[{:key=>:pickaxe, :type=>:book,
+			:address=>"Raleigh, North Carolina",
+			:author=>"Thomas, Dave, and Fowler, Chad, and Hunt, Andy",
+			:publisher=>"The Pragmatic Bookshelf",
+			:title=>"Programming Ruby 1.9: The Pragmatic Programmer's Guide",
+			:year=>"2009"}]}
 
 The Parser
 ----------
