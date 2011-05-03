@@ -244,7 +244,8 @@ and a BibTeX to HTML converter.
 BibTeX-Ruby offers an API which lets you manipulate BibTeX objects (string
 replacement, name parsing etc.); however, sometimes you just want quick access
 to your bibliography's contents. In these cases the **to_hash** method is
-useful: it converts all objects into simple Ruby hashes made up of symbols
+useful (use **to_a** if you are only interested in the bibliography's contents):
+it converts all objects into simple Ruby hashes made up of symbols
 and strings. Furthermore, often you would like to control what sort of quotes
 are used in an export;
 therefore, all conversion methods accept an options hash which lets you define
@@ -252,34 +253,34 @@ what quotes to use (note that BibTeX-Ruby will always use regular double
 quotes if a value consists of more than one token, because these tokens will
 be concatenated using BibTeX's '#' operator).
 
-    >> BibTeX.parse(<<-END).to_hash # implies: :quotes => ['{','}']
-		@book{pickaxe,
-		  Address = {Raleigh, North Carolina},
-		  Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-		  Publisher = {The Pragmatic Bookshelf},
-		  Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
-		  Year = {2009}
-		}
-		END
-		=> {:bibliography=>[{:key=>:pickaxe, :type=>:book,
-			:address=>"{Raleigh, North Carolina}",
-			:author=>"{Thomas, Dave, and Fowler, Chad, and Hunt, Andy}",
-			:publisher=>"{The Pragmatic Bookshelf}",
-			:title=>"{Programming Ruby 1.9: The Pragmatic Programmer's Guide}",
-			:year=>"{2009}"}]}
+    >> BibTeX.parse(<<-END).to_a # implies: :quotes => ['{','}']
+    @book{pickaxe,
+      Address = {Raleigh, North Carolina},
+      Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+      Publisher = {The Pragmatic Bookshelf},
+      Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+      Year = {2009}
+    }
+    END
+    => [{:key=>:pickaxe, :type=>:book,
+      :address=>"{Raleigh, North Carolina}",
+      :author=>"{Thomas, Dave, and Fowler, Chad, and Hunt, Andy}",
+      :publisher=>"{The Pragmatic Bookshelf}",
+      :title=>"{Programming Ruby 1.9: The Pragmatic Programmer's Guide}",
+      :year=>"{2009}"}]
 
 For post-processing in Ruby most of the time you do not need any explicit
 quotes; therefore you can simply add the :quotes option with an empty string:
 
-		>> BibTeX.parse(<<-END).to_hash(:quotes => '')
-		...
-		END
-		=> {:bibliography=>[{:key=>:pickaxe, :type=>:book,
-			:address=>"Raleigh, North Carolina",
-			:author=>"Thomas, Dave, and Fowler, Chad, and Hunt, Andy",
-			:publisher=>"The Pragmatic Bookshelf",
-			:title=>"Programming Ruby 1.9: The Pragmatic Programmer's Guide",
-			:year=>"2009"}]}
+    >> BibTeX.parse(<<-END).to_a(:quotes => '')
+    ...
+    END
+    => [{:key=>:pickaxe, :type=>:book,
+      :address=>"Raleigh, North Carolina",
+      :author=>"Thomas, Dave, and Fowler, Chad, and Hunt, Andy",
+      :publisher=>"The Pragmatic Bookshelf",
+      :title=>"Programming Ruby 1.9: The Pragmatic Programmer's Guide",
+      :year=>"2009"}]
 
 The Parser
 ----------
