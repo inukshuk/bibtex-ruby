@@ -21,6 +21,9 @@ require 'forwardable'
 module BibTeX
 
   class Names < Value
+    include Enumerable
+    
+    def_delegators :@tokens, :each, :sort
     
     def self.parse(string)
       Names.new(NameParser.new.parse(string))
@@ -37,17 +40,24 @@ module BibTeX
     
     def join; self; end
     
-    def to_s
+    def value
       @tokens.join(' and ')
     end
     
-    alias :value :to_s
+    def to_s(options = {})
+      return value unless options.has_key?(:quotes)
+      *q = options[:quotes]
+      [q[0], value, q[-1]].compact.join
+    end
     
     def name?; true; end
     def numeric?; false; end
+    def atomic?; true; end
     
     alias :names? :name?
     alias :symbol? :numeric?
+    
+    def to_name; self; end
     
     def add(name)
       case
@@ -64,13 +74,17 @@ module BibTeX
     alias :<< :add
     alias :push :add
     
+    def <=>(other)
+      other.respond_to?(:to_a) ? to_a <=> other.to_a  : super
+    end
+    
   end
 
   class Name < Struct.new(:first, :last, :prefix, :suffix)
     extend Forwardable
     include Comparable
     
-    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str
+    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str, :split
     
     class << self    
       def parse(string)
@@ -101,7 +115,9 @@ module BibTeX
     def display_order
       [prefix, last, first, suffix].compact.join(' ')
     end
-        
+    
+    alias :display :display_order
+    
     def sort_order
       [[prefix,last].compact.join(' '), suffix, first].compact.join(', ')
     end
@@ -109,11 +125,7 @@ module BibTeX
     alias :to_s :sort_order
     
     def <=>(other)
-      to_s <=> other.to_s
-    end
-
-    def ===(other)
-      to_s === other.to_s
+      other.is_a?(Name) ? [last, prefix, first, suffix].compact.join(' ') <=> [other.last, other.prefix, other.first, other.suffix].compact.join(' ') : super
     end
     
     def to_hash

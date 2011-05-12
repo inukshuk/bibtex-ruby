@@ -33,7 +33,7 @@ module BibTeX
       if File.exists?(string) || string =~ /^[a-z]+:\/\//i
         open(string, options, &block)
       else
-        Parser.new(options).parse(string)
+        Bibliography.parse(string, options)
       end
     end
   

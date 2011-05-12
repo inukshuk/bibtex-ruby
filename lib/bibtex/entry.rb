@@ -44,6 +44,7 @@ module BibTeX
 			:unpublished   => [:author,:title,:note]
 		}).freeze
 
+    NAME_FIELDS = [:author, :editor, :translator].freeze
 	  
 		attr_reader :type, :fields
     def_delegators :@fields, :empty?, :each
@@ -86,7 +87,7 @@ module BibTeX
 		end
 		
 		def has_type?(type)
-      type.to_s.match(/^entry$/i) || self.type == type.to_sym || super
+      type.to_s.match(/^entry$/i) || @type == type.to_sym || super
     end
     
 		def method_missing(name, *args)
@@ -101,7 +102,7 @@ module BibTeX
 		
 		# Returns the value of the field with the given name.
 		def [](name)
-			@fields[name.to_sym].to_s
+			@fields[name.to_sym]
 		end
 
 		# Adds a new field (name-value pair) to the entry.
@@ -121,7 +122,7 @@ module BibTeX
 		#
 		def add(*arguments)
 		  Hash[*arguments.flatten].each do |name, value|
-			  @fields[name] = Value.new(value)
+			  @fields[name.to_sym] = Value.new(value)
 			end
 			self
 		end
@@ -166,6 +167,20 @@ module BibTeX
       self
     end
 
+    # Parses all name values of the entry. Tries to replace and join the
+    # value prior to parsing.
+    def parse_names
+      NAME_FIELDS.each do |key|
+        if name = @fields[key]
+          name.replace(bibliography.strings) unless bibliography.nil?
+          name.join
+          name = name.to_name
+          @fields[key] = name
+        end
+      end
+      self
+    end
+    
 		# Returns a string of all the entry's fields.
 		def content(options = {})
 			@fields.map { |k,v| "#{k} = #{ @fields[k].to_s(options) }" }.join(",\n")

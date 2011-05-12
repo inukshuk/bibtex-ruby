@@ -113,7 +113,7 @@ require 'strscan'
   def do_scan
     until @src.eos?
       case
-      when @src.scan(/\s+and\s+/io)
+      when @src.scan(/,?\s+and\s+/io)
         push_word
         @stack.push([:AND,@src.matched])
         

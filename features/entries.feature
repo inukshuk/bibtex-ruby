@@ -58,10 +58,10 @@ Feature: Parse BibTeX preambles
 		}
 		"""
 		Then my bibliography should contain these books:
-			| title                                                  | author                                                     | publisher               | year |
-			| Agile Web Development with Rails                       | Ruby, Sam, and Thomas, Dave, and Hansson Heinemeier, David | The Pragmatic Bookshelf | 2009 |
-			| Compilers: Principles, Techniques, and Tools           | Aho, Alfred V., and Lam, Monica S., and Ullman, Jeffrey D. | Addison Wesley          | 2007 |
-			| Programming Ruby 1.9: The Pragmatic Programmer's Guide | Thomas, Dave, and Fowler, Chad, and Hunt, Andy             | The Pragmatic Bookshelf | 2009 |
+			| title                                                  | author                                                   | publisher               | year |
+			| Agile Web Development with Rails                       | Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David | The Pragmatic Bookshelf | 2009 |
+			| Compilers: Principles, Techniques, and Tools           | Aho, Alfred V. and Lam, Monica S. and Ullman, Jeffrey D. | Addison Wesley          | 2007 |
+			| Programming Ruby 1.9: The Pragmatic Programmer's Guide | Thomas, Dave and Fowler, Chad and Hunt, Andy             | The Pragmatic Bookshelf | 2009 |
 		And my bibliography should contain 2 books published in 2009
 		And my bibliography should contain a book with id "pickaxe"
 		And my bibliography should contain a book with id "dragon"

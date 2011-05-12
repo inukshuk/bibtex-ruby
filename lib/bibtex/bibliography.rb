@@ -55,7 +55,9 @@ module BibTeX
 
       # Parses the given string and returns a corresponding Bibliography instance.
       def parse(bibtex, options = {})
-        Parser.new(options).parse(bibtex)
+        b = Parser.new(options).parse(bibtex)
+        b.parse_names unless options[:parse_names] == false
+        b
       end
       
       #
@@ -109,6 +111,11 @@ module BibTeX
     def save_to(path, options = {})
       options[:quotes] ||= %w({ })
       File.open(path, "w") { |f| f.write(to_s(options)) }
+      self
+    end
+    
+    def parse_names
+      entries.values.each(&:parse_names)
       self
     end
     
@@ -209,6 +216,11 @@ module BibTeX
     end
     
     alias :join_strings :join
+
+    def sort(*arguments, &block)
+      @data.sort(*arguments, &block)
+      self
+    end
     
     # Returns a string representation of the bibliography.
     def to_s(options = {})

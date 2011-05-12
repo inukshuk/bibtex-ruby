@@ -20,6 +20,29 @@ require 'forwardable'
 
 module BibTeX
 
+  #
+  # A BibTeX Value is something very much like a string. In BibTeX files it
+  # can appear on the right hand side of @string or @entry field assignments
+  # or as @preamble contents. In the example below [VALUE] indicates possible
+  # occurences of values in BibTeX:
+  #
+  #     @preamble{ "foo" [VALUE] }
+  #     @string{ foo = "foo" [VALUE] }
+  #     @book{id,
+  #       author = {John Doe} [VALUE],
+  #       title = foo # "bar" [VALUE]
+  #     }
+  #
+  # All Values have in common that they can be simple strings in curly braces
+  # or double quotes or complex BibTeX string-concatenations (using the '#'
+  # symbol).
+  #
+  # Generally, Values try to behave as much as normal Ruby strings as possible;
+  # If you do not require any of the advanced BibTeX functionality (string
+  # replacement or concatentaion) you can simply convert them to strings using
+  # +to_s+. Note that BibTeX Names are special instances of Values which
+  # currently do not support string concatenation or replacement.
+  #
   class Value
     extend Forwardable
     include Comparable
@@ -27,7 +50,7 @@ module BibTeX
     attr_reader :tokens
     alias :to_a :tokens
     
-    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
+    def_delegators :to_s, :empty?, :=~, :match, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str, :split
     def_delegators :@tokens, :[]
     
     def initialize(*arguments)
@@ -160,10 +183,6 @@ module BibTeX
       @tokens.select { |v| v.is_a?(Symbol) }
     end
     
-    def ===(other)
-      to_s <=> other.to_s      
-    end
-
     def <=>(other)
       to_s <=> other.to_s
     end
