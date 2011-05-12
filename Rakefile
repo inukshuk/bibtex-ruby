@@ -39,7 +39,7 @@ end
 task :default => ['racc']
 
 desc 'Generates the BibTeX parser'
-task :racc => ['lib/bibtex/parser.rb']
+task :racc => ['lib/bibtex/parser.rb','lib/bibtex/name_parser.rb']
 
 desc 'Generates RDoc documentation for BibTeX-Ruby'
 task :rdoc => ['clean','racc','rdoc_task']
@@ -49,6 +49,10 @@ task :test => ['racc','test_task']
 file 'lib/bibtex/parser.output' => ['lib/bibtex/parser.rb']
 file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
   sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
+end
+
+file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
+  sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
 
 desc 'Updates the Manifest file'

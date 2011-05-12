@@ -26,10 +26,29 @@ module BibTeX
     
     attr_accessor :first, :last, :prefix, :suffix
     
-    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
+    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str
+    
+    PATTERNS = {
+      :sort => /^(?:((?:[[:alpha:]\s])*[[:lower:]][[:alpha:]])\s)*([[:alpha:]]+),(?:\s*([^,]*?)\s*,)?\s*([[:alpha:]\s]+)?$/,
+      :display => /^((?:(?:[\d\\\{\}]*[[:upper:]][[:alnum:]\\\{\}]*)\s)*)?(?:([\d\\\{\}]*[[:lower:]][[:alnum:]\\\{\}\s]*)\s)?(.+)$/      
+    }.freeze
     
     def self.parse(string)
-      new
+      NameParser.new.parse(string)[0]
+      # case string = string.strip
+      # when PATTERNS[:sort]
+      #   new(:prefix => $1, :last => $2, :suffix => $3, :first => $4)
+      # when PATTERNS[:display]
+      #   new(:first => $1 && $1.strip, :prefix => $2, :last => $3)
+      # else
+      #   new(:last => string)
+      # end
+    end
+    
+    def initialize(attributes = {})
+      attributes.each do |key,value|
+        send("#{key}=", value) if respond_to?(key)
+      end
     end
     
     def blank?

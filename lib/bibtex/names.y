@@ -23,7 +23,7 @@
 
 class BibTeX::NameParser
 
-token COMMA UWORD LWORD PWORD AND ERROR SORT
+token COMMA UWORD LWORD PWORD AND ERROR
 
 expect 0
 
@@ -35,20 +35,21 @@ rule
 	names : name                                      { result = [val[0]] }
 	      | names AND name                            { result << val[2] }
 	
-	name : word                                       { result = Name.new(:last => val[0]) }
-	     | u_words word                               { result = Name.new(:first => val[0], :last => val[1]) }
-	     | von last                                 { result = Name.new(:von => val[0], :last => val[1]) }
-	     | u_words von last                         { result = Name.new(:first => val[0], :von => val[1], :last => val[2]) }
-	     | sort first   { result = Name.new(:von => val[0][0], :last => val[0][1], :jr => val[1][0], :first => val[1][1]) }
+	name : last                                 { result = Name.new(:von => val[0][0], :last => val[0][1]) }
+	     | u_words last                         { result = Name.new(:first => val[0], :von => val[1][0], :last => val[1][1]) }
+	     | sort COMMA first   { result = Name.new(:von => val[0][0], :last => val[0][1], :jr => val[2][0], :first => val[2][1]) }
 	
-	last : LWORD                                     { result = val[0] }
-	     | u_words                                  { result = val[0] }
+	sort : u_words { result = [nil,val[0]]}
+	     | LWORD { result = [nil,val[0]]}
+	     | von LWORD  { result = [val[0],val[1]]}
+	     | von u_words { result = [val[0],val[1]]}
 	
-	sort : word { result = [nil,val[0]]}
-	     | von last  { result = [val[0],val[1]]}
+	last : word { result = [nil,val[0]]}
+	     | von LWORD  { result = [val[0],val[1]]}
+	     | von u_words  { result = [val[0],val[1]]}
 	
-	first : COMMA opt_words { result = [nil,val[1]] }
-	   | COMMA opt_words COMMA opt_words   { result = [val[1],val[3]] }
+	first : opt_words { result = [nil,val[0]] }
+	   | opt_words COMMA opt_words   { result = [val[0],val[2]] }
 	
 	u_words : u_word                                  { result = val[0] }
 	        | u_words u_word                          { result = val[0,2].join(' ') }
@@ -146,7 +147,6 @@ require 'strscan'
 		end
 		
 		push_word
-		# @stack.unshift([:SORT,nil]) if @stack.detect { |token| token[0] == :COMMA }
 		@stack
 	end
 	
