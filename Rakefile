@@ -71,7 +71,7 @@ end
 
 desc 'Pushes the gem file to rubygems.org'
 task :release => ['build'] do
-  system "gem push bibtex-ruby-#{BibTeX::Version::STRING}"
+  system "gem push bibtex-ruby-#{BibTeX::Version::STRING}.gem"
 end
 
 CLEAN.include('lib/bibtex/parser.rb')

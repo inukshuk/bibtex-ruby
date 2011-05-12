@@ -32,7 +32,7 @@ Quickstart
     => 3
     >> b['@article'].length
     => 0
-    >> bib['@book[year=2009]'].length
+    >> b['@book[year=2009]'].length
     => 1
 
 

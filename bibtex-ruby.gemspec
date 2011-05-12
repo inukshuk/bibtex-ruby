@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.email             = 'http://sylvester.keil.or.at'
   s.homepage          = 'http://inukshuk.github.com/bibtex-ruby'
   s.summary           = 'A BibTeX parser and converter written in Ruby.'
-  s.description       = 'A (fairly complete) BibTeX parser written in Ruby. Supports regular BibTeX entries, @comments, string replacement via @string. Allows for easy export/conversion to formats such as YAML, JSON, and XML.'
+  s.description       = 'A (fairly complete) BibTeX library and parser written in Ruby. Includes a name parser and supports regular BibTeX entries, @comments, string replacement via @string. Allows for easy export/conversion to formats such as YAML, JSON, and XML.'
   s.date              = Time.now
 
   s.required_rubygems_version = '>= 1.3.6'
