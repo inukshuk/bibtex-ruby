@@ -54,7 +54,7 @@ Debugger.start
 require 'bibtex/extensions'
 require 'bibtex/value'
 require 'bibtex/name_parser'
-require 'bibtex/name'
+require 'bibtex/names'
 require 'bibtex/replaceable'
 require 'bibtex/elements'
 require 'bibtex/entry'
