@@ -89,32 +89,35 @@ require 'bibtex/lexer'
 
   attr_reader :lexer
   
-  def initialize(options={})
-    @options = options
-    @options[:include] ||= [:errors]
-    @lexer = Lexer.new(options)
+  def initialize(options = {})
+		self.options.merge!(options)
+    @lexer = Lexer.new(@options)
   end
 
+	def options
+		@options ||= { :include => [:errors], :debug => ENV['DEBUG'] == true }
+	end
+	
   def parse(input)
-    @yydebug = self.debug?
+    @yydebug = debug?
     
-    self.lexer.src = input
-    self.lexer.analyse
+    @lexer.src = input
+    @lexer.analyse
     
     do_parse
   end
   
   def next_token
-    token = self.lexer.next_token
+    token = @lexer.next_token
     if token[0] == :ERROR
-      self.include_errors? ? token : next_token
+      include_errors? ? token : next_token
     else
       [token[0],token[1][0]]
     end
   end
   
   def debug?
-    @options[:debug] == true || ENV['DEBUG'] == true
+    @options[:debug] == true
   end
   
   def include_errors?

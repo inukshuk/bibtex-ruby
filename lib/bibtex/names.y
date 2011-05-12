@@ -79,7 +79,7 @@ require 'strscan'
 ---- inner
   
   def initialize(options = {})
-    self.options.merge(options)
+    self.options.merge!(options)
   end
 
   def options
