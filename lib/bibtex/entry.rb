@@ -172,6 +172,7 @@ module BibTeX
 		end
 
 		def replace(*arguments)
+		  arguments = bibliography.q('@string') if arguments.empty?
 			@fields.values.each { |v| v.replace(*arguments) }
 			self
 		end

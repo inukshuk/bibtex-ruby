@@ -1,12 +1,13 @@
 BibTeX-Ruby
 ===========
 
-The BibTeX-Ruby package contains a parser for BibTeX bibliography files and a
-class structure to manage, search, or convert BibTeX objects in Ruby. It is
-designed to support all BibTeX objects (including @comment,
+BibTeX-Ruby is a fairly complete library and parser for BibTeX bibliography
+files; it offers an interface to manage, search, or convert BibTeX objects in
+Ruby. It is designed to support all BibTeX objects (including @comment,
 string-replacements via @string, as well as string concatenation using '#')
 and handles all content outside of BibTeX objects as 'meta content' which may
-or may not be included in post-processing.
+or may not be included in post-processing. BibTeX-Ruby also includes a name
+parser to support comfortable access to the individual tokens of name values.
 
 
 Quickstart
@@ -16,32 +17,23 @@ Quickstart
     $ irb
     >> require 'bibtex'
     => true
-    > bib = BibTeX.open('./ruby.bib')
-    => book{pickaxe,
-      address = {Raleigh, North Carolina},
-      author  = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-      date-added = {2010-08-05 09:54:07 0200},
-      date-modified = {2010-08-05 10:07:01 0200},
-      keywords = {ruby},
-      publisher = {The Pragmatic Bookshelf},
-      series = {The Facets of Ruby},
-      title = {Programming Ruby 1.9: The Pragmatic Programmers Guide},
-      year = {2009}
-    }
-    >> bib[:pickaxe].year
+    >> b = BibTeX.open('./ruby.bib')
+    >> b[:pickaxe]
     => "2009"
-    >> bib[:pickaxe][:title]
+    >> b[:pickaxe].title
     => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
-    >> bib[:pickaxe].author = 'Thomas, D., Fowler, C., and Hunt, A.'
-    => "Thomas, D., and Fowler, C., and Hunt, A."
-    >> bib['@book'].length
-    => 1
-    >> bib['@article'].length
+    >> b[:pickaxe].author.length
+    => 3
+    >> b[:pickaxe].author.to_s
+    => "Thomas, Dave and Fowler, Chad and Hunt, Andy"
+    >> b[:pickaxe].author[2].first
+    => "Andy"
+    >> b['@book'].length
+    => 3
+    >> b['@article'].length
     => 0
     >> bib['@book[year=2009]'].length
     => 1
-    >> bib['@book[year=2011]'].length
-    => 0
 
 
 Installation
@@ -61,14 +53,15 @@ If you want to work with the sources:
     $ rake features
     $ rake test
 
-Or, alternatively, fork the [project on GitHub](http://github.com/inukshuk/bibtex-ruby.git).
+For extra credit, fork the
+[project on GitHub](http://github.com/inukshuk/bibtex-ruby.git).
 
 
 Requirements
 ------------
 
 * The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
-  required to generate parser.
+  required to generate the BibTeX parser and the name parser.
 * The **json** gem is required on older Ruby versions for JSON export.
 
 The bibtex-ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
@@ -90,13 +83,10 @@ of regular BibTeX elements; however, if you wish to include everything, simply a
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
 For example, if you set up your bibliography as follows:
 
-    bib = BibTeX.parse <<-END
+    b = BibTeX.parse <<-END
     @book{pickaxe,
       address = {Raleigh, North Carolina},
-      author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
-      date-added = {2010-08-05 09:54:07 +0200},
-      date-modified = {2010-08-05 10:07:01 +0200},
-      keywords = {ruby},
+      author = {Thomas, Dave and Fowler, Chad and Hunt, Andy},
       publisher = {The Pragmatic Bookshelf},
       series = {The Facets of Ruby},
       title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
@@ -104,20 +94,20 @@ For example, if you set up your bibliography as follows:
     }
     END
     
-You could easily access it, using the entry's key, 'pickaxe', like so: `bib[:pickaxe]`;
-you also have easy access to individual fields, for example: `bib[:pickaxe][:author]`.
+You could easily access it, using the entry's key, 'pickaxe', like so: `b[:pickaxe]`;
+you also have easy access to individual fields, for example: `b[:pickaxe][:author]`.
 Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry's fields,
 similar to **ActiveRecord::Base**. Therefore, it is equally possible to access the
-'author' field above as `bib[:pickaxe].author`.
+'author' field above as `b[:pickaxe].author`.
 
 Instead of parsing strings you can also create BibTeX elements directly in Ruby:
 
     > bib = BibTeX::Bibliography.new
     > bib << BibTeX::Entry.new({
     >   :type => :book,
-    >   :key => 'rails',
+    >   :key => :rails,
     >   :address => 'Raleigh, North Carolina',
-    >   :author => 'Ruby, Sam, and Thomas, Dave, and Hansson, David Heinemeier',
+    >   :author => 'Ruby, Sam and Thomas, Dave, and Hansson, David Heinemeier',
     >   :booktitle => 'Agile Web Development with Rails',
     >   :edition => 'third',
     >   :keywords => 'ruby, rails',
@@ -128,7 +118,7 @@ Instead of parsing strings you can also create BibTeX elements directly in Ruby:
     > })
     > book = BibTeX::Entry.new
     > book.type = :book
-    > book.key = 'mybook'
+    > book.key = :mybook
     > bib << book
 
 
@@ -190,7 +180,7 @@ the **replace** method. Thus, to replace all strings defined in bibliography
 b you could use the following code:
 
     b.each do |obj|
-      obj.replace(b.strings)
+      obj.replace(b.q('@string'))
     end
     
 A shorthand version for replacing all strings in a given bibliography is the
@@ -222,6 +212,32 @@ A shorthand version for replacing all strings in a given bibliography is the
       author = {fooAuthor},
       title = {foobar}
     }
+
+### Names
+
+Since version 1.3, BibTeX-Ruby features a name parser. You can use the top-level
+`BibTeX.names` utility to quickly parse individual name values. Alternatively,
+you can call `Bibliography.parse_names` to convert all name fields contained
+in the bibliography. When parsing BibTeX files, BibTeX-Ruby will automatically
+convert names; if you do not want the names to be parsed you can set the
+`:parse_names` parser option to false.
+
+Note that the string replacement and concatenation features described above
+are not supported for name objects; therefore, BibTeX-Ruby tries to replace
+and join all values before name conversion; name fields containing string
+symbols that cannot be replaced will not be parsed.
+
+In the following example, string replacement can take place, thus all names
+are parsed and can easily be mapped to their last names:
+
+    >> BibTeX.parse(<<-END)[1].author.map(&:last)
+       @string{ ht = "Nathaniel Hawthorne" }
+       @book{key,
+         author = ht # " and Melville, Herman"
+       }
+       END
+    => ["Hawthorne", "Melville"]
+
 
 ### Conversions
 

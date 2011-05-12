@@ -51,7 +51,7 @@ module BibTeX
     alias :to_a :tokens
     
     def_delegators :to_s, :empty?, :=~, :match, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str, :split, :each_byte, :each_char, :each_line
-    def_delegators :@tokens, :[]
+    def_delegators :@tokens, :[], :length
     
     def initialize(*arguments)
       @tokens = []
