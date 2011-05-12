@@ -45,6 +45,55 @@
 				
 				<p>BibTeX-Ruby is a fairly complete library and parser for BibTeX bibliography files; it offers an interface to manage, search, or convert BibTeX objects in Ruby. It is designed to support all BibTeX objects (including @comment, string-replacements via @string, as well as string concatenation using '#') and handles all content outside of BibTeX objects as 'meta content' which may or may not be included in post-processing. BibTeX-Ruby also includes a name parser to support comfortable access to the individual tokens of name values.</p>
 
+				<h2>Quickstart</h2>
+
+				<pre><code>$ [sudo] gem install bibtex-ruby
+				$ irb
+				&gt;&gt; require 'bibtex'
+				=&gt; true
+
+				&gt;&gt; b = BibTeX.open('./ruby.bib')
+				&gt;&gt; b[:pickaxe]
+				=&gt; "2009"
+				&gt;&gt; b[:pickaxe].title
+				=&gt; "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+				&gt;&gt; b[:pickaxe].author.length
+				=&gt; 3
+				&gt;&gt; b[:pickaxe].author.to_s
+				=&gt; "Thomas, Dave and Fowler, Chad and Hunt, Andy"
+
+				&gt;&gt; b[:pickaxe].author[2].first
+				=&gt; "Andy"
+				&gt;&gt; b['@book'].length
+				=&gt; 3
+				&gt;&gt; b['@article'].length
+				=&gt; 0
+				&gt;&gt; b['@book[year=2009]'].length
+				=&gt; 1
+				</code></pre>
+
+				<h2>Installation</h2>
+
+				<p>If you just want to use it:</p>
+
+				<pre><code>$ [sudo] gem install bibtex-ruby
+				</code></pre>
+
+				<p>If you want to work with the sources:</p>
+
+				<pre><code>$ git clone http://github.com/inukshuk/bibtex-ruby.git
+				$ cd bibtex-ruby
+				$ [sudo] bundle install
+				$ rake racc
+				$ rake rdoc
+				$ rake features
+				$ rake test
+				</code></pre>
+
+				<p>For extra credit, fork the
+
+				<a href="http://github.com/inukshuk/bibtex-ruby.git">project on GitHub</a>.</p>
+
 			</div>
   	</div>
 		
