@@ -48,28 +48,28 @@
 				<h2>Quickstart</h2>
 
 				<pre><code>$ [sudo] gem install bibtex-ruby
-				$ irb
-				&gt;&gt; require 'bibtex'
-				=&gt; true
+$ irb
+&gt;&gt; require 'bibtex'
+=&gt; true
 
-				&gt;&gt; b = BibTeX.open('./ruby.bib')
-				&gt;&gt; b[:pickaxe]
-				=&gt; "2009"
-				&gt;&gt; b[:pickaxe].title
-				=&gt; "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
-				&gt;&gt; b[:pickaxe].author.length
-				=&gt; 3
-				&gt;&gt; b[:pickaxe].author.to_s
-				=&gt; "Thomas, Dave and Fowler, Chad and Hunt, Andy"
+&gt;&gt; b = BibTeX.open('./ruby.bib')
+&gt;&gt; b[:pickaxe]
+=&gt; "2009"
+&gt;&gt; b[:pickaxe].title
+=&gt; "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+&gt;&gt; b[:pickaxe].author.length
+=&gt; 3
+&gt;&gt; b[:pickaxe].author.to_s
+=&gt; "Thomas, Dave and Fowler, Chad and Hunt, Andy"
 
-				&gt;&gt; b[:pickaxe].author[2].first
-				=&gt; "Andy"
-				&gt;&gt; b['@book'].length
-				=&gt; 3
-				&gt;&gt; b['@article'].length
-				=&gt; 0
-				&gt;&gt; b['@book[year=2009]'].length
-				=&gt; 1
+&gt;&gt; b[:pickaxe].author[2].first
+=&gt; "Andy"
+&gt;&gt; b['@book'].length
+=&gt; 3
+&gt;&gt; b['@article'].length
+=&gt; 0
+&gt;&gt; b['@book[year=2009]'].length
+=&gt; 1
 				</code></pre>
 
 				<h2>Installation</h2>
@@ -82,12 +82,12 @@
 				<p>If you want to work with the sources:</p>
 
 				<pre><code>$ git clone http://github.com/inukshuk/bibtex-ruby.git
-				$ cd bibtex-ruby
-				$ [sudo] bundle install
-				$ rake racc
-				$ rake rdoc
-				$ rake features
-				$ rake test
+$ cd bibtex-ruby
+$ [sudo] bundle install
+$ rake racc
+$ rake rdoc
+$ rake features
+$ rake test
 				</code></pre>
 
 				<p>For extra credit, fork the
