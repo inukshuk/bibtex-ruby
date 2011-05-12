@@ -48,11 +48,13 @@ task :test => ['racc','test_task']
 
 file 'lib/bibtex/parser.output' => ['lib/bibtex/parser.rb']
 file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
-  sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
+  # sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
+  sh 'racc -v -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
 end
 
 file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
-  sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
+  # sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
+  sh 'racc -v -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
 
 desc 'Updates the Manifest file'
@@ -74,6 +76,8 @@ end
 
 CLEAN.include('lib/bibtex/parser.rb')
 CLEAN.include('lib/bibtex/parser.output')
+CLEAN.include('lib/bibtex/name_parser.rb')
+CLEAN.include('lib/bibtex/name_parser.output')
 CLEAN.include('doc/html')
 CLEAN.include('*.gem')
 
