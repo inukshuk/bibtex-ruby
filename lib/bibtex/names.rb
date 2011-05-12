@@ -20,29 +20,27 @@ require 'forwardable'
 
 module BibTeX
 
-  class Name
+  class Names < Value
+    
+    def self.parse(string)
+      NameParser.new.parse(string)
+    end
+    
+    def initialize
+      @tokens
+    end
+
+    
+  end
+
+  class Name < Struct.new(:first, :last, :prefix, :suffix)
     extend Forwardable
     include Comparable
     
-    attr_accessor :first, :last, :prefix, :suffix
-    
     def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str
-    
-    PATTERNS = {
-      :sort => /^(?:((?:[[:alpha:]\s])*[[:lower:]][[:alpha:]])\s)*([[:alpha:]]+),(?:\s*([^,]*?)\s*,)?\s*([[:alpha:]\s]+)?$/,
-      :display => /^((?:(?:[\d\\\{\}]*[[:upper:]][[:alnum:]\\\{\}]*)\s)*)?(?:([\d\\\{\}]*[[:lower:]][[:alnum:]\\\{\}\s]*)\s)?(.+)$/      
-    }.freeze
-    
+        
     def self.parse(string)
-      NameParser.new.parse(string)[0]
-      # case string = string.strip
-      # when PATTERNS[:sort]
-      #   new(:prefix => $1, :last => $2, :suffix => $3, :first => $4)
-      # when PATTERNS[:display]
-      #   new(:first => $1 && $1.strip, :prefix => $2, :last => $3)
-      # else
-      #   new(:last => string)
-      # end
+      [Names.parse(string)].flatten[0]
     end
     
     def initialize(attributes = {})
@@ -51,8 +49,12 @@ module BibTeX
       end
     end
     
+    def initalize_copy(other)
+      each_pair { |k,v| self[k] = v }
+    end
+    
     def blank?
-      [prefix, first, last, suffix].join.empty?
+      to_a.compact.empty?
     end
     
     def to_s
@@ -64,7 +66,15 @@ module BibTeX
     end
     
     def to_hash
-      { :first => first, :last => last, :prefix => prefix, :suffix => suffix }
+      Hash[each_pair.to_a]
+    end
+
+    [:strip!, :upcase!, :downcase!, :sub!, :gsub!].each do |method_id|
+      define_method(method_id) do |*arguments, &block|
+        each do |part|
+          part.send(method_id, *arguments, &block)
+        end
+      end
     end
     
     def to_citeproc
