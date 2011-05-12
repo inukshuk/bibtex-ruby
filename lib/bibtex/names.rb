@@ -23,13 +23,46 @@ module BibTeX
   class Names < Value
     
     def self.parse(string)
-      NameParser.new.parse(string)
+      Names.new(NameParser.new.parse(string))
     end
     
-    def initialize
-      @tokens
+    def initialize(*arguments)
+      @tokens = []
+      arguments.flatten.compact.each do |argument|
+        add(argument)
+      end
     end
 
+    def replace(*arguments); self; end
+    
+    def join; self; end
+    
+    def to_s
+      @tokens.join(' and ')
+    end
+    
+    alias :value :to_s
+    
+    def name?; true; end
+    def numeric?; false; end
+    
+    alias :names? :name?
+    alias :symbol? :numeric?
+    
+    def add(name)
+      case
+      when name.is_a?(Name)
+        @tokens << name
+      when name.respond_to?(:to_s)
+        @tokens += Names.parse(name.to_s)
+      else
+        raise ArgumentError, "failed to add #{name.inspect}: not a name."
+      end
+      self
+    end
+    
+    alias :<< :add
+    alias :push :add
     
   end
 
@@ -38,9 +71,17 @@ module BibTeX
     include Comparable
     
     def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str
-        
-    def self.parse(string)
-      [Names.parse(string)].flatten[0]
+    
+    class << self    
+      def parse(string)
+        [NameParser.new.parse(string)].flatten[0]
+      end
+      
+      # Returns true if thing looks like a name.
+      # Actually converts thing to a string and tries to parse it.
+      def looks_like?(thing)
+        thing.respond_to?(:to_s) && [Name.new.parse(string)].flatten.compact.empty?
+      end
     end
     
     def initialize(attributes = {})
@@ -57,19 +98,29 @@ module BibTeX
       to_a.compact.empty?
     end
     
-    def to_s
+    def display_order
+      [prefix, last, first, suffix].compact.join(' ')
+    end
+        
+    def sort_order
       [[prefix,last].compact.join(' '), suffix, first].compact.join(', ')
     end
     
+    alias :to_s :sort_order
+    
     def <=>(other)
       to_s <=> other.to_s
+    end
+
+    def ===(other)
+      to_s === other.to_s
     end
     
     def to_hash
       Hash[each_pair.to_a]
     end
 
-    [:strip!, :upcase!, :downcase!, :sub!, :gsub!].each do |method_id|
+    [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
         each do |part|
           part.send(method_id, *arguments, &block)

@@ -28,28 +28,35 @@ module BibTeX
     alias :to_a :tokens
     
     def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str
-    def_delegators :@tokens, :<<, :push, :[]
+    def_delegators :@tokens, :[]
     
     def initialize(*arguments)
       @tokens = []
-      
-      arguments.flatten.each do |argument|
-        case argument
-        when Value
-          @tokens += argument.tokens.dup
-        when ::String
-          @tokens << argument
-        when Symbol
-          @tokens << argument
-        else
-          raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
-        end
+      arguments.flatten.compact.each do |argument|
+        add(argument)
       end
     end
     
     def initialize_copy(other)
       @tokens = other.tokens.dup
     end
+    
+    def add(argument)
+      case argument
+      when Value
+        @tokens += argument.tokens.dup
+      when ::String
+        @tokens << argument
+      when Symbol
+        @tokens << argument
+      else
+        raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
+      end
+      self
+    end
+    
+    alias :<< :add
+    alias :push :add
     
     def replace(*arguments)
       return self unless has_symbol?
@@ -119,11 +126,20 @@ module BibTeX
       @tokens.length < 2
     end
     
-    # Returns true if the Value looks like a BibTeX name value.
+    # Returns true if the Value looks like a BibTeX name value. 
     def name?
     end
     
+    alias :names? :name?
     alias :is_name? :name?
+    
+    def to_name
+      Names.parse(to_s)
+    end
+    
+    alias :to_names :to_name
+    
+    
     
     # Returns true if the Value's content is numeric.
     def numeric?

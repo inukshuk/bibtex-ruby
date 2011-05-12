@@ -28,15 +28,29 @@ module BibTeX
     end
   
     # Parses the given string and returns a corresponding +Bibliography+ object.
-    # Delegates to BibTeX.open if the string is a filename.
+    # Delegates to BibTeX.open if the string is a filename or URI.
     def parse(string, options = {}, &block)
-      File.exists?(string) ? open(string, options, &block) : Parser.new(options).parse(string)
+      if File.exists?(string) || string =~ /^[a-z]+:\/\//i
+        open(string, options, &block)
+      else
+        Parser.new(options).parse(string)
+      end
     end
   
     # Returns true if the given file is a valid BibTeX bibliography.
     def valid?(file)
       Bibliography.open(file).valid?
     end
+    
+    # Parses the given string as a BibTeX name value and returns a Names object.
+    def names(string)
+      Names.parse(string)
+    end
+    
+    alias :name :names
+    alias :parse_name :names
+    alias :parse_names :names
+    
   end
 
 end

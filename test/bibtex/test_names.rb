@@ -1,7 +1,7 @@
 require 'helper'
 
 module BibTeX
-  class NameTest < MiniTest::Spec
+  class NamesTest < MiniTest::Spec
     
     context 'string behaviour' do
       setup do
@@ -16,6 +16,7 @@ module BibTeX
       should 'implement gsub!' do
         assert_equal 'dX la VallXX PoussXn, Jr., CharlXs LouXs XavXXr JosXph', @name.gsub!(/[ei]/, 'X').to_s        
       end
+      
     end
     
   end
