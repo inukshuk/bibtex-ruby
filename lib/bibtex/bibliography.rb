@@ -115,7 +115,7 @@ module BibTeX
     end
     
     def parse_names
-      entries.values.each(&:parse_names)
+      q('@entry') { |e| e.parse_names }
       self
     end
     
@@ -217,6 +217,11 @@ module BibTeX
     
     alias :join_strings :join
 
+    def rename(*arguments, &block)
+      q('@entry') { |e| e.rename(*arguments, &block) }
+      self
+    end
+    
     def sort(*arguments, &block)
       @data.sort(*arguments, &block)
       self
@@ -241,9 +246,14 @@ module BibTeX
       to_a(options).to_yaml
     end
     
-    # Returns a JSON representation of the bibliography. Only BibTeX entries are exported.
+    # Returns a JSON representation of the bibliography.
     def to_json(options = {})
       to_a(options).to_json
+    end
+    
+    # Returns a CiteProc JSON representation of the bibliography. Only BibTeX enrties are exported.
+    def to_citeproc(options = {})
+      q('@entry').map { |o| o.to_citeproc(options) }
     end
     
     # Returns an XML representation of the bibliography. Only BibTeX entries are exported.

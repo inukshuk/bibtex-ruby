@@ -100,6 +100,20 @@ module BibTeX
 		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || super
 		end
 		
+		# Renames the given field names unless a field with the new name already
+		# exists.
+		def rename(*arguments)
+		  Hash[*arguments.flatten].each_pair do |from,to|
+		    if @field.has_key?(from) && !@field.has_key?(to)
+		      @field[to] = @field[from]
+		      @field.delete(from)
+	      end
+		  end
+		  self
+		end
+		
+		alias :rename_fields :rename
+		
 		# Returns the value of the field with the given name.
 		def [](name)
 			@fields[name.to_sym]
@@ -121,7 +135,7 @@ module BibTeX
 		# add(:author => "Edgar A. Poe", :title => "The Raven")
 		#
 		def add(*arguments)
-		  Hash[*arguments.flatten].each do |name, value|
+		  Hash[*arguments.flatten].each_pair do |name, value|
 			  @fields[name.to_sym] = Value.new(value)
 			end
 			self
@@ -172,7 +186,7 @@ module BibTeX
     def parse_names
       NAME_FIELDS.each do |key|
         if name = @fields[key]
-          name.replace(bibliography.strings) unless bibliography.nil?
+          name.replace(bibliography.q('@string')) unless bibliography.nil?
           name.join
           name = name.to_name
           @fields[key] = name
@@ -195,6 +209,10 @@ module BibTeX
 		def to_hash(options = {})
 		  options[:quotes] ||= %w({ })
 		  Hash[*([:key, key, :type, type] + @fields.map { |k,v| [k, v.to_s(options)] }.flatten)]
+		end
+
+		def to_citeproc(options = {})
+		  to_hash(options)
 		end
 		
 		def to_xml(options = {})

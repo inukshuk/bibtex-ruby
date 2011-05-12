@@ -84,7 +84,7 @@ module BibTeX
     extend Forwardable
     include Comparable
     
-    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str, :split
+    def_delegators :to_s, :empty?, :=~, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str, :split, :each_byte, :each_char, :each_line
     
     class << self    
       def parse(string)
@@ -137,6 +137,7 @@ module BibTeX
         each do |part|
           part.send(method_id, *arguments, &block)
         end
+        self
       end
     end
     

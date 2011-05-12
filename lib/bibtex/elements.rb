@@ -33,7 +33,7 @@ module BibTeX
     end
     
 		# Returns a string containing the object's content.
-		def content
+		def content(options = {})
 			''
 		end
 
@@ -53,6 +53,14 @@ module BibTeX
   
     def has_type?(type)
       self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
+    end
+    
+    [:entry, :book, :article, :collection, :string, :preamble, :comment]. each do |type|
+      method_id = "#{type}?"
+      unless method_defined?(method_id)
+        define_method(method_id) { has_type?(type) }
+        alias_method("is_#{method_id}", method_id)
+      end
     end
     
     # Returns true if the element matches the given query.
@@ -264,7 +272,7 @@ module BibTeX
 			@content = content
 		end
 
-	  alias :to_s :content
+		def to_s(options = {}); @content; end
 	end
 
 end

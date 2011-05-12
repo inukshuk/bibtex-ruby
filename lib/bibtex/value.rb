@@ -50,7 +50,7 @@ module BibTeX
     attr_reader :tokens
     alias :to_a :tokens
     
-    def_delegators :to_s, :empty?, :=~, :match, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str, :split
+    def_delegators :to_s, :empty?, :=~, :match, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str, :split, :each_byte, :each_char, :each_line
     def_delegators :@tokens, :[]
     
     def initialize(*arguments)
@@ -80,6 +80,15 @@ module BibTeX
     
     alias :<< :add
     alias :push :add
+    
+    [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
+      define_method(method_id) do |*arguments, &block|
+        @tokens.each do |part|
+          part.send(method_id, *arguments, &block)
+        end
+        self
+      end
+    end
     
     def replace(*arguments)
       return self unless has_symbol?
