@@ -2,12 +2,13 @@ BibTeX-Ruby
 ===========
 
 BibTeX-Ruby is a fairly complete library and parser for BibTeX bibliography
-files; it offers an interface to manage, search, or convert BibTeX objects in
+files; it offers a rich interface to manage, search, or convert BibTeX objects in
 Ruby. It is designed to support all BibTeX objects (including @comment,
 string-replacements via @string, as well as string concatenation using '#')
-and handles all content outside of BibTeX objects as 'meta content' which may
-or may not be included in post-processing. BibTeX-Ruby also includes a name
-parser to support comfortable access to the individual tokens of name values.
+and optionally handles all content outside of BibTeX objects as 'meta content'
+which may or may not be included in post-processing. BibTeX-Ruby also includes
+a name parser to support comfortable access to the individual tokens of name
+values.
 
 
 Quickstart
@@ -34,6 +35,26 @@ Quickstart
     => 0
     >> b['@book[year=2009]'].length
     => 1
+
+BibTeX-Ruby helps you convert your bibliography to JSON, XML, or YAML;
+alternatively, you can export to the JSON format used by
+[CSL](http://citationstyles.org) processors and render the bibliography in
+many styles:
+
+    >> require 'citeproc'  # requires the citeproc-ruby gem
+    => true
+		>> CiteProc.process b[:pickaxe].to_citeproc, :style => :apa
+		=> "Thomas, D., Fowler, C., & Hunt, A. (2009). Programming Ruby 1.9:
+		  The Pragmatic Programmer's Guide. The Facets of Ruby.
+		  Raleigh, North Carolina: The Pragmatic Bookshelf."
+		>> CiteProc.process b[:pickaxe].to_citeproc, :style => 'chicago-author-date'
+		=> "Thomas, Dave, Chad Fowler, and Andy Hunt. 2009. Programming Ruby 1.9:
+		  The Pragmatic Programmer's Guide. The Facets of Ruby.
+		  Raleigh, North Carolina: The Pragmatic Bookshelf."
+		>> CiteProc.process b[:pickaxe].to_citeproc, :style => :mla
+		=> "Thomas, Dave, Chad Fowler, and Andy Hunt. Programming Ruby 1.9:
+		  The Pragmatic Programmer's Guide. Raleigh, North Carolina:
+		  The Pragmatic Bookshelf, 2009."
 
 
 Installation
@@ -255,7 +276,8 @@ BibTeX to YAML converter:
     >> BibTeX.open('example.bib').to_yaml
 
 Look at the 'examples' directory for more elaborate examples of a BibTeX to YAML
-and a BibTeX to HTML converter.
+and a BibTeX to HTML converter using **#to_citeproc** to format a bibliography
+using [CSL](http://citationstyles.org/).
 
 BibTeX-Ruby offers an API which lets you manipulate BibTeX objects (string
 replacement, name parsing etc.); however, sometimes you just want quick access
