@@ -73,7 +73,11 @@ module BibTeX
       when Symbol
         @tokens << argument
       else
-        raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
+        if argument.respond_to?(:to_s)
+          @tokens << argument.to_s
+        else
+          raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
+        end
       end
       self
     end
@@ -158,9 +162,8 @@ module BibTeX
       @tokens.length < 2
     end
     
-    # Returns true if the Value looks like a BibTeX name value. 
-    def name?
-    end
+    # Returns true if the value is a BibTeX name value. 
+    def name?; false; end
     
     alias :names? :name?
     alias :is_name? :name?
@@ -170,8 +173,17 @@ module BibTeX
     end
     
     alias :to_names :to_name
+
+    # Returns true if the Value's content looks like a date.    
+    def date?
+    end
+
+    alias :is_date? :date?
     
-    
+    # Returns the string as a citeproc date. TODO use edtf format instead.
+    def to_date
+      numeric? ? { 'date-parts' => [[to_i]] } : { 'literal' => to_s(:quotes => [])}
+    end
     
     # Returns true if the Value's content is numeric.
     def numeric?
@@ -179,6 +191,10 @@ module BibTeX
     end
     
     alias :is_numeric? :numeric?
+    
+    def to_citeproc(options = {})
+      to_s(options)
+    end
     
     # Returns true if the Value contains at least one symbol.
     def symbol?

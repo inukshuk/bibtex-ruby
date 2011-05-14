@@ -45,9 +45,40 @@ module BibTeX
 		}).freeze
 
     NAME_FIELDS = [:author, :editor, :translator].freeze
+    DATE_FIELDS = [:year].freeze
+
+    CSL_FIELDS = Hash.new {|h,k|k}.merge(Hash[*%w{
+      date      issued
+      isbn      ISBN
+      booktitle container-title
+      journal   container-title
+      series    collection-title
+      address   publisher-place
+      pages     page
+      number    issue
+      url       URL
+      doi       DOI
+      year      issued
+    }.map(&:intern)]).freeze
+
+    CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
+      booklet        pamphlet
+      conference     paper-conference
+      inbook         chapter
+      incollection   chapter
+      inproceedings  paper-conference
+      manual         book
+      mastersthesis  thesis
+      misc           article
+      phdthesis      thesis
+      proceedings    paper-conference
+      techreport     report
+      unpublished    manuscript
+    }.map(&:intern)]).freeze
+
 	  
 		attr_reader :type, :fields
-    def_delegators :@fields, :empty?, :each
+    def_delegators :@fields, :empty?, :each, :each_pair
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
 		def initialize(attributes = {})
@@ -90,6 +121,10 @@ module BibTeX
       type.to_s.match(/^entry$/i) || @type == type.to_sym || super
     end
     
+    def has_field?(field)
+      @fields.has_key?(field)
+    end
+    
 		def method_missing(name, *args)
 		  return self[name] if @fields.has_key?(name)
 		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.to_s.match(/=$/)		  
@@ -100,19 +135,25 @@ module BibTeX
 		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || super
 		end
 		
+		# Returns a copy of the Entry with all the field names renamed.
+		def rename(*arguments)
+		  dup.rename!(*arguments)
+		end
+		
 		# Renames the given field names unless a field with the new name already
 		# exists.
-		def rename(*arguments)
+		def rename!(*arguments)
 		  Hash[*arguments.flatten].each_pair do |from,to|
-		    if @field.has_key?(from) && !@field.has_key?(to)
-		      @field[to] = @field[from]
-		      @field.delete(from)
+		    if @fields.has_key?(from) && !@fields.has_key?(to)
+		      @fields[to] = @fields[from]
+		      @fields.delete(from)
 	      end
 		  end
 		  self
 		end
 		
 		alias :rename_fields :rename
+		alias :rename_fields! :rename!
 		
 		# Returns the value of the field with the given name.
 		def [](name)
@@ -209,11 +250,18 @@ module BibTeX
 		
 		def to_hash(options = {})
 		  options[:quotes] ||= %w({ })
-		  Hash[*([:key, key, :type, type] + @fields.map { |k,v| [k, v.to_s(options)] }.flatten)]
+		  hash = { :key => key, :type => type }
+		  each_pair { |k,v| hash[k] = v.to_s(options) }
+		  hash
 		end
 
 		def to_citeproc(options = {})
-		  to_hash(options)
+		  options[:quotes] ||= []
+		  hash = { 'id' => key.to_s, 'type' => CSL_TYPES[type].to_s }
+      each_pair do |k,v|
+		    hash[CSL_FIELDS[k].to_s] = k == :year ? v.to_date : v.to_citeproc(options)
+		  end
+		  hash
 		end
 		
 		def to_xml(options = {})

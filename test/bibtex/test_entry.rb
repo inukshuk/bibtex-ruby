@@ -3,12 +3,43 @@ require 'helper.rb'
 module BibTeX
   class EntryTest < MiniTest::Spec
 
-    context 'a new Entry' do
+    context 'a new entry' do
       should 'not be nil' do
         assert Entry.new
       end
     end
 
+    context 'given an entry' do
+      setup do
+        @entry = Entry.new do |e|
+          e.type = :book
+          e.key = :key
+          e.title = 'Moby Dick'
+          e.author = 'Herman Melville'
+          e.publisher = 'Penguin'
+          e.address = 'New York'
+          e.year = 1993
+          e.parse_names
+        end
+      end
+      
+      should 'support renaming of field attributes' do
+        @entry.rename(:title => :foo)
+        refute @entry.has_field?(:title)
+        assert_equal 'Moby Dick', @entry[:foo]
+      end
+      
+      should 'support citeproc export' do
+        e = @entry.to_citeproc
+        assert_equal 'book', e['type']
+        assert_equal 'New York', e['publisher-place']
+        assert_equal [1993], e['issued']['date-parts'][0]
+        assert_equal 1, e['author'].length
+        assert_equal 'Herman', e['author'][0]['given']
+        assert_equal 'Melville', e['author'][0]['family']
+      end
+    end
+    
     def test_simple
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
       refute_nil(bib)
@@ -93,7 +124,6 @@ module BibTeX
       assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0,2]
 
     end
-  
   
   end
 end

@@ -59,6 +59,14 @@ module BibTeX
     
     def to_name; self; end
     
+    def to_citeproc(options = {})
+      map { |n| n.to_citeproc(options) }
+    end
+    
+    def strip_braces
+      gsub!(/\{|\}/,'')
+    end
+    
     def add(name)
       case
       when name.is_a?(Name)
@@ -141,12 +149,13 @@ module BibTeX
       end
     end
     
-    def to_citeproc
-      {
-        'family' => [prefix, last].compact.join(' '),
-        'given' =>  [first, suffix].compact.join(', '),
-        'parse-names' => true
-      }
+    def to_citeproc(options = {})
+      hash = {}
+      hash['family'] = family unless family.nil?
+      hash['given'] = given unless given.nil?
+      hash['suffix'] = suffix unless suffix.nil?
+      hash['dropping-particle'] = prefix unless prefix.nil?
+      hash
     end
     
     alias :family :last
