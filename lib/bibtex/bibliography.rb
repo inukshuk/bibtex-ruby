@@ -44,7 +44,7 @@ module BibTeX
       #
       def open(path, options = {})
         b = parse(Kernel.open(path).read, options)
-        return b unless block_given?
+        return b unless !b.nil? and block_given?
 
         begin
           yield b
@@ -56,7 +56,7 @@ module BibTeX
       # Parses the given string and returns a corresponding Bibliography instance.
       def parse(bibtex, options = {})
         b = Parser.new(options).parse(bibtex)
-        b.parse_names unless options[:parse_names] == false
+        b.parse_names unless b.nil? || options[:parse_names] == false
         b
       end
       

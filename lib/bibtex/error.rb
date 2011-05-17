@@ -1,4 +1,6 @@
 module BibTeX
+
+  class ParseError < StandardError; end
   
   #
   # Represents a lexical or syntactical error.
