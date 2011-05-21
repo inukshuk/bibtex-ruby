@@ -302,7 +302,7 @@ module BibTeX
 		end
 		
 		def issued
-		  m = MONTHS.find_index(month && month.v)
+		  m = MONTHS.find_index(@fields[:month] && @fields[:month].v)
 		  m = m + 1 unless m.nil?
 		  { 'date-parts' => [[@fields[:year],m].compact.map(&:to_i)] }
 		end
