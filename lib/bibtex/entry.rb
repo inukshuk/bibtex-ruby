@@ -44,10 +44,23 @@ module BibTeX
 			:unpublished   => [:author,:title,:note]
 		}).freeze
 
-    NAME_FIELDS = [:author, :editor, :translator].freeze
-    DATE_FIELDS = [:year].freeze
+    NAME_FIELDS = [:author,:editor,:translator].freeze
+    DATE_FIELDS = [:year,:month].freeze
+    
+    MONTHS = [:jan,:feb,:mar,:apr,:may,:jun,:jul,:aug,:sep,:oct,:nov,:dec].freeze
 
-    CSL_FIELDS = Hash.new {|h,k|k}.merge(Hash[*%w{
+    MONTHS_FILTER = Hash.new do |h,k|
+      case k.to_s.strip
+      when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
+        h[k] = Value.new(k.to_s[0,3].downcase.to_sym)
+      when /^\d\d?$/
+        h[k] = Value.new(MONTHS[k.to_i - 1] || k)
+      else
+        h[k] = Value.new(k)
+      end
+    end
+    
+    CSL_FILTER = Hash.new {|h,k|k}.merge(Hash[*%w{
       date      issued
       isbn      ISBN
       booktitle container-title
@@ -61,6 +74,18 @@ module BibTeX
       year      issued
     }.map(&:intern)]).freeze
 
+    CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
+      authority call-number chapter-number citation-label citation-number
+      collection-title container-title DOI edition event event-place
+      first-reference-note-number genre ISBN issue jurisdiction keyword locator 
+      medium note number number-of-pages number-of-volumes original-publisher
+      original-publisher-place original-title page page-first publisher
+      publisher-place references section status title URL version volume
+      year-suffix accessed container event-date issued original-date
+      author editor translator recipient interviewer publisher composer
+      original-publisher original-author container-author collection-editor
+    }.map(&:intern).freeze
+    
     CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
       booklet        pamphlet
       conference     paper-conference
@@ -223,6 +248,17 @@ module BibTeX
       self
     end
 
+    def month=(month)
+      @fields[:month] = MONTHS_FILTER[month]
+    end
+    
+    def parse_month
+      @fields[:month] = MONTHS_FILTER[@fields[:month]] if @fields.has_key?(:month)
+      self
+    end
+    
+    alias :parse_months :parse_month
+    
     # Parses all name values of the entry. Tries to replace and join the
     # value prior to parsing.
     def parse_names
@@ -259,10 +295,19 @@ module BibTeX
 		  options[:quotes] ||= []
 		  hash = { 'id' => key.to_s, 'type' => CSL_TYPES[type].to_s }
       each_pair do |k,v|
-		    hash[CSL_FIELDS[k].to_s] = k == :year ? v.to_date : v.to_citeproc(options)
+		    hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
 		  end
+		  hash['issued'] = citeproc_date
 		  hash
 		end
+		
+		def issued
+		  m = MONTHS.find_index(month && month.v)
+		  m = m + 1 unless m.nil?
+		  { 'date-parts' => [[@fields[:year],m].compact.map(&:to_i)] }
+		end
+		
+		alias :citeproc_date :issued
 		
 		def to_xml(options = {})
 		  require 'rexml/document'

@@ -9,6 +9,39 @@ module BibTeX
       end
     end
 
+    context 'month conversion' do
+      setup do
+        @entry = Entry.new
+      end
+      
+      [[:jan,'January'], [:feb,'February'], [:sep,'September']].each do |m|
+        should 'convert english months' do
+          @entry.month = m[1]
+          assert_equal m[0], @entry.month.v
+        end
+      end
+
+      [[:jan,:jan], [:feb,:feb], [:sep,:sep]].each do |m|
+        should 'convert bibtex abbreviations' do
+          @entry.month = m[1]
+          assert_equal m[0], @entry.month.v
+        end
+      end
+
+      [[:jan,1], [:feb,2], [:sep,9]].each do |m|
+        should 'convert numbers' do
+          @entry.month = m[1]
+          assert_equal m[0], @entry.month.v
+        end
+        should 'convert numbers when parsing' do
+          @entry = Entry.parse("@misc{id, month = #{m[1]}}")[0]
+          assert_equal m[0], @entry.month.v
+        end
+      end
+      
+    end
+    
+
     context 'given an entry' do
       setup do
         @entry = Entry.new do |e|
@@ -18,6 +51,7 @@ module BibTeX
           e.author = 'Herman Melville'
           e.publisher = 'Penguin'
           e.address = 'New York'
+          e.month = 'Nov'
           e.year = 1993
           e.parse_names
         end
@@ -33,7 +67,7 @@ module BibTeX
         e = @entry.to_citeproc
         assert_equal 'book', e['type']
         assert_equal 'New York', e['publisher-place']
-        assert_equal [1993], e['issued']['date-parts'][0]
+        assert_equal [1993,11], e['issued']['date-parts'][0]
         assert_equal 1, e['author'].length
         assert_equal 'Herman', e['author'][0]['given']
         assert_equal 'Melville', e['author'][0]['family']

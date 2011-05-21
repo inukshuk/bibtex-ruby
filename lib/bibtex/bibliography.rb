@@ -57,6 +57,7 @@ module BibTeX
       def parse(bibtex, options = {})
         b = Parser.new(options).parse(bibtex)
         b.parse_names unless b.nil? || options[:parse_names] == false
+        b.parse_months unless b.nil? || options[:parse_months] == false
         b
       end
       
@@ -116,6 +117,11 @@ module BibTeX
     
     def parse_names
       q('@entry') { |e| e.parse_names }
+      self
+    end
+    
+    def parse_months
+      q('@entry') { |e| e.parse_month }
       self
     end
     

@@ -29,7 +29,12 @@ module BibTeX
 		
 		# Returns an array of BibTeX elements.
     def self.parse(string, options = {})
-      BibTeX::Parser.new(options).parse(string).data
+      elements = BibTeX::Parser.new(options).parse(string).data
+      elements.each do |e|
+        e.parse_names unless !e.respond_to?(:parse_names) || options[:parse_names] == false
+        e.parse_month unless !e.respond_to?(:parse_month) || options[:parse_months] == false
+      end
+      elements
     end
     
 		# Returns a string containing the object's content.

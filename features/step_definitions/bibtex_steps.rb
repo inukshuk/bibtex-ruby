@@ -52,11 +52,17 @@ Then /^my bibliography should contain the following numbers of elements:$/ do |t
   end
 end
 
-Then /^my bibliography should contain an entry with key "([^"]*)"$/ do |key|
+Then /^my bibliography should contain an entry with (?:key|id) "([^"]*)"$/ do |key|
   refute_nil @bibliography[key.to_s]
 end
 
-Then /^my bibliography should not contain an entry with key "([^"]*)"$/ do |key|
+Then /^my bibliography should contain an entry with (?:key|id) "([^"]*)" and a?n? (\w+) value of "([^"]*)"$/ do |key,field,value|
+  refute_nil @bibliography[key.to_s]
+  assert_equal value, @bibliography[key.to_s][field].to_s
+end
+
+
+Then /^my bibliography should not contain an entry with (?:key|id) "([^"]*)"$/ do |key|
   assert_nil @bibliography[key.to_sym]
 end
 
