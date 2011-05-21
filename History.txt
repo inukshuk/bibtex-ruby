@@ -1,5 +1,6 @@
 === 1.3.2
 
+* Fixed numeric keys issue
 * Fixed CiteProc/CSL date export
 * Implemented BibTeX month value conversion
 

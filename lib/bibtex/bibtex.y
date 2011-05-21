@@ -70,6 +70,7 @@ rule
 
   key : NAME                                       { result = val[0] }
       | NUMBER                                     { result = val[0] }
+      | NUMBER NAME                                { result = val[0,2].join }
 
   assignments : assignment                         { result = val[0] }
               | assignments COMMA assignment       { result.merge!(val[2]) }
