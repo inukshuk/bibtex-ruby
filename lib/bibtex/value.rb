@@ -88,7 +88,7 @@ module BibTeX
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
         @tokens.each do |part|
-          part.send(method_id, *arguments, &block)
+          part.send(method_id, *arguments, &block) unless part.nil?
         end
         self
       end

@@ -64,6 +64,8 @@ Feature: BibTeX Names
 		| Ludwig von Beethoven              | Ludwig                  | von            | Beethoven                      |     |
 		| von Beethoven, Ludwig             | Ludwig                  | von            | Beethoven                      |     |
 		| {von Beethoven}, Ludwig           | Ludwig                  |                | {von Beethoven}                |     |
+		| {{von} Beethoven}, Ludwig         | Ludwig                  |                | {{von} Beethoven}              |     |
+		| John {}Paul Jones                 | John {}Paul             |                | Jones                          |     |
 		| Ford, Jr., Henry                  | Henry                   |                | Ford                           | Jr. |
     | Brinch Hansen, Per                | Per                     |                | Brinch Hansen                  |     |
     | {Barnes and Noble, Inc.}          |                         |                | {Barnes and Noble, Inc.}       |     |

@@ -50,8 +50,8 @@ module BibTeX
 end
 
 # Load debugger
-# require 'ruby-debug'
-# Debugger.start
+require 'ruby-debug'
+Debugger.start
 
 require 'bibtex/extensions'
 require 'bibtex/value'

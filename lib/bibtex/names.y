@@ -136,7 +136,8 @@ require 'strscan'
         @word[1] << @src.matched
         
       when @src.scan(/\{/o)
-        scan_literal(@src.matched)
+        @word[1] << @src.matched
+        scan_literal
         
       when @src.scan(/\}/o)
         error_unbalanced
@@ -165,21 +166,21 @@ require 'strscan'
     @word[0] = :UWORD if @word[0] == :PWORD
   end
   
-  def scan_literal(content = '')
-    @brace_level += 1
-    content << @src.scan_until(/[^\\][\{\}]/o).to_s # TODO accept empty braces {}
-    case @src.matched
-    when /\{/
-      scan_braced_expression(content)
-    when /\}/
-      @brace_level -= 1
-      if @brace_level >= 0
-        @word[1] << content
-      else
-        error_unbalanced
-      end
-    else
-      error_unbalanced
+  def scan_literal
+    @brace_level = 1
+
+ 		while @brace_level > 0
+			@word[1] << @src.scan_until(/[\{\}]/o).to_s
+
+    	case @src.matched
+			when '{'
+				@brace_level += 1
+			when '}'
+				@brace_level -= 1
+			else
+				@brace_level = 0
+				error_unbalanced
+			end
     end
   end
 

@@ -139,6 +139,7 @@ module BibTeX
 		end
 		
 		def <=>(other)
+		  return nil unless other.respond_to? :type and other.respond_to? :to_s
 		  [type, to_s] <=> [other.type, other.to_s]
 		end
 		

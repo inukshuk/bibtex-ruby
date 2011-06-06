@@ -1,3 +1,7 @@
+=== 1.3.3
+
+* Fixed name parsing of nested braced expressions
+
 === 1.3.2
 
 * Fixed numeric keys issue
