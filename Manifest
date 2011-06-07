@@ -1,4 +1,3 @@
-Bibliography.bib
 Gemfile
 Gemfile.lock
 History.txt
@@ -61,6 +60,7 @@ test/bibtex/test_string.rb
 test/bibtex/test_utilities.rb
 test/bibtex/test_value.rb
 test/fixtures
+test/fixtures/benchmark.bib
 test/fixtures/bibdesk.bib
 test/fixtures/comment.bib
 test/fixtures/decoret.bib
@@ -71,5 +71,7 @@ test/fixtures/no_bibtex.bib
 test/fixtures/preamble.bib
 test/fixtures/roundtrip.bib
 test/helper.rb
+test/profile.dot
+test/profile.rb
 test/test_bibtex.rb
 test/test_export.rb
