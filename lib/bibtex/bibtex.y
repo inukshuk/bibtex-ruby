@@ -102,7 +102,7 @@ require 'bibtex/lexer'
   def parse(input)
     @yydebug = debug?
     
-    @lexer.src = input
+    @lexer.data = input
     @lexer.analyse
     
     do_parse

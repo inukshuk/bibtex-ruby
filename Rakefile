@@ -4,14 +4,14 @@ $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require 'rubygems'
 require 'bundler/setup'
 
-require 'rake'
 require 'rake/clean'
 require 'rake/testtask'
-require 'rake/rdoctask'
+
+require 'rdoc/task'
 
 require 'bibtex/version'
 
-Rake::RDocTask.new(:rdoc_task) do |rd|
+RDoc::Task.new(:rdoc_task) do |rd|
   rd.main = 'README.md'
   rd.title = "BibTeX-Ruby Documentation"
   rd.rdoc_files.include('README.md',"lib/**/*.rb")
@@ -58,6 +58,18 @@ file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
   # sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
   sh 'racc -v -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
+
+desc 'Runs the benchmarks (and plots the results)'
+task :benchmark => ['racc'] do
+  require File.expand_path('../test/benchmark.rb', __FILE__)
+end
+task :bm => ['benchmark']
+
+desc 'Runs the profiler'
+task :profile => ['racc'] do
+  require File.expand_path('../test/profile.rb', __FILE__)
+end
+
 
 desc 'Updates the Manifest file'
 task :manifest => ['clean', 'racc'] do

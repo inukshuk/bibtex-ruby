@@ -22,7 +22,7 @@ input = <<-END
 }
 END
 
-n, k = 101, 20
+n, k = 1001, 20
 lexer = BibTeX::Lexer.new
 
 f = []
@@ -34,7 +34,7 @@ Benchmark.benchmark((" "*15) + CAPTION, 7, FMTSTR, '%14s:' % 'sum(f)', '%14s:' %
   
     f << b.report('%14s:' % "f(#{i})") do
       i.times do
-        lexer.src = input
+        lexer.data = input
         lexer.analyse
       end
     end
@@ -42,7 +42,7 @@ Benchmark.benchmark((" "*15) + CAPTION, 7, FMTSTR, '%14s:' % 'sum(f)', '%14s:' %
     data = input * i
   
     g << b.report('%14s:' % "g(#{i})") do
-      lexer.src = data
+      lexer.data = data
       lexer.analyse
     end
     

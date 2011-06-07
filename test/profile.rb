@@ -5,8 +5,6 @@ require 'bundler/setup'
 
 require 'ruby-prof'
 
-data = File.open(BibTeX::Test.fixtures(:bibdesk)).read
-
 data = <<-END
 @book{pickaxe,
 	Address = {Raleigh, North Carolina},
@@ -28,4 +26,4 @@ result = RubyProf.profile do
 end
 
 printer = RubyProf::DotPrinter.new(result)
-printer.print(File.open(File.expand_path('../../profile.dot', __FILE__), 'w'), :min_percent => 5)
+printer.print(File.open(File.expand_path('../profile.dot', __FILE__), 'w'), :min_percent => 5)
