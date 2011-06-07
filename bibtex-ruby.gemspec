@@ -25,6 +25,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency('autowatchr', ['>= 0.1'])
   s.add_development_dependency('cucumber', ['>= 0.10'])
   s.add_development_dependency('json', ['>= 1.5'])
+  s.add_development_dependency('ruby-prof', ['>= 0.10'])
+  s.add_development_dependency('gnuplot', ['>= 2.3'])
 
   s.files             = File.open('Manifest').readlines.map(&:chomp)
   s.test_files        = Dir.glob('test/**/test*.rb')
