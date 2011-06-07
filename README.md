@@ -43,18 +43,12 @@ many styles:
 
     >> require 'citeproc'  # requires the citeproc-ruby gem
     => true
-		>> CiteProc.process b[:pickaxe].to_citeproc, :style => :apa
-		=> "Thomas, D., Fowler, C., & Hunt, A. (2009). Programming Ruby 1.9:
-		  The Pragmatic Programmer's Guide. The Facets of Ruby.
-		  Raleigh, North Carolina: The Pragmatic Bookshelf."
-		>> CiteProc.process b[:pickaxe].to_citeproc, :style => 'chicago-author-date'
-		=> "Thomas, Dave, Chad Fowler, and Andy Hunt. 2009. Programming Ruby 1.9:
-		  The Pragmatic Programmer's Guide. The Facets of Ruby.
-		  Raleigh, North Carolina: The Pragmatic Bookshelf."
-		>> CiteProc.process b[:pickaxe].to_citeproc, :style => :mla
-		=> "Thomas, Dave, Chad Fowler, and Andy Hunt. Programming Ruby 1.9:
-		  The Pragmatic Programmer's Guide. Raleigh, North Carolina:
-		  The Pragmatic Bookshelf, 2009."
+    >> CiteProc.process b[:pickaxe].to_citeproc, :style => :apa
+    => "Thomas, D., Fowler, C., & Hunt, A. (2009). Programming Ruby 1.9: The Pragmatic Programmer's Guide. The Facets of Ruby. Raleigh, North Carolina: The Pragmatic Bookshelf."
+    >> CiteProc.process b[:pickaxe].to_citeproc, :style => 'chicago-author-date'
+    => "Thomas, Dave, Chad Fowler, and Andy Hunt. 2009. Programming Ruby 1.9: The Pragmatic Programmer's Guide. The Facets of Ruby.Raleigh, North Carolina: The Pragmatic Bookshelf."
+    >> CiteProc.process b[:pickaxe].to_citeproc, :style => :mla
+    => "Thomas, Dave, Chad Fowler, and Andy Hunt. Programming Ruby 1.9: The Pragmatic Programmer's Guide. Raleigh, North Carolina: The Pragmatic Bookshelf, 2009."
 
 
 Installation
