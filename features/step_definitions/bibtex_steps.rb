@@ -71,10 +71,18 @@ Then /^there should be exactly (\d+) match(?:es)?$/ do |matches|
 end
 
 
+Then /^my bibliography should contain (\d+) (\w+)$/ do |count, type|
+  assert_equal count.to_i, @bibliography.q("@#{type.chomp!('s')}").length
+end
+
 Then /^my bibliography should contain (\d+) (\w+) published in (\d+)$/ do |count, type, year|
-  assert_equal @bibliography.q("@#{type.chomp!('s')}[year=#{year}]").length, count.to_i
+  assert_equal count.to_i, @bibliography.q("@#{type.chomp!('s')}[year=#{year}]").length
 end
 
 Then /^my bibliography should contain an? (\w+) with id "([^"]*)"$/ do |type, id|
   assert_equal @bibliography[id.to_sym].type, type.to_sym
+end
+
+Then /^the string "([^"]*)" should be "([^"]*)"$/ do |key, value|
+  assert_equal value, @bibliography.strings[key].to_s
 end
