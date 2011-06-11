@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('json', ['>= 1.5'])
   s.add_development_dependency('ruby-prof', ['>= 0.10'])
   s.add_development_dependency('gnuplot', ['>= 2.3'])
+  s.add_development_dependency('rdoc', ['>= 3.6'])
 
   s.files             = File.open('Manifest').readlines.map(&:chomp)
   s.test_files        = Dir.glob('test/**/test*.rb')

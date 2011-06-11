@@ -15,9 +15,11 @@ features
 features/bibtex.feature
 features/entries.feature
 features/issues
+features/issues/braced_strings.feature
 features/issues/number_keys.feature
 features/issues/parse_months.feature
 features/issues/slash_keys.feature
+features/issues/trailing_comma.feature
 features/names.feature
 features/preambles.feature
 features/query.feature
@@ -54,6 +56,7 @@ test/bibtex
 test/bibtex/test_bibliography.rb
 test/bibtex/test_elements.rb
 test/bibtex/test_entry.rb
+test/bibtex/test_lexer.rb
 test/bibtex/test_names.rb
 test/bibtex/test_parser.rb
 test/bibtex/test_string.rb
