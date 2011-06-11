@@ -45,22 +45,26 @@ module BibTeX
 		#
 		def initialize(options = {})
       @options = DEFAULTS.merge(options)
-			@data = nil
 		end
 
-		# Sets the source for the lexical analysis and resets the internal state.
-		def data=(string)
+    def reset
 			@stack = []
 			@brace_level = 0
 			@mode = :meta
 			@active_object = nil
+			@data = nil
+    end
+    
+		# Sets the source for the lexical analysis and resets the internal state.
+		def data=(string)
+		  reset
 			@data = StringScanner.new(string)
-
-      # @line_breaks = []
-      # @line_breaks << @data.pos until @data.scan_until(/\n|$/).empty?
-      # @data.reset
 		end
 
+    def symbols
+      @stack.map(&:first)
+    end
+    
 		# Returns the line number at a given position in the source.
 		def line_number_at(index)
 			0 # (@line_breaks.find_index { |n| n >= index } || 0) + 1
@@ -72,7 +76,7 @@ module BibTeX
 		end
 
 		def mode=(mode)
-      # Log.debug("Lexer: switching to #{mode} mode...")
+      Log.debug("Lexer: switching to #{mode} mode...")
 
 			@active_object = case
 				when [:comment,:string,:preamble,:entry].include?(mode) then mode
@@ -107,17 +111,17 @@ module BibTeX
 			case
 			when ([:CONTENT,:STRING_LITERAL].include?(value[0]) && value[0] == @stack.last[0])
 				@stack.last[1][0] << value[1]
-				@stack.last[1][1] = line_number_at(@data.pos)
+				@stack.last[1][1] = @data.pos
 			when value[0] == :ERROR
 				@stack.push(value) if @options[:include].include?(:errors)
 				leave_object
 			when value[0] == :META_CONTENT
 				if @options[:include].include?(:meta_content)
-					value[1] = [value[1], line_number_at(@data.pos)]
+					value[1] = [value[1], @data.pos]
 					@stack.push(value)
 				end
 			else
-				value[1] = [value[1], line_number_at(@data.pos)]
+				value[1] = [value[1], @data.pos]
 				@stack.push(value)
 			end
 			self
@@ -145,6 +149,7 @@ module BibTeX
 			end
 			
 			Log.debug('Lexer: finished lexical analysis.')
+			Log.debug(@stack.inspect)
 			push [false, '$end']
 		end
 
@@ -154,7 +159,7 @@ module BibTeX
 			when @data.scan(/\{/o)
 				@brace_level += 1
 				push [:LBRACE,'{']
-				if (@brace_level == 1 && active?(:comment)) || (@brace_level == 2 && active?(:entry))
+				if (@brace_level == 1 && active?(:comment)) || (@brace_level > 1 )
 					self.mode = :content
 				end
 			when @data.scan(/\}/o)
@@ -210,7 +215,7 @@ module BibTeX
 					push [:CONTENT,match.chop]
 					push [:RBRACE,'}']
 					leave_object
-				when @brace_level == 1 && active?(:entry)
+				when @brace_level == 1 && (active?(:entry) || active?(:string))
 					push [:CONTENT,match.chop]
 					push [:RBRACE,'}']
 					self.mode = :bibtex
@@ -249,7 +254,7 @@ module BibTeX
 				push [:STRING_LITERAL,match.chop]
 				error_unterminated_string
 			else
-				push [:STRING_LITERAL,self.data.rest]
+				push [:STRING_LITERAL,@data.rest]
 				@data.terminate
 				error_unterminated_string
 			end
@@ -285,26 +290,26 @@ module BibTeX
 
 
 		def error_unbalanced_braces
-			n = line_number_at(@data.pos)
-			Log.warn("Lexer: unbalanced braces on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			n = @data.pos
+			Log.warn("Lexer: unbalanced braces at #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNBALANCED_BRACES, [self.data.matched,n]]
 		end
 		
 		def error_unterminated_string
-			n = line_number_at(@data.pos)
-			Log.warn("Lexer: unterminated string on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			n = @data.pos
+			Log.warn("Lexer: unterminated string at #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNTERMINATED_STRING, [@data.matched,n]]
 		end
 
 		def error_unterminated_content
-			n = line_number_at(@data.pos)
-			Log.warn("Lexer: unterminated content on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			n = @data.pos
+			Log.warn("Lexer: unterminated content at #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNTERMINATED_CONTENT, [@data.matched,n]]
 		end
 		
 		def error_unexpected_token
-			n = line_number_at(@data.pos)
-			Log.warn("Lexer: unexpected token `#{@data.matched}' on line #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			n = @data.pos
+			Log.warn("Lexer: unexpected token `#{@data.matched}' at #{n}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNEXPECTED_TOKEN, [@data.matched,n]]
 		end
 		

@@ -3,6 +3,15 @@ Feature: BibTeX Braced Strings
 	I want to be able to parse BibTeX files containing string definitions using braced expressions
 	Because applications such as BibDesk produce that format
 
+	@string
+	Scenario: A simple string assignment
+		When I parse the following file:
+		"""
+		@string{ foo = {foo} }
+		"""
+		Then my bibliography should contain 1 string
+		
+	@string @replacement
 	Scenario: A BibTeX file with string assignments
 		When I parse the following file:
 		"""
@@ -13,13 +22,11 @@ Feature: BibTeX Braced Strings
 		@string{foo4={foo}}
 		@string{ foo5 = {"foo" bar} }
 		@string{ foo6 = {"foo" bar{"}} }
-		@string{ foo7 = {"foo" bar\} foo} }
-		@string{ foo8 = {"foo" bar\{ foo} }
 		
 		Compound strings:
-		@string{ foo8 = foo1 }
-		@string{ foo9 = foo1 # {bar} }
-		@string{ foo10 = {foo } # {bar} }
+		@string{ foo7 = foo1 }
+		@string{ foo8 = foo1 # {bar} }
+		@string{ foo9 = {foo } # {bar} }
 		
 		"""
 		Then my bibliography should contain 9 strings
@@ -31,12 +38,11 @@ Feature: BibTeX Braced Strings
 			| foo              |
 			| "foo" bar        |
 			| "foo" bar{"}     |
-			| "foo" bar\} foo  |
-			| "foo" bar\{ foo  |
-			| foo              |
+			| foo1             |
 			| foo1 # "bar"     |
 			| "foo " # "bar"   |
-		When I replace all strings in my bibliography
-		Then the string "foo9" should be "foobar"
-		And the string "foo10" should be "foo bar"
+		When I replace and join all strings in my bibliography
+		Then the string "foo7" should be "foo"
+		And the string "foo8" should be "foobar"
+		And the string "foo9" should be "foo bar"
 		

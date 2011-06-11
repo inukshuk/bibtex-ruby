@@ -2,6 +2,7 @@ Feature: BibTeX Strings
 	As a hacker who works with bibliographies
 	I want to be able to parse BibTeX files containing string assignments
 
+	@string
 	Scenario: A BibTeX file with string assignments
 		When I parse the following file:
 		"""

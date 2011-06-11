@@ -72,11 +72,11 @@ end
 
 
 Then /^my bibliography should contain (\d+) (\w+)$/ do |count, type|
-  assert_equal count.to_i, @bibliography.q("@#{type.chomp!('s')}").length
+  assert_equal count.to_i, @bibliography.q("@#{type.chomp('s')}").length
 end
 
 Then /^my bibliography should contain (\d+) (\w+) published in (\d+)$/ do |count, type, year|
-  assert_equal count.to_i, @bibliography.q("@#{type.chomp!('s')}[year=#{year}]").length
+  assert_equal count.to_i, @bibliography.q("@#{type.chomp('s')}[year=#{year}]").length
 end
 
 Then /^my bibliography should contain an? (\w+) with id "([^"]*)"$/ do |type, id|
@@ -84,5 +84,5 @@ Then /^my bibliography should contain an? (\w+) with id "([^"]*)"$/ do |type, id
 end
 
 Then /^the string "([^"]*)" should be "([^"]*)"$/ do |key, value|
-  assert_equal value, @bibliography.strings[key].to_s
+  assert_equal value, @bibliography.strings[key.to_sym].v.to_s
 end
