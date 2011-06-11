@@ -106,25 +106,17 @@ require 'bibtex/lexer'
     @lexer.analyse
     
     do_parse
+		#yyparse(@lexer,:each)
   end
   
   def next_token
-    token = @lexer.next_token
-    if token[0] == :ERROR
-      include_errors? ? token : next_token
-    else
-      [token[0],token[1][0]]
-    end
+    @lexer.next_token
   end
   
   def debug?
     @options[:debug] == true
   end
-  
-  def include_errors?
-    @options[:include].include?(:errors)
-  end
-  
+    
   def on_error(tid, val, vstack)
     Log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
     #raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])

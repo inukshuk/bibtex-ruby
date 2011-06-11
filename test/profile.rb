@@ -8,7 +8,7 @@ require 'ruby-prof'
 data = <<-END
 @book{pickaxe,
 	Address = {Raleigh, North Carolina},
-	Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+	Author = "Thomas, Dave, and Fowler, Chad, and Hunt, Andy",
 	Date-Added = {2010-08-05 09:54:07 +0200},
 	Date-Modified = {2010-08-05 10:07:01 +0200},
 	Keywords = {ruby},
@@ -19,10 +19,12 @@ data = <<-END
 }
 END
 
-data = data * 50
+# data = data * 50
+data = File.open(File.expand_path('../fixtures/benchmark.bib', __FILE__)).read
 
 result = RubyProf.profile do
-  BibTeX.parse(data)
+  # BibTeX.parse(data)
+  BibTeX::Lexer.new.analyse(data)
 end
 
 printer = RubyProf::DotPrinter.new(result)
