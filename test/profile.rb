@@ -23,7 +23,7 @@ END
 data = File.open(File.expand_path('../fixtures/benchmark.bib', __FILE__)).read
 
 result = RubyProf.profile do
-  BibTeX.parse(data)
+  BibTeX.parse(data, :parse_names => false)
   # BibTeX::Lexer.new.analyse(data)
 end
 
