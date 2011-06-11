@@ -26,7 +26,7 @@ module BibTeX
 	#
 	class Lexer
 	  extend Forwardable
-	  include Enumerable
+    include Enumerable
 
 		attr_reader :options, :stack, :mode, :scanner
 		attr_writer :mode
@@ -35,7 +35,6 @@ module BibTeX
     def_delegators :@stack, :each
 
     DEFAULTS = { :include => [:errors], :strict => true }.freeze
-    # OBJECTS = [:bibtex,:entry,:string,:preamble,:comment].freeze
     
     MODE = Hash.new(:meta).merge(:bibtex => :bibtex, :entry => :bibtex, :string => :bibtex, :preamble => :bibtex, :comment => :bibtex, :meta => :meta, :literal => :literal, :content => :content).freeze
     

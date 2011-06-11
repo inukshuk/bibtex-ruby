@@ -88,22 +88,18 @@ require 'bibtex/lexer'
 
 ---- inner
 
-  attr_reader :lexer
+  attr_reader :lexer, :options
   
+	DEFAULTS = { :include => [:errors], :debug => ENV['DEBUG'] == true }.freeze
+	
   def initialize(options = {})
-		self.options.merge!(options)
+		@options = DEFAULTS.merge(options)
     @lexer = Lexer.new(@options)
   end
 
-	def options
-		@options ||= { :include => [:errors], :debug => ENV['DEBUG'] == true }
-	end
-	
   def parse(input)
-    @yydebug = debug?
-    
-    @lexer.data = input
-    @lexer.analyse
+    @yydebug = debug?   
+    @lexer.analyse(input)
     
     do_parse
 		#yyparse(@lexer,:each)
