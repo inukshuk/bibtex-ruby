@@ -1,6 +1,6 @@
-=== 1.3.6 / 2011-06-
+=== 1.3.6 / 2011-06-11
 
-* Refactored Lexer 
+* Refactored lexer and parser for speed
 * Added support for @strings with braced values (fixes #10)
 
 === 1.3.5 / 2011-06-07

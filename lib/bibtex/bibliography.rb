@@ -30,7 +30,9 @@ module BibTeX
     
     include Enumerable
     include Comparable
-        
+    
+    DEFAULTS = { :parse_names => true, :parse_months => true }.freeze
+    
     class << self    
 
       # Opens and parses the `.bib' file at the given +path+. Returns
@@ -40,7 +42,11 @@ module BibTeX
       # to specify a save path other than the path from where the file is
       # loaded).
       #
-      # The options argument is passed on to BibTeX::Parser.new.
+      # The options argument is passed on to BibTeX::Parser.new. Additional
+      # option parameters are:
+      #
+      # -:parse_names: set to false to disable automatic name parsing
+      # -:parse_months: set to false to disable automatic month conversion
       #
       def open(path, options = {})
         b = parse(Kernel.open(path).read, options)
@@ -55,10 +61,7 @@ module BibTeX
 
       # Parses the given string and returns a corresponding Bibliography instance.
       def parse(bibtex, options = {})
-        b = Parser.new(options).parse(bibtex)
-        b.parse_names unless b.nil? || options[:parse_names] == false
-        b.parse_months unless b.nil? || options[:parse_months] == false
-        b
+        Parser.new(options).parse(bibtex)
       end
       
       #
@@ -73,7 +76,7 @@ module BibTeX
     end
   
     attr_accessor :path
-    attr_reader :data, :strings, :entries, :errors
+    attr_reader :data, :strings, :entries, :errors, :options
 
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
     
@@ -81,13 +84,13 @@ module BibTeX
 
     
     #
-    # Creates a new bibliography; empty if no data attribute is specified.
+    # Creates a new bibliography.
     #
-    def initialize(data = [])
-      @data = []
-      @strings = {}
-      @entries = {}
-      add(data)
+    def initialize(options = {})
+      @options = DEFAULTS.merge(options)
+      @data, @strings, @entries = [], {}, {}
+
+      yield self if block_given?
     end
     
     # Adds a new element, or a list of new elements to the bibliography.
@@ -100,8 +103,8 @@ module BibTeX
       self
     end
     
-    alias :<< :add
-    alias :push :add
+    alias << add
+    alias push add
     
     # Saves the bibliography to the current path.
     def save(options = {})
@@ -116,12 +119,12 @@ module BibTeX
     end
     
     def parse_names
-      q('@entry') { |e| e.parse_names }
+      @entries.values.each { |e| e.parse_names }
       self
     end
     
     def parse_months
-      q('@entry') { |e| e.parse_month }
+      @entries.values.each { |e| e.parse_month }
       self
     end
     
@@ -139,8 +142,8 @@ module BibTeX
       objects.length == 1 ? objects[0] : objects
     end
     
-    alias :remove :delete
-    alias :rm :delete
+    alias remove delete
+    alias rm delete
 
     #
     # Returns an element or a list of elements according to the given index,
@@ -221,7 +224,7 @@ module BibTeX
       self
     end
     
-    alias :join_strings :join
+    alias join_strings join
 
     def rename(*arguments, &block)
       q('@entry') { |e| e.rename(*arguments, &block) }
@@ -300,13 +303,13 @@ module BibTeX
       send(query_handler(selector), &filter)
     end
     
-    alias :q :query
+    alias q query
         
     def find_by_type(*types, &block)
       q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
     end
     
-    alias :find_by_types :find_by_type
+    alias find_by_types find_by_type
 
     def <=>(other)
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil

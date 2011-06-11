@@ -30,7 +30,7 @@ expect 0
 
 rule
 
-  bibliography : /* empty */                       { result = BibTeX::Bibliography.new }
+  bibliography : /* empty */                       { result = BibTeX::Bibliography.new(@options) }
                | objects                           { result = val[0] }
 
   objects : object                                 { result = BibTeX::Bibliography.new << val[0] }

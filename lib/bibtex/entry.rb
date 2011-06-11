@@ -227,6 +227,8 @@ module BibTeX
 		def added_to_bibliography(bibliography)
 			super
 			bibliography.entries[key] = self
+			parse_names if bibliography.options[:parse_names]
+			parse_months if bibliography.options[:parse_months]
 			self
 		end
 				
@@ -262,10 +264,10 @@ module BibTeX
     # Parses all name values of the entry. Tries to replace and join the
     # value prior to parsing.
     def parse_names
+      strings = bibliography ? bibliography.strings.values : []
       NAME_FIELDS.each do |key|
         if name = @fields[key]
-          name.replace(bibliography.q('@string')) unless bibliography.nil?
-          name.join
+          name.replace(strings).join
           name = name.to_name
           @fields[key] = name
         end

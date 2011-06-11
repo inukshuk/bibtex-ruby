@@ -38,9 +38,7 @@ module BibTeX
     end
     
 		# Returns a string containing the object's content.
-		def content(options = {})
-			''
-		end
+		def content(options = {}); ''; end
 
     # Invokes BibTeX string replacement on this element.
     def replace(*arguments); self; end
@@ -70,28 +68,28 @@ module BibTeX
     
     # Returns true if the element matches the given query.
     def matches?(query)
-      return true if query.nil? || query.respond_to?(:empty?) && query.empty?
+      return true if !query || query.respond_to?(:empty?) && query.empty?
       
       case query
-      when Element
-        self == query
       when Symbol
-        id == query
+        query == id
+      when Element
+        query == self
       when Regexp
         to_s.match(query)
-      when /^\/(.+)\/$/
-        to_s.match(Regexp.new($1))
       when /@(\w+)(?:\[([^\]]*)\])?/
         query.scan(/@(\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
           has_type?(type) && ( condition.nil? || meets?(condition.split(/,\s*/)) )
         end
+      when /^\/(.+)\/$/
+        to_s.match(Regexp.new($1))
       else
         id == query.to_sym
       end      
     end
     
-    alias :=== :matches?
-    alias :match? :matches?
+    alias === matches?
+    alias match? matches?
     
     # Returns true if the element meets all of the given conditions.
     def meets?(*conditions)
@@ -101,9 +99,9 @@ module BibTeX
       end
     end
     
-    alias :meet? :meets?
+    alias meet? meets?
     
-		alias :to_s :content
+		alias to_s content
 		
 		def to_hash(options = {})
 		  { type => content }

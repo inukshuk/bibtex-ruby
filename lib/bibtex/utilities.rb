@@ -31,7 +31,7 @@ module BibTeX
     # Delegates to BibTeX.open if the string is a filename or URI.
     def parse(string, options = {}, &block)
       if File.exists?(string) || string =~ /^[a-z]+:\/\//i
-        open(string, options, &block)
+        Bibliography.open(string, options, &block)
       else
         Bibliography.parse(string, options)
       end

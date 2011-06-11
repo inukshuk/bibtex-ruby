@@ -124,13 +124,13 @@ module BibTeX
       [prefix, last, first, suffix].compact.join(' ')
     end
     
-    alias :display :display_order
+    alias display display_order
     
     def sort_order
       [[prefix,last].compact.join(' '), suffix, first].compact.join(', ')
     end
     
-    alias :to_s :sort_order
+    alias to_s sort_order
     
     def <=>(other)
       other.is_a?(Name) ? [last, prefix, first, suffix].compact.join(' ') <=> [other.last, other.prefix, other.first, other.suffix].compact.join(' ') : super
@@ -158,14 +158,14 @@ module BibTeX
       hash
     end
     
-    alias :family :last
-    alias :family= :last=    
-    alias :given :first
-    alias :given= :first=
-    alias :jr :suffix
-    alias :jr= :suffix=
-    alias :von :prefix
-    alias :von= :prefix=    
+    alias family last
+    alias family= last=    
+    alias given first
+    alias given= first=
+    alias jr suffix
+    alias jr= suffix=
+    alias von prefix
+    alias von= prefix=    
     
   end
 end
