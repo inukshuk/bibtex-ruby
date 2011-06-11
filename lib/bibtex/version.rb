@@ -18,6 +18,6 @@
 
 module BibTeX
   module Version
-    STRING = '1.3.5'.freeze
+    STRING = '1.3.6'.freeze
   end
 end
