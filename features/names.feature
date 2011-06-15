@@ -43,6 +43,7 @@ Feature: BibTeX Names
 		| bb CC,XX, AA    | AA         | bb         | CC      | XX |
 		| bb CC,xx, AA    | AA         | bb         | CC      | xx |
 		| BB,, AA         | AA         |            | BB      |    |
+		| CC dd BB, AA    | AA         | CC dd      | BB      |    |
 		
 	Scenarios: Decoret further remarks
 		| name                              | first                | von            | last                    | jr |
