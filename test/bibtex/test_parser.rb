@@ -75,5 +75,21 @@ module BibTeX
       end
     end
     
+    context 'given an entry containing a multi-line literals' do
+      setup do
+        @braces = %Q[@TechReport{key,\n  author = {Donald,\n     Duck}\n}]
+        @string = %Q[@TechReport{key,\n  author = "Donald,\n     Duck"\n}]
+      end
+      
+      should 'parse string literals' do
+        refute_nil Parser.new.parse(@string)[:key]
+      end
+
+      should 'parse braced literals' do
+        refute_nil Parser.new.parse(@braces)[:key]
+      end
+
+    end
+    
   end
 end
