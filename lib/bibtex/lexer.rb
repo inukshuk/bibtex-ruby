@@ -204,7 +204,7 @@ module BibTeX
 		end
 		
 		def parse_literal
-			match = @scanner.scan_until(/[\{\}"\n]/o)
+			match = @scanner.scan_until(/[\{\}"]/o)
 			case @scanner.matched
 			when '{'
 				@brace_level += 1
