@@ -44,7 +44,17 @@ Feature: BibTeX Names
 		| bb CC,xx, AA    | AA         | bb         | CC      | xx |
 		| BB,, AA         | AA         |            | BB      |    |
 		| CC dd BB, AA    | AA         | CC dd      | BB      |    |
-		
+		| BB, AA          | AA         |            | BB      |    |
+	
+	@sort @wip
+	Scenarios: Long von parts
+		| name            | first      | von        | last    | jr |
+		| bb cc dd CC, AA | AA         | bb cc dd   | CC      |    |
+		| bb CC dd CC, AA | AA         | bb CC dd   | CC      |    |
+		| BB cc dd CC, AA | AA         | BB cc dd   | CC      |    |
+		| BB CC dd CC, AA | AA         | BB CC dd   | CC      |    |
+
+	
 	Scenarios: Decoret further remarks
 		| name                              | first                | von            | last                    | jr |
 		# | Paul \'Emile Victor               | Paul \'Emile        |                | Victor                  |    |
@@ -73,3 +83,4 @@ Feature: BibTeX Names
     | {Barnes and} {Noble, Inc.}        | {Barnes and}            |                | {Noble, Inc.}                  |     |
     | {Barnes} {and} {Noble,} {Inc.}    | {Barnes} {and} {Noble,} |                | {Inc.}                         |     |
     | Charles Louis Xavier Joseph de la Vallee Poussin | Charles Louis Xavier Joseph | de la | Vallee Poussin       |     |
+

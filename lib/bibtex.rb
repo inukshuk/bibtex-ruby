@@ -43,7 +43,7 @@ module BibTeX
 	#
 	Log = Logger.new(STDERR)
 	Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
-	Log.datetime_format = "%Y-%m-%d %H:%M:%S"
+	Log.datetime_format = '%Y-%m-%d %H:%M:%S'
 
   def self.log; BibTeX::Log end
 end

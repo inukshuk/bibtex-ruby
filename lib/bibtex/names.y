@@ -35,18 +35,20 @@ rule
   names : name                       { result = [val[0]] }
         | names AND name             { result << val[2] }
   
-  name : last                        { result = Name.new(:von => val[0][0], :last => val[0][1]) }
-       | u_words last                { result = Name.new(:first => val[0], :von => val[1][0], :last => val[1][1]) }
-       | sort COMMA first            { result = Name.new(:von => val[0][0], :last => val[0][1], :jr => val[2][0], :first => val[2][1]) }
-  
-  sort : u_words                     { result = [nil,val[0]]}
-       | LWORD                       { result = [nil,val[0]]}
-       | von LWORD                   { result = [val[0],val[1]]}
-       | von u_words                 { result = [val[0],val[1]]}
-  
-  last : word                        { result = [nil,val[0]]}
-       | von LWORD                   { result = [val[0],val[1]]}
-       | von u_words                 { result = [val[0],val[1]]}
+	name : word                          { result = Name.new(:last => val[0]) }
+       | u_words word                  { result = Name.new(:first => val[0], :last => val[1]) }
+       | u_words von last              { result = Name.new(:first => val[0], :von => val[1], :last => val[2]) }
+       | von last                      { result = Name.new(:von => val[0], :last => val[1]) }
+       | last COMMA first              { result = Name.new(:last => val[0], :jr => val[2][0], :first => val[2][1]) }
+       | von last COMMA first          { result = Name.new(:von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1]) }
+       | u_words von last COMMA first  { result = Name.new(:von => val[0,2].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1]) }
+
+  von : LWORD                        { result = val[0] }
+      | von LWORD                    { result = val.join(' ') }
+      | von u_words LWORD            { result = val.join(' ') }
+
+	last : LWORD                       { result = val[0] }
+	     | u_words                     { result = val[0] }
   
   first : opt_words                  { result = [nil,val[0]] }
         | opt_words COMMA opt_words  { result = [val[0],val[2]] }
@@ -57,10 +59,6 @@ rule
   u_word : UWORD                     { result = val[0] }
          | PWORD                     { result = val[0] }
 
-  von : LWORD                        { result = val[0] }
-      | von u_words LWORD            { result = val[0,3].join(' ') }
-      | von LWORD                    { result = val[0,2].join(' ') }
-    
   words : word                       { result = val[0] }
         | words word                 { result = val[0,2].join(' ') }
 
