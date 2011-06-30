@@ -1,4 +1,4 @@
-=== 1.3.7
+=== 1.3.7 / 2011-06-30
 
 * Added option to toggle dropping/non-dropping behaviour of 'von' parts
   when exporting to CiteProc/CSL

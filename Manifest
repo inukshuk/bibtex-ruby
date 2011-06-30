@@ -58,6 +58,7 @@ test/bibtex/test_bibliography.rb
 test/bibtex/test_elements.rb
 test/bibtex/test_entry.rb
 test/bibtex/test_lexer.rb
+test/bibtex/test_name_parser.rb
 test/bibtex/test_names.rb
 test/bibtex/test_parser.rb
 test/bibtex/test_string.rb
