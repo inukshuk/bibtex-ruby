@@ -73,6 +73,25 @@ module BibTeX
         assert_equal 'Melville', e['author'][0]['family']
       end
     end
+
+    context 'citeproc export' do
+      setup do
+        @entry = Entry.new do |e|
+          e.type = :book
+          e.key = :key
+          e.author = 'van Beethoven, Ludwig'
+          e.parse_names
+        end
+      end
+      
+      should 'use dropping-particle by default' do
+        assert_equal 'van', @entry.to_citeproc['author'][0]['dropping-particle']
+      end
+      
+      should 'accept option to use non-dropping-particle' do
+        assert_equal 'van', @entry.to_citeproc(:particle => 'non-dropping-particle')['author'][0]['non-dropping-particle']
+      end
+    end
     
     def test_simple
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)

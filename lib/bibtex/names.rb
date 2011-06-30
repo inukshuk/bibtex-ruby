@@ -154,7 +154,7 @@ module BibTeX
       hash['family'] = family unless family.nil?
       hash['given'] = given unless given.nil?
       hash['suffix'] = suffix unless suffix.nil?
-      hash['dropping-particle'] = prefix unless prefix.nil?
+      hash[options[:particle] || 'dropping-particle'] = prefix unless prefix.nil?
       hash
     end
     

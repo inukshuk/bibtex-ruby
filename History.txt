@@ -1,7 +1,15 @@
+=== 1.3.7
+
+* Added option to toggle dropping/non-dropping behaviour of 'von' parts
+  when exporting to CiteProc/CSL
+* Fixed name parser not accepting 'von' parts starting with upper case words
+  in sort order (#11)
+* Added support for multi-line string literals (#15)
+
 === 1.3.6 / 2011-06-11
 
 * Refactored lexer and parser for speed
-* Added support for @strings with braced values (fixes #10)
+* Added support for @strings with braced values (#10)
 
 === 1.3.5 / 2011-06-07
 
