@@ -117,6 +117,15 @@ module BibTeX
 			yield self if block_given?
 		end
 
+    def initialize_copy (other)
+      @fields = {}
+      
+      self.type = other.type
+      self.key = other.key
+      
+      add(other.fields)
+    end
+    
 		# Sets the key of the entry
 		def key=(key)
 			raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
@@ -133,8 +142,8 @@ module BibTeX
 		  @key ||= default_key
 		end
 
-		alias :id :key		
-		alias :id= :key=
+		alias id key		
+		alias id= key=
 		
 		# Sets the type of the entry.
 		def type=(type)
@@ -207,7 +216,7 @@ module BibTeX
 			self
 		end
 		
-		alias :<< :add
+		alias << add
 
 		# Removes the field with a given name from the entry.
 		# Returns the value of the deleted field; nil if the field was not set.
@@ -259,7 +268,7 @@ module BibTeX
       self
     end
     
-    alias :parse_months :parse_month
+    alias parse_months parse_month
     
     # Parses all name values of the entry. Tries to replace and join the
     # value prior to parsing.
@@ -309,7 +318,7 @@ module BibTeX
 		  { 'date-parts' => [[@fields[:year],m].compact.map(&:to_i)] }
 		end
 		
-		alias :citeproc_date :issued
+		alias citeproc_date issued
 		
 		def to_xml(options = {})
 		  require 'rexml/document'
@@ -322,6 +331,22 @@ module BibTeX
         xml.add_element(e)
       end
       xml
+		end
+		
+		# Returns a duplicate entry with all values converted using the filter.
+		# If an optional block is given, only those values will be converted where
+		# the block returns true (the block will be called with each key-value pair).
+		#
+		# @see convert!
+		#
+		def convert (filter)
+		  block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
+		end
+		
+		# In-place variant of @see convert
+		def convert! (filter)
+		  @fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
+		  self
 		end
 		
 		def <=>(other)

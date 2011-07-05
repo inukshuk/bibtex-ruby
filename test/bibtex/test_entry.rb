@@ -40,7 +40,6 @@ module BibTeX
       end
       
     end
-    
 
     context 'given an entry' do
       setup do
@@ -57,11 +56,25 @@ module BibTeX
         end
       end
       
-      should 'support renaming of field attributes' do
-        @entry.rename(:title => :foo)
+      should 'support renaming! of field attributes' do
+        @entry.rename!(:title => :foo)
         refute @entry.has_field?(:title)
         assert_equal 'Moby Dick', @entry[:foo]
       end
+
+      should 'support renaming of field attributes' do
+        e = @entry.rename(:title => :foo)
+
+        assert @entry.has_field?(:title)
+        refute @entry.has_field?(:foo)
+
+        assert e.has_field?(:foo)
+        refute e.has_field?(:title)
+        
+        assert_equal 'Moby Dick', @entry[:title]
+        assert_equal 'Moby Dick', e[:foo]
+      end
+
       
       should 'support citeproc export' do
         e = @entry.to_citeproc
@@ -72,6 +85,39 @@ module BibTeX
         assert_equal 'Herman', e['author'][0]['given']
         assert_equal 'Melville', e['author'][0]['family']
       end
+      
+      context 'given a filter' do
+        setup do
+          @filter = Object.new
+          def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
+        end
+        
+        should 'support arbitrary conversion' do
+          e = @entry.convert(@filter)
+          assert_equal 'MOBY DICK', e.title
+          assert_equal 'Moby Dick', @entry.title
+        end
+
+        should 'support arbitrary in-place conversion' do
+          @entry.convert!(@filter)
+          assert_equal 'MOBY DICK', @entry.title
+        end
+
+        should 'support conditional arbitrary in-place conversion' do
+          @entry.convert!(@filter) { |k,v| k.to_s =~ /publisher/i  }
+          assert_equal 'Moby Dick', @entry.title
+          assert_equal 'PENGUIN', @entry.publisher
+        end
+
+        should 'support conditional arbitrary conversion' do
+          e = @entry.convert(@filter) { |k,v| k.to_s =~ /publisher/i  }
+          assert_equal 'Moby Dick', e.title
+          assert_equal 'PENGUIN', e.publisher
+          assert_equal 'Penguin', @entry.publisher
+        end
+        
+      end
+      
     end
 
     context 'citeproc export' do
