@@ -39,6 +39,9 @@ lib/bibtex/elements.rb
 lib/bibtex/entry.rb
 lib/bibtex/error.rb
 lib/bibtex/extensions.rb
+lib/bibtex/filters
+lib/bibtex/filters/latex.rb
+lib/bibtex/filters.rb
 lib/bibtex/lexer.rb
 lib/bibtex/name_parser.output
 lib/bibtex/name_parser.rb
@@ -57,6 +60,7 @@ test/bibtex
 test/bibtex/test_bibliography.rb
 test/bibtex/test_elements.rb
 test/bibtex/test_entry.rb
+test/bibtex/test_filters.rb
 test/bibtex/test_lexer.rb
 test/bibtex/test_name_parser.rb
 test/bibtex/test_names.rb

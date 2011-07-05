@@ -26,6 +26,9 @@ When /^I replace and join all strings(?: in my bibliography)$/ do
   @bibliography.replace_strings.join_strings
 end
 
+When /^I convert all entries using the filter "([^"]*)"$/ do |filter|
+  @bibliography.convert(filter)
+end
 
 
 Then /^my bibliography should contain the following objects:$/ do |table|
@@ -85,4 +88,8 @@ end
 
 Then /^the string "([^"]*)" should be "([^"]*)"$/ do |key, value|
   assert_equal value, @bibliography.strings[key.to_sym].v.to_s
+end
+
+Then /^the entry with key "([^"]*)" should have a field "([^"]*)" with the value "([^"]*)"$/ do |key, field, value|
+  assert_equal value, @bibliography[key.to_sym][field.to_sym].to_s
 end

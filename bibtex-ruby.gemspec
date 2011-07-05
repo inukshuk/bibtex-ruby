@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = '>= 1.3.6'
   s.rubyforge_project = s.name
 
+  s.add_runtime_dependency('latex-decode', ['>= 0.0.1'])
+
   s.add_development_dependency('rake', ['>= 0.8'])
   s.add_development_dependency('racc', ['>= 1.4'])
   s.add_development_dependency('mini_shoulda', ['>= 0.3'])
