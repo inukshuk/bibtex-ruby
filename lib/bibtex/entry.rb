@@ -238,6 +238,7 @@ module BibTeX
 			bibliography.entries[key] = self
 			parse_names if bibliography.options[:parse_names]
 			parse_months if bibliography.options[:parse_months]
+			convert(bibliography.options[:filter]) if bibliography.options[:filter]
 			self
 		end
 				

@@ -47,6 +47,7 @@ module BibTeX
       #
       # -:parse_names: set to false to disable automatic name parsing
       # -:parse_months: set to false to disable automatic month conversion
+      # -:filter: convert all entries using the sepcified filter (not set by default)
       #
       def open(path, options = {})
         b = parse(Kernel.open(path).read, options)
@@ -119,13 +120,19 @@ module BibTeX
     end
     
     def parse_names
-      @entries.values.each { |e| e.parse_names }
+      @entries.each_value { |e| e.parse_names }
       self
     end
     
     def parse_months
-      @entries.values.each { |e| e.parse_month }
+      @entries.each_value { |e| e.parse_month }
       self
+    end
+    
+    # Converts all enties using the given filter. If an optional block is given
+    # the block is used as a condition. @see Entry#convert!
+    def convert (filter, &block)
+      @entries.each_value { |e| e.convert(filter, &block) }
     end
     
     #
