@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2011  Sylvester Keil <sylvester.keil.or.at>
@@ -48,7 +50,7 @@ module BibTeX
     include Comparable
     
     attr_reader :tokens
-    alias :to_a :tokens
+    alias to_a tokens
     
     def_delegators :to_s, :empty?, :=~, :match, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str, :split, :each_byte, :each_char, :each_line
     def_delegators :@tokens, :[], :length
@@ -82,8 +84,8 @@ module BibTeX
       self
     end
     
-    alias :<< :add
-    alias :push :add
+    alias << add
+    alias push add
     
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
@@ -128,6 +130,9 @@ module BibTeX
     # If the Value is atomic and the option :quotes is given, the string
     # will be quoted using the quote symbols specified.
     #
+    # If the option :filter is given, the Value will be converted using
+    # the filter(s) specified.
+    #
     # call-seq:
     # Value.new('foo').to_s                       #=> "foo"
     # Value.new(:foo).to_s                        #=> "foo"
@@ -136,8 +141,10 @@ module BibTeX
     # Value.new('foo').to_s(:quotes => ['{','}']) #=> "{foo}"
     # Value.new(:foo, 'bar').to_s                 #=> "foo # \"bar\""
     # Value.new('foo', 'bar').to_s                #=> "\"foo\" # \"bar\""
+    # Value.new('\"u').to_s(:filter => :latex)    #=> "ü"
     #
     def to_s(options = {})
+      return convert(options.delete(:filter)).to_s(options) if options.has_key?(:filter)
       return value.to_s unless options.has_key?(:quotes) && atomic?
       *q = options[:quotes]
       [q[0], value, q[-1]].compact.join
@@ -172,13 +179,13 @@ module BibTeX
       Names.parse(to_s)
     end
     
-    alias :to_names :to_name
+    alias to_names to_name
 
     # Returns true if the Value's content looks like a date.    
     def date?
     end
 
-    alias :is_date? :date?
+    alias is_date? date?
     
     # Returns the string as a citeproc date. TODO use edtf format instead.
     def to_date
@@ -190,9 +197,9 @@ module BibTeX
       to_s =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
     end
     
-    alias :is_numeric? :numeric?
+    alias is_numeric? numeric?
     
-    def to_citeproc(options = {})
+    def to_citeproc (options = {})
       to_s(options)
     end
     
@@ -201,14 +208,45 @@ module BibTeX
       @tokens.detect { |v| v.is_a?(Symbol) }
     end
     
-    alias :has_symbol? :symbol?
+    alias has_symbol? symbol?
     
     # Returns all symbols contained in the Value.
     def symbols
       @tokens.select { |v| v.is_a?(Symbol) }
     end
     
-    def <=>(other)
+    def each_token; @tokens.each; end
+    
+    # Returns a new Value with all string values converted according to the given filter.
+    def convert (filter)
+      dup.convert!(filter)
+    end
+    
+    # Converts all string values according to the given filter.
+    def convert! (filter)
+      f = Filters.resolve(filter)
+
+      unless f
+        message = "Failed to load filter #{f.inspect}"
+        Log.error message
+        raise ArgumentError.new(message)
+      end
+      
+      @tokens.map! { |t| f.apply(t) }
+      self
+    end
+    
+    def method_missing (name, *args)
+      return convert($1) if name =~ /^(?:convert|from)_([a-z]+)$/
+		  super
+		end
+		
+		def respond_to? (method)
+		  method =~ /^(?:convert|from)_([a-z]+)$/ || super
+		end
+		
+    
+    def <=> (other)
       to_s <=> other.to_s
     end
     

@@ -50,7 +50,7 @@ module BibTeX
       #
       def open(path, options = {})
         b = parse(Kernel.open(path).read, options)
-        return b unless !b.nil? and block_given?
+        return b unless block_given?
 
         begin
           yield b
@@ -61,7 +61,7 @@ module BibTeX
 
       # Parses the given string and returns a corresponding Bibliography instance.
       def parse(bibtex, options = {})
-        Parser.new(options).parse(bibtex)
+        Parser.new(options).parse(bibtex) || Bibliography.new(options)
       end
       
       #
