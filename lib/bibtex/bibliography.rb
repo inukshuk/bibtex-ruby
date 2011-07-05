@@ -130,9 +130,10 @@ module BibTeX
     end
     
     # Converts all enties using the given filter. If an optional block is given
-    # the block is used as a condition. @see Entry#convert!
-    def convert (filter, &block)
-      @entries.each_value { |e| e.convert(filter, &block) }
+    # the block is used as a condition (the block will be called with each
+    # entry). @see Entry#convert!
+    def convert (filter)
+      @entries.each_value { |e| e.convert!(filter) if !block_given? || yield(e) }
     end
     
     #

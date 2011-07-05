@@ -135,6 +135,25 @@ module BibTeX
         assert_equal @bib, BibTeX.open(tmp.path)
       end
       
+      context 'given a filter' do
+        setup do
+          @filter = Object
+          def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
+        end
+          
+        should 'support arbitrary conversions' do
+          @bib.convert(@filter)
+          assert_equal 'RUBY, RAILS', @bib[:rails].keywords
+        end
+        
+        should 'support conditional arbitrary conversions' do
+          @bib.convert(@filter) { |e| e.key != :rails }
+          assert_equal 'ruby, rails', @bib[:rails].keywords
+          assert_equal 'RUBY', @bib[:flanagan2008].keywords
+        end
+        
+      end
+      
     end
     
     
