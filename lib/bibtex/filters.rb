@@ -35,9 +35,9 @@ module BibTeX
       case
       when filter.respond_to?(:apply)
         filter
-      when filter.is_a?(::String) || filter.is_a?(Symbol)
+      when filter.respond_to?(:to_s)
         klass = Filter.subclasses.detect do |c|
-          c.name.split(/::/)[-1] =~ /^#{filter}$/i
+          c.name == filter.to_s || c.name.split(/::/)[-1] =~ /^#{filter}$/i
         end
         klass && klass.instance
       else
