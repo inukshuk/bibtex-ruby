@@ -134,6 +134,7 @@ module BibTeX
     # entry). @see Entry#convert!
     def convert (filter)
       @entries.each_value { |e| e.convert!(filter) if !block_given? || yield(e) }
+      self
     end
     		
     #

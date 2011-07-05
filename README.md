@@ -256,6 +256,34 @@ are parsed and can easily be mapped to their last names:
        END
     => ["Hawthorne", "Melville"]
 
+### Filters
+
+Since version 1.3.8 BibTeX-Ruby comes with a plugin framework for input
+filters. You can use the methods `convert` and `convert!` methods if `Value`,
+`Entry` and `Bibliography` instances to easily convert string values according
+to a given filter. Starting with version 1.3.9 BibTeX-Ruby includes a
+LaTeX filter that depends on the
+[latex-decode gem](http://rubygems.org/gems/latex-decode). Example:
+
+    >> faust = '@book{faust, title = {Faust: Der Trag\"odie Erster Teil}}'
+    >> BibTeX.parse(faust).convert(:latex)[:faust].title
+    => "Faust: Der Tragödie Erster Teil"
+
+Conditional conversions are also supported:
+
+    >> faust1 = '@book{faust1, title = {Faust: Der Trag\"odie Erster Teil}}'
+    >> faust2 = '@book{faust2, title = {Faust: Der Trag\"odie Zweiter Teil}}'
+    >> p BibTeX.parse(faust1 + faust2).convert(:latex) { |e| e.key == :faust2 }.to_s
+		@book{faust1,
+		  title = {Faust: Der Trag\"odie Erster Teil}
+		}
+		@book{faust2,
+		  title = {Faust: Der Tragödie Zweiter Teil}
+		}
+
+If you need to express a condition on the basis of individual fields, use the
+conversion methods of BibTeX::Entry with a block instead (the block will be
+passed the key and value of each field prior to conversion).
 
 ### Conversions
 
