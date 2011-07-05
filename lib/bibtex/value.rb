@@ -237,12 +237,12 @@ module BibTeX
     end
     
     def method_missing (name, *args)
-      return convert($1) if name =~ /^(?:convert|from)_([a-z]+)$/
+      return $2 ? convert!($1) : convert($1) if name =~ /^(?:convert|from)_([a-z]+)(!)?$/
 		  super
 		end
 		
 		def respond_to? (method)
-		  method =~ /^(?:convert|from)_([a-z]+)$/ || super
+		  method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
 		end
 		
     

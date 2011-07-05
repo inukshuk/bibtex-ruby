@@ -95,8 +95,13 @@ module BibTeX
           assert_equal ['FOO', '"FOO" # BAR'], @values.map { |v| v.convert_upcase.to_s }
         end
         
-        should "not alter the value" do
+        should "not alter the value when using a filter name" do
           @values.each { |v| v.convert(:upcase) }
+          assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
+        end
+
+        should "not alter the value when using a ghost method" do
+          @values.each { |v| v.convert_upcase }
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
         end
       end
@@ -106,8 +111,13 @@ module BibTeX
           assert_equal ['FOO', '"FOO" # BAR'], @values.map { |v| v.convert!(:upcase).to_s }
         end
         
-        should "alter the value" do
+        should "alter the value when given the name of a filter" do
           @values.each { |v| v.convert!(:upcase) }
+          assert_equal ['FOO', '"FOO" # BAR'], @values.map(&:to_s)
+        end
+
+        should "alter the value when using a ghost method" do
+          @values.each { |v| v.convert_upcase! }
           assert_equal ['FOO', '"FOO" # BAR'], @values.map(&:to_s)
         end
         
