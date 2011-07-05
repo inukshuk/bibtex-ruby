@@ -159,14 +159,15 @@ module BibTeX
       @fields.has_key?(field)
     end
     
-		def method_missing(name, *args)
+		def method_missing(name, *args, &block)
 		  return self[name] if @fields.has_key?(name)
 		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.to_s.match(/=$/)		  
+      return $2 ? convert!($1, &block) : convert($1, &block) if name =~ /^(?:convert|from)_([a-z]+)(!)?$/
 		  super
 		end
 		
 		def respond_to?(method)
-		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || super
+		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
 		end
 		
 		# Returns a copy of the Entry with all the field names renamed.

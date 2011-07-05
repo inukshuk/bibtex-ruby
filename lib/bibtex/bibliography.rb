@@ -135,7 +135,7 @@ module BibTeX
     def convert (filter)
       @entries.each_value { |e| e.convert!(filter) if !block_given? || yield(e) }
     end
-    
+    		
     #
     # Deletes an object, or a list of objects from the bibliography.
     # If a list of objects is to be deleted, you can either supply the list
