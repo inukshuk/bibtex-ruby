@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.license     = 'GPL-3'
   s.date        = Time.now
 
-  s.add_runtime_dependency('latex-decode', ['>= 0.0.1'])
+  s.add_runtime_dependency('latex-decode', ['>= 0.0.3'])
 
   s.add_development_dependency('rake', ['>= 0.8'])
   s.add_development_dependency('racc', ['>= 1.4'])
@@ -29,10 +29,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency('gnuplot', ['>= 2.3'])
   s.add_development_dependency('rdoc', ['>= 3.6'])
 
-  s.files             = File.open('Manifest').readlines.map(&:chomp)
-  s.test_files        = Dir.glob('test/**/test*.rb')
-  s.executables       = []
-  s.require_path      = 'lib'
+  s.files        = File.open('Manifest').readlines.map(&:chomp)
+  s.test_files   = Dir.glob('test/**/test*.rb')
+  s.executables  = []
+  s.require_path = 'lib'
 
   s.rdoc_options      = %w{--line-numbers --inline-source --title "BibTeX-Ruby\ Documentation" --main README.md --webcvs=http://github.com/inukshuk/bibtex-ruby/tree/master/}
   s.extra_rdoc_files  = %w{README.md}
