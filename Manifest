@@ -7,7 +7,6 @@ README.md
 Rakefile
 auto.watchr
 bibtex-ruby.gemspec
-doc
 examples
 examples/bib2html.rb
 examples/bib2yaml.rb
@@ -17,6 +16,7 @@ features/bibtex.feature
 features/entries.feature
 features/issues
 features/issues/braced_strings.feature
+features/issues/latex_filter.feature
 features/issues/number_keys.feature
 features/issues/parse_months.feature
 features/issues/slash_keys.feature
@@ -69,7 +69,6 @@ test/bibtex/test_string.rb
 test/bibtex/test_utilities.rb
 test/bibtex/test_value.rb
 test/fixtures
-test/fixtures/benchmark.bib
 test/fixtures/bibdesk.bib
 test/fixtures/comment.bib
 test/fixtures/decoret.bib
@@ -80,7 +79,6 @@ test/fixtures/no_bibtex.bib
 test/fixtures/preamble.bib
 test/fixtures/roundtrip.bib
 test/helper.rb
-test/profile.dot
 test/profile.rb
 test/test_bibtex.rb
 test/test_export.rb
