@@ -149,8 +149,8 @@ module BibTeX
 				push([:COMMA,','])
 			when @scanner.scan(/\d+/o)
 				push([:NUMBER,@scanner.matched])
-			when @scanner.scan(/[a-z\d\/:_!$\.%&*-]+/io)
-				push([:NAME,@scanner.matched])
+			when @scanner.scan(/[a-z\d \/:_!$\.%&*-]+/io)
+				push([:NAME,@scanner.matched.rstrip])
 			when @scanner.scan(/"/o)
 				@mode = :literal
 			when @scanner.scan(/#/o)
