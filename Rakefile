@@ -1,8 +1,4 @@
 # -*- ruby -*-
-$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-
-require 'rubygems'
-require 'bundler/setup'
 
 require 'rake/clean'
 require 'rake/testtask'
@@ -51,12 +47,12 @@ task :test => ['racc','test_task']
 file 'lib/bibtex/parser.output' => ['lib/bibtex/parser.rb']
 file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
   # sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
-  sh 'racc -v -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
+  sh 'bundle exec racc -v -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
 end
 
 file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
   # sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
-  sh 'racc -v -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
+  sh 'bundle exec racc -v -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
 
 desc 'Runs the benchmarks (and plots the results)'
