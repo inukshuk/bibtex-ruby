@@ -15,6 +15,12 @@ RDoc::Task.new(:rdoc => ['clean','racc']) do |rd|
   rd.options << '--webcvs=http://github.com/inukshuk/bibtex-ruby/tree/master/'
 end
 
+Rake::TestTask.new(:test_task) do |t|
+  t.libs << 'lib' << 'test'
+  t.test_files = FileList['test/**/test_*.rb']
+  t.verbose = true
+end
+
 begin
   require 'cucumber/rake/task'
   Cucumber::Rake::Task.new(:features) do |t|
