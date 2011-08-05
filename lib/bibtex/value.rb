@@ -146,7 +146,7 @@ module BibTeX
     def to_s(options = {})
       return convert(options.delete(:filter)).to_s(options) if options.has_key?(:filter)
       return value.to_s unless options.has_key?(:quotes) && atomic?
-      *q = options[:quotes]
+      q = [options[:quotes]].flatten
       [q[0], value, q[-1]].compact.join
     end
 
@@ -237,7 +237,10 @@ module BibTeX
     end
     
     def method_missing (name, *args)
-      return $2 ? convert!($1) : convert($1) if name =~ /^(?:convert|from)_([a-z]+)(!)?$/
+      if name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
+        return $2 ? convert!($1) : convert($1)
+      end
+      
 		  super
 		end
 		

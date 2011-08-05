@@ -13,7 +13,7 @@ module BibTeX
       bib = BibTeX.parse %q[ @book{ id, author = {Poe, Edgar Allen}, title = "Ligeia" } ]
       assert_equal 1, bib.length
       assert_equal 'Ligeia', bib[:id].title
-      assert_equal 'Poe, Edgar Allen', bib[:id].author
+      assert_equal 'Poe, Edgar Allen', bib[:id].author.to_s
     end
       
     def test_validation

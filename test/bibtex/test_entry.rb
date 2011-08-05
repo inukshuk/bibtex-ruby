@@ -151,8 +151,8 @@ module BibTeX
       assert_equal(:book, bib.data[0].type)
       assert_equal(:article, bib.data[1].type)
       assert_equal(:article, bib.data[2].type)
-      assert_equal('Poe, Edgar A.', bib.data[0][:author])
-      assert_equal('Hawthorne, Nathaniel', bib.data[1][:author])
+      assert_equal('Poe, Edgar A.', bib.data[0][:author].to_s)
+      assert_equal('Hawthorne, Nathaniel', bib.data[1][:author].to_s)
       assert_equal('2003', bib.data[0][:year])
       assert_equal('2001', bib.data[1][:year])
       assert_equal('American Library', bib.data[0][:publisher])
@@ -164,29 +164,28 @@ module BibTeX
     def test_ghost_methods
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
 
-      assert_equal 'Poe, Edgar A.', bib[0].author
+      assert_equal 'Poe, Edgar A.', bib[0].author.to_s
     
       expected = 'Poe, Edgar Allen'
       bib.data[0].author = expected
     
-      assert_equal expected, bib[0].author
+      assert_equal expected, bib[0].author.to_s
     end
   
-    def test_creation_simple
-      expected = "@book{raven,\n  author = {Poe, Edgar A.},\n  title = {The Raven}\n}\n"
-    
+    def test_creation_simple    
       entry = BibTeX::Entry.new
       entry.type = :book
       entry.key = :raven
       entry.author = 'Poe, Edgar A.'
       entry.title = 'The Raven'
     
-      assert_equal expected, entry.to_s
+      assert_equal :book, entry.type
+      assert_equal :raven, entry.key
+      assert_equal 'Poe, Edgar A.', entry.author
+      assert_equal 'The Raven', entry.title
     end
 
     def test_creation_from_hash
-      expected = "@book{raven,\n  author = {Poe, Edgar A.},\n  title = {The Raven}\n}\n"
-    
       entry = BibTeX::Entry.new({
         :type => 'book',
         :key => :raven,
@@ -194,12 +193,13 @@ module BibTeX
         :title => 'The Raven'
       })
     
-      assert_equal expected, entry.to_s
+      assert_equal :book, entry.type
+      assert_equal :raven, entry.key
+      assert_equal 'Poe, Edgar A.', entry.author
+      assert_equal 'The Raven', entry.title
     end
 
     def test_creation_from_block
-      expected = "@book{raven,\n  author = {Poe, Edgar A.},\n  title = {The Raven}\n}\n"
-    
       entry = BibTeX::Entry.new do |e|
         e.type = :book
         e.key = :raven
@@ -207,7 +207,10 @@ module BibTeX
         e.title = 'The Raven'
       end
     
-      assert_equal expected, entry.to_s
+      assert_equal :book, entry.type
+      assert_equal :raven, entry.key
+      assert_equal 'Poe, Edgar A.', entry.author
+      assert_equal 'The Raven', entry.title
     end
   
     def test_sorting

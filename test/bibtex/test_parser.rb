@@ -33,8 +33,8 @@ module BibTeX
       end
       
       should 'parse all values correctly' do
-        assert_equal 'Poe, Edgar A.', @bib[:'key:0'].author
-        assert_equal 'Hawthorne, Nathaniel', @bib[:'key:1'].author
+        assert_equal 'Poe, Edgar A.', @bib[:'key:0'].author.to_s
+        assert_equal 'Hawthorne, Nathaniel', @bib[:'key:1'].author.to_s
         
         assert_equal '2003', @bib[:'key:0'].year
         assert_equal '2001', @bib[:'key:1'].year

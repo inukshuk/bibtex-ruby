@@ -327,7 +327,7 @@ module BibTeX
     private
     
     def query_handler(selector)
-      case selector
+      case selector.to_s
       when /first|distinct|detect/i
         :detect
       when /none|reject|not/i
