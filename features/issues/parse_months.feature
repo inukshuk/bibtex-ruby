@@ -2,7 +2,7 @@ Feature: Keys containing '/' symbols
 	As a hacker who works with bibliographies
 	I want to export BibTeX entries to the CiteProc format
 	
-	Scenario: An entry taken from the DBLP
+	Scenario: Numeric months
 		When I parse the following file:
 		"""
 		@article{DBLP:journals/dq/RossinK99,
@@ -12,12 +12,32 @@ Feature: Keys containing '/' symbols
 		               An Experimental Comparison},
 		  journal   = {Data Quality Journal},
 		  volume    = {5},
-			month     = sep,
+			month     = {9},
 		  year      = {1999},
 		  ee        = {http://www.dataquality.com/999KR.htm},
 		  bibsource = {DBLP, http://dblp.uni-trier.de}
 		}
 		"""
 		Then my bibliography should contain these articles:
-			| issued                      |
-			| {"date-parts"=>[[1999, 9]]} |
+			| year | month |
+			| 1999 | sep   |
+
+	Scenario: Full month names
+		When I parse the following file:
+		"""
+		@article{DBLP:journals/dq/RossinK99,
+		  author    = {Donald F. Rossin and
+		               Barbara D. Klein},
+		  title     = {Data Errors in Neural Network and Linear Regression Models:
+		               An Experimental Comparison},
+		  journal   = {Data Quality Journal},
+		  volume    = {5},
+			month     = {September},
+		  year      = {1999},
+		  ee        = {http://www.dataquality.com/999KR.htm},
+		  bibsource = {DBLP, http://dblp.uni-trier.de}
+		}
+		"""
+		Then my bibliography should contain these articles:
+			| year | month |
+			| 1999 | sep   |
