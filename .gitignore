@@ -3,6 +3,7 @@
 **/*~
 *.rbc
 doc/**/*
+.bundle
 lib/bibtex/parser.rb
 lib/bibtex/parser.output
 lib/bibtex/name_parser.rb
