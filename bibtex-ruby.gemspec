@@ -17,16 +17,14 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency('latex-decode', ['>=0.0.3'])
 
-  s.add_development_dependency('rake', ['~>0.8'])
+  s.add_development_dependency('rake', ['~>0.9'])
   s.add_development_dependency('racc', ['~>1.4'])
   s.add_development_dependency('mini_shoulda', ['~>0.3'])
   s.add_development_dependency('mynyml-redgreen', ['~>0.7'])
   s.add_development_dependency('autowatchr', ['~>0.1'])
   s.add_development_dependency('cucumber', ['~>0.10'])
   s.add_development_dependency('json', ['~>1.5'])
-  s.add_development_dependency('ruby-prof', ['~>0.10'])
-  s.add_development_dependency('gnuplot', ['~>2.3'])
-  s.add_development_dependency('rdoc', ['~>3.6'])
+  s.add_development_dependency('rdoc', ['~>3.9'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)
   s.test_files   = Dir.glob('test/**/test*.rb')
