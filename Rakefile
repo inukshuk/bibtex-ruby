@@ -7,18 +7,12 @@ require 'rdoc/task'
 
 require 'bibtex/version'
 
-RDoc::Task.new(:rdoc_task) do |rd|
+RDoc::Task.new(:rdoc => ['clean','racc']) do |rd|
   rd.main = 'README.md'
   rd.title = "BibTeX-Ruby Documentation"
   rd.rdoc_files.include('README.md',"lib/**/*.rb")
   rd.rdoc_dir = "doc/html"
   rd.options << '--webcvs=http://github.com/inukshuk/bibtex-ruby/tree/master/'
-end
-
-Rake::TestTask.new(:test_task) do |t|
-  t.libs << 'lib' << 'test'
-  t.test_files = FileList['test/**/test_*.rb']
-  t.verbose = true
 end
 
 begin
@@ -38,9 +32,6 @@ task :default => ['racc']
 
 desc 'Generates the BibTeX parser'
 task :racc => ['lib/bibtex/parser.rb','lib/bibtex/name_parser.rb']
-
-desc 'Generates RDoc documentation for BibTeX-Ruby'
-task :rdoc => ['clean','racc','rdoc_task']
 
 task :test => ['racc','test_task']
 
