@@ -160,10 +160,16 @@ module BibTeX
     end
     
 		def method_missing(name, *args, &block)
-		  return self[name] if @fields.has_key?(name)
-		  return self.send(:add, name.to_s.chop.to_sym, args[0]) if name.to_s.match(/=$/)		  
-      return $2 ? convert!($1, &block) : convert($1, &block) if name =~ /^(?:convert|from)_([a-z]+)(!)?$/
-		  super
+		  case
+		  when @fields.has_key?(name)
+		    @fields[name]
+		  when name.to_s =~ /^(.+)=$/
+		    send(:add, $1.to_sym, args[0]) 		  
+		  when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
+        $2 ? convert!($1, &block) : convert($1, &block)
+      else
+        super
+      end
 		end
 		
 		def respond_to?(method)
