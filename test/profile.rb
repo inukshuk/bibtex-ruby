@@ -1,8 +1,5 @@
 require File.expand_path('../../lib/bibtex.rb', __FILE__)
 
-require 'rubygems'
-require 'bundler/setup'
-
 require 'ruby-prof'
 
 data = <<-END
@@ -19,8 +16,8 @@ data = <<-END
 }
 END
 
-# data = data * 50
-data = File.open(File.expand_path('../fixtures/benchmark.bib', __FILE__)).read
+data = data * 50
+# data = File.open(File.expand_path('../fixtures/benchmark.bib', __FILE__)).read
 
 result = RubyProf.profile do
   BibTeX.parse(data)

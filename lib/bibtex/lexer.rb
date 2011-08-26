@@ -17,7 +17,6 @@
 #++
 
 require 'strscan'
-require 'forwardable'
 
 module BibTeX
 	
@@ -26,13 +25,11 @@ module BibTeX
 	#
 	class Lexer
 	  extend Forwardable
-    include Enumerable
 
 		attr_reader :options, :stack, :mode, :scanner
 		attr_writer :mode
 		
     def_delegator :@scanner, :string, :data
-    def_delegators :@stack, :each
 
     DEFAULTS = { :include => [:errors], :strict => true }.freeze
     

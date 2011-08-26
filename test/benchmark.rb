@@ -1,8 +1,5 @@
 require File.expand_path('../../lib/bibtex.rb', __FILE__)
 
-require 'rubygems'
-require 'bundler/setup'
-
 require 'benchmark'
 include Benchmark
 
@@ -23,7 +20,8 @@ input = <<-END
 END
 
 n, k = 1001, 20
-lexer = BibTeX::Lexer.new
+# lexer = BibTeX::Lexer.new
+# parser = BibTeX::Parser.new
 
 f = []
 g = []
@@ -34,16 +32,18 @@ Benchmark.benchmark((" "*15) + CAPTION, 7, FMTSTR, '%14s:' % 'sum(f)', '%14s:' %
   
     f << b.report('%14s:' % "f(#{i})") do
       i.times do
-        lexer.data = input
-        lexer.analyse
+        # lexer.data = input
+        # lexer.analyse
+				BibTeX::Parser.new.parse(input)
       end
     end
 
     data = input * i
   
     g << b.report('%14s:' % "g(#{i})") do
-      lexer.data = data
-      lexer.analyse
+      # lexer.data = data
+      # lexer.analyse
+			BibTeX::Parser.new.parse(data)
     end
     
   end
