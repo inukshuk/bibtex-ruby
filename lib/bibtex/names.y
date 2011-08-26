@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 #
-# A BibTeX grammar for the parser generator +racc+
+# A BibTeX Names grammar for the parser generator +racc+
 #
 
 # -*- racc -*-
@@ -29,45 +29,61 @@ expect 0
 
 rule
 
-  result :                           { result = [] }
-         | names                     { result = val[0] }
+  result : { result = [] } | names
 
-  names : name                       { result = [val[0]] }
-        | names AND name             { result << val[2] }
+  names : name           { result = [val[0]] }
+        | names AND name { result << val[2] }
   
-	name : word                          { result = Name.new(:last => val[0]) }
-       | u_words word                  { result = Name.new(:first => val[0], :last => val[1]) }
-       | u_words von last              { result = Name.new(:first => val[0], :von => val[1], :last => val[2]) }
-       | von last                      { result = Name.new(:von => val[0], :last => val[1]) }
-       | last COMMA first              { result = Name.new(:last => val[0], :jr => val[2][0], :first => val[2][1]) }
-       | von last COMMA first          { result = Name.new(:von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1]) }
-       | u_words von last COMMA first  { result = Name.new(:von => val[0,2].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1]) }
+  name : word
+       {
+         result = Name.new(:last => val[0])
+       }
+       | u_words word
+       {
+         result = Name.new(:first => val[0], :last => val[1])
+       }
+       | u_words von last
+       {
+         result = Name.new(:first => val[0], :von => val[1], :last => val[2])
+       }
+       | von last
+       {
+         result = Name.new(:von => val[0], :last => val[1])
+       }
+       | last COMMA first
+       {
+         result = Name.new(:last => val[0], :jr => val[2][0], :first => val[2][1])
+       }
+       | von last COMMA first
+       {
+         result = Name.new(:von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1])
+       }
+       | u_words von last COMMA first
+       {
+         result = Name.new(:von => val[0,2].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1])
+       }
+       ;
 
-  von : LWORD                        { result = val[0] }
-      | von LWORD                    { result = val.join(' ') }
-      | von u_words LWORD            { result = val.join(' ') }
+  von : LWORD
+      | von LWORD         { result = val.join(' ') }
+      | von u_words LWORD { result = val.join(' ') }
 
-	last : LWORD                       { result = val[0] }
-	     | u_words                     { result = val[0] }
+  last : LWORD | u_words
   
-  first : opt_words                  { result = [nil,val[0]] }
-        | opt_words COMMA opt_words  { result = [val[0],val[2]] }
+  first : opt_words                 { result = [nil,val[0]] }
+        | opt_words COMMA opt_words { result = [val[0],val[2]] }
   
-  u_words : u_word                   { result = val[0] }
-          | u_words u_word           { result = val[0,2].join(' ') }
+  u_words : u_word
+          | u_words u_word { result = val.join(' ') }
 
-  u_word : UWORD                     { result = val[0] }
-         | PWORD                     { result = val[0] }
+  u_word : UWORD | PWORD
 
-  words : word                       { result = val[0] }
-        | words word                 { result = val[0,2].join(' ') }
+  words : word
+        | words word { result = val.join(' ') }
 
-  opt_words :                        { result = nil }
-            | words                  { result = val[0] }
+  opt_words : /* empty */ | words
   
-  word : LWORD                       { result = val[0] }
-       | UWORD                       { result = val[0] }
-       | PWORD                       { result = val[0] }
+  word : LWORD | UWORD | PWORD
 
 end
 
@@ -167,18 +183,18 @@ require 'strscan'
   def scan_literal
     @brace_level = 1
 
- 		while @brace_level > 0
-			@word[1] << @src.scan_until(/[\{\}]/o).to_s
+    while @brace_level > 0
+      @word[1] << @src.scan_until(/[\{\}]/o).to_s
 
-    	case @src.matched
-			when '{'
-				@brace_level += 1
-			when '}'
-				@brace_level -= 1
-			else
-				@brace_level = 0
-				error_unbalanced
-			end
+      case @src.matched
+      when '{'
+        @brace_level += 1
+      when '}'
+        @brace_level -= 1
+      else
+        @brace_level = 0
+        error_unbalanced
+      end
     end
   end
 
