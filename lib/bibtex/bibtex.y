@@ -33,7 +33,7 @@ rule
   bibliography : /* empty */                       { result = BibTeX::Bibliography.new(@options) }
                | objects                           { result = val[0] }
 
-  objects : object                                 { result = BibTeX::Bibliography.new << val[0] }
+  objects : object                                 { result = BibTeX::Bibliography.new(@options) << val[0] }
           | objects object                         { result << val[1] }
 
   object : AT at_object                            { result = val[1] }
