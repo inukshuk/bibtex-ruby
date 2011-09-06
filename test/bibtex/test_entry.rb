@@ -227,5 +227,12 @@ module BibTeX
 
     end
   
+		def test_default_keys
+			assert_equal :poe1996raven, Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :year => 1996).key
+			assert_equal :poe1996, Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :year => 1996).key
+			assert_equal :'1996raven', Entry.new(:type => 'book', :title => 'The Raven', :year => 1996).key
+			assert_match /^\d+$/, Entry.new.key
+		end
+		
   end
 end

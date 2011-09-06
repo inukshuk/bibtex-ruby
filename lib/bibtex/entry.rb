@@ -102,7 +102,7 @@ module BibTeX
     }.map(&:intern)]).freeze
 
 	  
-		attr_reader :type, :fields
+		attr_reader :fields, :type		
     def_delegators :@fields, :empty?, :each, :each_pair
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
@@ -142,9 +142,10 @@ module BibTeX
 		  @key ||= default_key
 		end
 
-		alias id key		
+		alias id key
 		alias id= key=
-		
+
+		# TODO we should be more lenient: allow strings as key or don't check at all
 		# Sets the type of the entry.
 		def type=(type)
 			raise(ArgumentError, "types must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
@@ -152,26 +153,26 @@ module BibTeX
 		end
 		
 		def has_type?(type)
-      type.to_s.match(/^entry$/i) || @type == type.to_sym || super
-    end
+			type.to_s.match(/^entry$/i) || @type == type.to_sym || super
+		end
     
     def has_field?(field)
       @fields.has_key?(field)
     end
     
 		def method_missing(name, *args, &block)
-		  case
-		  when @fields.has_key?(name)
-		    @fields[name]
-		  when name.to_s =~ /^(.+)=$/
-		    send(:add, $1.to_sym, args[0]) 		  
-		  when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
-        $2 ? convert!($1, &block) : convert($1, &block)
-      else
-        super
-      end
+			case
+			when @fields.has_key?(name)
+				@fields[name]
+			when name.to_s =~ /^(.+)=$/
+				send(:add, $1.to_sym, args[0]) 		  
+			when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
+				$2 ? convert!($1, &block) : convert($1, &block)
+			else
+				super
+			end
 		end
-		
+
 		def respond_to?(method)
 		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
 		end
@@ -184,15 +185,15 @@ module BibTeX
 		# Renames the given field names unless a field with the new name already
 		# exists.
 		def rename!(*arguments)
-		  Hash[*arguments.flatten].each_pair do |from,to|
-		    if @fields.has_key?(from) && !@fields.has_key?(to)
-		      @fields[to] = @fields[from]
-		      @fields.delete(from)
-	      end
-		  end
-		  self
+			Hash[*arguments.flatten].each_pair do |from,to|
+				if @fields.has_key?(from) && !@fields.has_key?(to)
+					@fields[to] = @fields[from]
+					@fields.delete(from)
+				end
+			end
+			self
 		end
-		
+
 		alias :rename_fields :rename
 		alias :rename_fields! :rename!
 		
@@ -364,7 +365,25 @@ module BibTeX
 		protected
 		
 		def default_key
-		  object_id.to_s.to_sym
+			a = case fields[:author]
+			when Names
+				author[0].last
+			when Value
+				author.to_s[/\w+/]
+			else
+				nil
+			end
+			
+			case
+			when a && has_field?(:year) && has_field?(:title)
+				[a,year,title.to_s[/\w{4,}/]].join.downcase.to_sym
+			when a && has_field?(:year)
+				[a,year].join.downcase.to_sym
+			when has_field?(:year) && has_field?(:title)
+				[year,title.to_s[/\w{4,}/]].join.downcase.to_sym
+			else
+		  	object_id.to_s
+			end
 		end
 		
 	end
