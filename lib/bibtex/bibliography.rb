@@ -53,6 +53,7 @@ module BibTeX
       #
       def open(path, options = {})
         b = parse(Kernel.open(path).read, options)
+				b.path = path
         return b unless block_given?
 
         begin
@@ -331,6 +332,26 @@ module BibTeX
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
     
+		# TODO this should be faster than select_duplicates_by
+		# def detect_duplicates_by(*arguments)
+		# end
+
+		def select_duplicates_by(*arguments)
+			d, fs = Hash.new([]), arguments.flatten.map(&:to_sym)
+			q('@entry') do |e|
+				d[e.generate_hash(fs)] << e
+			end
+			
+			d.values
+		end
+		
+		alias duplicates select_duplicates_by
+		
+		def duplicates?
+			!select_duplicates_by?.empty?
+		end
+		
+		
     private
     
     def query_handler(selector)

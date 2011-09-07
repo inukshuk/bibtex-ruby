@@ -167,6 +167,13 @@ module BibTeX
       fields.has_key?(field)
     end
     
+		# Returns a sorted list of the Entry's field names. If a +filter+ is passed
+		# as argument, returns all field names that are also defined by the filter.
+		# If the +filter+ is empty, returns all field names.
+		def field_names(filter = [])
+			(filter.empty? ? fields.keys : fields.keys | filter.map(&:to_sym)).sort
+		end
+		
 		def method_missing(name, *args, &block)
 			case
 			when @fields.has_key?(name)
@@ -248,6 +255,10 @@ module BibTeX
 			end
 		end
 
+		def generate_hash(filter = [])
+			Digest::MD5.hexdigest(field_names(filter).map { |k| [k, fields[k]] }.flatten.join)
+		end
+		
 		# Called when the element was added to a bibliography.
 		def added_to_bibliography(bibliography)
 			super

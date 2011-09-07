@@ -147,7 +147,7 @@ module BibTeX
         end
         
         should 'support conditional arbitrary conversions' do
-          @bib.convert(@filter) { |e| e.key != :rails }
+          @bib.convert(@filter) { |e| e.key != 'rails' }
           assert_equal 'ruby, rails', @bib[:rails].keywords
           assert_equal 'RUBY', @bib[:flanagan2008].keywords
         end
@@ -155,9 +155,7 @@ module BibTeX
       end
       
     end
-    
-    
-    
+        
     
   end
 end
