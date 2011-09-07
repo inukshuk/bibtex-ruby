@@ -126,7 +126,7 @@ module BibTeX
       add(other.fields)
     end
     
-		# Sets the key of the entry
+		# Sets the Entry's key.
 		def key=(key)
 			raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
 
@@ -293,6 +293,12 @@ module BibTeX
       self
     end
     
+		# Returns a list of all names (authors, editors, translators)
+		def names
+			NAME_FIELDS.map { |k| has_field?(k) ? @fields[k].tokens : nil }.flatten.compact
+		end
+			
+			
 		# Returns a string of all the entry's fields.
 		def content(options = {})
 			@fields.map { |k,v| "#{k} = #{ @fields[k].to_s(options) }" }.join(",\n")
@@ -361,29 +367,18 @@ module BibTeX
 		def <=>(other)
 		  type != other.type ? type <=> other.type : key != other.key ? key <=> other.key : to_s <=> other.to_s
 		end
+
+		private
 		
-		protected
-		
+		# Returns a default key for this entry.
 		def default_key
-			a = case fields[:author]
-			when Names
-				author[0].last
-			when Value
-				author.to_s[/\w+/]
-			else
-				nil
-			end
-			
-			case
-			when a && has_field?(:year) && has_field?(:title)
-				[a,year,title.to_s[/\w{4,}/]].join.downcase.to_sym
-			when a && has_field?(:year)
-				[a,year].join.downcase.to_sym
-			when has_field?(:year) && has_field?(:title)
-				[year,title.to_s[/\w{4,}/]].join.downcase.to_sym
-			else
-		  	object_id.to_s
-			end
+			k = names[0]
+			k = k.respond_to?(:family) ? k.family : k.to_s
+			k = k[/[[:alpha:]]+/] || 'unknown'
+			k << (has_field?(:year) ? year : '-')
+			k << 'a'
+			k.downcase!
+			k
 		end
 		
 	end

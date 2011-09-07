@@ -57,13 +57,11 @@ lib/bibtex/filters.rb
 lib/bibtex/filters.rbc
 lib/bibtex/lexer.rb
 lib/bibtex/lexer.rbc
-lib/bibtex/name_parser.output
 lib/bibtex/name_parser.rb
 lib/bibtex/name_parser.rbc
 lib/bibtex/names.rb
 lib/bibtex/names.rbc
 lib/bibtex/names.y
-lib/bibtex/parser.output
 lib/bibtex/parser.rb
 lib/bibtex/parser.rbc
 lib/bibtex/replaceable.rb
@@ -77,6 +75,7 @@ lib/bibtex/version.rb
 lib/bibtex/version.rbc
 lib/bibtex.rb
 lib/bibtex.rbc
+profile.png
 test
 test/benchmark.rb
 test/bibtex
@@ -114,6 +113,7 @@ test/fixtures/preamble.bib
 test/fixtures/roundtrip.bib
 test/helper.rb
 test/helper.rbc
+test/profile.dot
 test/profile.rb
 test/test_bibtex.rb
 test/test_bibtex.rbc

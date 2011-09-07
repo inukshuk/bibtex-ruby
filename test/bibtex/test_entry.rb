@@ -3,12 +3,35 @@ require 'helper.rb'
 module BibTeX
   class EntryTest < MiniTest::Spec
 
-    context 'a new entry' do
-      should 'not be nil' do
-        assert Entry.new
+    describe 'a new entry' do
+      it "won't be nil" do
+        Entry.new.wont_be_nil
       end
     end
 
+		describe '#names' do
+			it 'returns an empty list by default' do
+				Entry.new.names.must_be :==, []
+			end
+			
+			it 'returns the author (if set)' do
+				Entry.new(:author => 'A').names.must_be :==, %w{ A }
+			end
+
+			it 'returns all authors (if set)' do
+				Entry.new(:author => 'A B and C D').parse_names.names.length.must_be :==, 2
+			end
+			
+			it 'returns the editor (if set)' do
+				Entry.new(:editor => 'A').names.must_be :==, %w{ A }
+			end
+
+			it 'returns the translator (if set)' do
+				Entry.new(:translator => 'A').names.must_be :==, %w{ A }
+			end
+			
+		end
+		
     context 'month conversion' do
       setup do
         @entry = Entry.new
@@ -227,11 +250,32 @@ module BibTeX
 
     end
   
-		def test_default_keys
-			assert_equal :poe1996raven, Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :year => 1996).key
-			assert_equal :poe1996, Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :year => 1996).key
-			assert_equal :'1996raven', Entry.new(:type => 'book', :title => 'The Raven', :year => 1996).key
-			assert_match /^\d+$/, Entry.new.key
+		describe 'default keys' do
+			setup {
+				@e1 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
+				@e2 = Entry.new(:type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
+				@e3 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
+			}
+	
+			it 'should return "unknown-a" for an empty Entry' do
+				Entry.new.key.must_be :==, 'unknown-a'
+			end
+	
+			it 'should return a key made up of author-year-a if all fields are present' do
+				@e1.key.must_be :==, 'poe1996a'
+			end
+
+			it 'should return a key made up of editor-year-a if there is no author' do
+				@e2.key.must_be :==, 'john1996a'
+			end
+
+			it 'should return use the last name if the author/editor names have been parsed' do
+				@e2.parse_names.key.must_be :==, 'hopkins1996a'
+			end
+
+			it 'skips the year if not present' do
+				@e3.key.must_be :==, 'poe-a'
+			end
 		end
 		
   end

@@ -54,6 +54,11 @@ module BibTeX
       self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.intern
     end
   
+		# Returns a list of names for that Element. All Elements except Entries rill return an empty list.
+		def names
+			[]
+		end
+		
     def has_type?(type)
       self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
     end
