@@ -17,7 +17,7 @@ module BibTeX
       yaml = YAML.load(bib.to_yaml)
       refute_nil(yaml)
       assert_equal(3, yaml.length)
-      assert_equal([:dragon, :pickaxe, :rails], yaml.map { |y| y[:key] }.sort)
+      assert_equal(%w[ dragon pickaxe rails], yaml.map { |y| y[:key] }.sort)
       assert_equal('{The Facets of Ruby}', yaml[0][:series])
     end
   

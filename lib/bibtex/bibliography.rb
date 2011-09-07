@@ -31,10 +31,12 @@ module BibTeX
     include Enumerable
     include Comparable
     
-    DEFAULTS = { :parse_names => true, :parse_months => true }.freeze
+    @defaults = { :parse_names => true, :parse_months => true }.freeze
     
     class << self    
 
+			attr_reader :defaults
+			
       # Opens and parses the `.bib' file at the given +path+. Returns
       # a new Bibliography instance corresponding to the file, or, if a block
       # is given, yields the instance to the block, ensuring that the file
@@ -77,7 +79,6 @@ module BibTeX
     end
   
     attr_accessor :path
-
     attr_reader :data, :strings, :entries, :errors, :options
 
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
@@ -87,8 +88,9 @@ module BibTeX
     
     # Creates a new bibliography.
     def initialize(options = {})
-      @options = DEFAULTS.merge(options)
-      @data, @strings, @entries = [], {}, {}
+      @options = Bibliography.defaults.merge(options)
+      @data, @strings = [], {}
+			@entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
 
       yield self if block_given?
     end
@@ -207,6 +209,11 @@ module BibTeX
       !errors? && @entries.values.all?(&:valid?)
     end
     
+		# Returns a list of the names of all authors, editors and translators in the Bibliography.
+		def names
+			map(&:names).flatten
+		end
+		
     # Replaces all string symbols which are defined in the bibliography.
     #
     # By default symbols in @string, @preamble and entries are replaced; this
@@ -306,7 +313,8 @@ module BibTeX
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)") unless arguments.length.between?(0,2)
 
       q, selector = arguments.reverse
-      filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } : Proc.new { |e| e.match?(q) }
+      filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } :
+				Proc.new { |e| e.match?(q) }
 
       send(query_handler(selector), &filter)
     end

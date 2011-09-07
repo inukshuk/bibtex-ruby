@@ -77,7 +77,7 @@ module BibTeX
       
       case query
       when Symbol
-        query == id
+        query.to_s == id.to_s
       when Element
         query == self
       when Regexp
@@ -89,7 +89,7 @@ module BibTeX
       when /^\/(.+)\/$/
         to_s.match(Regexp.new($1))
       else
-        id == query.to_sym
+        id.to_s == query
       end      
     end
     
@@ -131,7 +131,7 @@ module BibTeX
 
 		# Called when the element was added to a bibliography.
 		def added_to_bibliography(bibliography)
-			raise Error, "failed to add element to Bibliography: already registered with another Bibliography" unless @bibliography.nil?
+			# raise BibTeXError, "failed to add element to Bibliography: already registered with another Bibliography" unless @bibliography.nil?
 			@bibliography = bibliography
 			self
 		end

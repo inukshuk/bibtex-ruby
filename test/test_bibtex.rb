@@ -27,7 +27,7 @@ module BibTeX
       bib = BibTeX::Bibliography.open(Test.fixtures(:decoret), :debug => false)
       assert_equal(15, bib.length)
       assert_equal([BibTeX::Entry,BibTeX::Comment,BibTeX::String,BibTeX::Preamble], bib.data.map(&:class).uniq)
-      assert_equal(:py03, bib.data[0].key)
+      assert_equal('py03', bib.data[0].key)
       assert_equal(:article, bib[:py03].type)
       assert_equal("D\\'ecoret, Xavier", bib[:py03][:author].to_s)
       assert_equal('PyBiTex', bib[:py03][:title])
@@ -45,7 +45,7 @@ module BibTeX
     def test_bibdesk
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
       assert_equal 3, bib.length
-      assert_equal :rails, bib[0].key
+      assert_equal 'rails', bib[0].key
       assert_equal '2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified']
     end
   

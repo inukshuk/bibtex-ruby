@@ -164,7 +164,7 @@ module BibTeX
 		end
     
     def has_field?(field)
-      @fields.has_key?(field)
+      fields.has_key?(field)
     end
     
 		def method_missing(name, *args, &block)

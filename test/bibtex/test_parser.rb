@@ -18,13 +18,13 @@ module BibTeX
       end
       
       should 'parse the key values' do
-        assert_equal %w{ key:0 key:1 foo }.map(&:to_sym), @bib.map(&:key)
+        assert_equal %w{ key:0 key:1 foo }, @bib.map(&:key)
       end
 
       should 'handle strange keys' do
         input = "@Misc{George Martin06,title = {FEAST FOR CROWS}}"
         bib = Parser.new(:debug => false, :strict => false).parse(input)
-        assert_equal :"George Martin06", bib.first.key
+        assert_equal "George Martin06", bib.first.key
         assert bib[:"George Martin06"]
       end
 
