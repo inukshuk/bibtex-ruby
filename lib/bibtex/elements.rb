@@ -110,7 +110,7 @@ module BibTeX
 		
 		def to_hash(options = {})
 		  { type => content }
-	  end
+		end
 	  
 	  def to_yaml(options = {})
 	    require 'yaml'
@@ -131,6 +131,7 @@ module BibTeX
 
 		# Called when the element was added to a bibliography.
 		def added_to_bibliography(bibliography)
+			raise Error, "failed to add element to Bibliography: already registered with another Bibliography" unless @bibliography.nil?
 			@bibliography = bibliography
 			self
 		end
@@ -174,11 +175,11 @@ module BibTeX
 		def key=(key)
 		  raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
 			
-      unless @bibliography.nil?
-  			@bibliography.strings.delete(@key)
-  			@bibliography.strings[key.to_sym] = self
-  		end
-  		
+			unless @bibliography.nil?
+				@bibliography.strings.delete(@key)
+				@bibliography.strings[key.to_sym] = self
+			end
+
 			@key = key.to_sym
 		end
 

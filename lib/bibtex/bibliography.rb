@@ -77,16 +77,15 @@ module BibTeX
     end
   
     attr_accessor :path
+
     attr_reader :data, :strings, :entries, :errors, :options
 
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
     
     def_delegators :@data, :length, :size, :each, :empty?
-
+		def_delegators :@entries, :has_key?
     
-    #
     # Creates a new bibliography.
-    #
     def initialize(options = {})
       @options = DEFAULTS.merge(options)
       @data, @strings, @entries = [], {}, {}

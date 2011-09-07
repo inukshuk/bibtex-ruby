@@ -168,9 +168,9 @@ module BibTeX
       assert_equal(BibTeX::Bibliography, bib.class)
       assert_equal(3, bib.data.length)
       assert_equal([BibTeX::Entry], bib.data.map(&:class).uniq)
-      assert_equal(:'key:0', bib.data[0].key)
-      assert_equal(:'key:1', bib.data[1].key)
-      assert_equal(:'foo', bib.data[2].key)
+      assert_equal('key:0', bib.data[0].key)
+      assert_equal('key:1', bib.data[1].key)
+      assert_equal('foo', bib.data[2].key)
       assert_equal(:book, bib.data[0].type)
       assert_equal(:article, bib.data[1].type)
       assert_equal(:article, bib.data[2].type)
@@ -203,7 +203,7 @@ module BibTeX
       entry.title = 'The Raven'
     
       assert_equal :book, entry.type
-      assert_equal :raven, entry.key
+      assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
     end
@@ -217,7 +217,7 @@ module BibTeX
       })
     
       assert_equal :book, entry.type
-      assert_equal :raven, entry.key
+      assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
     end
@@ -225,13 +225,13 @@ module BibTeX
     def test_creation_from_block
       entry = BibTeX::Entry.new do |e|
         e.type = :book
-        e.key = :raven
+        e.key = 'raven'
         e.author = 'Poe, Edgar A.'
         e.title = 'The Raven'
       end
     
       assert_equal :book, entry.type
-      assert_equal :raven, entry.key
+      assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
     end
@@ -245,7 +245,7 @@ module BibTeX
     
       entries.sort!
     
-      assert_equal [:raven1, :raven1, :raven2, :raven3], entries.map(&:key)
+      assert_equal ['raven1', 'raven1', 'raven2', 'raven3'], entries.map(&:key)
       assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0,2]
 
     end
@@ -275,6 +275,30 @@ module BibTeX
 
 			it 'skips the year if not present' do
 				@e3.key.must_be :==, 'poe-a'
+			end
+		end
+		
+		context 'when the entry is added to a Bibliography' do
+			setup {
+				@e = Entry.new
+				@bib = Bibliography.new
+			}
+			
+			it 'should register itself with its key' do
+				@bib << @e
+				@bib.entries.keys.must_include @e.key
+			end
+			
+			context "when there is already an element registered with the entry's key" do
+				setup { @bib << Entry.new }
+				
+				it "should find a suitable key" do
+					k = @e.key
+					@bib << @e
+					@bib.entries.keys.must_include @e.key
+					k.wont_be :==, @e.key
+				end
+				
 			end
 		end
 		

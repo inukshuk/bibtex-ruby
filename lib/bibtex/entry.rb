@@ -126,16 +126,23 @@ module BibTeX
       add(other.fields)
     end
     
-		# Sets the Entry's key.
+		# Sets the Entry's key. If the Entry is currently registered with a
+		# Bibliography, re-registers the Entry with the new key; note that this
+		# may change the key value if another Entry is already regsitered with
+		# the same key.
+		#
+		# Returns the new key.
 		def key=(key)
-			raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
-
-      unless @bibliography.nil?
-  			@bibliography.entries.delete(@key)
-  			@bibliography.entries[key] = self
+			key = key.to_s
+			
+      if registered?
+  			bibliography.entries.delete(@key)
+  			key = register(key)
       end
 
-			@key = key.to_sym
+			@key = key
+		rescue => e
+			raise BibTeXError, "failed to set key to #{key.inspect}: #{e.message}"
 		end
 		
 		def key
@@ -186,20 +193,20 @@ module BibTeX
 		# exists.
 		def rename!(*arguments)
 			Hash[*arguments.flatten].each_pair do |from,to|
-				if @fields.has_key?(from) && !@fields.has_key?(to)
-					@fields[to] = @fields[from]
-					@fields.delete(from)
+				if fields.has_key?(from) && !fields.has_key?(to)
+					fields[to] = fields[from]
+					fields.delete(from)
 				end
 			end
 			self
 		end
 
-		alias :rename_fields :rename
-		alias :rename_fields! :rename!
+		alias rename_fields rename
+		alias rename_fields! rename!
 		
 		# Returns the value of the field with the given name.
 		def [](name)
-			@fields[name.to_sym]
+			fields[name.to_sym]
 		end
 
 		# Adds a new field (name-value pair) to the entry.
@@ -219,8 +226,9 @@ module BibTeX
 		#
 		def add(*arguments)
 		  Hash[*arguments.flatten].each_pair do |name, value|
-			  @fields[name.to_sym] = Value.new(value)
+			  fields[name.to_sym] = Value.new(value)
 			end
+			
 			self
 		end
 		
@@ -229,7 +237,7 @@ module BibTeX
 		# Removes the field with a given name from the entry.
 		# Returns the value of the deleted field; nil if the field was not set.
 		def delete(name)
-			@fields.delete(name.to_sym)
+			fields.delete(name.to_sym)
 		end
 
 		# Returns false if the entry is one of the standard entry types and does not have
@@ -243,20 +251,46 @@ module BibTeX
 		# Called when the element was added to a bibliography.
 		def added_to_bibliography(bibliography)
 			super
-			bibliography.entries[key] = self
-			parse_names if bibliography.options[:parse_names]
-			parse_months if bibliography.options[:parse_months]
-			convert(bibliography.options[:filter]) if bibliography.options[:filter]
-			self
-		end
-				
-		# Called when the element was removed from a bibliography.
-		def removed_from_bibliography(bibliography)
-			super
-			bibliography.entries[key] = nil
+
+			@key = register(key)
+			
+			[:parse_names, :parse_months].each do |parser|
+				send(parser) if bibliography.options[parser]
+			end
+			
+			if bibliography.options[:filter]
+				convert(bibliography.options[:filter]) 
+			end
+			
 			self
 		end
 
+		# Called when the element was removed from a bibliography.
+		def removed_from_bibliography(bibliography)
+			super
+			bibliography.entries.delete(key)
+			self
+		end
+
+		# Returns true if the Entry is currently registered with the associated Bibliography.
+		def registered?
+			bibliography && bibliography.entries[key].equal?(self)
+		end
+		
+		# Registers this Entry in the associated Bibliographies entries hash.
+		# This method may change the Entry's key, if another entry is already
+		# registered with the current key.
+		#
+		# Returns the key or nil if the Entry is not associated with a Bibliography.
+		def register(key)
+			return nil if bibliography.nil?
+			
+			k = key.dup
+			k.succ! while bibliography.has_key?(k)
+			bibliography.entries[k] = self
+			k
+		end
+		
 		def replace(*arguments)
 		  arguments = bibliography.q('@string') if arguments.empty?
 			@fields.values.each { |v| v.replace(*arguments) }
@@ -377,7 +411,7 @@ module BibTeX
 			k = k[/[[:alpha:]]+/] || 'unknown'
 			k << (has_field?(:year) ? year : '-')
 			k << 'a'
-			k.downcase!
+			k.downcase!			
 			k
 		end
 		
