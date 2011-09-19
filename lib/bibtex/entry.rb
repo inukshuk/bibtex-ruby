@@ -345,13 +345,27 @@ module BibTeX
 			
 		# Returns true if the entry has a valid cross-reference in the Bibliography.
 		def has_crossref?
-			!!(bibliography && has_field?(:crossref) && bibliography.has_key?(fields[:crossref].to_s))
+			!reference.nil?
 		end
 
+		alias has_cross_reference? has_crossref?
+		alias has_reference? has_crossref?
+		
 		# Returns true if the entry is cross-referenced by another entry in the Bibliography.
 		def crossref?
 			!referenced_by.empty?
 		end
+		
+		alias cross_referenced? crossref?
+		alias referenced? crossref?
+		
+		# Returns the cross-referenced Entry from the Bibliography or nil if this
+		# entry does define a cross-reference.
+		def reference
+			bibliography && bibliography[fields[:crossref]]
+		end
+		
+		alias cross_reference reference
 		
 		# Returns a list of all entries in the Bibliography containing a
 		# cross-reference to this entry or [] if there are no references to this
@@ -360,6 +374,9 @@ module BibTeX
 			(bibliography && bibliography.q("@entry[crossref=#{key}]")) || []
 		end
 
+		alias cross_referenced_by referenced_by
+		alias crossref_by referenced_by
+		
 		# Returns a string of all the entry's fields.
 		def content(options = {})
 			@fields.map { |k,v| "#{k} = #{ @fields[k].to_s(options) }" }.join(",\n")

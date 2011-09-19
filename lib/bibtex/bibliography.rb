@@ -185,12 +185,21 @@ module BibTeX
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
 
       case
-      when !([Range, Numeric] & arguments[0].class.ancestors).empty?
+      when arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
         data[*arguments] 
-      when arguments.length == 1 && arguments[0].is_a?(Symbol)
-        entries[arguments[0]]
-	 		when arguments.length == 1 && arguments[0].is_a?(::String) && !arguments[0].start_with?('@')
-        entries[arguments[0]]
+			when arguments.length == 1
+				case
+				when arguments[0].nil?
+					nil
+				when arguments[0].respond_to?(:empty?) && arguments[0].empty?
+					nil
+      	when arguments[0].is_a?(Symbol)
+        	entries[arguments[0]]
+	 			when arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@')
+        	entries[arguments[0]]
+				else
+					query(*arguments)
+				end
       else
         query(*arguments)
       end
