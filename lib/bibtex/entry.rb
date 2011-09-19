@@ -171,7 +171,7 @@ module BibTeX
 		# as argument, returns all field names that are also defined by the filter.
 		# If the +filter+ is empty, returns all field names.
 		def field_names(filter = [])
-			(filter.empty? ? fields.keys : fields.keys | filter.map(&:to_sym)).sort
+			(filter.empty? ? fields.keys : fields.keys & filter.map(&:to_sym)).sort
 		end
 		
 		def method_missing(name, *args, &block)
@@ -251,7 +251,7 @@ module BibTeX
 		# definitions of all the required fields for that type.
 		def valid?
 			REQUIRED_FIELDS[@type].all? do |f|
-				f.is_a?(Array) ? !(f & @fields.keys).empty? : !@fields[f].nil?
+				f.is_a?(Array) ? !(f & fields.keys).empty? : !fields[f].nil?
 			end
 		end
 
@@ -419,10 +419,10 @@ module BibTeX
 		def default_key
 			k = names[0]
 			k = k.respond_to?(:family) ? k.family : k.to_s
-			k = k[/[[:alpha:]]+/] || 'unknown'
+			k = k[/[A-Za-z]+/] || 'unknown'
 			k << (has_field?(:year) ? year : '-')
-			k << 'a'
-			k.downcase!			
+			k << 'a'			
+			k.downcase!
 			k
 		end
 		

@@ -342,7 +342,7 @@ module BibTeX
 				d[e.generate_hash(fs)] << e
 			end
 			
-			d.values
+			d.values.dup
 		end
 		
 		alias duplicates select_duplicates_by
