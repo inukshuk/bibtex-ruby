@@ -1,14 +1,14 @@
 BibTeX-Ruby
 ===========
 
-BibTeX-Ruby is a fairly complete library and parser for BibTeX bibliography
-files; it offers a rich interface to manage, search, or convert BibTeX objects in
-Ruby. It is designed to support all BibTeX objects (including @comment,
-string-replacements via @string, as well as string concatenation using '#')
-and optionally handles all content outside of BibTeX objects as 'meta content'
-which may or may not be included in post-processing. BibTeX-Ruby also includes
-a name parser to support comfortable access to the individual tokens of name
-values.
+BibTeX-Ruby is the Rubyist's swiss-army-knife for all things BibTeX. It
+includes a parser for all common BibTeX objects (@string, @preamble,
+@comment and regular entries) and a sophisticated name parser that
+tokenizes correctly formatted names; BibTeX-Ruby recognizes BibTeX string
+replacements, joins values containing multiple strings or variables,
+supports cross-references, and decodes common LaTeX formatting
+instructions to unicode; if you are in a hurry, it also allows for easy
+export/conversion to formats such as YAML, JSON, CSL, and XML (BibTeXML).
 
 
 Quickstart
@@ -273,21 +273,22 @@ Conditional conversions are also supported:
     >> faust1 = '@book{faust1, title = {Faust: Der Trag\"odie Erster Teil}}'
     >> faust2 = '@book{faust2, title = {Faust: Der Trag\"odie Zweiter Teil}}'
     >> p BibTeX.parse(faust1 + faust2).convert(:latex) { |e| e.key == :faust2 }.to_s
-		@book{faust1,
-		  title = {Faust: Der Trag\"odie Erster Teil}
-		}
-		@book{faust2,
-		  title = {Faust: Der Tragödie Zweiter Teil}
-		}
+    @book{faust1,
+      title = {Faust: Der Trag\"odie Erster Teil}
+    }
+    @book{faust2,
+      title = {Faust: Der Tragödie Zweiter Teil}
+    }
 
 If you need to express a condition on the basis of individual fields, use the
 conversion methods of BibTeX::Entry with a block instead (the block will be
 passed the key and value of each field prior to conversion).
 
-### Conversions
+### Exports
 
 Furthermore, BibTeX-Ruby allows you to export your bibliography for processing
 by other tools. Currently supported formats include YAML, JSON, and XML.
+
 Of course, you can also export your bibliography back to BibTeX; if you include
 `:meta_content', your export should be identical to the original '.bib' file,
 except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
@@ -298,6 +299,51 @@ In order to export your bibliography use **#to\_s**, **#to\_yaml**, **#to\_json*
 BibTeX to YAML converter:
 
     >> BibTeX.open('example.bib').to_yaml
+
+Starting with version 2.0, BibTeX-Ruby's `#to_xml` exports your bibliography
+to the [BibTeXML](http//bibtexml.sf.net/) format. By passing the option
+`:extended => true` you can make use of the BibTeXML's extended  format which
+will return individual person elements and name tokens (provided you have
+successfully parsed the names of your bibliography).
+
+The following example parse a BibTeX entry, formats it as extended BibTeXML,
+and writes it to standard out using two-space indentation:
+
+    > BibTeX.parse(<<-END).to_xml(:extended => true).write($stdout, 2)
+    " @book{pickaxe,
+    "   Address = {Raleigh, North Carolina},
+    "     Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
+    "     Publisher = {The Pragmatic Bookshelf},
+    "     Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
+    "     Year = {2009}
+    "   }
+    " END
+    <?xml version='1.0' encoding='UTF-8'?>
+    <bibtex:file xmlns:bibtex='http://bibtexml.sf.net/'>
+      <bibtex:entry id='pickaxe'>
+        <bibtex:book>
+          <bibtex:address>Raleigh, North Carolina</bibtex:address>
+          <bibtex:person>
+            <bibtex:first>Dave</bibtex:first>
+            <bibtex:last>Thomas</bibtex:last>
+          </bibtex:person>
+          <bibtex:person>
+            <bibtex:first>Chad</bibtex:first>
+            <bibtex:last>Fowler</bibtex:last>
+          </bibtex:person>
+          <bibtex:person>
+            <bibtex:first>Andy</bibtex:first>
+            <bibtex:last>Hunt</bibtex:last>
+          </bibtex:person>
+          <bibtex:author/>
+          <bibtex:publisher>The Pragmatic Bookshelf</bibtex:publisher>
+          <bibtex:title>
+            Programming Ruby 1.9: The Pragmatic Programmer&apos;s Guide
+          </bibtex:title>
+          <bibtex:year>2009</bibtex:year>
+        </bibtex:book>
+      </bibtex:entry>
+    </bibtex:file>
 
 Look at the 'examples' directory for more elaborate examples of a BibTeX to YAML
 and a BibTeX to HTML converter using **#to_citeproc** to format a bibliography
@@ -343,6 +389,7 @@ quotes; therefore you can simply add the :quotes option with an empty string:
       :publisher=>"The Pragmatic Bookshelf",
       :title=>"Programming Ruby 1.9: The Pragmatic Programmer's Guide",
       :year=>"2009"}]
+
 
 The Parser
 ----------
