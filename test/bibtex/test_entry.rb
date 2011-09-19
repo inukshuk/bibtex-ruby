@@ -19,7 +19,7 @@ module BibTeX
 				Entry.new.referenced_by.must_be_empty
 			end
 			
-			context 'given a bibliography with cross referenced entries' do
+			describe 'given a bibliography with cross referenced entries' do
 				before do
 					@bib = Bibliography.parse <<-END
 						@book{a, editor = "A", title = "A"}
@@ -58,27 +58,27 @@ module BibTeX
 				end
 				
 				describe 'resolve field values using array accessors #[]' do
-					context 'when a "title" is set in the entry itself' do
+					describe 'when a "title" is set in the entry itself' do
 						before { @bib['a1'].title = 'A1' }
 						it 'returns the title' do
 							@bib['a1'].title.must_be :==, 'A1'
 						end
 					end
 					
-					context 'when "title" is undefined for the entry but defined in the reference' do
+					describe 'when "title" is undefined for the entry but defined in the reference' do
 						it 'returns the referenced title' do
 							@bib['a1'].title.must_be :==, @bib['a'].title
 						end
 					end
 					
-					context 'when "booktitle" is undefined for the entry but defined in the reference' do
+					describe 'when "booktitle" is undefined for the entry but defined in the reference' do
 						before { @bib['a'].booktitle = "A Booktitle" }
 						it 'returns the referenced booktitle' do
 							@bib['a1'].booktitle.must_be :==, @bib['a'].booktitle
 						end
 					end
 
-					context 'when "booktitle" is undefined for the entry and the reference but the reference has a "title"' do
+					describe 'when "booktitle" is undefined for the entry and the reference but the reference has a "title"' do
 						it "returns the reference's title" do
 							@bib['a1'].booktitle.must_be :==, @bib['a'].title
 						end
@@ -143,31 +143,31 @@ module BibTeX
 			
 		end
 		
-    context 'month conversion' do
-      setup do
+    describe 'month conversion' do
+      before do
         @entry = Entry.new
       end
       
       [[:jan,'January'], [:feb,'February'], [:sep,'September']].each do |m|
-        should 'convert english months' do
+        it 'should convert english months' do
           @entry.month = m[1]
           assert_equal m[0], @entry.month.v
         end
       end
 
       [[:jan,:jan], [:feb,:feb], [:sep,:sep]].each do |m|
-        should 'convert bibtex abbreviations' do
+        it 'should convert bibtex abbreviations' do
           @entry.month = m[1]
           assert_equal m[0], @entry.month.v
         end
       end
 
       [[:jan,1], [:feb,2], [:sep,9]].each do |m|
-        should 'convert numbers' do
+        it 'should convert numbers' do
           @entry.month = m[1]
           assert_equal m[0], @entry.month.v
         end
-        should 'convert numbers when parsing' do
+        it 'should convert numbers when parsing' do
           @entry = Entry.parse("@misc{id, month = #{m[1]}}")[0]
           assert_equal m[0], @entry.month.v
         end
@@ -175,8 +175,8 @@ module BibTeX
       
     end
 
-    context 'given an entry' do
-      setup do
+    describe 'given an entry' do
+      before do
         @entry = Entry.new do |e|
           e.type = :book
           e.key = :key
@@ -190,13 +190,13 @@ module BibTeX
         end
       end
       
-      should 'support renaming! of field attributes' do
+      it 'should support renaming! of field attributes' do
         @entry.rename!(:title => :foo)
         refute @entry.has_field?(:title)
         assert_equal 'Moby Dick', @entry[:foo]
       end
 
-      should 'support renaming of field attributes' do
+      it 'should support renaming of field attributes' do
         e = @entry.rename(:title => :foo)
 
         assert @entry.has_field?(:title)
@@ -210,7 +210,7 @@ module BibTeX
       end
 
       
-      should 'support citeproc export' do
+      it 'should support citeproc export' do
         e = @entry.to_citeproc
         assert_equal 'book', e['type']
         assert_equal 'New York', e['publisher-place']
@@ -220,30 +220,30 @@ module BibTeX
         assert_equal 'Melville', e['author'][0]['family']
       end
       
-      context 'given a filter' do
-        setup do
+      describe 'given a filter' do
+        before do
           @filter = Object.new
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
         end
         
-        should 'support arbitrary conversion' do
+        it 'should support arbitrary conversion' do
           e = @entry.convert(@filter)
           assert_equal 'MOBY DICK', e.title
           assert_equal 'Moby Dick', @entry.title
         end
 
-        should 'support arbitrary in-place conversion' do
+        it 'should support arbitrary in-place conversion' do
           @entry.convert!(@filter)
           assert_equal 'MOBY DICK', @entry.title
         end
 
-        should 'support conditional arbitrary in-place conversion' do
+        it 'should support conditional arbitrary in-place conversion' do
           @entry.convert!(@filter) { |k,v| k.to_s =~ /publisher/i  }
           assert_equal 'Moby Dick', @entry.title
           assert_equal 'PENGUIN', @entry.publisher
         end
 
-        should 'support conditional arbitrary conversion' do
+        it 'should support conditional arbitrary conversion' do
           e = @entry.convert(@filter) { |k,v| k.to_s =~ /publisher/i  }
           assert_equal 'Moby Dick', e.title
           assert_equal 'PENGUIN', e.publisher
@@ -254,8 +254,8 @@ module BibTeX
       
     end
 
-    context 'citeproc export' do
-      setup do
+    describe 'citeproc export' do
+      before do
         @entry = Entry.new do |e|
           e.type = :book
           e.key = :key
@@ -264,11 +264,11 @@ module BibTeX
         end
       end
       
-      should 'use dropping-particle by default' do
+      it 'should use dropping-particle by default' do
         assert_equal 'van', @entry.to_citeproc['author'][0]['dropping-particle']
       end
       
-      should 'accept option to use non-dropping-particle' do
+      it 'should accept option to use non-dropping-particle' do
         assert_equal 'van', @entry.to_citeproc(:particle => 'non-dropping-particle')['author'][0]['non-dropping-particle']
       end
     end
@@ -362,7 +362,7 @@ module BibTeX
     end
   
 		describe 'default keys' do
-			setup {
+			before {
 				@e1 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
 				@e2 = Entry.new(:type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
 				@e3 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
@@ -389,8 +389,8 @@ module BibTeX
 			end
 		end
 		
-		context 'when the entry is added to a Bibliography' do
-			setup {
+		describe 'when the entry is added to a Bibliography' do
+			before {
 				@e = Entry.new
 				@bib = Bibliography.new
 			}
@@ -400,8 +400,8 @@ module BibTeX
 				@bib.entries.keys.must_include @e.key
 			end
 			
-			context "when there is already an element registered with the entry's key" do
-				setup { @bib << Entry.new }
+			describe "when there is already an element registered with the entry's key" do
+				before { @bib << Entry.new }
 				
 				it "should find a suitable key" do
 					k = @e.key

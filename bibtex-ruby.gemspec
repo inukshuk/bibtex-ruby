@@ -11,19 +11,25 @@ Gem::Specification.new do |s|
   s.authors     = ['Sylvester Keil']
   s.email       = ['http://sylvester.keil.or.at']
   s.homepage    = 'http://inukshuk.github.com/bibtex-ruby'
-  s.summary     = 'A BibTeX parser and converter written in Ruby.'
-  s.description = 'A (fairly complete) BibTeX library and parser written in Ruby. Includes a name parser and supports regular BibTeX entries, @comments, string replacement via @string. Allows for easy export/conversion to formats such as YAML, JSON, and XML.'
   s.license     = 'GPL-3'
 
+  s.summary     = 'A BibTeX parser, converter and API for Ruby.'
+  s.description = <<-END_DESCRIPTION
+		BibTeX-Ruby is the Rubyist's swiss-army-knife for all things BibTeX. It
+    includes a parser for all common BibTeX objects (@string, @preamble,
+    @comment and regular entries) and a sophisticated name parser that
+    tokenizes correctly formatted names; BibTeX-Ruby recognizes BibTeX string
+    replacements, joins values containing multiple strings or variables,
+    supports cross-references, and decodes common LaTeX formatting
+    instructions to unicode; if you are in a hurry, it also allows for easy
+    export/conversion to formats such as YAML, JSON, CSL, and XML (BibTeXML).
+	END_DESCRIPTION
+	
   s.add_runtime_dependency('latex-decode', ['>=0.0.3'])
+  s.add_development_dependency('multi_json', ['~>1.0'])
 
   s.add_development_dependency('rake', ['~>0.9'])
   s.add_development_dependency('racc', ['~>1.4'])
-  s.add_development_dependency('mini_shoulda', ['~>0.3'])
-  s.add_development_dependency('mynyml-redgreen', ['~>0.7'])
-  s.add_development_dependency('autowatchr', ['~>0.1'])
-  s.add_development_dependency('cucumber', ['~>0.10'])
-  s.add_development_dependency('json', ['~>1.5'])
   s.add_development_dependency('rdoc', ['~>3.9'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)

@@ -3,20 +3,20 @@ require 'helper.rb'
 module BibTeX
   class StringTest < MiniTest::Spec
 
-    context 'when parsing a simple string' do
-      setup do
+    describe 'when parsing a simple string' do
+      before do
         @bib = BibTeX.parse('@string{ foo = "bar" }')
       end        
-      should 'should not be empty' do
+      it 'should should not be empty' do
         assert_equal 1, @bib.length
       end
-      should 'have a symbol as key' do
+      it 'should have a symbol as key' do
         assert_equal :foo, @bib[0].key
       end
-      should 'have a value string' do
+      it 'should have a value string' do
         assert_equal 'bar', @bib[0].value.to_s
       end
-      should 'have been registered' do
+      it 'should have been registered' do
         refute @bib.strings[:foo].nil?
       end
     end

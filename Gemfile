@@ -7,6 +7,13 @@ group :debug do
 	gem 'rbx-trepanning', :platforms => [:rbx]
 end
 
+group :test do
+	gem 'minitest', :platforms => [:ruby_18]
+  gem 'mynyml-redgreen', ['~>0.7']
+  gem 'autowatchr', ['~>0.1']
+  gem 'cucumber', ['~>1.0']
+end
+
 group :profile do
 	gem 'ruby-prof', ['~>0.10']
 	gem 'gnuplot', ['~>2.3']
