@@ -292,15 +292,20 @@ module BibTeX
       q('@entry').map { |o| o.to_citeproc(options) }
     end
     
-    # Returns an XML representation of the bibliography. Only BibTeX entries are exported.
-    def to_xml
+    # Returns a REXML::Document representation of the bibliography using the
+		# BibTeXML format.
+    def to_xml(options = {})
       require 'rexml/document'
 	    
-      xml = REXML::Document.new
+      xml =  REXML::Document.new
       xml << REXML::XMLDecl.new('1.0','UTF-8')
-      root = REXML::Element.new('bibliography')
-      each { |e| root.add_element(e.to_xml) }
-      xml << root
+
+      root = REXML::Element.new('bibtex:file')
+			root.add_namespace('bibtex', 'http://bibtexml.sf.net/')
+			
+      each { |e| root.add_element(e.to_xml(options)) }
+
+      xml.add_element(root)
       xml
     end
 

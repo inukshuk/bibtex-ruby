@@ -49,7 +49,7 @@ module BibTeX
       q = [options[:quotes]].flatten
       [q[0], value, q[-1]].compact.join
     end
-    
+
     def name?; true; end
     def numeric?; false; end
     def atomic?; true; end
@@ -91,8 +91,15 @@ module BibTeX
   class Name < Struct.new(:first, :last, :prefix, :suffix)
     extend Forwardable
     include Comparable
-    
-    def_delegators :to_s, :empty?, :=~, :casecmp, :match, :length, :intern, :to_sym, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_str, :split, :each_byte, :each_char, :each_line
+
+    BibTeXML = {
+			:first  => :first,
+			:last   => :last,
+			:prefix => :prelast,
+			:suffix => :lineage
+		}.freeze
+		
+    def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|!$/ }
     
     class << self    
       def parse(string)
@@ -140,6 +147,21 @@ module BibTeX
       Hash[each_pair.to_a]
     end
 
+		def to_xml
+			require 'rexml/document'			
+			xml = REXML::Element.new('bibtex:person')
+
+			each_pair do |part, text|
+				unless text.nil?
+					element = REXML::Element.new("bibtex:#{BibTeXML[part]}")
+					element.text = text
+					xml.add_element(element)
+				end
+			end
+			
+			xml
+		end
+    
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
         each do |part|

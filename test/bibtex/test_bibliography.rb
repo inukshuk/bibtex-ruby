@@ -154,6 +154,27 @@ module BibTeX
         
       end
       
+			describe 'BibTeXML export' do
+				before { @bibtexml = Tempfile.new('bibtexml') }
+				after  { @bibtexml.unlink }
+					
+				it 'should support exporting to BibTeXML' do
+					@bib.to_xml.write(@bibtexml, 2)
+					@bibtexml.rewind
+					xml = REXML::Document.new(@bibtexml)
+					xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
+					xml.root.get_elements('//bibtex:entry').wont_be_empty
+				end
+
+				it 'should support exporting to extended BibTeXML' do
+					@bib.to_xml(:extended => true).write(@bibtexml, 2)
+					@bibtexml.rewind
+					xml = REXML::Document.new(@bibtexml)
+					xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
+					xml.root.get_elements('//bibtex:person').wont_be_empty
+				end
+				
+			end
     end
         
     

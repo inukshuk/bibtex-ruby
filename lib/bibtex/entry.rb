@@ -477,14 +477,25 @@ module BibTeX
 		def to_xml(options = {})
 		  require 'rexml/document'
 	    
-  		xml = REXML::Element.new(type)
-  		xml.attributes['key'] = key
-      @fields.each do |k,v|
-        e = REXML::Element.new(k.to_s)
-        e.text = v.to_s(options)
-        xml.add_element(e)
+			xml = REXML::Element.new('bibtex:entry')
+			xml.attributes['id'] = key
+
+  		entry = REXML::Element.new("bibtex:#{type}")
+
+      fields.each do |key, value|
+        field = REXML::Element.new("bibtex:#{key}")
+				
+				if options[:extended] && value.name?
+					value.each { |n| entry.add_element(n.to_xml) }
+				else
+        	field.text = value.to_s(options)
+				end
+				
+        entry.add_element(field)
       end
-      xml
+
+      xml.add_element(entry)
+			xml
 		end
 		
 		# Returns a duplicate entry with all values converted using the filter.
