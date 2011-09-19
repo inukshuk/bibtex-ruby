@@ -52,7 +52,7 @@ module BibTeX
     attr_reader :tokens
     alias to_a tokens
     
-    def_delegators :to_s, :empty?, :=~, :match, :intern, :to_sym, :to_i, :to_f, :end_with?, :start_with?, :include?, :upcase, :downcase, :reverse, :chop, :chomp, :rstrip, :gsub, :sub, :size, :strip, :succ, :to_c, :to_r, :to_str, :split, :each_byte, :each_char, :each_line
+    def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|!$/ }
     def_delegators :@tokens, :[], :length
     
     def initialize(*arguments)
@@ -236,19 +236,19 @@ module BibTeX
       self
     end
     
-    def method_missing (name, *args)
-      if name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
-        return $2 ? convert!($1) : convert($1)
-      end
-      
-		  super
+		def method_missing (name, *args)
+			case
+			when name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
+				$2 ? convert!($1) : convert($1)
+			else
+				super
+			end
 		end
 		
 		def respond_to? (method)
 		  method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
 		end
-		
-    
+		    
     def <=> (other)
       to_s <=> other.to_s
     end
