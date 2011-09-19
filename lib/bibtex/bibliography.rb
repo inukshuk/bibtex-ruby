@@ -284,7 +284,7 @@ module BibTeX
     
     # Returns a JSON representation of the bibliography.
     def to_json(options = {})
-      to_a(options).to_json
+      MultiJson.encode(to_a(options))
     end
     
     # Returns a CiteProc JSON representation of the bibliography. Only BibTeX enrties are exported.

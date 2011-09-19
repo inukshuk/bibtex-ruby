@@ -118,8 +118,7 @@ module BibTeX
 	  end
 	  
 	  def to_json(options = {})
-	    require 'json'
-	    to_hash.to_json
+	    MultiJson.encode(to_hash(options))
 	  end
 	  
 	  def to_xml(options = {})

@@ -24,6 +24,8 @@ require 'digest/md5'
 require 'bibtex/version'
 require 'logger'
 
+require 'multi_json'
+
 # = BibTeX
 #
 # This module encompasses a parser for BibTeX files and

@@ -80,9 +80,8 @@ Requirements
 
 * The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
   required to generate the BibTeX parser and the name parser.
-* The **json** gem is required on older Ruby versions for JSON export.
 
-The bibtex-ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
+The BibTeX-Ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
 been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java;
 however, there have been some [issues](https://github.com/inukshuk/bibtex-ruby/issues)
 with MacRuby implementations.

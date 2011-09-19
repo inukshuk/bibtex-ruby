@@ -1,7 +1,6 @@
 require 'helper.rb'
 
 require 'yaml'
-require 'json'
 
 module BibTeX
   class TestString < MiniTest::Unit::TestCase
@@ -23,7 +22,7 @@ module BibTeX
   
     def test_json
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
-      json = JSON.parse(bib.to_json)
+      json = MultiJson.decode(bib.to_json)
       refute_nil(json)
       assert_equal(3, json.length)
       assert_equal(%w[ dragon pickaxe rails], json.map { |y| y['key'] }.sort)
