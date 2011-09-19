@@ -46,7 +46,7 @@ Feature: BibTeX Names
 		| CC dd BB, AA    | AA         | CC dd      | BB      |    |
 		| BB, AA          | AA         |            | BB      |    |
 	
-	@sort @wip
+	@sort
 	Scenarios: Long von parts
 		| name            | first      | von        | last    | jr |
 		| bb cc dd CC, AA | AA         | bb cc dd   | CC      |    |

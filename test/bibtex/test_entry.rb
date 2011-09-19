@@ -57,13 +57,63 @@ module BibTeX
 					end
 				end
 				
-				describe 'resolve field values' do
-					it 'returns referenced title as booktitle (when there is no booktitle)'
-					it 'returns referenced booktitle as booktitle (when there is a booktitle)'
-					it 'does not store referenced values permanently'
+				describe 'resolve field values using array accessors #[]' do
+					context 'when a "title" is set in the entry itself' do
+						before { @bib['a1'].title = 'A1' }
+						it 'returns the title' do
+							@bib['a1'].title.must_be :==, 'A1'
+						end
+					end
+					
+					context 'when "title" is undefined for the entry but defined in the reference' do
+						it 'returns the referenced title' do
+							@bib['a1'].title.must_be :==, @bib['a'].title
+						end
+					end
+					
+					context 'when "booktitle" is undefined for the entry but defined in the reference' do
+						before { @bib['a'].booktitle = "A Booktitle" }
+						it 'returns the referenced booktitle' do
+							@bib['a1'].booktitle.must_be :==, @bib['a'].booktitle
+						end
+					end
 
-					describe '#resolve_reference' do
-						it 'copies referenced values to the entry'
+					context 'when "booktitle" is undefined for the entry and the reference but the reference has a "title"' do
+						it "returns the reference's title" do
+							@bib['a1'].booktitle.must_be :==, @bib['a'].title
+						end
+					end
+					
+					it 'does not store referenced values permanently' do
+						refute_nil @bib['a1'].booktitle
+						assert_nil @bib['a1'].fields[:booktitle]
+					end
+
+					describe '#referenced_field_names' do
+						it 'returns an empty list by default' do
+							Entry.new.referenced_field_names.must_be_empty
+						end
+						
+						it 'returns an empty list if this entry has no cross-reference' do
+							@bib['a'].referenced_field_names.must_be_empty
+						end
+						
+						it 'returns an empty list if this entry has a cross-reference but the reference does not exist in the bibliography' do
+							@bib['b1'].referenced_field_names.must_be_empty
+						end
+						
+						it 'returns a list of all fields not set in the field but in the reference' do
+							@bib['a1'].referenced_field_names.must_be :==, [:booktitle, :editor, :title]
+						end
+					end
+					
+					describe '#resolve_referenced_fields' do
+						it 'copies referenced values to the entry' do
+							@bib['a1'].title = 'a1'
+							@bib['a1'].resolve_referenced_fields
+							@bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
+							@bib['a1'].fields[:title].wont_be :==, @bib['a'].title
+						end
 					end
 				end
 				

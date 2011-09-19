@@ -84,7 +84,7 @@ module BibTeX
 
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
     
-    def_delegators :@data, :length, :size, :each, :empty?
+    def_delegators :@data, :length, :size, :each, :empty?, :last
 		def_delegators :@entries, :has_key?
     
     # Creates a new bibliography.

@@ -61,7 +61,7 @@ end
 
 Then /^my bibliography should contain an entry with (?:key|id) "([^"]*)" and a?n? (\w+) value of "([^"]*)"$/ do |key,field,value|
   refute_nil @bibliography[key.to_s]
-  assert_equal value, @bibliography[key.to_s][field].to_s
+  assert_equal value, @bibliography[key.to_s][field.downcase.to_sym].to_s
 end
 
 
@@ -91,5 +91,5 @@ Then /^the string "([^"]*)" should be "([^"]*)"$/ do |key, value|
 end
 
 Then /^the entry with key "([^"]*)" should have a field "([^"]*)" with the value "([^"]*)"$/ do |key, field, value|
-  assert_equal value, @bibliography[key.to_sym][field.to_sym].to_s
+  assert_equal value, @bibliography[key][field.downcase.to_sym].to_s
 end

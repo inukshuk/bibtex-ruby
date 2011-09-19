@@ -26,7 +26,7 @@ module BibTeX
 	  extend Forwardable	  
 	  include Enumerable
 
-		# Hash containing the required fields of the standard entry types
+		# Defines the required fields of the standard entry types
 		REQUIRED_FIELDS = Hash.new([]).merge({
 			:article       => [:author,:title,:journal,:year],
 			:book          => [[:author,:editor],:title,:publisher,:year],
@@ -44,6 +44,12 @@ module BibTeX
 			:unpublished   => [:author,:title,:note]
 		}).freeze
 
+		# Defines the default fallbacks for values defined in cross-references
+		FIELD_ALIASES = {
+			:booktitle => :title,
+			# :editor => :author
+		}.freeze
+		
     NAME_FIELDS = [:author,:editor,:translator].freeze
     DATE_FIELDS = [:year,:month].freeze
     
@@ -102,13 +108,13 @@ module BibTeX
     }.map(&:intern)]).freeze
 
 	  
-		attr_reader :fields, :type		
+		attr_reader :fields, :type
     def_delegators :@fields, :empty?, :each, :each_pair
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
 		def initialize(attributes = {})
 			@fields = {}
-		  
+		
 		  self.type = attributes.delete(:type) if attributes.has_key?(:type)
 		  self.key = attributes.delete(:key) if attributes.has_key?(:key)
 			
@@ -125,7 +131,12 @@ module BibTeX
       
       add(other.fields)
     end
-    
+  
+		# Returns the Entry's field name aliases.
+		def aliases
+			@aliases ||= FIELD_ALIASES.dup
+		end
+		
 		# Sets the Entry's key. If the Entry is currently registered with a
 		# Bibliography, re-registers the Entry with the new key; note that this
 		# may change the key value if another Entry is already regsitered with
@@ -163,32 +174,80 @@ module BibTeX
 			type.to_s.match(/^entry$/i) || @type == type.to_sym || super
 		end
     
-    def has_field?(field)
-      fields.has_key?(field)
+    def has_field?(name)
+			name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
     end
+
+		# Returns true if the Entry has a field or a crossref-alias for the passed-in name.
+		def has_reference_for?(name)
+			return nil unless name.respond_to?(:to_sym)
+			has_field?(name) || has_field?(aliases[name.to_sym])
+		end
     
+		# Returns the field value referenced by the passed-in name.
+		# For example, this will return the 'title' value for 'booktitle'.
+		def reference_for(name)
+			return nil unless name.respond_to?(:to_sym)
+			name = name.to_sym			
+			fields[name] || fields[aliases[name]]
+		end
+		
+		# If the Entry has cross-reference, copies all referenced field values.
+		def resolve_referenced_fields
+			referenced_field_names.each do |name|
+				fields[name] = reference.reference_for(name)
+			end
+			
+			self
+		end
+		
 		# Returns a sorted list of the Entry's field names. If a +filter+ is passed
 		# as argument, returns all field names that are also defined by the filter.
 		# If the +filter+ is empty, returns all field names.
-		def field_names(filter = [])
-			(filter.empty? ? fields.keys : fields.keys & filter.map(&:to_sym)).sort
+		#
+		# If the second optional argument is true (default) and the Entry contains
+		# a cross-reference, the list will include all referenced fields.
+		def field_names(filter = [], include_references = true)
+			names = fields.keys
+			
+			if include_references && has_crossref?
+				names.concat(referenced_field_names)
+			end
+			
+			names = names & filter.map(&:to_sym) unless filter.empty?
+			names.sort!
+			
+			names
+		end
+
+		# Returns a sorted list of all field names referenced by this Entry's cross-reference.
+		def referenced_field_names
+			return [] unless has_crossref?
+			
+			names = reference.fields.keys - fields.keys
+			names.concat(reference.aliases.reject { |k,v| !reference.has_field?(v) }.keys)
+			names.sort!
+			names
 		end
 		
 		def method_missing(name, *args, &block)
 			case
-			when @fields.has_key?(name)
-				@fields[name]
+			when fields.has_key?(name)
+				fields[name]
 			when name.to_s =~ /^(.+)=$/
 				send(:add, $1.to_sym, args[0]) 		  
 			when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
 				$2 ? convert!($1, &block) : convert($1, &block)
+			when has_crossref? && reference.has_reference_for?(name)
+				reference.reference_for(name)
 			else
 				super
 			end
 		end
 
 		def respond_to?(method)
-		  @fields.has_key?(method.to_sym) || method.to_s.match(/=$/) || method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
+		  fields.has_key?(method.to_sym) || method.to_s.match(/=$/) ||
+				method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || (has_crossref? && refernce.respond_to(method)) || super
 		end
 		
 		# Returns a copy of the Entry with all the field names renamed.
@@ -211,9 +270,11 @@ module BibTeX
 		alias rename_fields rename
 		alias rename_fields! rename!
 		
-		# Returns the value of the field with the given name.
+		# Returns the value of the field with the given name. If the value is not
+		# defined and the entry has cross-reference, returns the cross-referenced
+		# value instead.
 		def [](name)
-			fields[name.to_sym]
+			fields[name.to_sym] || reference && reference.reference_for(name)
 		end
 
 		# Adds a new field (name-value pair) to the entry.
