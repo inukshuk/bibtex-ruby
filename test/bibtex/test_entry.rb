@@ -9,6 +9,67 @@ module BibTeX
       end
     end
 
+		describe 'cross-references' do
+			it 'has no cross-reference by default' do
+				Entry.new.will_be :has_crossref?, false
+			end
+			
+			it 'is not cross-referenced by default' do
+				Entry.new.will_be :crossref?, false
+				Entry.new.referenced_by.will_be_empty
+			end
+			
+			context 'given a bibliography with cross referenced entries' do
+				before do
+					@bib = Bibliography.parse <<-END
+						@book{a, editor = "A", title = "A"}
+						@incollection{a1, crossref = "a"}
+						@incollection{b1, crossref = "b"}
+					END
+				end
+				
+				describe '#has_crossref?' do
+					it 'returns true if the entry has a valid cross-reference' do
+						assert_equal true, @bib['a1'].has_crossref?
+					end
+					it 'returns false if the entry has no valid cross-reference' do
+						assert_equal false, @bib['a'].has_crossref?
+						assert_equal false, @bib['b1'].has_crossref?
+					end
+				end
+				
+				describe '#crossref?' do
+					it 'returns true if the entry is a cross-referenced by another entry' do
+						assert_equal true, @bib['a'].crossref?
+					end
+					it 'returns false if the entry is not cross-referenced' do
+						assert_equal false, @bib['a1'].crossref?
+					end
+				end
+				
+				describe '#referenced_by' do
+					it 'returns a list of all entries that cross-reference this entry' do
+						@bib['a'].referenced_by.must_include(@bib['a1'])
+					end
+					
+					it 'returns an empty list if there are no cross-references to this entry' do
+						@bib['a1'].referenced_by.must_be_empty
+					end
+				end
+				
+				describe 'resolve field values' do
+					it 'returns referenced title as booktitle (when there is no booktitle)'
+					it 'returns referenced booktitle as booktitle (when there is a booktitle)'
+					it 'does not store referenced values permanently'
+
+					describe '#resolve_reference' do
+						it 'copies referenced values to the entry'
+					end
+				end
+				
+			end
+		end
+		
 		describe '#names' do
 			it 'returns an empty list by default' do
 				Entry.new.names.must_be :==, []
