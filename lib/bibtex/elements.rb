@@ -100,7 +100,7 @@ module BibTeX
     def meets?(*conditions)
       conditions.flatten.all? do |condition|
         property, value = condition.split(/\s*=\s*/)
-        property.nil? || send(property).to_s == value
+        property.nil? || (respond_to?(property) && send(property).to_s == value)
       end
     end
     
@@ -147,6 +147,10 @@ module BibTeX
 		  [type, to_s] <=> [other.type, other.to_s]
 		end
 		
+		# Returns the Element as a nicely formatted string.
+		def inspect
+			"#<#{self.class} #{content}>"
+		end
 	end
 
  

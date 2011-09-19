@@ -285,7 +285,7 @@ module BibTeX
 
 		# Returns true if the Entry is currently registered with the associated Bibliography.
 		def registered?
-			bibliography && bibliography.entries[key].equal?(self)
+			!!(bibliography && bibliography.entries[key].equal?(self))
 		end
 		
 		# Registers this Entry in the associated Bibliographies entries hash.
@@ -338,12 +338,28 @@ module BibTeX
       self
     end
     
-		# Returns a list of all names (authors, editors, translators)
+		# Returns a list of all names (authors, editors, translators).
 		def names
 			NAME_FIELDS.map { |k| has_field?(k) ? @fields[k].tokens : nil }.flatten.compact
 		end
 			
-			
+		# Returns true if the entry has a valid cross-reference in the Bibliography.
+		def has_crossref?
+			!!(bibliography && has_field?(:crossref) && bibliography.has_key?(fields[:crossref].to_s))
+		end
+
+		# Returns true if the entry is cross-referenced by another entry in the Bibliography.
+		def crossref?
+			!referenced_by.empty?
+		end
+		
+		# Returns a list of all entries in the Bibliography containing a
+		# cross-reference to this entry or [] if there are no references to this
+		# entry.
+		def referenced_by
+			(bibliography && bibliography.q("@entry[crossref=#{key}]")) || []
+		end
+
 		# Returns a string of all the entry's fields.
 		def content(options = {})
 			@fields.map { |k,v| "#{k} = #{ @fields[k].to_s(options) }" }.join(",\n")

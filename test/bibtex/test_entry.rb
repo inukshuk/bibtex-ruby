@@ -11,12 +11,12 @@ module BibTeX
 
 		describe 'cross-references' do
 			it 'has no cross-reference by default' do
-				Entry.new.will_be :has_crossref?, false
+				assert_equal false, Entry.new.has_crossref?
 			end
 			
 			it 'is not cross-referenced by default' do
-				Entry.new.will_be :crossref?, false
-				Entry.new.referenced_by.will_be_empty
+				assert_equal false, Entry.new.crossref?
+				Entry.new.referenced_by.must_be_empty
 			end
 			
 			context 'given a bibliography with cross referenced entries' do

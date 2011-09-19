@@ -81,8 +81,8 @@ module BibTeX
       end
       
       should 'support queries by string key' do
-        assert_equal 1, @bib['rails'].length
-        assert_equal 0, @bib['ruby'].length
+        refute_nil @bib['rails']
+        assert_nil @bib['ruby']
       end
 
       should 'support queries by type string' do

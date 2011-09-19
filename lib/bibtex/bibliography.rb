@@ -171,7 +171,7 @@ module BibTeX
     # >> bib[:key]
     # => Returns the first entry with key 'key' or nil
     # >> bib['key']
-    # => Returns all entries with key 'key' or []
+    # => Same as above
     # >> bib['@article']
     # => Returns all entries of type 'article' or []
     # >> bib['@preamble']
@@ -186,9 +186,11 @@ module BibTeX
 
       case
       when !([Range, Numeric] & arguments[0].class.ancestors).empty?
-        @data[*arguments] 
+        data[*arguments] 
       when arguments.length == 1 && arguments[0].is_a?(Symbol)
-        @entries[arguments[0]]
+        entries[arguments[0]]
+	 		when arguments.length == 1 && arguments[0].is_a?(::String) && !arguments[0].start_with?('@')
+        entries[arguments[0]]
       else
         query(*arguments)
       end
