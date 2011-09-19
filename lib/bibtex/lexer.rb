@@ -95,10 +95,10 @@ module BibTeX
 		def push(value)
 			case value[0]
       when :CONTENT, :STRING_LITERAL
-        if !@stack.empty? && value[0] == @stack[-1][0]
-				  @stack[-1][1] << value[1]
+				if !@stack.empty? && value[0] == @stack[-1][0]
+					@stack[-1][1] << value[1]
 				else
-  				@stack.push(value)
+					@stack.push(value)
 				end
 			when :ERROR
 				@stack.push(value) if @include_errors
@@ -119,10 +119,10 @@ module BibTeX
 
 			self.data = string || @scanner.string
 			
-      until @scanner.eos?
-        send("parse_#{MODE[@mode]}")
+			until @scanner.eos?
+				send("parse_#{MODE[@mode]}")
 			end
-			
+
 			push([false, '$end'])
 		end
 
@@ -130,7 +130,7 @@ module BibTeX
     
 		def parse_bibtex
 			case
-			when @scanner.scan(/[\t\r\n\s]+/o)
+			when @scanner.scan(/[\s]+/o)
 			when @scanner.scan(/\{/o)
 				@brace_level += 1
 				push([:LBRACE,'{'])
@@ -146,7 +146,7 @@ module BibTeX
 				push([:COMMA,','])
 			when @scanner.scan(/\d+/o)
 				push([:NUMBER,@scanner.matched])
-			when @scanner.scan(/[[[:alpha:]]\d \/:_!$\.%&*-]+/io)
+			when @scanner.scan(/[[:alpha:]\d \/:_!$\.%&*-]+/io)
 				push([:NAME,@scanner.matched.rstrip])
 			when @scanner.scan(/"/o)
 				@mode = :literal

@@ -75,9 +75,8 @@ module BibTeX
     end
   
     def test_parse
-      file = File.read(Test.fixtures(:roundtrip))
       bib = BibTeX::Bibliography.new
-      bib.add(BibTeX::Element.parse(%q( @string{ pragprog = "The Pragmatic Booksehlf" } )))
+      bib.add(BibTeX::Element.parse(%q( @string{ pragprog = "The Pragmatic Bookshelf" } )))
       bib.add(BibTeX::Element.parse(<<-END))
       @book{rails,
         address = {Raleigh, North Carolina},
@@ -85,7 +84,7 @@ module BibTeX
         booktitle = {Agile Web Development with Rails},
         edition = {third},
         keywords = {ruby, rails},
-        publisher = {The Pragmatic Bookshelf},
+        publisher = pragprog,
         series = {The Facets of Ruby},
         title = {Agile Web Development with Rails},
         year = {2009}
@@ -95,7 +94,7 @@ module BibTeX
       assert_equal(2, bib.length)
       refute_nil(bib[:rails])
       bib.replace_strings
-      assert_equal(file.gsub(/[\s]+/, ''), bib[:rails].to_s.gsub(/[\s]+/, ''))
+			assert_equal 'The Pragmatic Bookshelf', bib['rails'].publisher
     end
   end
 

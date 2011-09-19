@@ -132,7 +132,7 @@ module BibTeX
         tmp = Tempfile.new('bibtex')
         tmp.close
         @bib.save_to(tmp.path)
-        assert_equal @bib.to_s, BibTeX.open(tmp.path).to_s
+        assert_equal @bib.length, BibTeX.open(tmp.path).length
       end
       
       describe 'given a filter' do
