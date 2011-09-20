@@ -398,11 +398,28 @@ The Parser
 
 The BibTeX-Ruby parser is generated using the awesome
 [racc](http://i.loveruby.net/en/projects/racc/) parser generator. You can take
-look at the grammar definition in the file
+look at the LALR grammar in the file
 [lib/bibtex/bibtex.y](https://github.com/inukshuk/bibtex-ruby/blob/master/lib/bibtex/bibtex.y).
 
 For more information about the BibTeX format and the parser's idiosyncrasies
 [refer to the project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/The-BibTeX-Format).
+
+Contributing
+------------
+
+The BibTeX-Ruby source code is
+[hosted on GitHub](http://github.com/inukshuk/bibtex-ruby/).
+You can check out a copy of the latest code using Git:
+
+    $ git clone https://github.com/inukshuk/bibtex-ruby.git
+
+If you've found a bug or have a question, please open an issue on the
+[BibTeX-Ruby issue tracker](http://github.com/inukshuk/bibtex-ruby/issues).
+Or, for extra credit, clone the BibTeX-Ruby repository, write a failing
+example, or cucumber feature, fix the bug and submit a pull request (for
+useful examples, take a look at the cucumber features in the
+[features/issues/](https://github.com/inukshuk/bibtex-ruby/blob/master/features/issues)
+directory).
 
 
 Credits
@@ -410,3 +427,6 @@ Credits
 
 The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/);
 kudos and thanks to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)!
+
+BibTeX-Ruby is distributed under the terms and conditions of the GPL. See
+LICENSE for details.
