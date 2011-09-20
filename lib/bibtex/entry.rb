@@ -375,11 +375,11 @@ module BibTeX
     end
 
     def month=(month)
-      @fields[:month] = MONTHS_FILTER[month]
+      fields[:month] = MONTHS_FILTER[month]
     end
     
     def parse_month
-      @fields[:month] = MONTHS_FILTER[@fields[:month]] if @fields.has_key?(:month)
+      fields[:month] = MONTHS_FILTER[fields[:month]] if fields.has_key?(:month)
       self
     end
     
@@ -390,10 +390,9 @@ module BibTeX
     def parse_names
       strings = bibliography ? bibliography.strings.values : []
       NAME_FIELDS.each do |key|
-        if name = @fields[key]
-          name.replace(strings).join
-          name = name.to_name
-          @fields[key] = name
+        if name = fields[key]
+          name = name.dup.replace(strings).join.to_name
+          fields[key] = name unless name.nil?
         end
       end
       self
@@ -403,6 +402,7 @@ module BibTeX
 		def names
 			NAME_FIELDS.map { |k| has_field?(k) ? @fields[k].tokens : nil }.flatten.compact
 		end
+			
 			
 		# Returns true if the entry has a valid cross-reference in the Bibliography.
 		def has_crossref?
@@ -438,9 +438,10 @@ module BibTeX
 		alias cross_referenced_by referenced_by
 		alias crossref_by referenced_by
 		
+		
 		# Returns a string of all the entry's fields.
 		def content(options = {})
-			@fields.map { |k,v| "#{k} = #{ @fields[k].to_s(options) }" }.join(",\n")
+			fields.map { |k,v| "#{k} = #{ fields[k].to_s(options) }" }.join(",\n")
 		end
 
 		# Returns a string representation of the entry.
@@ -502,13 +503,12 @@ module BibTeX
 		# If an optional block is given, only those values will be converted where
 		# the block returns true (the block will be called with each key-value pair).
 		#
-		# @see convert!
-		#
+		# @see #convert!
 		def convert (filter)
 		  block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
 		end
 		
-		# In-place variant of @see convert
+		# In-place variant of @see #convert
 		def convert! (filter)
 		  @fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
 		  self

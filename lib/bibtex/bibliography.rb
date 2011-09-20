@@ -82,7 +82,8 @@ module BibTeX
     attr_accessor :path
     attr_reader :data, :strings, :entries, :errors, :options
 
-    attr_by_type :article, :book, :journal, :collection, :preamble, :comment, :meta_content
+    attr_by_type :article, :book, :journal, :collection, :preamble, :comment,
+			:meta_content
     
     def_delegators :@data, :length, :size, :each, :empty?, :last
 		def_delegators :@entries, :has_key?
@@ -109,6 +110,7 @@ module BibTeX
     alias << add
     alias push add
     
+
     # Saves the bibliography to the current path.
     def save(options = {})
       save_to(@path, options)
@@ -121,15 +123,17 @@ module BibTeX
       self
     end
     
+
     def parse_names
       @entries.each_value { |e| e.parse_names }
       self
     end
-    
+
     def parse_months
       @entries.each_value { |e| e.parse_month }
       self
     end
+
     
     # Converts all enties using the given filter. If an optional block is given
     # the block is used as a condition (the block will be called with each
@@ -139,7 +143,7 @@ module BibTeX
       self
     end
     		
-    #
+
     # Deletes an object, or a list of objects from the bibliography.
     # If a list of objects is to be deleted, you can either supply the list
     # of objects or use a query or block to define the list.

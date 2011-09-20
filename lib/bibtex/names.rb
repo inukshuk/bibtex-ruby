@@ -26,7 +26,10 @@ module BibTeX
     def_delegators :@tokens, :each, :sort
     
     def self.parse(string)
-      Names.new(NameParser.new.parse(string))
+      new(NameParser.new.parse(string))
+		rescue => e
+			BibTeX.log.info(e.message)
+			nil
     end
     
     def initialize(*arguments)

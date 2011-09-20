@@ -8,7 +8,7 @@ group :debug do
 end
 
 group :test do
-	gem 'minitest', :platforms => [:ruby_18]
+	gem 'minitest', :platforms => [:ruby_18, :jruby, :rbx]
   gem 'mynyml-redgreen', ['~>0.7']
   gem 'autowatchr', ['~>0.1']
   gem 'cucumber', ['~>1.0']
