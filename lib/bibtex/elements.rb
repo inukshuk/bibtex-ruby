@@ -47,14 +47,14 @@ module BibTeX
     def join; self; end
     
     # Returns the element's id.
-    def id; @id ||= object_id.to_s.intern; end
+    def id; @id ||= object_id.to_s; end
     
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
       self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.intern
     end
   
-		# Returns a list of names for that Element. All Elements except Entries rill return an empty list.
+		# Returns a list of names for that Element. All Elements except Entries return an empty list.
 		def names
 			[]
 		end
@@ -64,12 +64,9 @@ module BibTeX
     end
     
     [:entry, :book, :article, :collection, :string, :preamble, :comment]. each do |type|
-      method_id = "#{type}?"
-      unless method_defined?(method_id)
-        define_method(method_id) { has_type?(type) }
-        alias_method("is_#{method_id}", method_id)
-      end
-    end
+			method_id = "#{type}?"
+			define_method(method_id) { has_type?(type) } unless method_defined?(method_id)
+		end
     
     # Returns true if the element matches the given query.
     def matches?(query)
@@ -148,7 +145,7 @@ module BibTeX
 		
 		# Returns the Element as a nicely formatted string.
 		def inspect
-			"#<#{self.class} #{content}>"
+			"#<#{self.class} #{content.gsub(/\n/, ' ')}>"
 		end
 	end
 
@@ -178,9 +175,9 @@ module BibTeX
 		def key=(key)
 		  raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
 			
-			unless @bibliography.nil?
-				@bibliography.strings.delete(@key)
-				@bibliography.strings[key.to_sym] = self
+			unless bibliography.nil?
+				bibliography.strings.delete(@key)
+				bibliography.strings[key.to_sym] = self
 			end
 
 			@key = key.to_sym
@@ -223,11 +220,15 @@ module BibTeX
 		def to_xml(options = {})
 		  require 'rexml/document'
 	    
-		  xml = REXML::Element.new(:string)
-		  key = REXML::Element.new(:key)
-		  val = REXML::Element.new(:value)
-		  key.text = @key.to_s
-		  val.text = @value.to_s(:quotes => '"')
+			xml = REXML::Element.new(:string)
+			
+			k, v = REXML::Element.new(:key), REXML::Element.new(:value)
+			k.text = key.to_s
+			v.text = value.to_s(:quotes => '"')
+		
+			xml.add_elements(k)
+			xml.add_elements(v)
+			
 		  xml
 		end
 	end

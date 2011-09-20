@@ -68,9 +68,7 @@ module BibTeX
         Parser.new(options).parse(bibtex) || Bibliography.new(options)
       end
       
-      #
       # Defines a new accessor that selects elements by type.
-      #
       def attr_by_type(*arguments)
         arguments.each do |type|
           method_id = "#{type}s"
@@ -88,6 +86,7 @@ module BibTeX
     def_delegators :@data, :length, :size, :each, :empty?, :last
 		def_delegators :@entries, :has_key?
     
+
     # Creates a new bibliography.
     def initialize(options = {})
       @options = Bibliography.defaults.merge(options)
@@ -102,7 +101,7 @@ module BibTeX
     def add(*arguments)
       arguments.flatten.each do |element|
         raise(ArgumentError, "Failed to add #{ element.inspect } to Bibliography; instance of BibTeX::Element expected.") unless element.is_a?(Element)
-        @data << element.added_to_bibliography(self)
+        data << element.added_to_bibliography(self)
       end
       self
     end

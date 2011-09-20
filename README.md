@@ -8,7 +8,7 @@ tokenizes correctly formatted names; BibTeX-Ruby recognizes BibTeX string
 replacements, joins values containing multiple strings or variables,
 supports cross-references, and decodes common LaTeX formatting
 instructions to unicode; if you are in a hurry, it also allows for easy
-export/conversion to formats such as YAML, JSON, CSL, and XML (BibTeXML).
+export/conversion to formats such as YAML, JSON, CiteProc, and XML (BibTeXML).
 
 
 Quickstart
@@ -39,7 +39,8 @@ Quickstart
 BibTeX-Ruby helps you convert your bibliography to JSON, XML, or YAML;
 alternatively, you can export to the JSON format used by
 [CSL](http://citationstyles.org) processors and render the bibliography in
-many styles:
+one of [many different styles](https://github.com/citation-style-language/styles)
+([previews](http://www.zotero.org/styles/)):
 
     >> require 'citeproc'  # requires the citeproc-ruby gem
     => true
@@ -306,9 +307,6 @@ to the [BibTeXML](http//bibtexml.sf.net/) format. By passing the option
 will return individual person elements and name tokens (provided you have
 successfully parsed the names of your bibliography).
 
-The following example parse a BibTeX entry, formats it as extended BibTeXML,
-and writes it to standard out using two-space indentation:
-
     > BibTeX.parse(<<-END).to_xml(:extended => true).write($stdout, 2)
     " @book{pickaxe,
     "   Address = {Raleigh, North Carolina},
@@ -318,6 +316,10 @@ and writes it to standard out using two-space indentation:
     "     Year = {2009}
     "   }
     " END
+
+This example parse a BibTeX entry, formats it as extended BibTeXML,
+and writes the following XML to standard out:
+
     <?xml version='1.0' encoding='UTF-8'?>
     <bibtex:file xmlns:bibtex='http://bibtexml.sf.net/'>
       <bibtex:entry id='pickaxe'>
