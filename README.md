@@ -10,6 +10,9 @@ supports cross-references, and decodes common LaTeX formatting
 instructions to unicode; if you are in a hurry, it also allows for easy
 export/conversion to formats such as YAML, JSON, CiteProc, and XML (BibTeXML).
 
+For a list of projects using BibTeX-Ruby, see
+[the project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/Projects-Using-BibTeX-Ruby).
+
 
 Quickstart
 ----------
@@ -83,7 +86,7 @@ Requirements
   required to generate the BibTeX parser and the name parser.
 
 The BibTeX-Ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
-been confirmed to work with REE 1.8.7 x86_64 and JRuby 1.5.6 x86_64-java;
+been confirmed to work with REE, JRuby, and Rubinius;
 however, there have been some [issues](https://github.com/inukshuk/bibtex-ruby/issues)
 with MacRuby implementations.
 
