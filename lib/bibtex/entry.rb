@@ -349,8 +349,8 @@ module BibTeX
 				send(parser) if bibliography.options[parser]
 			end
 			
-			if bibliography.options[:filter]
-				convert(bibliography.options[:filter]) 
+			if bibliography.options.has_key?(:filter)
+				convert!(bibliography.options[:filter])
 			end
 			
 			self
