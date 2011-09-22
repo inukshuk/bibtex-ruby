@@ -138,6 +138,28 @@ Instead of parsing strings you can also create BibTeX elements directly in Ruby:
     > book.key = :mybook
     > bib << book
 
+### Cross References
+
+From version 2.0, BibTeX-Ruby correctly resolves entry cross-references, which are commonly used for entries with type `inbook`, `incollection`, and `inproceedings`. When an entry has a valid citation key in field `crossref`, BibTeX-Ruby will return any fields inherited from the parent entry:
+
+    $ irb
+    > b = BibTeX.parse <<-END
+    @inbook{fraassen_1989b,
+    	Crossref = {fraassen_1989},
+    	Pages = {40-64},
+    	Title = {Ideal Science: David Lewis's Account of Laws},
+    }
+
+    @book{fraassen_1989,
+    	Address = {Oxford},
+    	Author = {Bas C. van Fraassen},
+    	Publisher = {Oxford University Press},
+    	Title = {Laws and Symmetry},
+    	Year = 1989
+    }
+    END
+    > b[:fraassen_1989b].booktitle
+     => <"Laws and Symmetry">
 
 ### Queries
 
