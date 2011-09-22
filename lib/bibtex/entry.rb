@@ -180,6 +180,10 @@ module BibTeX
 			name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
     end
 
+		def inherits?(name)
+			!has_field(name) && has_parent? && parent.provides?(name)
+		end
+		
 		# Returns true if the Entry has a field (or alias) for the passed-in name.
 		def provides?(name)
 			return nil unless name.respond_to?(:to_sym)
@@ -290,7 +294,7 @@ module BibTeX
 		alias get []
 		
 		def fetch(name, default = nil)
-			get(name) || default
+			get(name) || block_given? ? yield(name) : default
 		end
 
 		# Adds a new field (name-value pair) to the entry.
