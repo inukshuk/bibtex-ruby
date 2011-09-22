@@ -11,12 +11,12 @@ module BibTeX
 
 		describe 'cross-references' do
 			it 'has no cross-reference by default' do
-				assert_equal false, Entry.new.has_crossref?
+				assert_equal false, Entry.new.has_cross_reference?
 			end
 			
 			it 'is not cross-referenced by default' do
-				assert_equal false, Entry.new.crossref?
-				Entry.new.referenced_by.must_be_empty
+				assert_equal false, Entry.new.cross_referenced?
+				Entry.new.cross_referenced_by.must_be_empty
 			end
 			
 			describe 'given a bibliography with cross referenced entries' do
@@ -28,32 +28,32 @@ module BibTeX
 					END
 				end
 				
-				describe '#has_crossref?' do
+				describe '#has_cross_reference?' do
 					it 'returns true if the entry has a valid cross-reference' do
-						assert_equal true, @bib['a1'].has_crossref?
+						assert_equal true, @bib['a1'].has_cross_reference?
 					end
 					it 'returns false if the entry has no valid cross-reference' do
-						assert_equal false, @bib['a'].has_crossref?
-						assert_equal false, @bib['b1'].has_crossref?
+						assert_equal false, @bib['a'].has_cross_reference?
+						assert_equal false, @bib['b1'].has_cross_reference?
 					end
 				end
 				
-				describe '#crossref?' do
-					it 'returns true if the entry is a cross-referenced by another entry' do
-						assert_equal true, @bib['a'].crossref?
+				describe '#cross_referemced?' do
+					it 'returns true if the entry is cross-referenced by another entry' do
+						assert_equal true, @bib['a'].cross_referenced?
 					end
 					it 'returns false if the entry is not cross-referenced' do
-						assert_equal false, @bib['a1'].crossref?
+						assert_equal false, @bib['a1'].cross_referenced?
 					end
 				end
 				
-				describe '#referenced_by' do
+				describe '#cross_referenced_by' do
 					it 'returns a list of all entries that cross-reference this entry' do
-						@bib['a'].referenced_by.must_include(@bib['a1'])
+						@bib['a'].cross_referenced_by.must_include(@bib['a1'])
 					end
 					
 					it 'returns an empty list if there are no cross-references to this entry' do
-						@bib['a1'].referenced_by.must_be_empty
+						@bib['a1'].cross_referenced_by.must_be_empty
 					end
 				end
 				
@@ -89,28 +89,28 @@ module BibTeX
 						assert_nil @bib['a1'].fields[:booktitle]
 					end
 
-					describe '#referenced_field_names' do
+					describe '#inherited_fields' do
 						it 'returns an empty list by default' do
-							Entry.new.referenced_field_names.must_be_empty
+							Entry.new.inherited_fields.must_be_empty
 						end
 						
 						it 'returns an empty list if this entry has no cross-reference' do
-							@bib['a'].referenced_field_names.must_be_empty
+							@bib['a'].inherited_fields.must_be_empty
 						end
 						
 						it 'returns an empty list if this entry has a cross-reference but the reference does not exist in the bibliography' do
-							@bib['b1'].referenced_field_names.must_be_empty
+							@bib['b1'].inherited_fields.must_be_empty
 						end
 						
 						it 'returns a list of all fields not set in the field but in the reference' do
-							@bib['a1'].referenced_field_names.must_be :==, [:booktitle, :editor, :title]
+							@bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
 						end
 					end
 					
-					describe '#resolve_referenced_fields' do
+					describe '#save_inherited_fields' do
 						it 'copies referenced values to the entry' do
 							@bib['a1'].title = 'a1'
-							@bib['a1'].resolve_referenced_fields
+							@bib['a1'].save_inherited_fields
 							@bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
 							@bib['a1'].fields[:title].wont_be :==, @bib['a'].title
 						end

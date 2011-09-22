@@ -50,6 +50,7 @@ module BibTeX
 			# :editor => :author
 		}.freeze
 		
+		
     NAME_FIELDS = [:author,:editor,:translator].freeze
     DATE_FIELDS = [:year,:month].freeze
     
@@ -109,6 +110,7 @@ module BibTeX
 
 	  
 		attr_reader :fields, :type
+		
     def_delegators :@fields, :empty?, :each, :each_pair
 
 		# Creates a new instance. If a hash is given, the entry is populated accordingly.
@@ -166,7 +168,7 @@ module BibTeX
 		# TODO we should be more lenient: allow strings as key or don't check at all
 		# Sets the type of the entry.
 		def type=(type)
-			raise(ArgumentError, "types must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
+			# raise(ArgumentError, "types must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
 			@type = type.to_sym
 		end
 		
@@ -178,24 +180,28 @@ module BibTeX
 			name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
     end
 
-		# Returns true if the Entry has a field or a crossref-alias for the passed-in name.
-		def has_reference_for?(name)
+		# Returns true if the Entry has a field (or alias) for the passed-in name.
+		def provides?(name)
 			return nil unless name.respond_to?(:to_sym)
 			has_field?(name) || has_field?(aliases[name.to_sym])
 		end
     
 		# Returns the field value referenced by the passed-in name.
-		# For example, this will return the 'title' value for 'booktitle'.
-		def reference_for(name)
+		# For example, this will return the 'title' value for 'booktitle' if a
+		# corresponding alias is defined.
+		def provide(name)
 			return nil unless name.respond_to?(:to_sym)
 			name = name.to_sym			
 			fields[name] || fields[aliases[name]]
 		end
 		
-		# If the Entry has cross-reference, copies all referenced field values.
-		def resolve_referenced_fields
-			referenced_field_names.each do |name|
-				fields[name] = reference.reference_for(name)
+		# If the Entry has a cross-reference, copies all referenced all inherited
+		# values from the parent.
+		#
+		# Returns the Entry.
+		def save_inherited_fields
+			inherited_fields.each do |name|
+				fields[name] = parent.provide(name)
 			end
 			
 			self
@@ -206,29 +212,33 @@ module BibTeX
 		# If the +filter+ is empty, returns all field names.
 		#
 		# If the second optional argument is true (default) and the Entry contains
-		# a cross-reference, the list will include all referenced fields.
-		def field_names(filter = [], include_references = true)
+		# a cross-reference, the list will include all inherited fields.
+		def field_names(filter = [], include_inherited = true)
 			names = fields.keys
 			
-			if include_references && has_crossref?
-				names.concat(referenced_field_names)
+			if include_inherited && has_parent?
+				names.concat(inherited_fields)
 			end
 			
-			names = names & filter.map(&:to_sym) unless filter.empty?
-			names.sort!
+			unless filter.empty?
+				names = names & filter.map(&:to_sym)
+			end
 			
+			names.sort!
 			names
 		end
 
 		# Returns a sorted list of all field names referenced by this Entry's cross-reference.
-		def referenced_field_names
-			return [] unless has_crossref?
+		def inherited_fields
+			return [] unless has_parent?
 			
-			names = reference.fields.keys - fields.keys
-			names.concat(reference.aliases.reject { |k,v| !reference.has_field?(v) }.keys)
+			names = parent.fields.keys - fields.keys
+			names.concat(parent.aliases.reject { |k,v| !parent.has_field?(v) }.keys)
 			names.sort!
+			
 			names
 		end
+		
 		
 		def method_missing(name, *args, &block)
 			case
@@ -238,16 +248,16 @@ module BibTeX
 				send(:add, $1.to_sym, args[0]) 		  
 			when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
 				$2 ? convert!($1, &block) : convert($1, &block)
-			when has_crossref? && reference.has_reference_for?(name)
-				reference.reference_for(name)
+			when has_parent? && parent.provides?(name)
+				parent.provide(name)
 			else
 				super
 			end
 		end
 
 		def respond_to?(method)
-		  fields.has_key?(method.to_sym) || method.to_s.match(/=$/) ||
-				method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || (has_crossref? && refernce.respond_to(method)) || super
+		  provides?(method.to_sym) || method.to_s.match(/=$/) ||
+				method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || (has_parent? && parent.respond_to(method)) || super
 		end
 		
 		# Returns a copy of the Entry with all the field names renamed.
@@ -274,7 +284,13 @@ module BibTeX
 		# defined and the entry has cross-reference, returns the cross-referenced
 		# value instead.
 		def [](name)
-			fields[name.to_sym] || reference && reference.reference_for(name)
+			fields[name.to_sym] || parent && parent.provide(name)
+		end
+		
+		alias get []
+		
+		def fetch(name, default = nil)
+			get(name) || default
 		end
 
 		# Adds a new field (name-value pair) to the entry.
@@ -291,7 +307,6 @@ module BibTeX
 		# add(:author, "Edgar A. Poe", :title, "The Raven")
 		# add([:author, "Edgar A. Poe", :title, "The Raven"])
 		# add(:author => "Edgar A. Poe", :title => "The Raven")
-		#
 		def add(*arguments)
 		  Hash[*arguments.flatten].each_pair do |name, value|
 			  fields[name.to_sym] = Value.new(value)
@@ -403,40 +418,47 @@ module BibTeX
 			NAME_FIELDS.map { |k| has_field?(k) ? @fields[k].tokens : nil }.flatten.compact
 		end
 			
-			
-		# Returns true if the entry has a valid cross-reference in the Bibliography.
-		def has_crossref?
-			!reference.nil?
+		
+		# Returns true if the Entry has a valid cross-reference in the Bibliography.
+		def has_parent?
+			!parent.nil?
 		end
 
-		alias has_cross_reference? has_crossref?
-		alias has_reference? has_crossref?
-		
-		# Returns true if the entry is cross-referenced by another entry in the Bibliography.
-		def crossref?
-			!referenced_by.empty?
+		alias has_cross_reference? has_parent?		
+
+		# Returns true if the Entry cross-references an Entry which is not
+		# registered in the current Bibliography.
+		def parent_missing?
+			has_field?(:crossref) && !has_parent?
 		end
-		
-		alias cross_referenced? crossref?
-		alias referenced? crossref?
+	
+		alias cross_reference_missing? parent_missing?
 		
 		# Returns the cross-referenced Entry from the Bibliography or nil if this
-		# entry does define a cross-reference.
-		def reference
+		# Entry does define a cross-reference.
+		def parent
 			bibliography && bibliography[fields[:crossref]]
 		end
 		
-		alias cross_reference reference
+		alias cross_reference parent
+
+
+		# Returns true if the entry is cross-referenced by another entry in the
+		# Bibliography.
+		def has_children?
+			!children.empty?
+		end
+		
+		alias cross_referenced? has_children?
 		
 		# Returns a list of all entries in the Bibliography containing a
 		# cross-reference to this entry or [] if there are no references to this
 		# entry.
-		def referenced_by
+		def children
 			(bibliography && bibliography.q("@entry[crossref=#{key}]")) || []
 		end
 
-		alias cross_referenced_by referenced_by
-		alias crossref_by referenced_by
+		alias cross_referenced_by children
 		
 		
 		# Returns a string of all the entry's fields.
