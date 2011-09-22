@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 require 'helper'
 
 module BibTeX
@@ -13,7 +15,7 @@ module BibTeX
       end
     end
 
-    describe '#open' do
+    describe '.open' do
       it 'should accept a block and save the file after execution' do
         tmp = Tempfile.new('bibtex')
         tmp.close
@@ -25,7 +27,14 @@ module BibTeX
         
         assert_equal b.length - 1, BibTeX.open(tmp.path).length
       end
+
     end
+
+		describe '.parse' do
+			it 'should accept filters' do
+				Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'					
+			end
+		end
     
     describe 'given a populated biliography' do
       before do
