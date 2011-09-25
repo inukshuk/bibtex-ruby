@@ -144,7 +144,10 @@ Instead of parsing strings you can also create BibTeX elements directly in Ruby:
 
 ### Cross References
 
-From version 2.0, BibTeX-Ruby correctly resolves entry cross-references, which are commonly used for entries with type `inbook`, `incollection`, and `inproceedings`. When an entry has a valid citation key in field `crossref`, BibTeX-Ruby will return any fields inherited from the parent entry:
+From version 2.0, BibTeX-Ruby correctly resolves entry cross-references, which
+are commonly used for entries with type `inbook`, `incollection`, and
+`inproceedings`. When an entry has a valid citation key in field `crossref`,
+BibTeX-Ruby will return any fields inherited from the parent entry:
 
     > b = BibTeX.parse <<-END
     @inbook{fraassen_1989b,
@@ -162,7 +165,8 @@ From version 2.0, BibTeX-Ruby correctly resolves entry cross-references, which a
     }
     END
     > b['fraassen_1989b'].booktitle
-     => <"Laws and Symmetry">
+    => <"Laws and Symmetry">
+
 
 ### Queries
 
@@ -279,6 +283,16 @@ are parsed and can easily be mapped to their last names:
        }
        END
     => ["Hawthorne", "Melville"]
+
+Another useful method is `Bibliography#names` which returns all names in
+your bibliography (authors, editors, translators). For example, to quickly
+expand the initials of a name across your entire bibliography, you could
+use the following snippet:
+
+    b.names.each do |name|
+      name.first = 'Edgar Allen' if name.first =~ /E\.\s*A\./ and name.last == 'Poe'
+    end
+
 
 ### Filters
 
