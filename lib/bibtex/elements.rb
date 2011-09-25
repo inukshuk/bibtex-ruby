@@ -28,13 +28,22 @@ module BibTeX
 		attr_reader :bibliography
 		
 		# Returns an array of BibTeX elements.
-    def self.parse(string, options = {})
-      elements = BibTeX::Parser.new(options).parse(string).data
-      elements.each do |e|
-        e.parse_names unless !e.respond_to?(:parse_names) || options[:parse_names] == false
-        e.parse_month unless !e.respond_to?(:parse_month) || options[:parse_months] == false
-      end
-      elements
+    def self.parse(input, options = {})
+			case input
+			when Element
+				[input]
+			when Hash
+				[Entry.new(input)]
+			when Array
+				input.inject([]) { |s,a| s.concat(parse(a, options)) }
+			when ::String
+	      Parser.new(options).parse(input).data.each do |e|
+	        e.parse_names unless !e.respond_to?(:parse_names) || options[:parse_names] == false
+	        e.parse_month unless !e.respond_to?(:parse_month) || options[:parse_months] == false
+	      end
+			else
+				raise BibTeXError, "failed to parse Element from #{input.inspect}"
+			end
     end
     
 		# Returns a string containing the object's content.

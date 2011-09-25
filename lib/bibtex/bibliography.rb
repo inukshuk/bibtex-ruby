@@ -52,7 +52,7 @@ module BibTeX
       # -:filter: convert all entries using the sepcified filter (not set by default)
       #
       def open(path, options = {})
-        b = parse(Kernel.open(path).read, options)
+        b = parse(Kernel.open(path, 'r:UTF-8').read, options)
 				b.path = path
         return b unless block_given?
 
@@ -64,8 +64,13 @@ module BibTeX
       end
 
       # Parses the given string and returns a corresponding Bibliography instance.
-      def parse(bibtex, options = {})
-        Parser.new(options).parse(bibtex) || Bibliography.new(options)
+      def parse(input, options = {})
+				case input
+				when Array, Hash, Element
+					Bibliography.new(options).add(input)
+				else
+        	Parser.new(options).parse(input) || Bibliography.new(options)
+				end
       end
       
       # Defines a new accessor that selects elements by type.
@@ -78,6 +83,7 @@ module BibTeX
     end
   
     attr_accessor :path
+
     attr_reader :data, :strings, :entries, :errors, :options
 
     attr_by_type :article, :book, :journal, :collection, :preamble, :comment,
@@ -99,8 +105,7 @@ module BibTeX
     # Adds a new element, or a list of new elements to the bibliography.
     # Returns the Bibliography for chainability.
     def add(*arguments)
-      arguments.flatten.each do |element|
-        raise(ArgumentError, "Failed to add #{ element.inspect } to Bibliography; instance of BibTeX::Element expected.") unless element.is_a?(Element)
+      Element.parse(arguments.flatten).each do |element|
         data << element.added_to_bibliography(self)
       end
       self
@@ -118,7 +123,7 @@ module BibTeX
     # Saves the bibliography to a file at the given path. Returns the bibliography.
     def save_to(path, options = {})
       options[:quotes] ||= %w({ })
-      File.open(path, "w") { |f| f.write(to_s(options)) }
+      File.open(path, 'w:UTF-8') { |f| f.write(to_s(options)) }
       self
     end
     
