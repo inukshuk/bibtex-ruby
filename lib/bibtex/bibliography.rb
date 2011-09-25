@@ -68,8 +68,10 @@ module BibTeX
 				case input
 				when Array, Hash, Element
 					Bibliography.new(options).add(input)
-				else
+				when ::String
         	Parser.new(options).parse(input) || Bibliography.new(options)
+				else
+					raise ArgumentError, "failed to parse #{input.inspect}"
 				end
       end
       

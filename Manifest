@@ -17,6 +17,7 @@ features/bibtex.feature
 features/entries.feature
 features/issues
 features/issues/braced_strings.feature
+features/issues/crossref.feature
 features/issues/latex_filter.feature
 features/issues/number_keys.feature
 features/issues/parse_months.feature
@@ -75,7 +76,6 @@ lib/bibtex/version.rb
 lib/bibtex/version.rbc
 lib/bibtex.rb
 lib/bibtex.rbc
-profile.png
 test
 test/benchmark.rb
 test/bibtex

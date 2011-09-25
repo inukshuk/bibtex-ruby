@@ -42,7 +42,7 @@ module BibTeX
 	        e.parse_month unless !e.respond_to?(:parse_month) || options[:parse_months] == false
 	      end
 			else
-				raise BibTeXError, "failed to parse Element from #{input.inspect}"
+				raise ArgumentError, "failed to parse Element from #{input.inspect}"
 			end
     end
     

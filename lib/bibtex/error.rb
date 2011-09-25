@@ -10,7 +10,8 @@ module BibTeX
 	end
 	
   class ParseError < BibTeXError; end
-  
+  class ArgumentError < BibTeXError; end
+
   #
   # Represents a lexical or syntactical error.
   #

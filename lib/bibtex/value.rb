@@ -52,7 +52,7 @@ module BibTeX
     attr_reader :tokens
     alias to_a tokens
     
-    def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|!$/ }
+    def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|^dup$|!$/ }
     def_delegators :@tokens, :[], :length
     
     def initialize(*arguments)
