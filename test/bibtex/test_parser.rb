@@ -59,6 +59,23 @@ module BibTeX
 				Parser.new.parse(%q(@misc{key, title = "{"}"}))[0].title.must_be :==, '{"}'
 			end
 			
+			it 'parses complex LaTeX markup' do
+				b = Parser.new.parse(<<-END)[0]
+					@book{proust_1996,
+			      address = {Paris},
+			      author = {Proust, Jo\\"{e}lle},
+			      booktitle = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
+			      editor = {Proust, Jo\\"{e}lle},
+			      keywords = {Perception; Molyneux's Problem},
+			      publisher = {Presses Universitaires de France},
+			      title = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
+			      year = {1996}
+			    }
+				END
+				b.booktitle.must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
+				b.editor.must_be :==, 'Proust, Jo\"{e}lle'
+			end
+			
 		end
 		
     describe 'given a set of explicit and implicit comments' do
