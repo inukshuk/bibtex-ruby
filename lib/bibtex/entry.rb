@@ -485,6 +485,10 @@ module BibTeX
 
 		def to_citeproc(options = {})
 		  options[:quotes] ||= []
+		
+			parse_names
+			parse_month
+			
 		  hash = { 'id' => key.to_s, 'type' => CSL_TYPES[type].to_s }
       each_pair do |k,v|
 		    hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
