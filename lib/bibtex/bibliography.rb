@@ -125,18 +125,22 @@ module BibTeX
     # Saves the bibliography to a file at the given path. Returns the bibliography.
     def save_to(path, options = {})
       options[:quotes] ||= %w({ })
-      File.open(path, 'w:UTF-8') { |f| f.write(to_s(options)) }
+
+      File.open(path, 'w:UTF-8') do |f|
+				f.write(to_s(options))
+			end
+			
       self
     end
     
 
     def parse_names
-      @entries.each_value { |e| e.parse_names }
+      entries.each_value { |e| e.parse_names }
       self
     end
 
     def parse_months
-      @entries.each_value { |e| e.parse_month }
+      entries.each_value { |e| e.parse_month }
       self
     end
 
@@ -145,7 +149,10 @@ module BibTeX
     # the block is used as a condition (the block will be called with each
     # entry). @see Entry#convert!
     def convert (filter)
-      @entries.each_value { |e| e.convert!(filter) if !block_given? || yield(e) }
+      entries.each_value do |entry|
+				entry.convert!(filter) if !block_given? || yield(entry)
+			end
+			
       self
     end
     		
@@ -156,7 +163,6 @@ module BibTeX
     #
     # Returns the object (or the list of objects) that were deleted; nil
     # if the object was not part of the bibliography.
-    #
     def delete(*arguments, &block)
       objects = q(*arguments, &block).map { |o| o.removed_from_bibliography(self) }
       @data = @data - objects
@@ -166,7 +172,7 @@ module BibTeX
     alias remove delete
     alias rm delete
 
-    #
+
     # Returns an element or a list of elements according to the given index,
     # range, or query. Contrary to the Bibliography#query this method does
     # not yield to a block for additional refinement of the query.
@@ -190,7 +196,6 @@ module BibTeX
     # => Returns all objects that match 'ruby' anywhere or []
     # >> bib['@book[keywords=ruby]']
     # => Returns all books whose keywords attribute equals 'ruby' or []
-    #
     def [](*arguments)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
 

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'helper.rb'
 
 module BibTeX
@@ -190,13 +192,13 @@ module BibTeX
         end
       end
       
-      it 'should support renaming! of field attributes' do
+      it 'supports renaming! of field attributes' do
         @entry.rename!(:title => :foo)
         refute @entry.has_field?(:title)
         assert_equal 'Moby Dick', @entry[:foo]
       end
 
-      it 'should support renaming of field attributes' do
+      it 'supports renaming of field attributes' do
         e = @entry.rename(:title => :foo)
 
         assert @entry.has_field?(:title)
@@ -210,7 +212,7 @@ module BibTeX
       end
 
       
-      it 'should support citeproc export' do
+      it 'supports citeproc export' do
         e = @entry.to_citeproc
         assert_equal 'book', e['type']
         assert_equal 'New York', e['publisher-place']
@@ -226,24 +228,24 @@ module BibTeX
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
         end
         
-        it 'should support arbitrary conversion' do
+        it 'supports arbitrary conversion' do
           e = @entry.convert(@filter)
           assert_equal 'MOBY DICK', e.title
           assert_equal 'Moby Dick', @entry.title
         end
 
-        it 'should support arbitrary in-place conversion' do
+        it 'supports arbitrary in-place conversion' do
           @entry.convert!(@filter)
           assert_equal 'MOBY DICK', @entry.title
         end
 
-        it 'should support conditional arbitrary in-place conversion' do
+        it 'supports conditional arbitrary in-place conversion' do
           @entry.convert!(@filter) { |k,v| k.to_s =~ /publisher/i  }
           assert_equal 'Moby Dick', @entry.title
           assert_equal 'PENGUIN', @entry.publisher
         end
 
-        it 'should support conditional arbitrary conversion' do
+        it 'supports conditional arbitrary conversion' do
           e = @entry.convert(@filter) { |k,v| k.to_s =~ /publisher/i  }
           assert_equal 'Moby Dick', e.title
           assert_equal 'PENGUIN', e.publisher
@@ -252,6 +254,36 @@ module BibTeX
         
       end
       
+			describe 'LaTeX filter' do
+				before do
+					@entry.title = 'M\\"{o}by Dick'
+				end
+				
+				describe '#convert' do
+					it 'converts LaTeX umlauts' do
+						@entry.convert(:latex).title.must_be :==, 'Möby Dick'
+					end
+					
+					it 'does not change the original entry' do
+						e = @entry.convert(:latex)
+						e.wont_be :==, @entry
+						e.title.to_s.length.must_be :<, @entry.title.to_s.length
+					end
+				end
+
+				describe '#convert!' do
+					it 'converts LaTeX umlauts' do
+						@entry.convert!(:latex).title.must_be :==, 'Möby Dick'
+					end
+					
+					it 'changes the original entry in-place' do
+						e = @entry.convert!(:latex)
+						e.must_be :equal?, @entry
+						e.title.to_s.length.must_be :==, @entry.title.to_s.length
+					end
+				end
+				
+			end
     end
 
     describe 'citeproc export' do

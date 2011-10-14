@@ -89,7 +89,7 @@ module BibTeX
     
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
-        @tokens.each do |part|
+        tokens.each do |part|
           part.send(method_id, *arguments, &block) unless part.nil?
         end
         self
@@ -103,7 +103,7 @@ module BibTeX
         when ::String # simulates Ruby's String#replace
           @tokens = [argument]
         when String
-          @tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
+         	@tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
         when Hash
           @tokens = @tokens.map { |v| argument[v] || v }
         end
@@ -224,15 +224,12 @@ module BibTeX
     
     # Converts all string values according to the given filter.
     def convert! (filter)
-      f = Filters.resolve(filter)
-
-      unless f
-        message = "Failed to load filter #{f.inspect}"
-        Log.error message
-        raise ArgumentError.new(message)
+      if f = Filters.resolve(filter)
+				tokens.map! { |t| f.apply(t) }
+			else
+				raise ArgumentError, "Failed to load filter #{filter.inspect}"
       end
       
-      @tokens.map! { |t| f.apply(t) }
       self
     end
     

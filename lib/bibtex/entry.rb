@@ -530,13 +530,13 @@ module BibTeX
 		# the block returns true (the block will be called with each key-value pair).
 		#
 		# @see #convert!
-		def convert (filter)
+		def convert(filter)
 		  block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
 		end
 		
 		# In-place variant of @see #convert
-		def convert! (filter)
-		  @fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
+		def convert!(filter)
+		  fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
 		  self
 		end
 		

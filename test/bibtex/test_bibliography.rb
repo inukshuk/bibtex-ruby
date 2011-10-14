@@ -16,7 +16,7 @@ module BibTeX
     end
 
     describe '.open' do
-      it 'should accept a block and save the file after execution' do
+      it 'accepts a block and save the file after execution' do
         tmp = Tempfile.new('bibtex')
         tmp.close
         b = BibTeX.open(Test.fixtures(:bibdesk)).save_to(tmp.path)
@@ -31,7 +31,7 @@ module BibTeX
     end
 
 		describe '.parse' do
-			it 'should accept filters' do
+			it 'accepts filters' do
 				Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'					
 			end
 		end
@@ -150,12 +150,12 @@ module BibTeX
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
         end
           
-        it 'should support arbitrary conversions' do
+        it 'supports arbitrary conversions' do
           @bib.convert(@filter)
           assert_equal 'RUBY, RAILS', @bib[:rails].keywords
         end
         
-        it 'should support conditional arbitrary conversions' do
+        it 'supports conditional arbitrary conversions' do
           @bib.convert(@filter) { |e| e.key != 'rails' }
           assert_equal 'ruby, rails', @bib[:rails].keywords
           assert_equal 'RUBY', @bib[:flanagan2008].keywords
@@ -163,6 +163,17 @@ module BibTeX
         
       end
       
+			describe 'LaTeX filter' do
+				before do
+					@bib['rails'].keywords = 'r\\"uby'
+				end
+				
+				it 'converts LaTeX umlauts' do
+					@bib.convert(:latex)['rails'].keywords.must_be :==, 'rüby'
+				end
+				
+			end
+			
 			describe 'BibTeXML export' do
 				before { @bibtexml = Tempfile.new('bibtexml') }
 				after  { @bibtexml.unlink }

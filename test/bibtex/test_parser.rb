@@ -8,24 +8,17 @@ module BibTeX
         @bib = Parser.new(:debug => false).parse(File.read(Test.fixtures(:entry)))
       end
       
-      it 'should return a Bibliography' do
+      it 'returns a Bibliography instance' do
         assert @bib
         refute @bib.empty?
       end
         
-      it 'should parse all entries' do
+      it 'parses all entries' do
         assert_equal 3, @bib.length
       end
       
-      it 'should parse the key values' do
+      it 'parses the key values' do
         assert_equal %w{ key:0 key:1 foo }, @bib.map(&:key)
-      end
-
-      it 'should handle strange keys' do
-        input = "@Misc{George Martin06,title = {FEAST FOR CROWS}}"
-        bib = Parser.new(:debug => false, :strict => false).parse(input)
-        assert_equal "George Martin06", bib.first.key
-        assert bib[:"George Martin06"]
       end
 
       it 'should parse the entry types' do
@@ -47,6 +40,27 @@ module BibTeX
       end     
     end
     
+		describe 'key parsing' do
+		  it 'handles whitespace in keys' do
+        input = "@Misc{George Martin06,title = {FEAST FOR CROWS}}"
+        bib = Parser.new(:debug => false, :strict => false).parse(input)
+        assert_equal "George Martin06", bib.first.key
+        assert bib[:"George Martin06"]
+      end
+    end
+		
+		describe 'backslashes and escape sequences' do
+			
+			it 'leaves backslashes intact' do
+				Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title.must_be :==, 'a backslash: \\'
+			end
+			
+			it 'parses LaTeX escaped quotes {"}' do
+				Parser.new.parse(%q(@misc{key, title = "{"}"}))[0].title.must_be :==, '{"}'
+			end
+			
+		end
+		
     describe 'given a set of explicit and implicit comments' do
       before do
         @bib = Parser.new(:debug => false, :include => [:meta_content]).parse(File.read(Test.fixtures(:comment)))

@@ -78,45 +78,45 @@ module BibTeX
       end
       
       describe "#convert" do
-        it "should convert the value when given a filter instance" do
+        it "converts the value when given a filter instance" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase.instance).to_s }
         end
 
-        it "should convert the value when given a filter class" do
+        it "converts the value when given a filter class" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase).to_s }
         end
 
-        it "should convert the value when given the name of a filter" do
+        it "converts the value when given the name of a filter" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(:upcase).to_s }
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert('upcase').to_s }
         end
 
-        it "should convert the value when using a ghost method" do
+        it "converts the value when using a ghost method" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert_upcase.to_s }
         end
         
-        it "should not alter the value when using a filter name" do
+        it "does not alter the value when using a filter name" do
           @values.each { |v| v.convert(:upcase) }
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
         end
 
-        it "should not alter the value when using a ghost method" do
+        it "does not alter the value when using a ghost method" do
           @values.each { |v| v.convert_upcase }
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
         end
       end
       
       describe "#convert!" do
-        it "should convert the value when given the name of a filter" do
+        it "converts the value when given the name of a filter" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert!(:upcase).to_s }
         end
         
-        it "should alter the value when given the name of a filter" do
+        it "alters the value when given the name of a filter" do
           @values.each { |v| v.convert!(:upcase) }
           assert_equal ['FOO', '"FOO" # bar'], @values.map(&:to_s)
         end
 
-        it "should alter the value when using a ghost method" do
+        it "alters the value when using a ghost method" do
           @values.each { |v| v.convert_upcase! }
           assert_equal ['FOO', '"FOO" # bar'], @values.map(&:to_s)
         end
@@ -124,7 +124,7 @@ module BibTeX
       end
       
       describe "#to_s" do
-        it 'should accept a :filter option and convert the values accordingly without changing the value' do
+        it 'accepts a :filter option and convert the values accordingly without changing the value' do
           assert_equal '"FOO" # bar', @values[1].to_s(:filter => :upcase)
           assert_equal '"foo" # bar', @values[1].to_s
         end
