@@ -85,6 +85,12 @@ module BibTeX
     alias :<< :add
     alias :push :add
     
+    # Converts all string values according to the given filter.
+    def convert! (filter)
+			tokens.each { |t| t.convert!(filter) }      
+      self
+    end
+
     def <=>(other)
       other.respond_to?(:to_a) ? to_a <=> other.to_a  : super
     end
@@ -93,8 +99,9 @@ module BibTeX
 
   class Name < Struct.new(:first, :last, :prefix, :suffix)
     extend Forwardable
-    include Comparable
 
+    include Comparable
+		
     BibTeXML = {
 			:first  => :first,
 			:last   => :last,
@@ -174,6 +181,20 @@ module BibTeX
       end
     end
     
+		def convert(filter)
+			dup.convert!(filter)
+		end
+		
+		def convert!(filter)
+			if f = Filters.resolve(filter)
+				each_pair { |k,v| self[k] = f.apply(v) unless v.nil? }
+			else
+				raise ArgumentError, "Failed to load filter #{filter.inspect}"
+			end
+
+			self
+		end
+		
     def to_citeproc(options = {})
       hash = {}
       hash['family'] = family unless family.nil?

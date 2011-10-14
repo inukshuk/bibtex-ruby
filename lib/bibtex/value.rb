@@ -205,17 +205,17 @@ module BibTeX
     
     # Returns true if the Value contains at least one symbol.
     def symbol?
-      @tokens.detect { |v| v.is_a?(Symbol) }
+      tokens.detect { |v| v.is_a?(Symbol) }
     end
     
     alias has_symbol? symbol?
     
     # Returns all symbols contained in the Value.
     def symbols
-      @tokens.select { |v| v.is_a?(Symbol) }
+      tokens.select { |v| v.is_a?(Symbol) }
     end
     
-    def each_token; @tokens.each; end
+    def each_token; tokens.each; end
     
     # Returns a new Value with all string values converted according to the given filter.
     def convert (filter)

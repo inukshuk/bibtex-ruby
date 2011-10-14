@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'helper'
 
 module BibTeX
@@ -18,6 +20,27 @@ module BibTeX
       end
       
     end
+    
+		describe "conversions" do
+      before do
+        class Upcase < BibTeX::Filter
+          def apply (value)
+            value.upcase
+          end
+        end
+      end
+      
+      describe "#convert" do
+        it "converts the value when given a filter instance" do
+					Names.parse('Poe and Hawthorne').convert(Upcase.instance).to_s.must_be :==, 'POE and HAWTHORNE'
+        end
+
+				it "converts LaTeX umlauts" do
+					Names.parse("S{\\o}ren Kirkegaard and Emmanuel L\\'evinas").convert(:latex).to_s.must_be :==, 'Kirkegaard, Søren and Lévinas, Emmanuel'
+				end
+			end
+
+		end
     
   end
 end
