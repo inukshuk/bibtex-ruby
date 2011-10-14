@@ -17,6 +17,7 @@ Feature: Parse BibTeX files and convert LaTeX to Unicode
      When I convert all entries using the filter "latex"
      Then the entry with key "issue16" should have a field "title" with the value "An umlaut: ü!"
 
+	@latex
   Scenario: A BibTeX file containing a variety of LaTeX strings
     When I parse the following file:
     """
