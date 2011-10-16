@@ -106,6 +106,7 @@ module BibTeX
       proceedings    paper-conference
       techreport     report
       unpublished    manuscript
+      article        article-journal
     }.map(&:intern)]).freeze
 
 	  
@@ -408,13 +409,15 @@ module BibTeX
     # value prior to parsing.
     def parse_names
       strings = bibliography ? bibliography.strings.values : []
+
       NAME_FIELDS.each do |key|
         if name = fields[key]
           name = name.dup.replace(strings).join.to_name
           fields[key] = name unless name.nil?
         end
       end
-      self
+
+  		self
     end
     
 		# Returns a list of all names (authors, editors, translators).
@@ -502,7 +505,7 @@ module BibTeX
 		def issued
 		  m = MONTHS.find_index(@fields[:month] && @fields[:month].v)
 		  m = m + 1 unless m.nil?
-		  { 'date-parts' => [[@fields[:year],m].compact.map(&:to_i)] }
+		  Hash['date-parts', [[@fields[:year],m].compact.map(&:to_i)]]
 		end
 		
 		alias citeproc_date issued
