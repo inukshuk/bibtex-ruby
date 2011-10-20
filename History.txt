@@ -1,3 +1,9 @@
+2.0.1 / 2011-10-20
+==================
+
+* Fixed name parser incompatibility with Rails (kudos to @amattsmith)
+* Improved latex-decoder (kudos to @etc)
+
 2.0.0 / 2011-09-25
 ==================
 
