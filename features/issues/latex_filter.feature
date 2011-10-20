@@ -77,7 +77,7 @@ Feature: Parse BibTeX files and convert LaTeX to Unicode
       year = {1958}
     }
     @article{haggqvist_2007,
-      author = {H\"{a}ggqvist, S\"{o}ren and \"{A}sa Maria Wikforss},
+      author = {H\"{a}ggqvist, S\"{o}ren and {\AA}sa Maria Wikforss},
       journal = {Erkenntnis},
       keywords = {Externalism; Content; Mind},
       month = {nov},
