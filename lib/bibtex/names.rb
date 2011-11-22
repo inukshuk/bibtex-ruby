@@ -109,7 +109,8 @@ module BibTeX
 			:suffix => :lineage
 		}.freeze
 		
-    def_delegators :to_s, :=~, :===, *(String.instance_methods(false).reject { |m| m =~ /^\W|each|first|last|!$/ })
+    def_delegators :to_s, :=~, :===,
+			*String.instance_methods(false).reject { |m| m =~ /^\W|to_s|replace|each|first|last|!$/ }
     
     class << self    
       def parse(string)

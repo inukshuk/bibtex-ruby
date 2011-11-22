@@ -16,9 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require 'forwardable'
-require 'open-uri'
-
 module BibTeX
 
   #
@@ -35,8 +32,8 @@ module BibTeX
     
     class << self    
 
-			attr_reader :defaults
-			
+      attr_reader :defaults
+      
       # Opens and parses the `.bib' file at the given +path+. Returns
       # a new Bibliography instance corresponding to the file, or, if a block
       # is given, yields the instance to the block, ensuring that the file
@@ -53,7 +50,7 @@ module BibTeX
       #
       def open(path, options = {})
         b = parse(Kernel.open(path, 'r:UTF-8').read, options)
-				b.path = path
+        b.path = path
         return b unless block_given?
 
         begin
@@ -65,14 +62,14 @@ module BibTeX
 
       # Parses the given string and returns a corresponding Bibliography instance.
       def parse(input, options = {})
-				case input
-				when Array, Hash, Element
-					Bibliography.new(options).add(input)
-				when ::String
-        	Parser.new(options).parse(input) || Bibliography.new(options)
-				else
-					raise ArgumentError, "failed to parse #{input.inspect}"
-				end
+        case input
+        when Array, Hash, Element
+          Bibliography.new(options).add(input)
+        when ::String
+          Parser.new(options).parse(input) || Bibliography.new(options)
+        else
+          raise ArgumentError, "failed to parse #{input.inspect}"
+        end
       end
       
       # Defines a new accessor that selects elements by type.
@@ -88,18 +85,18 @@ module BibTeX
 
     attr_reader :data, :strings, :entries, :errors, :options
 
-    attr_by_type :article, :book, :journal, :collection, :preamble, :comment,
-			:meta_content
+    attr_by_type :article, :book, :journal, :collection, :preamble,
+      :comment, :meta_content
     
-    def_delegators :@data, :length, :size, :each, :empty?, :last
-		def_delegators :@entries, :has_key?
+    def_delegators :@data, :length, :size, :empty?
+    def_delegators :@entries, :key?, :has_key?
     
 
     # Creates a new bibliography.
     def initialize(options = {})
       @options = Bibliography.defaults.merge(options)
-      @data, @strings = [], {}
-			@entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
+      @data, @strings, @errors = [], {}, []
+      @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
 
       yield self if block_given?
     end
@@ -127,10 +124,20 @@ module BibTeX
       options[:quotes] ||= %w({ })
 
       File.open(path, 'w:UTF-8') do |f|
-				f.write(to_s(options))
-			end
-			
+        f.write(to_s(options))
+      end
+      
       self
+    end
+
+
+    def each
+      if block_given?
+        data.each(&Proc.new)
+        self
+      else
+        to_enum
+      end
     end
     
 
@@ -150,12 +157,12 @@ module BibTeX
     # entry). @see Entry#convert!
     def convert (filter)
       entries.each_value do |entry|
-				entry.convert!(filter) if !block_given? || yield(entry)
-			end
-			
+        entry.convert!(filter) if !block_given? || yield(entry)
+      end
+      
       self
     end
-    		
+        
 
     # Deletes an object, or a list of objects from the bibliography.
     # If a list of objects is to be deleted, you can either supply the list
@@ -202,28 +209,24 @@ module BibTeX
       case
       when arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
         data[*arguments] 
-			when arguments.length == 1
-				case
-				when arguments[0].nil?
-					nil
-				when arguments[0].respond_to?(:empty?) && arguments[0].empty?
-					nil
-      	when arguments[0].is_a?(Symbol)
-        	entries[arguments[0]]
-	 			when arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@')
-        	entries[arguments[0]]
-				else
-					query(*arguments)
-				end
+      when arguments.length == 1
+        case
+        when arguments[0].nil?
+          nil
+        when arguments[0].respond_to?(:empty?) && arguments[0].empty?
+          nil
+        when arguments[0].is_a?(Symbol)
+          entries[arguments[0]]
+        when arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@')
+          entries[arguments[0]]
+        else
+          query(*arguments)
+        end
       else
         query(*arguments)
       end
     end
 
-    # Returns all objects which could not be parsed successfully.
-    def errors
-      @errors ||= []
-    end
 
     # Returns true if there are object which could not be parsed.
     def errors?
@@ -233,14 +236,14 @@ module BibTeX
     # Returns true if the +Bibliography+ contains no errors and only
     # valid BibTeX objects (meta content is ignored).
     def valid?
-      !errors? && @entries.values.all?(&:valid?)
+      !errors? && entries.values.all?(&:valid?)
     end
     
-		# Returns a list of the names of all authors, editors and translators in the Bibliography.
-		def names
-			map(&:names).flatten
-		end
-		
+    # Returns a list of the names of all authors, editors and translators in the Bibliography.
+    def names
+      map(&:names).flatten
+    end
+    
     # Replaces all string symbols which are defined in the bibliography.
     #
     # By default symbols in @string, @preamble and entries are replaced; this
@@ -308,16 +311,16 @@ module BibTeX
     end
     
     # Returns a REXML::Document representation of the bibliography using the
-		# BibTeXML format.
+    # BibTeXML format.
     def to_xml(options = {})
       require 'rexml/document'
-	    
+      
       xml =  REXML::Document.new
       xml << REXML::XMLDecl.new('1.0','UTF-8')
 
       root = REXML::Element.new('bibtex:file')
-			root.add_namespace('bibtex', 'http://bibtexml.sf.net/')
-			
+      root.add_namespace('bibtex', 'http://bibtexml.sf.net/')
+      
       each { |e| root.add_element(e.to_xml(options)) }
 
       xml.add_element(root)
@@ -342,11 +345,11 @@ module BibTeX
     # #=> same as above without using a block
     #
     def query(*arguments, &block)
-      raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)") unless arguments.length.between?(0,2)
+      raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)" unless arguments.length.between?(0,2)
 
       q, selector = arguments.reverse
       filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } :
-				Proc.new { |e| e.match?(q) }
+        Proc.new { |e| e.match?(q) }
 
       send(query_handler(selector), &filter)
     end
@@ -363,26 +366,26 @@ module BibTeX
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
     
-		# TODO this should be faster than select_duplicates_by
-		# def detect_duplicates_by(*arguments)
-		# end
+    # TODO this should be faster than select_duplicates_by
+    # def detect_duplicates_by(*arguments)
+    # end
 
-		def select_duplicates_by(*arguments)
-			d, fs = Hash.new([]), arguments.flatten.map(&:to_sym)
-			q('@entry') do |e|
-				d[e.generate_hash(fs)] << e
-			end
-			
-			d.values.dup
-		end
-		
-		alias duplicates select_duplicates_by
-		
-		def duplicates?
-			!select_duplicates_by?.empty?
-		end
-		
-		
+    def select_duplicates_by(*arguments)
+      d, fs = Hash.new([]), arguments.flatten.map(&:to_sym)
+      q('@entry') do |e|
+        d[e.generate_hash(fs)] << e
+      end
+      
+      d.values.dup
+    end
+    
+    alias duplicates select_duplicates_by
+    
+    def duplicates?
+      !select_duplicates_by?.empty?
+    end
+    
+    
     private
     
     def query_handler(selector)

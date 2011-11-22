@@ -30,11 +30,11 @@ module BibTeX
 
     end
 
-		describe '.parse' do
-			it 'accepts filters' do
-				Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'					
-			end
-		end
+    describe '.parse' do
+      it 'accepts filters' do
+        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'         
+      end
+    end
     
     describe 'given a populated biliography' do
       before do
@@ -66,41 +66,41 @@ module BibTeX
         END
       end
       
-      it 'should support access by index' do
+      it 'supports access by index' do
         assert_equal 'ruby', @bib[1].keywords 
       end
       
-      it 'should support access by range' do
+      it 'supports access by range' do
         assert_equal %w{2008 2007}, @bib[1..2].map(&:year)
       end
 
-      it 'should support access by index and offset' do
+      it 'supports access by index and offset' do
         assert_equal %w{2008 2007}, @bib[1,2].map(&:year)
       end
       
-      it 'should support queries by symbol key' do
+      it 'supports queries by symbol key' do
         refute_nil @bib[:rails]
         assert_nil @bib[:ruby]
       end
 
-      it 'should support queries by symbol key and selector' do
+      it 'supports queries by symbol key and selector' do
         assert_equal 1, @bib.q(:all, :rails).length
         refute_nil @bib.q(:first, :rails)
         assert_nil @bib.q(:first, :railss)
       end
       
-      it 'should support queries by string key' do
+      it 'supports queries by string key' do
         refute_nil @bib['rails']
         assert_nil @bib['ruby']
       end
 
-      it 'should support queries by type string' do
+      it 'supports queries by type string' do
         assert_equal 2, @bib['@book'].length
         assert_equal 1, @bib['@article'].length
         assert_equal 0, @bib['@collection'].length
       end
 
-      it 'should support queries by type string and selector' do
+      it 'supports queries by type string and selector' do
         assert_equal 2, @bib.q(:all, '@book').length
         refute_nil @bib.q(:first, '@book')
         assert_equal 1, @bib.q(:all, '@article').length
@@ -110,16 +110,16 @@ module BibTeX
       end
 
 
-      it 'should support queries by pattern' do
+      it 'supports queries by pattern' do
         assert_equal 0, @bib[/reilly/].length
         assert_equal 2, @bib[/reilly/i].length
       end
       
-      it 'should support queries by type string and conditions' do
+      it 'supports queries by type string and conditions' do
         assert_equal 1, @bib['@book[keywords=ruby]'].length
       end
 
-      it 'should support queries by bibtex element' do
+      it 'supports queries by bibtex element' do
         entry = Entry.parse(<<-END).first
         @article{segaran2007,
           title = {{Programming collective intelligence}},
@@ -133,11 +133,11 @@ module BibTeX
         assert_equal 0, @bib[entry].length
       end
       
-      it 'should support query and additional block' do
+      it 'supports query and additional block' do
         assert_equal 1, @bib.q('@book') { |e| e.keywords.split(/,/).length > 1 }.length
       end
     
-      it 'should support saving the bibliography to a file' do
+      it 'supports saving the bibliography to a file' do
         tmp = Tempfile.new('bibtex')
         tmp.close
         @bib.save_to(tmp.path)
@@ -163,38 +163,38 @@ module BibTeX
         
       end
       
-			describe 'LaTeX filter' do
-				before do
-					@bib['rails'].keywords = 'r\\"uby'
-				end
-				
-				it 'converts LaTeX umlauts' do
-					@bib.convert(:latex)['rails'].keywords.must_be :==, 'rüby'
-				end
-				
-			end
-			
-			describe 'BibTeXML export' do
-				before { @bibtexml = Tempfile.new('bibtexml') }
-				after  { @bibtexml.unlink }
-					
-				it 'should support exporting to BibTeXML' do
-					@bib.to_xml.write(@bibtexml, 2)
-					@bibtexml.rewind
-					xml = REXML::Document.new(@bibtexml)
-					xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
-					xml.root.get_elements('//bibtex:entry').wont_be_empty
-				end
+      describe 'LaTeX filter' do
+        before do
+          @bib['rails'].keywords = 'r\\"uby'
+        end
+        
+        it 'converts LaTeX umlauts' do
+          @bib.convert(:latex)['rails'].keywords.must_be :==, 'rüby'
+        end
+        
+      end
+      
+      describe 'BibTeXML export' do
+        before { @bibtexml = Tempfile.new('bibtexml') }
+        after  { @bibtexml.unlink }
+          
+        it 'supports exporting to BibTeXML' do
+          @bib.to_xml.write(@bibtexml, 2)
+          @bibtexml.rewind
+          xml = REXML::Document.new(@bibtexml)
+          xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
+          xml.root.get_elements('//bibtex:entry').wont_be_empty
+        end
 
-				it 'should support exporting to extended BibTeXML' do
-					@bib.to_xml(:extended => true).write(@bibtexml, 2)
-					@bibtexml.rewind
-					xml = REXML::Document.new(@bibtexml)
-					xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
-					xml.root.get_elements('//bibtex:person').wont_be_empty
-				end
-				
-			end
+        it 'supports exporting to extended BibTeXML' do
+          @bib.to_xml(:extended => true).write(@bibtexml, 2)
+          @bibtexml.rewind
+          xml = REXML::Document.new(@bibtexml)
+          xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
+          xml.root.get_elements('//bibtex:person').wont_be_empty
+        end
+        
+      end
     end
         
     

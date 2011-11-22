@@ -16,22 +16,20 @@
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #++
 
-$:.unshift(File.dirname(__FILE__)) unless
-  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
-
 require 'digest/md5'
-
-require 'bibtex/version'
+require 'forwardable'
 require 'logger'
+require 'open-uri'
 
 require 'multi_json'
+
+require 'bibtex/version'
 
 # = BibTeX
 #
 # This module encompasses a parser for BibTeX files and
-# auxiliary classes to model the individual
-# BibTeX objects: +String+, +Preamble+, +Comment+, and
-# +Entry+.
+# an API to the individual BibTeX objects: +String+,
+# +Preamble+, +Comment+, and +Entry+.
 #
 # Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
 # Copyright:: Copyright (c) 2010-2011 Sylvester Keil
@@ -43,11 +41,13 @@ module BibTeX
 	# An instance of the Ruby core class +Logger+.
 	# Used for logging by BibTeX-Ruby.
 	#
-	Log = Logger.new(STDERR)
-	Log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
-	Log.datetime_format = '%Y-%m-%d %H:%M:%S'
+	@log = Logger.new(STDERR)
+	@log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
+	@log.datetime_format = '%Y-%m-%d %H:%M:%S'
 
-  def self.log; BibTeX::Log; end
+  class << self
+    attr_reader :log
+  end
 
 end
 

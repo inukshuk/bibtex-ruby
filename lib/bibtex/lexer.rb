@@ -260,27 +260,27 @@ module BibTeX
 		end
 
 		def error_unbalanced_braces
-			Log.warn("Lexer: unbalanced braces at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			BibTeX.log.warn("Lexer: unbalanced braces at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNBALANCED, @scanner.matched]
 		end
 		
 		def error_unterminated_string
-			Log.warn("Lexer: unterminated string at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			BibTeX.log.warn("Lexer: unterminated string at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNTERMINATED_STRING, @scanner.matched]
 		end
 
 		def error_unterminated_content
-			Log.warn("Lexer: unterminated content at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			BibTeX.log.warn("Lexer: unterminated content at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNTERMINATED_CONTENT, @scanner.matched]
 		end
 		
 		def error_unexpected_token
-			Log.warn("Lexer: unexpected token `#{@scanner.matched}' at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			BibTeX.log.warn("Lexer: unexpected token `#{@scanner.matched}' at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNEXPECTED_TOKEN, @scanner.matched]
 		end
 
 		def error_unexpected_object
-			Log.warn("Lexer: unexpected object at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
+			BibTeX.log.warn("Lexer: unexpected object at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
 			backtrace [:E_UNEXPECTED_OBJECT, '@']
 		end
 
