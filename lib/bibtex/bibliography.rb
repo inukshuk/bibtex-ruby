@@ -101,6 +101,14 @@ module BibTeX
       yield self if block_given?
     end
     
+    def initialize_copy(other)
+      @options = other.options.dup
+      @errors = other.errors.dup
+      @data, @strings = [], {}
+      @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
+      add(other.data)
+    end
+    
     # Adds a new element, or a list of new elements to the bibliography.
     # Returns the Bibliography for chainability.
     def add(*arguments)
@@ -180,10 +188,6 @@ module BibTeX
     alias rm delete
 
 
-    # Returns an element or a list of elements according to the given index,
-    # range, or query. Contrary to the Bibliography#query this method does
-    # not yield to a block for additional refinement of the query.
-    #
     # call-seq:
     # >> bib[-1]
     # => Returns the last element of the Bibliography or nil
@@ -203,6 +207,11 @@ module BibTeX
     # => Returns all objects that match 'ruby' anywhere or []
     # >> bib['@book[keywords=ruby]']
     # => Returns all books whose keywords attribute equals 'ruby' or []
+    #
+    # Returns an element or a list of elements according to the given index,
+    # range, or query. Contrary to the Bibliography#query this method does
+    # not yield to a block for additional refinement of the query.
+    #
     def [](*arguments)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
 
@@ -276,8 +285,9 @@ module BibTeX
       self
     end
     
+    
     def sort(*arguments, &block)
-      @data.sort(*arguments, &block)
+      data.sort(*arguments, &block)
       self
     end
     
@@ -286,6 +296,10 @@ module BibTeX
       map { |o| o.to_s(options) }.join
     end
 
+    def inspect
+      "#<#{self.class} data=[#{length}]>"
+    end
+    
     def to_a(options = {})
       map { |o| o.to_hash(options) }
     end

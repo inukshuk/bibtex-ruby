@@ -103,7 +103,7 @@ module BibTeX
         when ::String # simulates Ruby's String#replace
           @tokens = [argument]
         when String
-         	@tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
+          @tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
         when Hash
           @tokens = @tokens.map { |v| argument[v] || v }
         end
@@ -112,12 +112,11 @@ module BibTeX
     end
 
 
-    # Returns the Value instance with all consecutive String tokens joined.
-    #
     # call-seq:
-    # Value.new('foo', 'bar').join #=> <'foobar'>
-    # Value.new(:foo, 'bar').join  #=> <:foo, 'bar'>
+    #   Value.new('foo', 'bar').join #=> <'foobar'>
+    #   Value.new(:foo, 'bar').join  #=> <:foo, 'bar'>
     #
+    # Returns the Value instance with all consecutive String tokens joined.
     def join
       @tokens = @tokens.inject([]) do |a,b|
         a[-1].is_a?(::String) && b.is_a?(::String) ? a[-1] += b : a << b; a
@@ -125,6 +124,16 @@ module BibTeX
       self
     end
     
+    # call-seq:
+    #   Value.new('foo').to_s                       #=> "foo"
+    #   Value.new(:foo).to_s                        #=> "foo"
+    #   Value.new('foo').to_s(:quotes => '"')       #=> "\"foo\""
+    #   Value.new('foo').to_s(:quotes => ['"','"']) #=> "\"foo\""
+    #   Value.new('foo').to_s(:quotes => ['{','}']) #=> "{foo}"
+    #   Value.new(:foo, 'bar').to_s                 #=> "foo # \"bar\""
+    #   Value.new('foo', 'bar').to_s                #=> "\"foo\" # \"bar\""
+    #   Value.new('\"u').to_s(:filter => :latex)    #=> "ü"
+    #
     # Returns a the Value as a string. @see #value; the only difference is
     # that single symbols are returned as String, too.
     # If the Value is atomic and the option :quotes is given, the string
@@ -132,17 +141,6 @@ module BibTeX
     #
     # If the option :filter is given, the Value will be converted using
     # the filter(s) specified.
-    #
-    # call-seq:
-    # Value.new('foo').to_s                       #=> "foo"
-    # Value.new(:foo).to_s                        #=> "foo"
-    # Value.new('foo').to_s(:quotes => '"')       #=> "\"foo\""
-    # Value.new('foo').to_s(:quotes => ['"','"']) #=> "\"foo\""
-    # Value.new('foo').to_s(:quotes => ['{','}']) #=> "{foo}"
-    # Value.new(:foo, 'bar').to_s                 #=> "foo # \"bar\""
-    # Value.new('foo', 'bar').to_s                #=> "\"foo\" # \"bar\""
-    # Value.new('\"u').to_s(:filter => :latex)    #=> "ü"
-    #
     def to_s(options = {})
       return convert(options.delete(:filter)).to_s(options) if options.has_key?(:filter)
       return value.to_s unless options.has_key?(:quotes) && atomic?
@@ -161,7 +159,7 @@ module BibTeX
     alias :v :value
 
     def inspect
-      '<' + @tokens.map(&:inspect).join(', ') + '>'
+      "#<#{self.class} #{tokens.map(&:inspect).join(', ')}>"
     end
     
     # Returns true if the Value is empty or consists of a single token.
@@ -173,7 +171,6 @@ module BibTeX
     def name?; false; end
     
     alias :names? :name?
-    alias :is_name? :name?
     
     def to_name
       Names.parse(to_s)
@@ -181,24 +178,24 @@ module BibTeX
     
     alias to_names to_name
 
-    # Returns true if the Value's content looks like a date.    
+    # Returns true if the Value's content is a date.    
     def date?
+      !to_date.nil?
     end
-
-    alias is_date? date?
     
-    # Returns the string as a citeproc date. TODO use edtf format instead.
+    # Returns the string as a date.
     def to_date
-      numeric? ? { 'date-parts' => [[to_i]] } : { 'literal' => to_s(:quotes => [])}
+      require 'date'
+      Date.parse(to_s)
+    rescue
+      nil
     end
-    
+        
     # Returns true if the Value's content is numeric.
     def numeric?
       to_s =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
     end
-    
-    alias is_numeric? numeric?
-    
+        
     def to_citeproc (options = {})
       to_s(options)
     end
@@ -225,27 +222,27 @@ module BibTeX
     # Converts all string values according to the given filter.
     def convert! (filter)
       if f = Filters.resolve(filter)
-				tokens.map! { |t| f.apply(t) }
-			else
-				raise ArgumentError, "Failed to load filter #{filter.inspect}"
+        tokens.map! { |t| f.apply(t) }
+      else
+        raise ArgumentError, "Failed to load filter #{filter.inspect}"
       end
       
       self
     end
     
-		def method_missing (name, *args)
-			case
-			when name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
-				$2 ? convert!($1) : convert($1)
-			else
-				super
-			end
-		end
-		
-		def respond_to? (method)
-		  method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
-		end
-		    
+    def method_missing (name, *args)
+      case
+      when name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
+        $2 ? convert!($1) : convert($1)
+      else
+        super
+      end
+    end
+    
+    def respond_to? (method)
+      method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
+    end
+        
     def <=> (other)
       to_s <=> other.to_s
     end

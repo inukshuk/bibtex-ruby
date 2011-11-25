@@ -11,140 +11,140 @@ module BibTeX
       end
     end
 
-		describe 'cross-references' do
-			it 'has no cross-reference by default' do
-				assert_equal false, Entry.new.has_cross_reference?
-			end
-			
-			it 'is not cross-referenced by default' do
-				assert_equal false, Entry.new.cross_referenced?
-				Entry.new.cross_referenced_by.must_be_empty
-			end
-			
-			describe 'given a bibliography with cross referenced entries' do
-				before do
-					@bib = Bibliography.parse <<-END
-						@book{a, editor = "A", title = "A"}
-						@incollection{a1, crossref = "a"}
-						@incollection{b1, crossref = "b"}
-					END
-				end
-				
-				describe '#has_cross_reference?' do
-					it 'returns true if the entry has a valid cross-reference' do
-						assert_equal true, @bib['a1'].has_cross_reference?
-					end
-					it 'returns false if the entry has no valid cross-reference' do
-						assert_equal false, @bib['a'].has_cross_reference?
-						assert_equal false, @bib['b1'].has_cross_reference?
-					end
-				end
-				
-				describe '#cross_referemced?' do
-					it 'returns true if the entry is cross-referenced by another entry' do
-						assert_equal true, @bib['a'].cross_referenced?
-					end
-					it 'returns false if the entry is not cross-referenced' do
-						assert_equal false, @bib['a1'].cross_referenced?
-					end
-				end
-				
-				describe '#cross_referenced_by' do
-					it 'returns a list of all entries that cross-reference this entry' do
-						@bib['a'].cross_referenced_by.must_include(@bib['a1'])
-					end
-					
-					it 'returns an empty list if there are no cross-references to this entry' do
-						@bib['a1'].cross_referenced_by.must_be_empty
-					end
-				end
-				
-				describe 'resolve field values using array accessors #[]' do
-					describe 'when a "title" is set in the entry itself' do
-						before { @bib['a1'].title = 'A1' }
-						it 'returns the title' do
-							@bib['a1'].title.must_be :==, 'A1'
-						end
-					end
-					
-					describe 'when "title" is undefined for the entry but defined in the reference' do
-						it 'returns the referenced title' do
-							@bib['a1'].title.must_be :==, @bib['a'].title
-						end
-					end
-					
-					describe 'when "booktitle" is undefined for the entry but defined in the reference' do
-						before { @bib['a'].booktitle = "A Booktitle" }
-						it 'returns the referenced booktitle' do
-							@bib['a1'].booktitle.must_be :==, @bib['a'].booktitle
-						end
-					end
+    describe 'cross-references' do
+      it 'has no cross-reference by default' do
+        assert_equal false, Entry.new.has_cross_reference?
+      end
+      
+      it 'is not cross-referenced by default' do
+        assert_equal false, Entry.new.cross_referenced?
+        Entry.new.cross_referenced_by.must_be_empty
+      end
+      
+      describe 'given a bibliography with cross referenced entries' do
+        before do
+          @bib = Bibliography.parse <<-END
+            @book{a, editor = "A", title = "A"}
+            @incollection{a1, crossref = "a"}
+            @incollection{b1, crossref = "b"}
+          END
+        end
+        
+        describe '#has_cross_reference?' do
+          it 'returns true if the entry has a valid cross-reference' do
+            assert_equal true, @bib['a1'].has_cross_reference?
+          end
+          it 'returns false if the entry has no valid cross-reference' do
+            assert_equal false, @bib['a'].has_cross_reference?
+            assert_equal false, @bib['b1'].has_cross_reference?
+          end
+        end
+        
+        describe '#cross_referemced?' do
+          it 'returns true if the entry is cross-referenced by another entry' do
+            assert_equal true, @bib['a'].cross_referenced?
+          end
+          it 'returns false if the entry is not cross-referenced' do
+            assert_equal false, @bib['a1'].cross_referenced?
+          end
+        end
+        
+        describe '#cross_referenced_by' do
+          it 'returns a list of all entries that cross-reference this entry' do
+            @bib['a'].cross_referenced_by.must_include(@bib['a1'])
+          end
+          
+          it 'returns an empty list if there are no cross-references to this entry' do
+            @bib['a1'].cross_referenced_by.must_be_empty
+          end
+        end
+        
+        describe 'resolve field values using array accessors #[]' do
+          describe 'when a "title" is set in the entry itself' do
+            before { @bib['a1'].title = 'A1' }
+            it 'returns the title' do
+              @bib['a1'].title.must_be :==, 'A1'
+            end
+          end
+          
+          describe 'when "title" is undefined for the entry but defined in the reference' do
+            it 'returns the referenced title' do
+              @bib['a1'].title.must_be :==, @bib['a'].title
+            end
+          end
+          
+          describe 'when "booktitle" is undefined for the entry but defined in the reference' do
+            before { @bib['a'].booktitle = "A Booktitle" }
+            it 'returns the referenced booktitle' do
+              @bib['a1'].booktitle.must_be :==, @bib['a'].booktitle
+            end
+          end
 
-					describe 'when "booktitle" is undefined for the entry and the reference but the reference has a "title"' do
-						it "returns the reference's title" do
-							@bib['a1'].booktitle.must_be :==, @bib['a'].title
-						end
-					end
-					
-					it 'does not store referenced values permanently' do
-						refute_nil @bib['a1'].booktitle
-						assert_nil @bib['a1'].fields[:booktitle]
-					end
+          describe 'when "booktitle" is undefined for the entry and the reference but the reference has a "title"' do
+            it "returns the reference's title" do
+              @bib['a1'].booktitle.must_be :==, @bib['a'].title
+            end
+          end
+          
+          it 'does not store referenced values permanently' do
+            refute_nil @bib['a1'].booktitle
+            assert_nil @bib['a1'].fields[:booktitle]
+          end
 
-					describe '#inherited_fields' do
-						it 'returns an empty list by default' do
-							Entry.new.inherited_fields.must_be_empty
-						end
-						
-						it 'returns an empty list if this entry has no cross-reference' do
-							@bib['a'].inherited_fields.must_be_empty
-						end
-						
-						it 'returns an empty list if this entry has a cross-reference but the reference does not exist in the bibliography' do
-							@bib['b1'].inherited_fields.must_be_empty
-						end
-						
-						it 'returns a list of all fields not set in the field but in the reference' do
-							@bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
-						end
-					end
-					
-					describe '#save_inherited_fields' do
-						it 'copies referenced values to the entry' do
-							@bib['a1'].title = 'a1'
-							@bib['a1'].save_inherited_fields
-							@bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
-							@bib['a1'].fields[:title].wont_be :==, @bib['a'].title
-						end
-					end
-				end
-				
-			end
-		end
-		
-		describe '#names' do
-			it 'returns an empty list by default' do
-				Entry.new.names.must_be :==, []
-			end
-			
-			it 'returns the author (if set)' do
-				Entry.new(:author => 'A').names.must_be :==, %w{ A }
-			end
+          describe '#inherited_fields' do
+            it 'returns an empty list by default' do
+              Entry.new.inherited_fields.must_be_empty
+            end
+            
+            it 'returns an empty list if this entry has no cross-reference' do
+              @bib['a'].inherited_fields.must_be_empty
+            end
+            
+            it 'returns an empty list if this entry has a cross-reference but the reference does not exist in the bibliography' do
+              @bib['b1'].inherited_fields.must_be_empty
+            end
+            
+            it 'returns a list of all fields not set in the field but in the reference' do
+              @bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
+            end
+          end
+          
+          describe '#save_inherited_fields' do
+            it 'copies referenced values to the entry' do
+              @bib['a1'].title = 'a1'
+              @bib['a1'].save_inherited_fields
+              @bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
+              @bib['a1'].fields[:title].wont_be :==, @bib['a'].title
+            end
+          end
+        end
+        
+      end
+    end
+    
+    describe '#names' do
+      it 'returns an empty list by default' do
+        Entry.new.names.must_be :==, []
+      end
+      
+      it 'returns the author (if set)' do
+        Entry.new(:author => 'A').names.must_be :==, %w{ A }
+      end
 
-			it 'returns all authors (if set)' do
-				Entry.new(:author => 'A B and C D').parse_names.names.length.must_be :==, 2
-			end
-			
-			it 'returns the editor (if set)' do
-				Entry.new(:editor => 'A').names.must_be :==, %w{ A }
-			end
+      it 'returns all authors (if set)' do
+        Entry.new(:author => 'A B and C D').parse_names.names.length.must_be :==, 2
+      end
+      
+      it 'returns the editor (if set)' do
+        Entry.new(:editor => 'A').names.must_be :==, %w{ A }
+      end
 
-			it 'returns the translator (if set)' do
-				Entry.new(:translator => 'A').names.must_be :==, %w{ A }
-			end
-			
-		end
-		
+      it 'returns the translator (if set)' do
+        Entry.new(:translator => 'A').names.must_be :==, %w{ A }
+      end
+      
+    end
+    
     describe 'month conversion' do
       before do
         @entry = Entry.new
@@ -254,36 +254,36 @@ module BibTeX
         
       end
       
-			describe 'LaTeX filter' do
-				before do
-					@entry.title = 'M\\"{o}by Dick'
-				end
-				
-				describe '#convert' do
-					it 'converts LaTeX umlauts' do
-						@entry.convert(:latex).title.must_be :==, 'Möby Dick'
-					end
-					
-					it 'does not change the original entry' do
-						e = @entry.convert(:latex)
-						e.wont_be :==, @entry
-						e.title.to_s.length.must_be :<, @entry.title.to_s.length
-					end
-				end
+      describe 'LaTeX filter' do
+        before do
+          @entry.title = 'M\\"{o}by Dick'
+        end
+        
+        describe '#convert' do
+          it 'converts LaTeX umlauts' do
+            @entry.convert(:latex).title.must_be :==, 'Möby Dick'
+          end
+          
+          it 'does not change the original entry' do
+            e = @entry.convert(:latex)
+            e.wont_be :==, @entry
+            e.title.to_s.length.must_be :<, @entry.title.to_s.length
+          end
+        end
 
-				describe '#convert!' do
-					it 'converts LaTeX umlauts' do
-						@entry.convert!(:latex).title.must_be :==, 'Möby Dick'
-					end
-					
-					it 'changes the original entry in-place' do
-						e = @entry.convert!(:latex)
-						e.must_be :equal?, @entry
-						e.title.to_s.length.must_be :==, @entry.title.to_s.length
-					end
-				end
-				
-			end
+        describe '#convert!' do
+          it 'converts LaTeX umlauts' do
+            @entry.convert!(:latex).title.must_be :==, 'Möby Dick'
+          end
+          
+          it 'changes the original entry in-place' do
+            e = @entry.convert!(:latex)
+            e.must_be :equal?, @entry
+            e.title.to_s.length.must_be :==, @entry.title.to_s.length
+          end
+        end
+        
+      end
     end
 
     describe 'citeproc export' do
@@ -393,57 +393,57 @@ module BibTeX
 
     end
   
-		describe 'default keys' do
-			before {
-				@e1 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
-				@e2 = Entry.new(:type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
-				@e3 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
-			}
-	
-			it 'should return "unknown-a" for an empty Entry' do
-				Entry.new.key.must_be :==, 'unknown-a'
-			end
-	
-			it 'should return a key made up of author-year-a if all fields are present' do
-				@e1.key.must_be :==, 'poe1996a'
-			end
+    describe 'default keys' do
+      before {
+        @e1 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
+        @e2 = Entry.new(:type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
+        @e3 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
+      }
+  
+      it 'should return "unknown-a" for an empty Entry' do
+        Entry.new.key.must_be :==, 'unknown-a'
+      end
+  
+      it 'should return a key made up of author-year-a if all fields are present' do
+        @e1.key.must_be :==, 'poe1996a'
+      end
 
-			it 'should return a key made up of editor-year-a if there is no author' do
-				@e2.key.must_be :==, 'john1996a'
-			end
+      it 'should return a key made up of editor-year-a if there is no author' do
+        @e2.key.must_be :==, 'john1996a'
+      end
 
-			it 'should return use the last name if the author/editor names have been parsed' do
-				@e2.parse_names.key.must_be :==, 'hopkins1996a'
-			end
+      it 'should return use the last name if the author/editor names have been parsed' do
+        @e2.parse_names.key.must_be :==, 'hopkins1996a'
+      end
 
-			it 'skips the year if not present' do
-				@e3.key.must_be :==, 'poe-a'
-			end
-		end
-		
-		describe 'when the entry is added to a Bibliography' do
-			before {
-				@e = Entry.new
-				@bib = Bibliography.new
-			}
-			
-			it 'should register itself with its key' do
-				@bib << @e
-				@bib.entries.keys.must_include @e.key
-			end
-			
-			describe "when there is already an element registered with the entry's key" do
-				before { @bib << Entry.new }
-				
-				it "should find a suitable key" do
-					k = @e.key
-					@bib << @e
-					@bib.entries.keys.must_include @e.key
-					k.wont_be :==, @e.key
-				end
-				
-			end
-		end
-		
+      it 'skips the year if not present' do
+        @e3.key.must_be :==, 'poe-a'
+      end
+    end
+    
+    describe 'when the entry is added to a Bibliography' do
+      before {
+        @e = Entry.new
+        @bib = Bibliography.new
+      }
+      
+      it 'should register itself with its key' do
+        @bib << @e
+        @bib.entries.keys.must_include @e.key
+      end
+      
+      describe "when there is already an element registered with the entry's key" do
+        before { @bib << Entry.new }
+        
+        it "should find a suitable key" do
+          k = @e.key
+          @bib << @e
+          @bib.entries.keys.must_include @e.key
+          k.wont_be :==, @e.key
+        end
+        
+      end
+    end
+    
   end
 end
