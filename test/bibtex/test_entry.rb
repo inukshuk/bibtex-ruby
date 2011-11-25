@@ -40,7 +40,7 @@ module BibTeX
           end
         end
         
-        describe '#cross_referemced?' do
+        describe '#cross_referenced?' do
           it 'returns true if the entry is cross-referenced by another entry' do
             assert_equal true, @bib['a'].cross_referenced?
           end
@@ -56,6 +56,12 @@ module BibTeX
           
           it 'returns an empty list if there are no cross-references to this entry' do
             @bib['a1'].cross_referenced_by.must_be_empty
+          end
+        end
+        
+        describe '#respond_to?' do
+          it 'takes into account the inherited attributes' do
+            @bib['a1'].respond_to?(:title)
           end
         end
         
