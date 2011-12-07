@@ -69,7 +69,7 @@ module BibTeX
     end
     
     def has_type?(type)
-      self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
+      type == '*' || self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
     end
     
     [:entry, :book, :article, :collection, :string, :preamble, :comment]. each do |type|
@@ -88,8 +88,8 @@ module BibTeX
         query == self
       when Regexp
         to_s.match(query)
-      when /@(\w+)(?:\[([^\]]*)\])?/
-        query.scan(/@(\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
+      when /@(\*|\w+)(?:\[([^\]]*)\])?/
+        query.scan(/@(\*|\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
           has_type?(type) && ( condition.nil? || meets?(condition.split(/,\s*/)) )
         end
       when /^\/(.+)\/$/
