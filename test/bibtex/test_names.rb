@@ -23,7 +23,7 @@ module BibTeX
     
 		describe "conversions" do
       before do
-        class Upcase < BibTeX::Filter
+        class UpcaseAll < BibTeX::Filter
           def apply (value)
             value.upcase
           end
@@ -32,7 +32,7 @@ module BibTeX
       
       describe "#convert" do
         it "converts the value when given a filter instance" do
-					Names.parse('Poe and Hawthorne').convert(Upcase.instance).to_s.must_be :==, 'POE and HAWTHORNE'
+					Names.parse('Poe and Hawthorne').convert(UpcaseAll.instance).to_s.must_be :==, 'POE and HAWTHORNE'
         end
 
 				it "converts LaTeX umlauts" do

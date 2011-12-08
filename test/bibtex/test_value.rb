@@ -70,7 +70,7 @@ module BibTeX
     describe "conversions" do
       before do
         class Upcase < BibTeX::Filter
-          def apply (value)
+          def apply(value)
             value.is_a?(::String) ? value.upcase : value
           end
         end
@@ -81,7 +81,7 @@ module BibTeX
         it "converts the value when given a filter instance" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase.instance).to_s }
         end
-
+        
         it "converts the value when given a filter class" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase).to_s }
         end

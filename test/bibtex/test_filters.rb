@@ -28,6 +28,7 @@ module BibTeX
       
       it "should return nil if there is no filter by that name" do
         assert_equal nil, Filters.resolve(:foobar)
+        assert_equal nil, Filters.resolve(:upcase)
         assert_equal nil, Filters.resolve('foobar')
         assert_equal nil, Filters.resolve(nil)
       end
