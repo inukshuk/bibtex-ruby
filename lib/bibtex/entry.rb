@@ -192,7 +192,7 @@ module BibTeX
     end
     
     def has_type?(type)
-      type.to_s.match(/^entry$/i) || @type == type.to_sym || super
+      type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_sym || super
     end
     
     alias type? has_type?

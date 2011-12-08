@@ -53,4 +53,10 @@ Feature: Searching in BibTeX bibliographies
 		Then there should be exactly 0 matches
 		When I search for "@book, @article"
 		Then there should be exactly 3 matches
+		When I search for "@entry"
+		Then there should be exactly 3 matches
+		When I search for "@*"
+		Then there should be exactly 3 matches
+		When I search for "@*[year=2007]"
+		Then there should be exactly 1 match
 		

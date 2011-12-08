@@ -88,8 +88,8 @@ module BibTeX
         query == self
       when Regexp
         to_s.match(query)
-      when /@(\w+)(?:\[([^\]]*)\])?/
-        query.scan(/@(\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
+      when /@(\*|\w+)(?:\[([^\]]*)\])?/
+        query.scan(/@(\*|\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
           has_type?(type) && ( condition.nil? || meets?(condition.split(/,\s*/)) )
         end
       when /^\/(.+)\/$/
