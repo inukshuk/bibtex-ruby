@@ -341,22 +341,35 @@ module BibTeX
       xml
     end
 
+    # call-seq:
+    #   bib.query()          #=> returns all elements
+    #   bib.query(:all)      #=> same as above
+    #   bib.query(:first)    #=> returns the first element
+    #   bib.query('@book')   #=> returns all books
+    #   bib.query('@entry')  #=> returns all entries (books, articles etc.)
+    #   bib.query('@*')      #=> same as above
+    #   bib.query(:first, '@book, @article')
+    #     #=> returns the first book or article or nil
+    #   bib.query('@book[year=2011], @article)
+    #     #=> returns all books published in 2011 and all articles
+    #   bib.query('@book, @article) { |o| o.year == '2011' }
+    #     #=> returns all books and articles published in 2011
+    #   bib.query('@book[year=2011], @article[year=2011])
+    #     #=> same as above without using a block
+    #
     # Returns objects in the Bibliography which match the given selector and,
     # optionally, the conditions specified in the given block.
     #
-    # call-seq:
-    # bib.query()        #=> returns all objects
-    # bib.query(:all)    #=> returns all objects
-    # bib.query(:first)  #=> returns the first object
-    # bib.query('@book') #=> returns all books
-    # bib.query(:first, '@book, @article')
-    # #=> returns the first book or article
-    # bib.query('@book[year=2011], @article)
-    # #=> returns all books published in 2011 and all articles
-    # bib.query('@book, @article) { |o| o.year == '2011' }
-    # #=> returns all books and articles published in 2011
-    # bib.query('@book[year=2011], @article[year=2011])
-    # #=> same as above without using a block
+    # Queries offer syntactic sugar for common enumerator invocations:
+    #
+    #     >> bib.query(:all, '@book')
+    #     => same as bib.select { |b| b.has_type?(:book) }
+    #     >> bib.query('@book')
+    #     => same as above
+    #     >> bib.query(:first, '@book')
+    #     => same as bib.detect { |b| b.has_type?(:book) }
+    #     >> bib.query(:none, '@book')
+    #     => same as bib.reject { |b| b.has_type?(:book) }
     #
     def query(*arguments, &block)
       raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)" unless arguments.length.between?(0,2)
