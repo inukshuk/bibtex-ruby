@@ -69,7 +69,7 @@ module BibTeX
     end
     
     def has_type?(type)
-      self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
+      type == '*' || self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
     end
     
     [:entry, :book, :article, :collection, :string, :preamble, :comment]. each do |type|
