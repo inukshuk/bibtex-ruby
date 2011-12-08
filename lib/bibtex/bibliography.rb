@@ -343,8 +343,6 @@ module BibTeX
 
     # call-seq:
     #   bib.query()          #=> returns all elements
-    #   bib.query(:all)      #=> same as above
-    #   bib.query(:first)    #=> returns the first element
     #   bib.query('@book')   #=> returns all books
     #   bib.query('@entry')  #=> returns all entries (books, articles etc.)
     #   bib.query('@*')      #=> same as above
@@ -372,9 +370,17 @@ module BibTeX
     #     => same as bib.reject { |b| b.has_type?(:book) }
     #
     def query(*arguments, &block)
-      raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)" unless arguments.length.between?(0,2)
-
-      q, selector = arguments.reverse
+      case arguments.length
+      when 0
+        selector, q = :all, nil
+      when 1
+        selector, q = :all, arguments[0]
+      when 2
+        selector, q = arguments
+      else
+        raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)"
+      end
+      
       filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } :
         Proc.new { |e| e.match?(q) }
 

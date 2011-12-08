@@ -79,7 +79,7 @@ module BibTeX
     
     # Returns true if the element matches the given query.
     def matches?(query)
-      return true if !query || query.respond_to?(:empty?) && query.empty?
+      return true if query.nil? || query.respond_to?(:empty?) && query.empty?
       
       case query
       when Symbol

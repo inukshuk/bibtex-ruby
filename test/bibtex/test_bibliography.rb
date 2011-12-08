@@ -63,6 +63,7 @@ module BibTeX
           year={2007},
           publisher={O'Reilly}
         }
+        @string{ foo = "foobar" }
         END
       end
       
@@ -142,6 +143,22 @@ module BibTeX
         tmp.close
         @bib.save_to(tmp.path)
         assert_equal @bib.length, BibTeX.open(tmp.path).length
+      end
+      
+      describe '#query' do
+        
+        it 'returns all elements when passed no arguments' do
+          @bib.query.length.must_be :==, 4
+        end
+
+        it 'returns all elements when passed :all and an empty condition' do
+          @bib.query(:all, '').length.must_be :==, 4
+        end
+        
+        it 'returns all entries when passed a * wildcard' do
+          @bib.query('@*').length.must_be :==, 3
+        end
+        
       end
       
       describe 'given a filter' do
