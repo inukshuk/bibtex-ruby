@@ -335,7 +335,7 @@ module BibTeX
       root = REXML::Element.new('bibtex:file')
       root.add_namespace('bibtex', 'http://bibtexml.sf.net/')
       
-      each { |e| root.add_element(e.to_xml(options)) }
+      each { |e| root.add_element(e.to_xml(options)) if e.is_a?(Entry) }
 
       xml.add_element(root)
       xml
