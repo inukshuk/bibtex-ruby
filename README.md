@@ -459,12 +459,25 @@ useful examples, take a look at the cucumber features in the
 [features/issues/](https://github.com/inukshuk/bibtex-ruby/blob/master/features/issues)
 directory).
 
+To run the tests and cucumber examples execute these commands (from within
+the bibtex-ruby directory):
+
+    $ [sudo] gem install bundler
+    $ [sudo] bundle install
+    $ bundle exec cucumber
+    $ bundle exec rake test
+
+To execute the test suite continuously while you're working run:
+
+    $ bundle exec watchr auto.watchr
+
+
 
 Credits
 -------
 
-The BibTeX-Ruby package was written by [Sylvester Keil](http://sylvester.keil.or.at/);
-kudos and thanks to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)!
+Copyright 2011 [Sylvester Keil](http://sylvester.keil.or.at/).
 
-BibTeX-Ruby is distributed under the terms and conditions of the GPL. See
+BibTeX-Ruby was written by these awesome [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
+and is distributed under the terms and conditions of the GNU GPL. See
 LICENSE for details.
