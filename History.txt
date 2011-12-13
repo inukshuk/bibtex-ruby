@@ -1,3 +1,8 @@
+2.0.3 / 2011-12-13
+==================
+
+* Added new entry wildcard "@*" to queries (kudos to @vanto)
+
 2.0.2 / 2011-11-25
 ==================
 

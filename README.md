@@ -58,37 +58,18 @@ one of [many different styles](https://github.com/citation-style-language/styles
       Guide. Raleigh, North Carolina: The Pragmatic Bookshelf, 2009."
 
 
-Installation
-------------
-
-If you just want to use it:
-
-    $ [sudo] gem install bibtex-ruby
-
-If you want to work with the sources:
-
-    $ git clone http://github.com/inukshuk/bibtex-ruby.git
-    $ cd bibtex-ruby
-    $ [sudo] bundle install
-    $ rake racc
-    $ rake rdoc
-    $ rake features
-    $ rake test
-
-For extra credit, fork the
-[project on GitHub](http://github.com/inukshuk/bibtex-ruby.git).
-
 
 Requirements
 ------------
 
-* The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
-  required to generate the BibTeX parser and the name parser.
-
-The BibTeX-Ruby gem has been tested on Ruby versions 1.8.7 and 1.9.2; it has
+The BibTeX-Ruby gem has been tested on Ruby 1.8 and 1.9; it has
 been confirmed to work with REE, JRuby, and Rubinius;
 however, there have been some [issues](https://github.com/inukshuk/bibtex-ruby/issues)
 with MacRuby implementations.
+
+The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
+required to generate the BibTeX parser and the name parser; you do not need
+to install it to use the bibtex-ruby gem.
 
 
 
@@ -453,7 +434,7 @@ You can check out a copy of the latest code using Git:
 
 If you've found a bug or have a question, please open an issue on the
 [BibTeX-Ruby issue tracker](http://github.com/inukshuk/bibtex-ruby/issues).
-Or, for extra credit, clone the BibTeX-Ruby repository, write a failing
+For extra credit, clone the BibTeX-Ruby repository, write a failing
 example, or cucumber feature, fix the bug and submit a pull request (for
 useful examples, take a look at the cucumber features in the
 [features/issues/](https://github.com/inukshuk/bibtex-ruby/blob/master/features/issues)
@@ -478,6 +459,6 @@ Credits
 
 Copyright 2011 [Sylvester Keil](http://sylvester.keil.or.at/).
 
-BibTeX-Ruby was written by these awesome [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
+BibTeX-Ruby was written by many awesome [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
 and is distributed under the terms and conditions of the GNU GPL. See
 LICENSE for details.
