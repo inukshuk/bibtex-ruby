@@ -26,7 +26,10 @@ n, k = 1001, 20
 f = []
 g = []
 
-Benchmark.benchmark((" "*15) + CAPTION, 7, FMTSTR, '%14s:' % 'sum(f)', '%14s:' % 'sum(g)') do |b|
+# Ruby 1.9.3
+format = Benchmark.const_defined?(:FMTSTR) ? Benchmark::FMTSTR : Benchmark::FORMAT
+
+Benchmark.benchmark((" "*15) + CAPTION, 7, format, '%14s:' % 'sum(f)', '%14s:' % 'sum(g)') do |b|
 
   1.step(n,k) do |i|
   
