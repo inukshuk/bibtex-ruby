@@ -90,10 +90,10 @@ require 'bibtex/lexer'
 
   attr_reader :lexer, :options
   
-	DEFAULTS = { :include => [:errors], :debug => ENV['DEBUG'] == true }.freeze
-	
+  DEFAULTS = { :include => [:errors], :debug => ENV['DEBUG'] == true }.freeze
+  
   def initialize(options = {})
-		@options = DEFAULTS.merge(options)
+    @options = DEFAULTS.merge(options)
     @lexer = Lexer.new(@options)
   end
 
@@ -102,7 +102,7 @@ require 'bibtex/lexer'
     @lexer.analyse(input)
     
     do_parse
-		#yyparse(@lexer,:each)
+    #yyparse(@lexer,:each)
   end
   
   def next_token
@@ -114,8 +114,11 @@ require 'bibtex/lexer'
   end
     
   def on_error(tid, val, vstack)
-    Log.error("Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
-    #raise(ParseError, "Failed to parse BibTeX on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
+    message =
+      "Failed to parse BibTeX on value #{val.inspect} (#{token_to_str(tid) || '?'}) #{ vstack.inspect}"
+    
+    BibTeX.log.error message
+    raise ParseError, message
   end
 
 # -*- racc -*-
