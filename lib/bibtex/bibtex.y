@@ -116,7 +116,7 @@ require 'bibtex/lexer'
   def on_error(tid, val, vstack)
     message =
       "Failed to parse BibTeX on value #{val.inspect} (#{token_to_str(tid) || '?'}) #{ vstack.inspect}"
-    
+
     BibTeX.log.error message
     raise ParseError, message
   end

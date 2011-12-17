@@ -129,5 +129,26 @@ module BibTeX
 
     end
     
+		describe 'given an entry with missing commas between fields' do
+			before do
+				@level = BibTeX.log.level
+				BibTeX.log.level = Logger::FATAL
+			end
+			
+			after do
+				BibTeX.log.level = @level
+			end
+			
+			it 'raises a parser error' do
+				lambda {
+					Parser.new.parse <<-END
+						@book{book1,
+						 title = "Parse error because"
+						 author = "comma missing between title and author"
+						}
+					END
+				}.must_raise(ParseError)
+			end
+		end
   end
 end
