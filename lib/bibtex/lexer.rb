@@ -106,10 +106,16 @@ module BibTeX
     # Returns true if the lexer is currently in strict mode.
     def strict?; !!(@options[:strict]); end
     
+    def strip_line_breaks?
+      !!options[:strip] && !active?(:comment)
+    end
+    
     # Pushes a value onto the parse stack. Returns the Lexer.
     def push(value)
       case value[0]
       when :CONTENT, :STRING_LITERAL
+        value[1].gsub!(/\n\s*/, ' ') if strip_line_breaks?
+        
         if !@stack.empty? && value[0] == @stack[-1][0]
           @stack[-1][1] << value[1]
         else
@@ -236,9 +242,6 @@ module BibTeX
         else
           push([:STRING_LITERAL,match])
         end
-      when "\n"
-        push([:STRING_LITERAL,match.chop])
-        error_unterminated_string
       else
         push([:STRING_LITERAL,@scanner.rest])
         @scanner.terminate
