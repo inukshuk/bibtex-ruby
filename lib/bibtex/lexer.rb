@@ -31,10 +31,23 @@ module BibTeX
 		
     def_delegator :@scanner, :string, :data
 
-    DEFAULTS = { :include => [:errors], :strict => true }.freeze
+    @defaults = {
+			:include => [:errors],
+			:strict => true,
+			:strip => true
+		}.freeze
     
-    MODE = Hash.new(:meta).merge(:bibtex => :bibtex, :entry => :bibtex, :string => :bibtex, :preamble => :bibtex, :comment => :bibtex, :meta => :meta, :literal => :literal, :content => :content).freeze
+    MODE = Hash.new(:meta).merge({
+	    :bibtex  => :bibtex,  :entry    => :bibtex,
+	    :string  => :bibtex,  :preamble => :bibtex,
+	    :comment => :bibtex,  :meta     => :meta,
+	    :literal => :literal, :content  => :content
+	  }).freeze
     
+		class << self
+			attr_accessor :defaults
+		end
+		
 		#
 		# Creates a new instance. Possible options and their respective
 		# default values are:
@@ -46,9 +59,11 @@ module BibTeX
 		#		the `@' symbol is not possible except inside literals or @comment
 		#		objects; for a more lenient lexer set to false and objects are
 		#		expected to start after a new line (leading white space is permitted).
+		# - :strip => true When enabled, newlines will be stripped from quoted
+		#   string values.
 		#
 		def initialize(options = {})
-      @options = DEFAULTS.merge(options)
+      @options = Lexer.defaults.merge(options)
       reset
 		end
 
