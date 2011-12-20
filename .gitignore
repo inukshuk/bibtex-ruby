@@ -2,6 +2,7 @@
 *.tmproj
 **/*~
 *.rbc
+.rbx
 doc/**/*
 .bundle
 lib/bibtex/parser.rb
