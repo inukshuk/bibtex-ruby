@@ -1,3 +1,10 @@
+2.0.4 / 2011-12-20
+==================
+
+* Added lexer option :strip to strip newlines from literals (thanks to @JLimperg)
+* Added :linebreaks filter
+
+
 2.0.3 / 2011-12-13
 ==================
 
