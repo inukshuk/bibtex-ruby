@@ -1,11 +1,9 @@
-require 'latex/decode'
- 
 module BibTeX
   module Filters
     
-    class LaTeX < Filter
+    class LineBreaks < Filter
       def apply(value)
-        ::LaTeX.decode(value)
+        value.to_s.gsub(/\n\s*/, ' ')
       end
     end
     

@@ -6,7 +6,7 @@ module BibTeX
     
     class << self
       # Hook called by Ruby if Filter is subclassed
-      def inherited (base)
+      def inherited(base)
         base.class_eval { include Singleton }
         subclasses << base
       end
@@ -17,7 +17,9 @@ module BibTeX
       end
     end
     
-    def apply (value); value; end
+    def apply(value)
+      value
+    end
     
     alias convert apply
     alias << apply
@@ -31,7 +33,7 @@ module BibTeX
       require filter
     end
 
-    def self.resolve (filter)
+    def self.resolve(filter)
       case
       when filter.respond_to?(:apply)
         filter
