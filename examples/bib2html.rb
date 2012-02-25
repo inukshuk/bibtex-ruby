@@ -34,4 +34,4 @@ rescue LoadError
   exit
 end
 
-puts Redcarpet.new(content.join).to_html
+puts Redcarpet::Markdown.new(Redcarpet::Render::HTML).render(content.join)
