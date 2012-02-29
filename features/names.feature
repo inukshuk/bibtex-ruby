@@ -8,7 +8,7 @@ Feature: BibTeX Names
 			|  first  |  von  |  last  |  jr  |
 			| <first> | <von> | <last> | <jr> |
 	
-	@display
+	@names @display
 	Scenarios: Decoret test suite (display order)
 		| name            | first      | von        | last    | jr |
 		| AA BB           | AA         |            | BB      |    |
@@ -32,7 +32,7 @@ Feature: BibTeX Names
 		| AA bb {cc} DD   | AA         | bb         | {cc} DD |    |
 		| AA {bb} CC      | AA {bb}    |            | CC      |    |
 
-	@sort
+	@names @sort
 	Scenarios: Decoret test suite (sort order)
 		| name            | first      | von        | last    | jr |
 		| bb CC, AA       | AA         | bb         | CC      |    |
@@ -46,7 +46,7 @@ Feature: BibTeX Names
 		| CC dd BB, AA    | AA         | CC dd      | BB      |    |
 		| BB, AA          | AA         |            | BB      |    |
 	
-	@sort
+	@names @sort
 	Scenarios: Long von parts
 		| name            | first      | von        | last    | jr |
 		| bb cc dd CC, AA | AA         | bb cc dd   | CC      |    |
@@ -54,7 +54,7 @@ Feature: BibTeX Names
 		| BB cc dd CC, AA | AA         | BB cc dd   | CC      |    |
 		| BB CC dd CC, AA | AA         | BB CC dd   | CC      |    |
 
-	
+	@names 
 	Scenarios: Decoret further remarks
 		| name                              | first                | von            | last                    | jr |
 		# | Paul \'Emile Victor               | Paul \'Emile        |                | Victor                  |    |
@@ -69,6 +69,7 @@ Feature: BibTeX Names
 		| Dominique {G}alouzeau de Villepin  | Dominique            | {G}alouzeau de | Villepin                |    |
 		| Galouzeau {de} Villepin, Dominique | Dominique            |                | Galouzeau {de} Villepin |    |
 
+  @names 
 	Scenarios: Some actual names
 		| name                              | first                   | von            | last                           | jr  |
 		| John Paul Jones                   | John Paul               |                | Jones                          |     |

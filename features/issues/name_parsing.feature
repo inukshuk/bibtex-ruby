@@ -10,7 +10,8 @@ Feature: BibTeX Names
       
   @names @issue-46
   Scenarios: Names with LaTeX commands
-    | name               | first      | von        | last        | jr |
-    | G{\\"u}rkan, G.    | G.         |            | G{\\"u}rkan |    |
-    | {\"O}zge, A.       | A.         |            | {\"O}zge    |    |
-    | Yonca {\"O}zge, A. | A.         |            | {\"O}zge    |    |
+    | name               | first      | von        | last           | jr |
+    | G{\\"u}rkan, G.    | G.         |            | G{\\"u}rkan    |    |
+    | {\"O}zge, A.       | A.         |            | {\"O}zge       |    |
+    | Yonca Ozge, A.     | A.         |            | Yonca Ozge     |    |
+    | Yonca {\"O}zge, A. | A.         |            | Yonca {\"O}zge |    |
