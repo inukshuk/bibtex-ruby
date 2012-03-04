@@ -14,4 +14,6 @@ Feature: BibTeX Names
     | G{\\"u}rkan, G.    | G.         |            | G{\\"u}rkan    |    |
     | {\"O}zge, A.       | A.         |            | {\"O}zge       |    |
     | Yonca Ozge, A.     | A.         |            | Yonca Ozge     |    |
-    | Yonca {\"O}zge, A. | A.         |            | Yonca {\"O}zge |    |
+    | Yonca \"Ozge, A.   | A.         |            | Yonca \"Ozge   |    |
+    | Yonca Özge, A.     | A.         |            | Yonca Özge     |    |
+    | Yonca {\"O}Zge, A. | A.         |            | Yonca {\"O}Zge |    |
