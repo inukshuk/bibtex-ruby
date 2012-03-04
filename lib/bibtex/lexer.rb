@@ -37,6 +37,29 @@ module BibTeX
       :strip => true
     }.freeze
     
+    # Patterns Cache (#37: MacRuby does not cache regular expressions)
+    @patterns = {
+      :space       => /[\s]+/o,
+      :lbrace      => /\{/o,
+      :rbrace      => /\}/o,
+      :braces      => /\{|\}/o,
+      :eq          => /=/o,
+      :comma       => /,/o,
+      :number      => /\d+/o,
+      :name        => /[[:alpha:]\d \/:_!$\.%&*-]+/io,
+      :quote       => /"/o,
+      :unquote     => /[\{\}"]/o,
+      :sharp       => /#/o,
+      :object      => /@/o,
+      :period      => /./o,
+      :strict_next => /@[\t ]*/o,
+      :next        => /(^|\n)[\t ]*@[\t ]*/o,
+      :entry       => /[a-z\d:_!\.$%&*-]+/io,
+      :string      => /string/io,
+      :comment     => /comment/io,
+      :preamble    => /preamble/io
+    }.freeze
+    
     MODE = Hash.new(:meta).merge({
       :bibtex  => :bibtex,  :entry    => :bibtex,
       :string  => :bibtex,  :preamble => :bibtex,
@@ -45,7 +68,7 @@ module BibTeX
     }).freeze
     
     class << self
-      attr_accessor :defaults
+      attr_reader :defaults, :patterns
     end
     
     #
@@ -151,37 +174,37 @@ module BibTeX
     
     def parse_bibtex
       case
-      when @scanner.scan(/[\s]+/o)
-      when @scanner.scan(/\{/o)
+      when @scanner.scan(Lexer.patterns[:space])
+      when @scanner.scan(Lexer.patterns[:lbrace])
         @brace_level += 1
         push([:LBRACE,'{'])
         @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
-      when @scanner.scan(/\}/o)
+      when @scanner.scan(Lexer.patterns[:rbrace])
         @brace_level -= 1
         push([:RBRACE,'}'])
         return leave_object if @brace_level == 0
         return error_unbalanced_braces if @brace_level < 0
-      when @scanner.scan( /=/o)
+      when @scanner.scan(Lexer.patterns[:eq])
         push([:EQ,'='])
-      when @scanner.scan(/,/o)
+      when @scanner.scan(Lexer.patterns[:comma])
         push([:COMMA,','])
-      when @scanner.scan(/\d+/o)
+      when @scanner.scan(Lexer.patterns[:number])
         push([:NUMBER,@scanner.matched])
-      when @scanner.scan(/[[:alpha:]\d \/:_!$\.%&*-]+/io)
+      when @scanner.scan(Lexer.patterns[:name])
         push([:NAME,@scanner.matched.rstrip])
-      when @scanner.scan(/"/o)
+      when @scanner.scan(Lexer.patterns[:quote])
         @mode = :literal
-      when @scanner.scan(/#/o)
+      when @scanner.scan(Lexer.patterns[:sharp])
         push([:SHARP,'#'])
-      when @scanner.scan(/@/o)
+      when @scanner.scan(Lexer.patterns[:object])
         enter_object
-      when @scanner.scan(/./o)
+      when @scanner.scan(Lexer.patterns[:period])
         error_unexpected_token        
       end
     end
     
     def parse_meta
-      match = @scanner.scan_until(strict? ? /@[\t ]*/o : /(^|\n)[\t ]*@[\t ]*/o)
+      match = @scanner.scan_until(Lexer.patterns[strict? ? :strict_next : :next])
       if @scanner.matched
         push([:META_CONTENT,match.chop])
         enter_object
@@ -192,7 +215,7 @@ module BibTeX
     end
 
     def parse_content
-      match = @scanner.scan_until(/\{|\}/o)
+      match = @scanner.scan_until(Lexer.patterns[:braces])
       case @scanner.matched
       when '{'
         @brace_level += 1
@@ -222,7 +245,7 @@ module BibTeX
     end
     
     def parse_literal
-      match = @scanner.scan_until(/[\{\}"]/o)
+      match = @scanner.scan_until(Lexer.patterns[:unquote])
       case @scanner.matched
       when '{'
         @brace_level += 1
@@ -255,16 +278,16 @@ module BibTeX
       push [:AT,'@']
 
       case
-      when @scanner.scan(/string/io)
+      when @scanner.scan(Lexer.patterns[:string])
         @mode = @active_object = :string
         push [:STRING, @scanner.matched]
-      when @scanner.scan(/preamble/io)
+      when @scanner.scan(Lexer.patterns[:preamble])
         @mode = @active_object = :preamble
         push [:PREAMBLE, @scanner.matched]
-      when @scanner.scan(/comment/io)
+      when @scanner.scan(Lexer.patterns[:comment])
         @mode = @active_object = :comment
         push [:COMMENT, @scanner.matched]
-      when @scanner.scan(/[a-z\d:_!\.$%&*-]+/io)
+      when @scanner.scan(Lexer.patterns[:entry])
         @mode = @active_object = :entry
         push [:NAME, @scanner.matched]
       else
