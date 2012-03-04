@@ -92,6 +92,24 @@ require 'strscan'
 
 ---- inner
   
+  # Patterns Cache (#37: MacRuby does not cache regular expressions)
+  @patterns = {
+    :and => /,?\s+and\s+/io,
+    :space => /[\t\r\n\s]+/o,
+    :comma => /,/o,
+    :lower => /[[:lower:]][^\t\r\n\s\{\}\d\\,]*/o,
+    :upper => /[[:upper:]][^\t\r\n\s\{\}\d\\,]*/o,
+    :symbols => /(\d|\\.)+/o,
+    :lbrace => /\{/o,
+    :rbrace => /\}/o,
+    :period => /./o,
+    :braces => /[\{\}]/o
+  }.freeze
+  
+  class << self
+    attr_reader :patterns
+  end
+  
   def initialize(options = {})
     self.options.merge!(options)
   end
@@ -127,36 +145,36 @@ require 'strscan'
   def do_scan
     until @src.eos?
       case
-      when @src.scan(/,?\s+and\s+/io)
+      when @src.scan(NameParser.patterns[:and])
         push_word
         @stack.push([:AND,@src.matched])
         
-      when @src.scan(/[\t\r\n\s]+/o)
+      when @src.scan(NameParser.patterns[:space])
         push_word
       
-      when @src.scan(/,/o)
+      when @src.scan(NameParser.patterns[:comma])
         push_word
         @stack.push([:COMMA,@src.matched])
         
-      when @src.scan(/[[:lower:]][^\t\r\n\s\{\}\d\\,]*/o)
+      when @src.scan(NameParser.patterns[:lower])
         is_lowercase
         @word[1] << @src.matched
 
-      when @src.scan(/[[:upper:]][^\t\r\n\s\{\}\d\\,]*/o)
+      when @src.scan(NameParser.patterns[:upper])
         is_uppercase
         @word[1] << @src.matched
         
-      when @src.scan(/(\d|\\.)+/o)
+      when @src.scan(NameParser.patterns[:symbols])
         @word[1] << @src.matched
         
-      when @src.scan(/\{/o)
+      when @src.scan(NameParser.patterns[:lbrace])
         @word[1] << @src.matched
         scan_literal
         
-      when @src.scan(/\}/o)
+      when @src.scan(NameParser.patterns[:rbrace])
         error_unbalanced
 
-      when @src.scan(/./o)
+      when @src.scan(NameParser.patterns[:period])
         @word[1] << @src.matched
       end
     end
@@ -184,7 +202,7 @@ require 'strscan'
     @brace_level = 1
 
     while @brace_level > 0
-      @word[1] << @src.scan_until(/[\{\}]/o).to_s
+      @word[1] << @src.scan_until(NameParser.patterns[:braces]).to_s
 
       case @src.matched
       when '{'
