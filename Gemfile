@@ -2,7 +2,7 @@ source :rubygems
 gemspec
 
 group :debug do
-	gem 'ruby-debug19', :require => 'ruby-debug', :platforms => [:mri_19]
+	gem 'debugger', :platforms => [:mri_19]
 	gem 'ruby-debug', :platforms => [:mri_18]
 	gem 'rbx-trepanning', :platforms => [:rbx]
 end
