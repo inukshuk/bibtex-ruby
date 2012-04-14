@@ -11,6 +11,14 @@ module BibTeX
       end
     end
 
+    describe '#add' do
+      it 'preserves BibTeX::Names (and other subclasses of BibTeX::Value)' do
+        e = Entry.new
+        e.add(:author, Names.new(Name.new(first: 'Limperg')))
+        assert_equal e[:author].class, Names
+      end
+    end
+
     describe 'cross-references' do
       it 'has no cross-reference by default' do
         assert_equal false, Entry.new.has_cross_reference?
