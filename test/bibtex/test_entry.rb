@@ -14,7 +14,7 @@ module BibTeX
     describe '#add' do
       it 'preserves BibTeX::Names (and other subclasses of BibTeX::Value)' do
         e = Entry.new
-        e.add(:author, Names.new(Name.new(first: 'Limperg')))
+        e.add(:author, Names.new(Name.new(:first => 'first_name')))
         assert_equal e[:author].class, Names
       end
     end

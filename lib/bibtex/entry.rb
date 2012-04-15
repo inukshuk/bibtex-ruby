@@ -335,13 +335,10 @@ module BibTeX
     # add(:author, "Edgar A. Poe", :title, "The Raven")
     # add([:author, "Edgar A. Poe", :title, "The Raven"])
     # add(:author => "Edgar A. Poe", :title => "The Raven")
+    # add(:author => Names.new(Name.new(:first => 'Edgar A.', :last => 'Poe')))
     def add(*arguments)
       Hash[*arguments.flatten].each_pair do |name, value|
-        if value.class < Value
-          fields[name.to_sym] = value
-        else
-          fields[name.to_sym] = Value.new(value)
-        end
+        fields[name.to_sym] = Value.create(value)
       end
       
       self
