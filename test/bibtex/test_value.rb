@@ -2,6 +2,20 @@ require 'helper.rb'
 
 module BibTeX
   class ValueTest < MiniTest::Spec
+
+    describe "::create" do
+      it "should return a duplicate when called with a Value subclass" do
+        val   = Value.new('value')
+        names = Names.new(Name.new(:first => 'first_name'))
+
+        assert_equal val.dup,   Value.create(val)
+        assert_equal names.dup, Value.create(names)
+      end
+
+      it "should return a new Value object when called with other arguments" do
+        assert_equal Value.new('value'), Value.create('value')
+      end
+    end
     
     describe "when empty" do
       it "should be equal to an empty string" do
