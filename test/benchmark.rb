@@ -21,7 +21,7 @@ input = <<-END
 }
 END
 
-n, k = 1001, 20
+n, k = 31, 10
 lexer = BibTeX::Lexer.new
 # parser = BibTeX::Parser.new
 
@@ -56,29 +56,29 @@ Benchmark.benchmark((" "*15) + CAPTION, 7, format, '%14s:' % 'sum(f)', '%14s:' %
   [f.inject(:+), g.inject(:+)]
 end
 
-require 'gnuplot'
-
-f = f.map(&:total)
-g = g.map(&:total)
-
-x = 1.step(n,k).to_a
-
-Gnuplot.open do |gp|
-  Gnuplot::Plot.new(gp) do |plot|
-
-    plot.title  'BibTeX-Ruby Benchmark'
-    plot.ylabel 't'
-    plot.xlabel 'n'
-
-    plot.data << Gnuplot::DataSet.new([x,f]) do |ds|
-      ds.with = 'linespoints'
-      ds.title = 'f'
-    end
-
-    plot.data << Gnuplot::DataSet.new([x,g]) do |ds|
-      ds.with = 'linespoints'
-      ds.title = 'g'
-    end
-
-  end
-end
+# require 'gnuplot'
+# 
+# f = f.map(&:total)
+# g = g.map(&:total)
+# 
+# x = 1.step(n,k).to_a
+# 
+# Gnuplot.open do |gp|
+#   Gnuplot::Plot.new(gp) do |plot|
+# 
+#     plot.title  'BibTeX-Ruby Benchmark'
+#     plot.ylabel 't'
+#     plot.xlabel 'n'
+# 
+#     plot.data << Gnuplot::DataSet.new([x,f]) do |ds|
+#       ds.with = 'linespoints'
+#       ds.title = 'f'
+#     end
+# 
+#     plot.data << Gnuplot::DataSet.new([x,g]) do |ds|
+#       ds.with = 'linespoints'
+#       ds.title = 'g'
+#     end
+# 
+#   end
+# end
