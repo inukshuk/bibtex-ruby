@@ -16,5 +16,5 @@ end
 
 group :profile do
 	gem 'ruby-prof', ['~>0.10'], :platforms => [:mri_19, :mri_19]
-	gem 'gnuplot', ['~>2.3']
+	gem 'gnuplot', ['~>2.4']
 end
