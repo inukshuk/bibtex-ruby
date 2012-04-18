@@ -55,6 +55,16 @@ module BibTeX
     def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|^dup$|!$/ }
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
+
+    # call-seq:
+    #   create(other) => other.dup
+    #   create(*args) => Value.new(args)
+    #
+    # Duplicates a +Value+ object (or an object of any subclass of +Value+),
+    # or initializes a new one.
+    def self.create(*args)
+      args[0].class < Value && args.size == 1 ? args[0].dup : Value.new(args)
+    end
     
     def initialize(*arguments)
       @tokens = []
