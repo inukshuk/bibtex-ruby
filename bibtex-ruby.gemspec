@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
 	END_DESCRIPTION
 	
   s.add_runtime_dependency('latex-decode', ['>=0.0.6'])
-  s.add_runtime_dependency('multi_json', ['~>1.0'])
+  s.add_runtime_dependency('multi_json', ['~>1.3'])
 
   s.add_development_dependency('rake', ['~>0.9'])
   s.add_development_dependency('racc', ['~>1.4'])
