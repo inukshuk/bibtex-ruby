@@ -22,7 +22,7 @@ module BibTeX
   
     def test_json
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
-      json = MultiJson.decode(bib.to_json)
+      json = MultiJson.load(bib.to_json)
       refute_nil(json)
       assert_equal(3, json.length)
       assert_equal(%w[ dragon pickaxe rails], json.map { |y| y['key'] }.sort)
