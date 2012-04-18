@@ -34,6 +34,10 @@ module BibTeX
       it 'accepts filters' do
         Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'         
       end
+
+      it 'accepts filters in an array' do
+        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => ['latex'])[0].title.must_be :==, 'ü'         
+      end
     end
     
     describe 'given a populated biliography' do

@@ -375,7 +375,9 @@ module BibTeX
       end
       
       if bibliography.options.has_key?(:filter)
-        convert!(bibliography.options[:filter])
+				[*bibliography.options[:filter]].each do |filter|
+        	convert!(filter)
+				end
       end
       
       self
