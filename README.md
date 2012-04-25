@@ -8,22 +8,28 @@ tokenizes correctly formatted names; BibTeX-Ruby recognizes BibTeX string
 replacements, joins values containing multiple strings or variables,
 supports cross-references, and decodes common LaTeX formatting
 instructions to unicode; if you are in a hurry, it also allows for easy
-export/conversion to formats such as YAML, JSON, CiteProc, and XML (BibTeXML).
+export/conversion to formats such as YAML, JSON, CiteProc/CSL, and
+XML (BibTeXML).
 
-For a list of projects using BibTeX-Ruby, see
-[the project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/Projects-Using-BibTeX-Ruby).
+For a list of projects using BibTeX-Ruby, take a look at the
+[project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/Projects-Using-BibTeX-Ruby).
 
 
 Quickstart
 ----------
 
+Install and load BibTeX-Ruby in an IRB session:
+
     $ [sudo] gem install bibtex-ruby
     $ irb
     >> require 'bibtex'
-    => true
+
+Open a BibTeX bibliography:
+
     >> b = BibTeX.open('./ruby.bib')
-    >> b['pickaxe']
-    => "2009"
+
+Select a BibTeX entry and access individual fields:
+
     >> b['pickaxe'].title
     => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
     >> b[:pickaxe].author.length
@@ -32,6 +38,9 @@ Quickstart
     => "Thomas, Dave and Fowler, Chad and Hunt, Andy"
     >> b[:pickaxe].author[2].first
     => "Andy"
+
+Query a bibliography:
+
     >> b['@book'].length
     => 3
     >> b['@article'].length
@@ -39,14 +48,11 @@ Quickstart
     >> b['@book[year=2009]'].length
     => 1
 
-BibTeX-Ruby helps you convert your bibliography to JSON, XML, or YAML;
-alternatively, you can export to the JSON format used by
-[CSL](http://citationstyles.org) processors and render the bibliography in
-one of [many different styles](https://github.com/citation-style-language/styles)
-([previews](http://www.zotero.org/styles/)):
+Render your bibliography in one of
+[many different citation styles](https://github.com/citation-style-language/styles)
+(requires the **citeproc-ruby** gem):
 
-    >> require 'citeproc'  # requires the citeproc-ruby gem
-    => true
+    >> require 'citeproc'
     >> CiteProc.process b[:pickaxe].to_citeproc, :style => :apa
     => "Thomas, D., Fowler, C., & Hunt, A. (2009). Programming Ruby 1.9: The Pragmatic Programmer's
       Guide. The Facets of Ruby. Raleigh, North Carolina: The Pragmatic Bookshelf."
@@ -57,28 +63,32 @@ one of [many different styles](https://github.com/citation-style-language/styles
     => "Thomas, Dave, Chad Fowler, and Andy Hunt. Programming Ruby 1.9: The Pragmatic Programmer's
       Guide. Raleigh, North Carolina: The Pragmatic Bookshelf, 2009."
 
+Save a bibliography to a file:
 
-
-Requirements
-------------
-
-The BibTeX-Ruby gem has been tested on Ruby 1.8 and 1.9; it has
-been confirmed to work with REE, JRuby, and Rubinius;
-however, there have been some [issues](https://github.com/inukshuk/bibtex-ruby/issues)
-with MacRuby implementations.
-
-The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
-required to generate the BibTeX parser and the name parser; you do not need
-to install it to use the bibtex-ruby gem.
+    >> b.save
+    #=> saves the original file
+    >> b.save_to(file)
+    #=> saves the bibliography in a new file
 
 
 
-Usage
------
+Compatibility
+-------------
+
+The BibTeX-Ruby gem has been developed and tested on Ruby 1.8 and 1.9; it has
+been confirmed to work with JRuby, Rubinius, and REE, however, there have
+been repeated [issues](https://github.com/inukshuk/bibtex-ruby/issues)
+(performance mostly) with MacRuby caused by MacRuby's current StringScanner
+implementation.
+
+
+
+Documentation
+-------------
 
 It is very easy to use BibTeX-Ruby. You can use the top level utility methods
 **BibTeX.open** and **BibTeX.parse** to open a '.bib' file or to parse a string
-containing BibTeX contents. Normally, BibTeX-Ruby will discard all text outside
+containing BibTeX contents. By default, BibTeX-Ruby will discard all text outside
 of regular BibTeX elements; however, if you wish to include everything, simply add
 `:include => [:meta_content]` to your invocation of **BibTeX.open** or **BibTeX.parse**.
 
@@ -102,32 +112,45 @@ Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry
 similar to **ActiveRecord::Base**. Therefore, it is equally possible to access the
 'author' field above as `b[:pickaxe].author`.
 
+BibTeX-Ruby wraps all values of fields in an entry are wrapped in Value objects.
+This is necessary to transparently handle different types of values (e.g., strings,
+dates, names etc.). These Value objects are designed to be hardly discernible
+from regular Ruby strings, however, if you ever run into a problem with a field's
+value, simply convert it to a string by calling the `#to_s` method.
+
 Instead of parsing strings you can also create BibTeX elements directly in Ruby:
 
     > bib = BibTeX::Bibliography.new
+    
+Using a Hash:
+
     > bib << BibTeX::Entry.new({
-    >   :type => :book,
-    >   :key => :rails,
-    >   :address => 'Raleigh, North Carolina',
-    >   :author => 'Ruby, Sam and Thomas, Dave, and Hansson, David Heinemeier',
-    >   :booktitle => 'Agile Web Development with Rails',
-    >   :edition => 'third',
-    >   :keywords => 'ruby, rails',
-    >   :publisher => 'The Pragmatic Bookshelf',
-    >   :series => 'The Facets of Ruby',
-    >   :title => 'Agile Web Development with Rails',
-    >   :year => '2009'
-    > })
+        :type => :book,
+        :key => :rails,
+        :address => 'Raleigh, North Carolina',
+        :author => 'Ruby, Sam and Thomas, Dave, and Hansson, David Heinemeier',
+        :booktitle => 'Agile Web Development with Rails',
+        :edition => 'third',
+        :keywords => 'ruby, rails',
+        :publisher => 'The Pragmatic Bookshelf',
+        :series => 'The Facets of Ruby',
+        :title => 'Agile Web Development with Rails',
+        :year => '2009'
+      })
+
+Or programmatically:
+
     > book = BibTeX::Entry.new
     > book.type = :book
     > book.key = :mybook
     > bib << book
 
+
 ### Cross References
 
 From version 2.0, BibTeX-Ruby correctly resolves entry cross-references, which
 are commonly used for entries with type `inbook`, `incollection`, and
-`inproceedings`. When an entry has a valid citation key in field `crossref`,
+`inproceedings`. When an entry has a valid citation key in the field `crossref`,
 BibTeX-Ruby will return any fields inherited from the parent entry:
 
     > b = BibTeX.parse <<-END
@@ -271,7 +294,9 @@ expand the initials of a name across your entire bibliography, you could
 use the following snippet:
 
     b.names.each do |name|
-      name.first = 'Edgar Allen' if name.first =~ /E\.\s*A\./ and name.last == 'Poe'
+      if name.sort_order =~ /^Poe, E/
+        name.first = 'Edgar Allen'
+      end
     end
 
 
@@ -303,6 +328,13 @@ Conditional conversions are also supported:
 If you need to express a condition on the basis of individual fields, use the
 conversion methods of BibTeX::Entry with a block instead (the block will be
 passed the key and value of each field prior to conversion).
+
+When working with Bibliographies that contain LaTeX it is often best to
+apply the filter upon opening or parsing the Bibliography. You can do this,
+by passing the `:filter` option:
+
+   >> BibTeX.open 'references.bib', :filter => :latex
+   
 
 ### Exports
 
@@ -423,6 +455,7 @@ look at the LALR grammar in the file
 For more information about the BibTeX format and the parser's idiosyncrasies
 [refer to the project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/The-BibTeX-Format).
 
+
 Contributing
 ------------
 
@@ -439,6 +472,10 @@ example, or cucumber feature, fix the bug and submit a pull request (for
 useful examples, take a look at the cucumber features in the
 [features/issues/](https://github.com/inukshuk/bibtex-ruby/blob/master/features/issues)
 directory).
+
+The parser generator [racc](http://i.loveruby.net/en/projects/racc/) is
+required to generate the BibTeX parser and the name parser; you do not need
+to install it to use the bibtex-ruby gem.
 
 To run the tests and cucumber examples execute these commands (from within
 the bibtex-ruby directory):
@@ -457,8 +494,11 @@ To execute the test suite continuously while you're working run:
 Credits
 -------
 
-Copyright 2011 [Sylvester Keil](http://sylvester.keil.or.at/).
+Copyright 2011-2012 [Sylvester Keil](http://sylvester.keil.or.at/).
 
-BibTeX-Ruby was written by many awesome [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
-and is distributed under the terms and conditions of the GNU GPL. See
+See the [contributor page on GitHub](https://github.com/inukshuk/bibtex-ruby/contributors)
+for a list of all the awesome developers who have made BibTeX-Ruby
+possible.
+
+This software is distributed under the terms and conditions of the GNU GPL. See
 LICENSE for details.

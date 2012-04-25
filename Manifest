@@ -19,6 +19,7 @@ features/issues/braced_strings.feature
 features/issues/crossref.feature
 features/issues/latex_filter.feature
 features/issues/multiline_strings.feature
+features/issues/name_parsing.feature
 features/issues/number_keys.feature
 features/issues/parse_months.feature
 features/issues/slash_keys.feature
@@ -82,6 +83,8 @@ test/fixtures/no_bibtex.bib
 test/fixtures/preamble.bib
 test/fixtures/roundtrip.bib
 test/helper.rb
+test/macruby.d
+test/macruby.rb
 test/profile.rb
 test/test_bibtex.rb
 test/test_export.rb
