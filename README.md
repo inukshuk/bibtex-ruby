@@ -52,22 +52,22 @@ Render your bibliography in one of
 [many different citation styles](https://github.com/citation-style-language/styles)
 (requires the **citeproc-ruby** gem):
 
-    >> require 'citeproc'
-    >> CiteProc.process b[:pickaxe].to_citeproc, :style => :apa
-    => "Thomas, D., Fowler, C., & Hunt, A. (2009). Programming Ruby 1.9: The Pragmatic Programmer's
+    require 'citeproc'
+    CiteProc.process b[:pickaxe].to_citeproc, :style => :apa
+    #=> "Thomas, D., Fowler, C., & Hunt, A. (2009). Programming Ruby 1.9: The Pragmatic Programmer's
       Guide. The Facets of Ruby. Raleigh, North Carolina: The Pragmatic Bookshelf."
-    >> CiteProc.process b[:pickaxe].to_citeproc, :style => 'chicago-author-date'
-    => "Thomas, Dave, Chad Fowler, and Andy Hunt. 2009. Programming Ruby 1.9: The Pragmatic
+    CiteProc.process b[:pickaxe].to_citeproc, :style => 'chicago-author-date'
+    #=> "Thomas, Dave, Chad Fowler, and Andy Hunt. 2009. Programming Ruby 1.9: The Pragmatic
       Programmer's Guide. The Facets of Ruby.Raleigh, North Carolina: The Pragmatic Bookshelf."
-    >> CiteProc.process b[:pickaxe].to_citeproc, :style => :mla
-    => "Thomas, Dave, Chad Fowler, and Andy Hunt. Programming Ruby 1.9: The Pragmatic Programmer's
+    CiteProc.process b[:pickaxe].to_citeproc, :style => :mla
+    #=> "Thomas, Dave, Chad Fowler, and Andy Hunt. Programming Ruby 1.9: The Pragmatic Programmer's
       Guide. Raleigh, North Carolina: The Pragmatic Bookshelf, 2009."
 
 Save a bibliography to a file:
 
-    >> b.save
+    b.save
     #=> saves the original file
-    >> b.save_to(file)
+    b.save_to(file)
     #=> saves the bibliography in a new file
 
 
