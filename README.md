@@ -26,27 +26,27 @@ Install and load BibTeX-Ruby in an IRB session:
 
 Open a BibTeX bibliography:
 
-    >> b = BibTeX.open('./ruby.bib')
+    b = BibTeX.open('./ruby.bib')
 
 Select a BibTeX entry and access individual fields:
 
-    >> b['pickaxe'].title
-    => "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
-    >> b[:pickaxe].author.length
-    => 3
-    >> b[:pickaxe].author.to_s
-    => "Thomas, Dave and Fowler, Chad and Hunt, Andy"
-    >> b[:pickaxe].author[2].first
-    => "Andy"
+    b['pickaxe'].title
+    #=> "Programming Ruby 1.9: The Pragmatic Programmer's Guide"
+    b[:pickaxe].author.length
+    #=> 3
+    b[:pickaxe].author.to_s
+    #=> "Thomas, Dave and Fowler, Chad and Hunt, Andy"
+    b[:pickaxe].author[2].first
+    #=> "Andy"
 
 Query a bibliography:
 
-    >> b['@book'].length
-    => 3
-    >> b['@article'].length
-    => 0
-    >> b['@book[year=2009]'].length
-    => 1
+    b['@book'].length
+    #=> 3 - the number books in the bibliography
+    b['@article'].length
+    #=> 0 - the number of articles in the bibliography
+    b['@book[year=2009]'].length
+    #=> 1 - the number of books published in 2009
 
 Render your bibliography in one of
 [many different citation styles](https://github.com/citation-style-language/styles)
@@ -280,13 +280,13 @@ symbols that cannot be replaced will not be parsed.
 In the following example, string replacement can take place, thus all names
 are parsed and can easily be mapped to their last names:
 
-    >> BibTeX.parse(<<-END)[1].author.map(&:last)
-       @string{ ht = "Nathaniel Hawthorne" }
-       @book{key,
-         author = ht # " and Melville, Herman"
-       }
-       END
-    => ["Hawthorne", "Melville"]
+    BibTeX.parse(<<-END)[1].author.map(&:last)
+      @string{ ht = "Nathaniel Hawthorne" }
+      @book{key,
+       author = ht # " and Melville, Herman"
+      }
+      END
+    #=> ["Hawthorne", "Melville"]
 
 Another useful method is `Bibliography#names` which returns all names in
 your bibliography (authors, editors, translators). For example, to quickly
@@ -309,15 +309,18 @@ to a given filter. Starting with version 1.3.9 BibTeX-Ruby includes a
 LaTeX filter that depends on the
 [latex-decode gem](http://rubygems.org/gems/latex-decode). Example:
 
-    >> faust = '@book{faust, title = {Faust: Der Trag\"odie Erster Teil}}'
-    >> BibTeX.parse(faust).convert(:latex)[:faust].title
-    => "Faust: Der Tragödie Erster Teil"
+    faust = '@book{faust, title = {Faust: Der Trag\"odie Erster Teil}}'
+    BibTeX.parse(faust).convert(:latex)[:faust].title
+    #=> "Faust: Der Tragödie Erster Teil"
 
 Conditional conversions are also supported:
 
-    >> faust1 = '@book{faust1, title = {Faust: Der Trag\"odie Erster Teil}}'
-    >> faust2 = '@book{faust2, title = {Faust: Der Trag\"odie Zweiter Teil}}'
-    >> p BibTeX.parse(faust1 + faust2).convert(:latex) { |e| e.key == :faust2 }.to_s
+    faust1 = '@book{faust1, title = {Faust: Der Trag\"odie Erster Teil}}'
+    faust2 = '@book{faust2, title = {Faust: Der Trag\"odie Zweiter Teil}}'
+    p BibTeX.parse(faust1 + faust2).convert(:latex) { |e| e.key == :faust2 }.to_s
+    
+Returns:
+
     @book{faust1,
       title = {Faust: Der Trag\"odie Erster Teil}
     }
@@ -333,7 +336,7 @@ When working with Bibliographies that contain LaTeX it is often best to
 apply the filter upon opening or parsing the Bibliography. You can do this,
 by passing the `:filter` option:
 
-   >> BibTeX.open 'references.bib', :filter => :latex
+   BibTeX.open 'references.bib', :filter => :latex
    
 
 ### Exports
