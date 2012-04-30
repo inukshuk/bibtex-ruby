@@ -180,43 +180,49 @@ Additionally, you can access individual elements or groups of elements via
 their index using `Bibliography#[]`; this accessor also exposes some of the
 query functionality with the exception of yielding to a block. For instance:
 
-    >> bib[-1]
+    bib[-1]
     => Returns the last element of the Bibliography or nil
-    >> bib[1,2]
+    bib[1,2]
     => Returns the second and third elements or nil
-    >> bib[1..2]
-    >> Same as above
-    >> bib[:key]
+    bib[1..2]
+    => Same as above
+    bib[:key]
     => Returns the first entry with key 'key' or nil
-    >> bib['key']
+    bib['key']
     => Returns all entries with key 'key' or []
-    >> bib['@article']
+    bib['@article']
     => Returns all entries of type 'article' or []
-    >> bib['@preamble']
+    bib['@preamble']
     => Returns all preamble objects (this is the same as Bibliography#preambles) or []
-    >> bib[/ruby/]
+    bib[/ruby/]
     => Returns all objects that match 'ruby' anywhere or []
-    >> bib['@book[keywords=ruby]']
+    bib['@book[keywords=ruby]']
     => Returns all books whose keywords attribute equals 'ruby' or []
-    >> bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }
+    bib['@book[keywords!=ruby]']
+    => Returns all books whose keywords attribute does not equal 'ruby'
+    bib['@book[keywords/=ruby]']
+    => Same as above
+    bib.q('@book[keywords^=ruby]')
+    => Returns all books whose keywords attribute matches /ruby/
+    bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }
     => Returns all book entries with two or more keywords or []
 
 Queries offer syntactic sugar for common enumerator invocations:
 
-    >> bib.query(:all, '@book')
+    bib.query(:all, '@book')
     => same as bib.select { |b| b.has_type?(:book) }
-    >> bib.query('@book')
+    bib.query('@book')
     => same as above
-    >> bib.query(:first, '@book')
+    bib.query(:first, '@book')
     => same as bib.detect { |b| b.has_type?(:book) }
-    >> bib.query(:none, '@book')
+    bib.query(:none, '@book')
     => same as bib.reject { |b| b.has_type?(:book) }
 
 You can also use queries to delete entries in your bibliography:
 
-    >> bib.delete(/ruby/)
+    bib.delete(/ruby/)
     => deletes all object that match 'ruby' in their string representation
-    >> bib.delete('@comment')
+    bib.delete('@comment')
     => strips all BibTeX comments from the bibliography
 
 

@@ -124,6 +124,19 @@ module BibTeX
         assert_equal 1, @bib['@book[keywords=ruby]'].length
       end
 
+      it 'supports queries with negative conditions' do
+        assert_equal 2, @bib['@*[keywords!=ruby]'].length
+      end
+
+      it 'supports queries with pattern conditions' do
+        assert_equal 1, @bib['@*[keywords~=rails]'].length
+      end
+
+      it 'supports queries with start-pattern conditions' do
+        assert_equal 2, @bib['@*[keywords^=ruby]'].length
+      end
+
+
       it 'supports queries by bibtex element' do
         entry = Entry.parse(<<-END).first
         @article{segaran2007,
