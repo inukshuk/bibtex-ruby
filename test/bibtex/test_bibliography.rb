@@ -71,6 +71,12 @@ module BibTeX
         END
       end
       
+      describe '#entries_at' do
+        it 'returns a list of all entries identified by the passed-in keys' do
+          assert_equal [@bib['segaran2007'], @bib['rails']], @bib.entries_at('segaran2007', :rails)
+        end
+      end
+      
       it 'supports access by index' do
         assert_equal 'ruby', @bib[1].keywords 
       end

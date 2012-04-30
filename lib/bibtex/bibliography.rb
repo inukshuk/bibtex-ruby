@@ -89,8 +89,9 @@ module BibTeX
       :comment, :meta_content
     
     def_delegators :@data, :length, :size, :empty?
-    def_delegators :@entries, :key?, :has_key?
+    def_delegators :@entries, :key?, :has_key?, :values_at
     
+    alias entries_at values_at
 
     # Creates a new bibliography.
     def initialize(options = {})
