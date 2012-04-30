@@ -204,6 +204,8 @@ query functionality with the exception of yielding to a block. For instance:
     => Same as above
     bib.q('@book[keywords^=ruby]')
     => Returns all books whose keywords attribute matches /ruby/
+    bib.q('@article[year<=2007]')
+    => Returns all articles published in 2007 or earlier
     bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }
     => Returns all book entries with two or more keywords or []
 
