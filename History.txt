@@ -1,8 +1,10 @@
 2.0.6 / 2012-04-30
+==================
 
 * Added support for !=, /=, ~=, and ^= queries
 
 2.0.5 / 2012-04-19
+==================
 
 * Fixed Entry#dup (@JLimperg)
 * Implemented explicit caching of regular expressions (for MacRuby)
