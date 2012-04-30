@@ -105,7 +105,7 @@ module BibTeX
     # Returns true if the element meets all of the given conditions.
     def meets?(*conditions)
       conditions.flatten.all? do |condition|
-        property, operator, value = condition.split(/\s*([!~\/\^]?=)\s*/)
+        property, operator, value = condition.split(/\s*([!~\/\^<>]?=)\s*/)
         
         if property.nil?
           true
@@ -117,6 +117,10 @@ module BibTeX
             respond_to?(property) && send(property).to_s.match("^#{value}")
           when '~='
             respond_to?(property) && send(property).to_s.match(value)
+          when '<='
+            respond_to?(property) && send(property).to_i <= value.to_i
+          when '>='
+            respond_to?(property) && send(property).to_i >= value.to_i
           else
             respond_to?(property) && send(property).to_s == value
           end

@@ -136,6 +136,13 @@ module BibTeX
         assert_equal 2, @bib['@*[keywords^=ruby]'].length
       end
 
+      it 'supports queries with numeric conditions' do
+        assert_equal 3, @bib['@*[year<=2010]'].length
+        assert_equal 3, @bib['@*[year<=2009]'].length
+        assert_equal 2, @bib['@*[year>=2008]'].length
+        assert_equal 0, @bib['@*[year>=2010]'].length
+      end
+
 
       it 'supports queries by bibtex element' do
         entry = Entry.parse(<<-END).first
