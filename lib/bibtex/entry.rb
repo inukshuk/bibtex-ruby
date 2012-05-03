@@ -107,6 +107,35 @@ module BibTeX
       article        article-journal
     }.map(&:intern)]).freeze
 
+    BIBO_FIELDS = Hash[*%w{
+      pages      pages
+      number     issue
+      isbn       isbn
+      issn       issn
+      doi        doi
+      edition    edition
+      abstract   abstract
+      volume     volume
+    }.map(&:intern)].freeze
+
+    BIBO_TYPES = Hash.new(:Document).merge(Hash[*%w{
+      booklet        Book
+      book           Book
+      conference     Conference
+      inbook         Article
+      incollection   Article
+      inproceedings  Article
+      manual         Manual
+      mastersthesis  Thesis
+      phdthesis      Thesis
+      proceedings    Proceedings
+      techreport     Report
+      journal        Journal
+      periodical     Periodical
+      unpublished    Manuscript
+      article        Article
+    }.map(&:intern)]).freeze
+
     
     attr_reader :fields, :type
     
@@ -198,20 +227,33 @@ module BibTeX
     alias type? has_type?
     
     
-    def has_field?(name)
-      name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
+    def has_field?(*names)
+      names.flatten.any? do |name|
+        name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
+      end
     end
 
     alias field? has_field?
 
-    def inherits?(name)
-      !has_field(name) && has_parent? && parent.provides?(name)
+    def inherits?(*names)
+      names.flatten.any? do |name|
+        !has_field(name) && has_parent? && parent.provides?(name)
+      end
     end
     
-    # Returns true if the Entry has a field (or alias) for the passed-in name.
-    def provides?(name)
-      return nil unless name.respond_to?(:to_sym)
-      has_field?(name) || has_field?(aliases[name.to_sym])
+    # Returns true if the Entry has a field (or alias) for any of the passed-in names.
+    def provides?(*names)
+      names.flatten.any? do |name|
+        if name.respond_to?(:to_sym)
+          has_field?(name) || has_field?(aliases[name.to_sym])
+        else
+          false
+        end
+      end
+    end
+    
+    def provides_or_inherits?(*names)
+      provides?(names) || inherits?(names)
     end
     
     # Returns the field value referenced by the passed-in name.
@@ -327,6 +369,16 @@ module BibTeX
       add(name.to_sym, value)
     end
 
+    # Author, Editor and Translator readers
+    NAME_FIELDS.each do |contributor|
+      define_method(contributor) do
+        get(contributor)
+      end
+      
+      alias_method "#{contributor}s", contributor
+    end
+    
+    
     # Adds a new field (name-value pair) or multiple fields to the entry.
     # Returns the entry for chainability.
     #
@@ -362,6 +414,19 @@ module BibTeX
 
     def generate_hash(filter = [])
       Digest::MD5.hexdigest(field_names(filter).map { |k| [k, fields[k]] }.flatten.join)
+    end
+    
+    def identifier
+      case
+      when provides?(:doi)
+        "info:doi/#{get(:doi)}"
+      when provides?(:isbn)
+        "urn:isbn:#{get(:isbn)}"
+      when provides?(:issn)
+        "urn:issn:#{get(:issn)}"
+      else
+        "urn:bibtex:#{key}"
+      end
     end
     
     # Called when the element was added to a bibliography.
@@ -431,6 +496,9 @@ module BibTeX
     
     alias parse_months parse_month
     
+    def date
+      get(:date) || get(:year)
+    end
     
     # Parses all name values of the entry. Tries to replace and join the
     # value prior to parsing.
@@ -493,6 +561,43 @@ module BibTeX
     end
 
     alias cross_referenced_by children
+    
+    def container_title
+      get(:booktitle) || get(:journal) || get(:container)
+    end
+    
+    def pages_from
+      fetch(:pages, '').split(/\D+/)[0]
+    end
+
+    def pages_to
+      fetch(:pages, '').split(/\D+/)[-1]
+    end
+    
+    # Returns true if this entry is published inside a book, collection or journal
+    def contained?
+      has_field?(:booktitle, :container, :journal)
+    end
+    
+    
+    # Returns a duplicate entry with all values converted using the filter.
+    # If an optional block is given, only those values will be converted where
+    # the block returns true (the block will be called with each key-value pair).
+    #
+    # @see #convert!
+    def convert(filter)
+      block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
+    end
+    
+    # In-place variant of @see #convert
+    def convert!(filter)
+      fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
+      self
+    end
+    
+    def <=>(other)
+      type != other.type ? type <=> other.type : key != other.key ? key <=> other.key : to_s <=> other.to_s
+    end
     
     
     # Returns a string of all the entry's fields.
@@ -562,24 +667,107 @@ module BibTeX
       xml
     end
     
-    # Returns a duplicate entry with all values converted using the filter.
-    # If an optional block is given, only those values will be converted where
-    # the block returns true (the block will be called with each key-value pair).
-    #
-    # @see #convert!
-    def convert(filter)
-      block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
+    # Returns a RDF::Graph representation of the entry using the BIBO ontology.
+    # TODO: improve level of detail captured by export
+    def to_rdf(options = {})
+      require 'rdf'
+      
+      bibo = RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
+      
+      graph = RDF::Graph.new
+      entry = RDF::URI.new(identifier)
+
+      graph << [entry, RDF.type, bibo[BIBO_TYPES[type]]]
+      
+      [:title, :language].each do |key|        
+        graph << [entry, RDF::DC[key], get(key).to_s] if field?(key)
+      end
+
+      graph << [entry, RDF::DC.date, get(:year).to_s] if field?(:year)
+      
+      if field?(:publisher)
+        address = RDF::Vocabulary.new('http://schemas.talis.com/2005/address/schema#')
+        pub = RDF::Node.new
+
+        graph << [pub, RDF.type, RDF::FOAF[:Organization]]
+        graph << [pub, RDF::FOAF.name, get(:publisher)]
+        
+        graph << [pub, address[:localityName], get(:address)] if field?(:address)
+        
+        graph << [entry, RDF::DC.published, pub]
+      end
+
+      [:doi, :edition, :volume].each do |key|        
+        graph << [entry, bibo[key], get(key).to_s] if field?(key)
+      end
+      
+      if has_field?(:pages)
+        if get(:pages).to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
+          graph << [entry, bibo[:pageStart], $1]
+          graph << [entry, bibo[:pageEnd], $2]
+        else
+          graph << [entry, bibo[:pages], get(:pages).to_s]
+        end
+      end
+
+
+      if has_field?(:author)
+        seq = RDF::Node.new
+
+        graph << [seq, RDF.type, RDF[:Seq]]
+        graph << [entry, bibo[:authorList], seq]
+        
+        authors.each do |author|
+          a = RDF::Node.new
+        
+          graph << [a, RDF.type, RDF::FOAF[:Person]]
+          
+          if author.is_a?(Name)       
+            [:given, :family, :prefix, :suffix].each do |part|
+              graph << [a, bibo["#{part}Name"], author.send(part).to_s]
+            end
+          else
+            graph << [a, RDF::FOAF.name, author.to_s]
+          end
+
+          graph << [entry, RDF::DC.creator, a]
+          graph << [seq, RDF.li, a]
+        end
+      end
+
+      if has_field?(:editor)
+        seq = RDF::Node.new
+
+        graph << [seq, RDF.type, RDF[:Seq]]
+        graph << [entry, bibo[:editorList], seq]
+
+        editors.each do |editor|
+          e = RDF::Node.new
+
+          graph << [e, RDF.type, RDF::FOAF[:Person]]
+
+          if editor.is_a?(Name)
+            [:given, :family, :prefix, :suffix].each do |part|
+              graph << [e, bibo["#{part}Name"], editor.send(part).to_s]
+            end
+          else
+            graph << [e, RDF::FOAF.name, editor.to_s]
+          end
+
+          graph << [entry, bibo.editor, a]
+          graph << [seq, RDF.li, e]
+        end
+      end
+      
+      graph
+    rescue LoadError
+      BibTeX.log.error "Please gem install rdf for RDF support."
     end
     
-    # In-place variant of @see #convert
-    def convert!(filter)
-      fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
-      self
-    end
+    alias to_bibo to_rdf
     
-    def <=>(other)
-      type != other.type ? type <=> other.type : key != other.key ? key <=> other.key : to_s <=> other.to_s
-    end
+    
+
 
     private
     
@@ -593,6 +781,7 @@ module BibTeX
       k.downcase!
       k
     end
+    
     
   end
 end

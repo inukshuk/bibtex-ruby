@@ -1,6 +1,9 @@
 source :rubygems
 gemspec
 
+# RDF Export
+gem 'rdf', '~>0.3'
+
 group :debug do
 	gem 'debugger', :platforms => [:mri_19]
 	gem 'ruby-debug', :platforms => [:mri_18]

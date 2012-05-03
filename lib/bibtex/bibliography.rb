@@ -342,6 +342,22 @@ module BibTeX
       xml
     end
 
+    # Returns an RDF::Graph representation of the bibliography. The graph
+    # can be serialized using any of the RDF serializer plugins.
+    def to_rdf(options = {})
+      require 'rdf'
+      
+      graph = RDF::Graph.new
+
+      q('@entry').each do |entry|
+        graph << entry.to_rdf(options)
+      end
+      
+      graph
+    rescue LoadError
+      BibTeX.log.error "Please gem install rdf for RDF support."
+    end
+    
     # call-seq:
     #   bib.query()          #=> returns all elements
     #   bib.query('@book')   #=> returns all books
