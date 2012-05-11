@@ -20,6 +20,7 @@ require 'forwardable'
 
 module BibTeX
 
+  # A BibTeX Names value is an ordered list of name values.
   class Names < Value
     include Enumerable
     
@@ -27,9 +28,9 @@ module BibTeX
     
     def self.parse(string)
       new(NameParser.new.parse(string))
-		rescue => e
-			BibTeX.log.info(e.message)
-			nil
+    rescue => e
+      BibTeX.log.info(e.message)
+      nil
     end
     
     def initialize(*arguments)
@@ -39,12 +40,16 @@ module BibTeX
       end
     end
 
-    def replace(*arguments); self; end
+    def replace(*arguments)
+      self
+    end
     
-    def join; self; end
+    def join
+      self
+    end
     
-    def value
-      @tokens.join(' and ')
+    def value(options = {})
+      @tokens.map { |n| n.to_s(options) }.join(' and ')
     end
     
     def to_s(options = {})
@@ -53,14 +58,24 @@ module BibTeX
       [q[0], value, q[-1]].compact.join
     end
 
-    def name?; true; end
-    def numeric?; false; end
-    def atomic?; true; end
+    def name?
+      true
+    end
     
-    alias :names? :name?
-    alias :symbol? :numeric?
+    def numeric?
+      false
+    end
     
-    def to_name; self; end
+    def atomic?
+      true
+    end
+    
+    alias names? name?
+    alias symbol? numeric?
+    
+    def to_name
+      self
+    end
     
     def to_citeproc(options = {})
       map { |n| n.to_citeproc(options) }
@@ -82,12 +97,12 @@ module BibTeX
       self
     end
     
-    alias :<< :add
-    alias :push :add
+    alias << add
+    alias push add
     
     # Converts all string values according to the given filter.
     def convert! (filter)
-			tokens.each { |t| t.convert!(filter) }      
+      tokens.each { |t| t.convert!(filter) }      
       self
     end
 
@@ -97,20 +112,21 @@ module BibTeX
     
   end
 
+  # A Name comprises individual name parts (first, last, prefix and suffix),
+  # but behaves almost like an atomic string value.
   class Name < Struct.new(:first, :last, :prefix, :suffix)
     extend Forwardable
-
     include Comparable
-		
+    
     BibTeXML = {
-			:first  => :first,
-			:last   => :last,
-			:prefix => :prelast,
-			:suffix => :lineage
-		}.freeze
-		
+      :first  => :first,
+      :last   => :last,
+      :prefix => :prelast,
+      :suffix => :lineage
+    }.freeze
+    
     def_delegators :to_s, :=~, :===,
-			*String.instance_methods(false).reject { |m| m =~ /^\W|to_s|replace|each|first|last|!$/ }
+      *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|replace|each|first|last|!$/ }
     
     class << self    
       def parse(string)
@@ -125,53 +141,114 @@ module BibTeX
     end
     
     def initialize(attributes = {})
-      attributes.each do |key,value|
-        send("#{key}=", value) if respond_to?(key)
-      end
+      set(attributes)
     end
     
     def initalize_copy(other)
-      each_pair { |k,v| self[k] = v }
+      each_pair { |k,v| self[k] = v.dup }
+    end
+    
+    # Set the name tokens to the values defined in the passed-in hash.
+    def set(attributes = {})
+      attributes.each do |key, value|
+        send("#{key}=", value) if respond_to?(key)
+      end
+      
+      self
     end
     
     def blank?
       to_a.compact.empty?
     end
+
+    # Returns the first name (or the passed-in string) as initials.
+    def initials(token = first)
+      token.to_s.gsub(/([[:upper:]])[[:lower:]]+\s*/, '\1.')
+    end
     
-    def display_order
-      [prefix, last, first, suffix].compact.join(' ')
+    # Returns true if the first name consists solely of initials.
+    def initials?
+      !(first.nil? || first.empty? || first.to_s =~ /[[:alpha:]]{2,}[^\.]/)
+    end
+
+    # Sets the name's first name to the passed-in name if the last name equals
+    # for_last and the current first name has the same initials as with_first.
+    def extend_initials(with_first, for_last)
+      rename_if :first => with_first do |name|
+        name.last == for_last && name.initials.gsub(/\s+/, '') == initials(with_first).gsub(/\s+/, '')
+      end
+    end
+    
+    # Renames the tokens according to the passed-in attributes if all of the
+    # conditions match or if the given block returns true.
+    def rename_if(attributes, conditions = {})
+      if block_given?
+        set(attributes) if yield self
+      else
+        set(attributes) if conditions.all? do |key, value|
+          respond_to?(key) && send(key) == value
+        end
+      end
+      
+      self
+    end
+    
+    def rename_unless(attributes, conditions = {})
+      if block_given?
+        set(attributes) unless yield self
+      else
+        set(attributes) unless conditions.all? do |key, value|
+          respond_to?(key) && send(key) == value
+        end
+      end
+      
+      self
+    end
+    
+    # call-seq:
+    #   name.display_order #=> 'Edgar Allen Poe'
+    #   name.display_order :initials => true #=> 'E.A. Poe'
+    #
+    # Returns the name as a string in display order.
+    def display_order(options = {})
+      [options[:initials] ? initials : first, prefix, last, suffix].compact.join(' ')
     end
     
     alias display display_order
     
-    def sort_order
-      [[prefix,last].compact.join(' '), suffix, first].compact.join(', ')
+    # call-seq:
+    #   name.sort_order #=> 'Poe, Edgar Allen'
+    #   name.sort_order :initials => true #=> 'Poe, E.A.'
+    #
+    # Returns the name as a string in sort order.
+    def sort_order(options = {})
+      [[prefix, last].compact.join(' '), suffix, options[:initials] ? initials : first].compact.join(', ')
     end
     
     alias to_s sort_order
-    
+        
     def <=>(other)
-      other.is_a?(Name) ? [last, prefix, first, suffix].compact.join(' ') <=> [other.last, other.prefix, other.first, other.suffix].compact.join(' ') : super
+      other.is_a?(Name) ? sort_order <=> other.sort_order : super
     end
     
     def to_hash
       Hash[each_pair.to_a]
     end
 
-		def to_xml
-			require 'rexml/document'			
-			xml = REXML::Element.new('bibtex:person')
+    def to_xml
+      require 'rexml/document'      
+      xml = REXML::Element.new('bibtex:person')
 
-			each_pair do |part, text|
-				unless text.nil?
-					element = REXML::Element.new("bibtex:#{BibTeXML[part]}")
-					element.text = text
-					xml.add_element(element)
-				end
-			end
-			
-			xml
-		end
+      each_pair do |part, text|
+        unless text.nil?
+          element = REXML::Element.new("bibtex:#{BibTeXML[part]}")
+          element.text = text
+          xml.add_element(element)
+        end
+      end
+      
+      xml
+    end
     
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
@@ -182,20 +259,20 @@ module BibTeX
       end
     end
     
-		def convert(filter)
-			dup.convert!(filter)
-		end
-		
-		def convert!(filter)
-			if f = Filters.resolve(filter)
-				each_pair { |k,v| self[k] = f.apply(v) unless v.nil? }
-			else
-				raise ArgumentError, "Failed to load filter #{filter.inspect}"
-			end
+    def convert(filter)
+      dup.convert!(filter)
+    end
+    
+    def convert!(filter)
+      if f = Filters.resolve(filter)
+        each_pair { |k,v| self[k] = f.apply(v) unless v.nil? }
+      else
+        raise ArgumentError, "Failed to load filter #{filter.inspect}"
+      end
 
-			self
-		end
-		
+      self
+    end
+    
     def to_citeproc(options = {})
       hash = {}
       hash['family'] = family unless family.nil?
@@ -213,6 +290,6 @@ module BibTeX
     alias jr= suffix=
     alias von prefix
     alias von= prefix=    
-    
+   
   end
 end

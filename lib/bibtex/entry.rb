@@ -710,7 +710,6 @@ module BibTeX
         end
       end
 
-
       if has_field?(:author)
         seq = RDF::Node.new
 
