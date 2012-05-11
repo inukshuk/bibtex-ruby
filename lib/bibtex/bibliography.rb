@@ -286,6 +286,17 @@ module BibTeX
       self
     end
     
+    # call-seq:
+    #   b.extend_initials(['Edgar Allen', 'Poe'], ['Nathaniel', 'Hawthorne'])
+    #   #=> Extends the initials in names like 'E.A. Poe' or 'Hawethorne, N.'
+    #       in the bibliography.
+    def extend_initials(*arguments)
+      arguments.each do |with_first, for_last|
+        names.each do |name|
+          name.extend_initials(with_first, for_last)
+        end
+      end
+    end
     
     def sort(*arguments, &block)
       data.sort(*arguments, &block)

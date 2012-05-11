@@ -77,6 +77,14 @@ module BibTeX
         end
       end
       
+      describe '#extend_initials' do
+        it 'extends the initials in matching names' do
+          @bib.names.map(&:to_s).wont_include 'Flanagan, Dave'
+          @bib.extend_initials(['Dave', 'Flanagan'])
+          @bib.names.map(&:to_s).must_include 'Flanagan, Dave'
+        end
+      end
+      
       it 'supports access by index' do
         assert_equal 'ruby', @bib[1].keywords 
       end

@@ -100,10 +100,11 @@ module BibTeX
     alias << add
     alias push add
     
-    # Converts all string values according to the given filter.
-    def convert! (filter)
-      tokens.each { |t| t.convert!(filter) }      
-      self
+    [:convert!, :rename_if, :rename_unless, :extend_initials].each do |method_id|
+      define_method(method_id) do |*arguments|
+        tokens.each { |t| t.send(method_id, *arguments) }
+        self
+      end
     end
 
     def <=>(other)
