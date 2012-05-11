@@ -1,3 +1,9 @@
+2.0.8 / 2012-05-11
+==================
+
+* Added extend_initials feature for names
+* Added experimental RDF export (using BIBO ontology)
+
 2.0.7 / 2012-04-30
 ==================
 
