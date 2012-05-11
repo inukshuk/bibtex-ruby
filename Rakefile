@@ -80,6 +80,8 @@ end
 
 desc 'Pushes the gem file to rubygems.org'
 task :release => ['build'] do
+  system %Q{git tag "#{BibTeX::Version::STRING}"}
+  system "git push --tags"
   system "gem push bibtex-ruby-#{BibTeX::Version::STRING}.gem"
 end
 
