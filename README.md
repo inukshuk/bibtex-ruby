@@ -35,7 +35,7 @@ Select a BibTeX entry and access individual fields:
     b[:pickaxe].author.length
     #=> 3
     b[:pickaxe].author.to_s
-    #=> "Thomas, Dave and Fowler, Chad and Hunt, Andy"
+    #=> "Thomas, D. and Fowler, Chad and Hunt, Andy"
     b[:pickaxe].author[2].first
     #=> "Andy"
 
@@ -47,6 +47,12 @@ Query a bibliography:
     #=> 0 - the number of articles in the bibliography
     b['@book[year=2009]'].length
     #=> 1 - the number of books published in 2009
+
+Extend first name initials throughout your bibliography:
+
+    b.extend_initials ['Dave', 'Thomas']
+    b[:pickaxe].author.to_s
+    #=> "Thomas, Dave and Fowler, Chad and Hunt, Andy"
 
 Render your bibliography in one of
 [many different citation styles](https://github.com/citation-style-language/styles)
