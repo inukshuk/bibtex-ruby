@@ -1,3 +1,9 @@
+2.0.9 / 2012-05-15
+==================
+
+* Added extend_initials! method to extend all names in the bibliography
+* Added unify method as a shorthand to unify fields across the bibliography
+
 2.0.8 / 2012-05-11
 ==================
 

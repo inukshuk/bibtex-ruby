@@ -54,6 +54,25 @@ Extend first name initials throughout your bibliography:
     b[:pickaxe].author.to_s
     #=> "Thomas, Dave and Fowler, Chad and Hunt, Andy"
 
+You can also extend all names in the bibliography to their prototypical
+(i.e., the longest available) form:
+
+    b.extend_initials! #=> extends all names in the bibliography
+
+Use with caution as this method will treat two names as identical if they
+look the same in their `#sort_order(:initials => true)` form.
+
+Unify certain fields across the bibliography:
+
+    b.unify :publisher, /o'?reilly/i, "O'Reilly"
+    
+    b.unify :publisher, /^penguin/i do |entry|
+      entry.publisher = 'Penguin Books'
+      entry.address = 'London'
+    end
+
+This will unify various spellings of entries published by O'Reilly and Penguin.
+
 Render your bibliography in one of
 [many different citation styles](https://github.com/citation-style-language/styles)
 (requires the **citeproc-ruby** gem):
@@ -161,17 +180,17 @@ BibTeX-Ruby will return any fields inherited from the parent entry:
 
     > b = BibTeX.parse <<-END
     @inbook{fraassen_1989b,
-    	Crossref = {fraassen_1989},
-    	Pages = {40-64},
-    	Title = {Ideal Science: David Lewis's Account of Laws},
+      Crossref = {fraassen_1989},
+      Pages = {40-64},
+      Title = {Ideal Science: David Lewis's Account of Laws},
     }
 
     @book{fraassen_1989,
-    	Address = {Oxford},
-    	Author = {Bas C. van Fraassen},
-    	Publisher = {Oxford University Press},
-    	Title = {Laws and Symmetry},
-    	Year = 1989
+      Address = {Oxford},
+      Author = {Bas C. van Fraassen},
+      Publisher = {Oxford University Press},
+      Title = {Laws and Symmetry},
+      Year = 1989
     }
     END
     > b['fraassen_1989b'].booktitle
@@ -313,6 +332,20 @@ use the following snippet:
       end
     end
 
+There is also a short-hand for this use case:
+
+    b.extend_initials ['Edgar Allen', 'Poe']
+
+Alternatively, if your bibliography contains the same names in various
+forms (e.g., 'Poe, Edgar A.', 'Poe, E.A.', 'Poe, E. Allen') you can also
+set all names to their longest available form:
+
+    b.extend_initials!
+
+Use with caution, though, as this method will treat names as identical
+as long as their initials are the same. That is to say, 'Poe, Eric A.' would
+be extend to 'Poe, Edgar Allen'.
+
 
 ### Filters
 
@@ -351,7 +384,7 @@ apply the filter upon opening or parsing the Bibliography. You can do this,
 by passing the `:filter` option:
 
    BibTeX.open 'references.bib', :filter => :latex
-   
+
 
 ### Exports
 
