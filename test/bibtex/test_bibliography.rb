@@ -68,6 +68,14 @@ module BibTeX
           publisher={O'Reilly}
         }
         @string{ foo = "foobar" }
+        @misc{flanagan-1,
+          title={{Foo Bar}},
+          author={Flanagan, Dav}
+        }
+        @misc{flanagan-2,
+          title={{Foo Bar}},
+          author={Flanagan, David}
+        }
         END
       end
       
@@ -82,6 +90,36 @@ module BibTeX
           @bib.names.map(&:to_s).wont_include 'Flanagan, Dave'
           @bib.extend_initials(['Dave', 'Flanagan'])
           @bib.names.map(&:to_s).must_include 'Flanagan, Dave'
+        end
+      end
+      
+      describe '#extend_initials!' do
+        it 'extends the initials of all names to the longest prototype' do
+          assert_equal "Ruby, Sam Thomas, Dave Hansson Heinemeier, David Flanagan, David Matsumoto, Y. Segaran, T.",
+            @bib.extend_initials!.names.map(&:sort_order).uniq.join(' ')
+        end
+      end
+      
+      describe '#unify' do
+        it 'sets all fields matching the given pattern to the passed-in value' do
+          @bib.unify :publisher, /reilly/i, 'OReilly'
+          assert_equal 'OReilly', @bib['segaran2007'].publisher
+          assert_equal 'OReilly', @bib['flanagan2008'].publisher
+        end
+        
+        it 'does not change the value of fields that do not match' do
+          @bib.unify :publisher, /reilly/i, 'OReilly'
+          assert_equal 'The Pragmatic Bookshelf', @bib['rails'].publisher
+        end
+        
+        it 'passes each entry with matching fields to the block if given' do
+          years = []
+          @bib.unify(:publisher, /reilly/i) { |e| years << e.year.to_s }
+          assert_equal ['2007','2008'], years.sort
+        end
+        
+        it 'returns the bibliography' do
+          assert_equal @bib, @bib.unify(:publisher, /reilly/i, 'OReilly')
         end
       end
       
@@ -139,7 +177,7 @@ module BibTeX
       end
 
       it 'supports queries with negative conditions' do
-        assert_equal 2, @bib['@*[keywords!=ruby]'].length
+        assert_equal 4, @bib['@*[keywords!=ruby]'].length
       end
 
       it 'supports queries with pattern conditions' do
@@ -186,15 +224,15 @@ module BibTeX
       describe '#query' do
         
         it 'returns all elements when passed no arguments' do
-          @bib.query.length.must_be :==, 4
+          @bib.query.length.must_be :==, 6
         end
 
         it 'returns all elements when passed :all and an empty condition' do
-          @bib.query(:all, '').length.must_be :==, 4
+          @bib.query(:all, '').length.must_be :==, 6
         end
         
         it 'returns all entries when passed a * wildcard' do
-          @bib.query('@*').length.must_be :==, 3
+          @bib.query('@*').length.must_be :==, 5
         end
         
       end

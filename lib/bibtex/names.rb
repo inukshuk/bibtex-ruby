@@ -151,7 +151,7 @@ module BibTeX
     
     # Set the name tokens to the values defined in the passed-in hash.
     def set(attributes = {})
-      attributes.each do |key, value|
+      attributes.each_pair do |key, value|
         send("#{key}=", value) if respond_to?(key)
       end
       

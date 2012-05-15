@@ -302,6 +302,64 @@ module BibTeX
       self
     end
     
+    # This method combines all names in the bibliography that look identical
+    # when using initials as first names and then tries to extend the first
+    # names for all names in each group to the longest available form.
+    # Returns the bibliography.
+    #
+    # If your bibliography contains the names 'Poe, Edgar A.', 'Poe, E.A.',
+    # and 'Poe, E. A.' calling this method would convert all three names to
+    # 'Poe, Edgar A.'.
+    def extend_initials!
+      groups = Hash.new do |h,k|
+        h[k] = { :prototype => nil, :names => [] }
+      end
+      
+      # group names together
+      names.each do |name|
+        group = groups[name.sort_order(:initials => true).gsub(/\s+/, '')]
+        group[:names] << name
+        
+        if group[:prototype].nil? || group[:prototype].first.length < name.first.length
+          group[:prototype] = name
+        end
+      end
+      
+      # extend all names in group to prototype
+      groups.each_value do |group|
+        group[:names].each do |name|
+          name.set(group[:prototype])
+        end
+      end
+      
+      self
+    end
+
+    # call-seq:
+    #   b.unify :publisher, /o'?reilly/i, "O'Reilly"
+    #   #=> Unifies the publisher name "O'Reilly" in the bibliography
+    #
+    # Sets all fields matching the passed-in pattern to the supplied value.
+    # If a block is given, each matching entry will be passed to the block
+    # instead. Returns the bibliography.
+    def unify(field, pattern, value = nil)
+      pattern = Regexp.new(pattern) unless pattern.is_a?(Regexp)
+
+      block = if block_given?
+        Proc.new
+      else
+        Proc.new { |e| e[field] = value }
+      end
+      
+      each_entry do |entry|
+        if entry.field?(field) && entry[field].to_s =~ pattern
+          block.call(entry)
+        end
+      end
+            
+      self
+    end
+    
     def sort(*arguments, &block)
       data.sort(*arguments, &block)
       self
@@ -420,7 +478,15 @@ module BibTeX
     end
     
     alias q query
-        
+    
+    def each_entry
+      if block_given?
+        q('@entry').each(&Proc.new)
+      else
+        q('@entry').to_enum
+      end
+    end
+    
     def find_by_type(*types, &block)
       q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
     end
