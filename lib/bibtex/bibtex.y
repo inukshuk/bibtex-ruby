@@ -90,27 +90,34 @@ require 'bibtex/lexer'
 
   attr_reader :lexer, :options
   
-  DEFAULTS = { :include => [:errors], :debug => ENV['DEBUG'] == true }.freeze
+	@defaults = {
+		:include => [:errors],
+		:debug => false
+	}.freeze
   
+	class << self
+		attr_reader :defaults
+	end
+	
   def initialize(options = {})
-    @options = DEFAULTS.merge(options)
+    @options = Parser.defaults.merge(options)
     @lexer = Lexer.new(@options)
   end
 
   def parse(input)
     @yydebug = debug?   
-    @lexer.analyse(input)
-    
+
+    lexer.analyse(input)    
     do_parse
     #yyparse(@lexer,:each)
   end
   
   def next_token
-    @lexer.next_token
+    lexer.next_token
   end
   
   def debug?
-    @options[:debug] == true
+    @options[:debug] || ENV['DEBUG']
   end
     
   def on_error(tid, val, vstack)
