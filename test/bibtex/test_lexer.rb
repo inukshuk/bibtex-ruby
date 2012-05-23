@@ -17,5 +17,8 @@ module BibTeX
         [:STRING_LITERAL, 'foo bar']
     end
     
+    it 'matches KEY tokens' do
+      Lexer.new.analyse("@misc{foo, }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
+    end
   end
 end

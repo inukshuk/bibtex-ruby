@@ -34,30 +34,33 @@ module BibTeX
     @defaults = {
       :include => [:errors],
       :strict => true,
+      :allow_missing_keys => false,
       :strip => true
     }.freeze
     
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
-      :space       => /[\s]+/o,
-      :lbrace      => /\{/o,
-      :rbrace      => /\}/o,
-      :braces      => /\{|\}/o,
-      :eq          => /=/o,
-      :comma       => /,/o,
-      :number      => /\d+/o,
-      :name        => /[[:alpha:]\d \/:_!$\.%&*-]+/io,
-      :quote       => /"/o,
-      :unquote     => /[\{\}"]/o,
-      :sharp       => /#/o,
-      :object      => /@/o,
-      :period      => /./o,
-      :strict_next => /@[\t ]*/o,
-      :next        => /(^|\n)[\t ]*@[\t ]*/o,
-      :entry       => /[a-z\d:_!\.$%&*-]+/io,
-      :string      => /string/io,
-      :comment     => /comment/io,
-      :preamble    => /preamble/io
+      :space        => /[\s]+/o,
+      :lbrace       => /\s*\{/o,
+      :rbrace       => /\s*\}\s*/o,
+      :braces       => /\{|\}/o,
+      :eq           => /\s*=\s*/o,
+      :comma        => /\s*,\s*/o,
+      :number       => /\d+/o,
+      :name         => /[[:alpha:]\d\/:_!$\?\.%&\*-]+/io,
+      :quote        => /\s*"/o,
+      :unquote      => /[\{\}"]/o,
+      :sharp        => /\s*#\s*/o,
+      :object       => /@/o,
+      :period       => /./o,
+      :strict_next  => /@[\t ]*/o,
+      :next         => /(^|\n)[\t ]*@[\t ]*/o,
+      :entry        => /[a-z\d:_!\.$%&*-]+/io,
+      :string       => /string/io,
+      :comment      => /comment/io,
+      :preamble     => /preamble/io,
+      :key          => /[[:alpha:]\d \/:_!$\?\.%&\*-]+,/io,
+      :optional_key => /[[:alpha:]\d \/:_!$\?\.%&\*-]+*,/io
     }.freeze
     
     MODE = Hash.new(:meta).merge({
@@ -127,7 +130,13 @@ module BibTeX
     end
     
     # Returns true if the lexer is currently in strict mode.
-    def strict?; !!(@options[:strict]); end
+    def strict?
+      !!@options[:strict]
+    end
+    
+    def allow_missing_keys?
+      !!@options[:allow_missing_keys]
+    end
     
     def strip_line_breaks?
       !!options[:strip] && !active?(:comment)
@@ -174,7 +183,6 @@ module BibTeX
     
     def parse_bibtex
       case
-      when @scanner.scan(Lexer.patterns[:space])
       when @scanner.scan(Lexer.patterns[:lbrace])
         @brace_level += 1
         push([:LBRACE,'{'])
@@ -198,6 +206,8 @@ module BibTeX
         push([:SHARP,'#'])
       when @scanner.scan(Lexer.patterns[:object])
         enter_object
+      when @scanner.scan(Lexer.patterns[:space])
+        # skip
       when @scanner.scan(Lexer.patterns[:period])
         error_unexpected_token        
       end
@@ -290,9 +300,21 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:entry])
         @mode = @active_object = :entry
         push [:NAME, @scanner.matched]
+        
+        # TODO: DRY - try to parse key
+        if @scanner.scan(Lexer.patterns[:lbrace])
+          @brace_level += 1
+          push([:LBRACE,'{'])
+          @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
+
+          if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
+            push [:KEY, @scanner.matched.chop.strip]
+          end
+        end
+        
       else
         error_unexpected_object
-      end
+      end      
     end
 
     # Called when parser leaves a BibTeX object.

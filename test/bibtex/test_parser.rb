@@ -40,44 +40,58 @@ module BibTeX
       end     
     end
     
-		describe 'key parsing' do
-		  it 'handles whitespace in keys' do
+    describe 'key parsing' do
+      it 'handles whitespace in keys' do
         input = "@Misc{George Martin06,title = {FEAST FOR CROWS}}"
         bib = Parser.new(:debug => false, :strict => false).parse(input)
         assert_equal "George Martin06", bib.first.key
         assert bib[:"George Martin06"]
       end
+
+      it 'fails when there is no cite-key' do
+        input = "@misc{title = {Crime and Punishment}}"       
+        assert_raises ParseError do
+          Parser.new(:debug => false, :strict => false).parse(input)
+        end
+      end
+      
+      it 'tolerates missing key with :allow_missing_keys set' do
+        input = "@misc{title = {Crime and Punishment}}"       
+        assert_equal :misc, Parser.new({
+          :debug => false, :strict => false, :allow_missing_keys => true
+        }).parse(input)[0].type
+      end
     end
-		
-		describe 'backslashes and escape sequences' do
-			
-			it 'leaves backslashes intact' do
-				Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title.must_be :==, 'a backslash: \\'
-			end
-			
-			it 'parses LaTeX escaped quotes {"}' do
-				Parser.new.parse(%q(@misc{key, title = "{"}"}))[0].title.must_be :==, '{"}'
-			end
-			
-			it 'parses complex LaTeX markup' do
-				b = Parser.new.parse(<<-END)[0]
-					@book{proust_1996,
-			      address = {Paris},
-			      author = {Proust, Jo\\"{e}lle},
-			      booktitle = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
-			      editor = {Proust, Jo\\"{e}lle},
-			      keywords = {Perception; Molyneux's Problem},
-			      publisher = {Presses Universitaires de France},
-			      title = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
-			      year = {1996}
-			    }
-				END
-				b.booktitle.must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
-				b.editor.must_be :==, 'Proust, Jo\"{e}lle'
-			end
-			
-		end
-		
+    
+    describe 'backslashes and escape sequences' do
+      
+      it 'leaves backslashes intact' do
+        Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title.must_be :==, 'a backslash: \\'
+      end
+      
+      it 'parses LaTeX escaped quotes {"}' do
+        Parser.new.parse(%q(@misc{key, title = "{"}"}))[0].title.must_be :==, '{"}'
+      end
+      
+      it 'parses complex LaTeX markup' do
+        b = Parser.new.parse(<<-END)[0]
+          @book{proust_1996,
+            address = {Paris},
+            author = {Proust, Jo\\"{e}lle},
+            booktitle = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
+            editor = {Proust, Jo\\"{e}lle},
+            keywords = {Perception; Molyneux's Problem},
+            publisher = {Presses Universitaires de France},
+            title = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
+            year = {1996}
+          }
+        END
+        b.booktitle.must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
+        b.editor.must_be :==, 'Proust, Jo\"{e}lle'
+      end
+      
+    end
+    
     describe 'given a set of explicit and implicit comments' do
       before do
         @bib = Parser.new(:debug => false, :include => [:meta_content]).parse(File.read(Test.fixtures(:comment)))
@@ -129,26 +143,26 @@ module BibTeX
 
     end
     
-		describe 'given an entry with missing commas between fields' do
-			before do
-				@level = BibTeX.log.level
-				BibTeX.log.level = Logger::FATAL
-			end
-			
-			after do
-				BibTeX.log.level = @level
-			end
-			
-			it 'raises a parser error' do
-				lambda {
-					Parser.new.parse <<-END
-						@book{book1,
-						 title = "Parse error because"
-						 author = "comma missing between title and author"
-						}
-					END
-				}.must_raise(ParseError)
-			end
-		end
+    describe 'given an entry with missing commas between fields' do
+      before do
+        @level = BibTeX.log.level
+        BibTeX.log.level = Logger::FATAL
+      end
+      
+      after do
+        BibTeX.log.level = @level
+      end
+      
+      it 'raises a parser error' do
+        lambda {
+          Parser.new.parse <<-END
+            @book{book1,
+             title = "Parse error because"
+             author = "comma missing between title and author"
+            }
+          END
+        }.must_raise(ParseError)
+      end
+    end
   end
 end

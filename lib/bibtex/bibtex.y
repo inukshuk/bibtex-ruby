@@ -23,7 +23,7 @@
 
 class BibTeX::Parser
 
-token AT COMMA COMMENT CONTENT ERROR EQ LBRACE META_CONTENT
+token AT COMMA COMMENT CONTENT ERROR EQ LBRACE META_CONTENT KEY
       NAME NUMBER PREAMBLE RBRACE SHARP STRING STRING_LITERAL
 
 expect 0
@@ -67,12 +67,11 @@ rule
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
         | entry_head RBRACE                        { result = val[0] }
 
-  entry_head : NAME LBRACE key COMMA               { result = BibTeX::Entry.new(:type => val[0].downcase.to_sym, :key => val[2]) }
+  entry_head : NAME LBRACE opt_key                 { result = BibTeX::Entry.new(:type => val[0].downcase.to_sym, :key => val[2]) }
 
-  key : NAME                                       { result = val[0] }
-      | NUMBER                                     { result = val[0] }
-      | NUMBER NAME                                { result = val[0,2].join }
-
+  opt_key :                                        { missing_key }
+          | KEY
+  
   assignments : assignment                         { result = val[0] }
               | assignments COMMA assignment       { result.merge!(val[2]) }
 
@@ -92,6 +91,7 @@ require 'bibtex/lexer'
   
   @defaults = {
     :include => [:errors],
+    :allow_missing_keys => false,
     :debug => false
   }.freeze
   
@@ -117,9 +117,19 @@ require 'bibtex/lexer'
   end
   
   def debug?
-    @options[:debug] || ENV['DEBUG']
+    options[:debug] || ENV['DEBUG']
   end
-    
+  
+  def allow_missing_keys?
+    options[:allow_missing_keys]
+  end
+  
+  def missing_key
+    unless allow_missing_keys?
+      raise ParseError, "Failed to parse BibTeX entry: cite-key missing"
+    end
+  end
+  
   def on_error(tid, val, vstack)
     message =
       "Failed to parse BibTeX on value #{val.inspect} (#{token_to_str(tid) || '?'}) #{ vstack.inspect}"
