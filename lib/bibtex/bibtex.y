@@ -90,15 +90,15 @@ require 'bibtex/lexer'
 
   attr_reader :lexer, :options
   
-	@defaults = {
-		:include => [:errors],
-		:debug => false
-	}.freeze
+  @defaults = {
+    :include => [:errors],
+    :debug => false
+  }.freeze
   
-	class << self
-		attr_reader :defaults
-	end
-	
+  class << self
+    attr_reader :defaults
+  end
+  
   def initialize(options = {})
     @options = Parser.defaults.merge(options)
     @lexer = Lexer.new(@options)
