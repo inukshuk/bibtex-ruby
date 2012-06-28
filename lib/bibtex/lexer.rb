@@ -60,7 +60,7 @@ module BibTeX
       :comment      => /comment/io,
       :preamble     => /preamble/io,
       :key          => /[[:alpha:]\d \/:_!$\?\.%&\*-]+,/io,
-      :optional_key => /[[:alpha:]\d \/:_!$\?\.%&\*-]+*,/io
+      :optional_key => /[[:alpha:]\d \/:_!$\?\.%&\*-]*,/io
     }.freeze
     
     MODE = Hash.new(:meta).merge({
