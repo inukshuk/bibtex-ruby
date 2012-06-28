@@ -635,7 +635,7 @@ module BibTeX
     end
     
     def issued
-      m = MONTHS.find_index(fields[:month].to_s.intern)
+      m = MONTHS.find_index(fields[:month].to_s.intern) unless !has_field?(:month)
       m = m + 1 unless m.nil?
       
       Hash['date-parts', [[fields[:year],m].compact.map(&:to_i)]]
