@@ -87,7 +87,7 @@ module BibTeX
           }
         END
         b.booktitle.must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
-        b.editor.must_be :==, 'Proust, Jo\"{e}lle'
+        b.editor.to_s.must_be :==, 'Proust, Jo\"{e}lle'
       end
       
     end
