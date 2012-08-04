@@ -110,19 +110,21 @@ module BibTeX
         if property.nil?
           true
         else
+          actual = respond_to?(property) ? send(property) : nil
+          
           case operator
           when '!=', '/='
-            !respond_to?(property) || send(property).to_s != value
+            actual.nil? || actual.to_s != value
           when '^='
-            respond_to?(property) && send(property).to_s.match("^#{value}")
+            !actual.nil? && actual.to_s.match("^#{value}")
           when '~='
-            respond_to?(property) && send(property).to_s.match(value)
+            !actual.nil? && actual.to_s.match(value)
           when '<='
-            respond_to?(property) && send(property).to_i <= value.to_i
+            !actual.nil? && actual.to_i <= value.to_i
           when '>='
-            respond_to?(property) && send(property).to_i >= value.to_i
+            !actual.nil? && actual.to_i >= value.to_i
           else
-            respond_to?(property) && send(property).to_s == value
+            !actual.nil? && actual.to_s == value
           end
         end
       end

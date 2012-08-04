@@ -161,7 +161,28 @@ module BibTeX
       
       add(other.fields)
     end
-  
+
+
+    # Generate Accessors for required fields (#52)
+
+    REQUIRED_FIELDS.values.flatten.uniq.each do |name|
+
+      define_method(name) do
+        case
+        when fields.has_key?(name)
+          fields[name]
+        when has_parent? && parent.provides?(name)
+          parent.provide(name)
+        else
+          nil
+        end
+      end
+      
+      define_method("#{name}=") do |value|
+        add name, value
+      end
+    end
+    
     # call-seq:
     #   entry.each      { |key, value| block } -> entry
     #   entry.each_pair { |key, value| block } -> entry
