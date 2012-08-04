@@ -1,6 +1,11 @@
+begin
+  require 'simplecov'
+  require 'debugger'
+rescue LoadError
+  # ignore
+end
 
 require 'minitest/autorun'
-require 'redgreen'
 require 'tempfile'
 
 require 'bibtex'
