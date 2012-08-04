@@ -310,8 +310,8 @@ module BibTeX
         end
       end
       
-      it 'should use dropping-particle by default' do
-        assert_equal 'van', @entry.to_citeproc['author'][0]['dropping-particle']
+      it 'should use non-dropping-particle by default' do
+        assert_equal 'van', @entry.to_citeproc['author'][0]['non-dropping-particle']
       end
       
       it 'should accept option to use non-dropping-particle' do

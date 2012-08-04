@@ -36,7 +36,7 @@ rescue LoadError
 end
 
 
-task :default => ['racc']
+task :default => [:test, :features]
 
 desc 'Generates the BibTeX parser'
 task :racc => ['lib/bibtex/parser.rb','lib/bibtex/name_parser.rb']
