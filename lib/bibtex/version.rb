@@ -17,7 +17,12 @@
 #++
 
 module BibTeX
-  module Version
-    STRING = '2.0.12'.freeze
+  module Version    
+    MAJOR = 2
+    MINOR = 0
+    PATCH = 12
+    BUILD = nil
+
+    STRING = [MAJOR, MINOR, PATCH, BUILD].compact.join('.').freeze
   end
 end

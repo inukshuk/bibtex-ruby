@@ -1,6 +1,16 @@
-# -*- ruby -*-
-lib = File.expand_path('../lib/', __FILE__)
-$:.unshift lib unless $:.include?(lib)
+# encoding: utf-8
+
+require 'bundler'
+begin
+  Bundler.setup
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+
+$:.unshift(File.join(File.dirname(__FILE__), './lib'))
+
 
 require 'rake/clean'
 require 'rake/testtask'
@@ -31,7 +41,7 @@ begin
 rescue LoadError
   desc 'Cucumber rake task not available'
   task :features do
-    abort 'Cucumber rake task is not available. Be sure to install cucumber as a gem or plugin'
+    abort 'Cucumber rake task is not available. Please install cucumber as a gem or plugin'
   end
 end
 
@@ -53,6 +63,18 @@ file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
   # sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
   sh 'bundle exec racc -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
+
+desc 'Run an IRB session with BibTeX-Ruby loaded'
+task :console, [:script] do |t,args|
+  ARGV.clear
+
+  require 'irb'
+  require 'bibtex'
+  
+  IRB.conf[:SCRIPT] = args.script
+  IRB.start
+end
+
 
 desc 'Runs the benchmarks (and plots the results)'
 task :benchmark => ['racc'] do
@@ -91,5 +113,3 @@ CLEAN.include('lib/bibtex/name_parser.rb')
 CLEAN.include('lib/bibtex/name_parser.output')
 CLEAN.include('doc/html')
 CLEAN.include('*.gem')
-
-# vim: syntax=ruby

@@ -8,3 +8,8 @@ unless Symbol.include?(Comparable)
     end
   end
 end
+
+if RUBY_VERSION < '1.9'
+  $KCODE = 'u'
+  require 'jcode'
+end
