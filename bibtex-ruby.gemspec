@@ -28,10 +28,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency('latex-decode', ['>=0.0.6'])
   s.add_runtime_dependency('multi_json', ['~>1.3'])
 
-  s.add_development_dependency('rake', ['~>0.9'])
-  s.add_development_dependency('racc', ['~>1.4'])
-  s.add_development_dependency('rdoc', ['~>3.9'])
-
   s.files        = File.open('Manifest').readlines.map(&:chomp)
   s.test_files   = Dir.glob('test/**/test*.rb')
   s.executables  = []

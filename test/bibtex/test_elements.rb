@@ -2,29 +2,29 @@ require 'helper'
 
 module BibTeX
   
-	class ElementTest < MiniTest::Spec
-		
-		describe '.parse' do
-			
-			it 'accepts a BibTeX string' do
-				Element.parse('@misc{x,},@misc{y,}').length.must_be :==, 2
-			end
-			
-			it 'accepts an Element' do
-				Element.parse(Comment.new('blah')).length.must_be :==, 1
-			end
-			
-			it 'accepts a Hash and returns an Entry' do
-				Element.parse({ :type => :book })[0].type.must_be :==, :book
-			end
-			
-			it 'accepts an array of hashes' do
-				Element.parse([{ :type => :book }, { :type => :misc }])[1].type.must_be :==, :misc
-			end
-			
-		end
-		
-	end
+  class ElementTest < MiniTest::Spec
+    
+    describe '.parse' do
+      
+      it 'accepts a BibTeX string' do
+        Element.parse('@misc{x,},@misc{y,}').length.must_be :==, 2
+      end
+      
+      it 'accepts an Element' do
+        Element.parse(Comment.new('blah')).length.must_be :==, 1
+      end
+      
+      it 'accepts a Hash and returns an Entry' do
+        Element.parse({ :type => :book })[0].type.must_be :==, :book
+      end
+      
+      it 'accepts an array of hashes' do
+        Element.parse([{ :type => :book }, { :type => :misc }])[1].type.must_be :==, :misc
+      end
+      
+    end
+    
+  end
 
   class PreambleTest < MiniTest::Spec
     

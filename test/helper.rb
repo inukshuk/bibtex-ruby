@@ -6,6 +6,7 @@ rescue LoadError
 end
 
 require 'minitest/autorun'
+require 'minitest/colorize'
 require 'tempfile'
 
 require 'bibtex'

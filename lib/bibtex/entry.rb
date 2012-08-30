@@ -400,15 +400,15 @@ module BibTeX
     end
     
     
+    # call-seq:
+    #   add(:author, "Edgar A. Poe")
+    #   add(:author, "Edgar A. Poe", :title, "The Raven")
+    #   add([:author, "Edgar A. Poe", :title, "The Raven"])
+    #   add(:author => "Edgar A. Poe", :title => "The Raven")
+    #   add(:author => Names.new(Name.new(:first => 'Edgar A.', :last => 'Poe')))
+    #
     # Adds a new field (name-value pair) or multiple fields to the entry.
     # Returns the entry for chainability.
-    #
-    # call-seq:
-    # add(:author, "Edgar A. Poe")
-    # add(:author, "Edgar A. Poe", :title, "The Raven")
-    # add([:author, "Edgar A. Poe", :title, "The Raven"])
-    # add(:author => "Edgar A. Poe", :title => "The Raven")
-    # add(:author => Names.new(Name.new(:first => 'Edgar A.', :last => 'Poe')))
     def add(*arguments)
       Hash[*arguments.flatten].each_pair do |name, value|
         fields[name.to_sym] = Value.create(value)
@@ -461,9 +461,9 @@ module BibTeX
       end
       
       if bibliography.options.has_key?(:filter)
-				[*bibliography.options[:filter]].each do |filter|
-        	convert!(filter)
-				end
+        [*bibliography.options[:filter]].each do |filter|
+          convert!(filter)
+        end
       end
       
       self
