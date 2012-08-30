@@ -13,7 +13,7 @@ group :test do
   gem 'cucumber', ['~>1.0']
 end
 
-group :development do
+group :extra do
 	gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
 	gem 'guard-minitest'
 	gem 'guard-cucumber'
