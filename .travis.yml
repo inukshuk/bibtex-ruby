@@ -1,5 +1,5 @@
 language: ruby
-bundler_args: --without debug profile extra
+bundler_args: --without debug development profile extra
 rvm:
   - 1.9.2
   - 1.9.3
@@ -21,3 +21,4 @@ matrix:
     - rvm: ree
     - rvm: 1.9.2
     - rvm: rbx-19mode
+    - rvm: rbx-18mode
