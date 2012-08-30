@@ -10,4 +10,4 @@ lib/bibtex/parser.output
 lib/bibtex/name_parser.rb
 lib/bibtex/name_parser.output
 Gemfile.lock
-./coverage
+coverage
