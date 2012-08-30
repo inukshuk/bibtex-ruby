@@ -10,12 +10,12 @@ end
 
 group :test do
 	gem 'minitest'
+	gem 'minitest-colorize'
   gem 'cucumber', ['~>1.0']
 end
 
 group :extra do
 	gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
-	gem 'minitest-colorize'
 	gem 'guard-minitest'
 	gem 'guard-cucumber'
 end
