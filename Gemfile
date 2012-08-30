@@ -28,4 +28,5 @@ end
 
 group :development do
   gem 'rake'
+  gem 'racc'
 end
