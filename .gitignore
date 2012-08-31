@@ -4,6 +4,7 @@
 *.rbc
 .rbx
 doc/**/*
+.yardoc
 .bundle
 lib/bibtex/parser.rb
 lib/bibtex/parser.output
