@@ -1,15 +1,15 @@
 BibTeX-Ruby
 ===========
+[![Build Status](https://secure.travis-ci.org/inukshuk/bibtex-ruby.png?branch=master)](http://travis-ci.org/inukshuk/bibtex-ruby)
 
 BibTeX-Ruby is the Rubyist's swiss-army-knife for all things BibTeX. It
-includes a parser for all common BibTeX objects (@string, @preamble,
-@comment and regular entries) and a sophisticated name parser that
-tokenizes correctly formatted names; BibTeX-Ruby recognizes BibTeX string
-replacements, joins values containing multiple strings or variables,
-supports cross-references, and decodes common LaTeX formatting
-instructions to unicode; if you are in a hurry, it also allows for easy
-export/conversion to formats such as YAML, JSON, CiteProc/CSL, and
-XML (BibTeXML).
+includes a parser for all common BibTeX objects (@string, @preamble, @comment
+and regular entries) and a sophisticated name parser that tokenizes correctly
+formatted names; BibTeX-Ruby recognizes BibTeX string replacements, joins
+values containing multiple strings or variables, supports cross-references,
+and decodes common LaTeX formatting instructions to unicode; if you are in a
+hurry, it also allows for easy export/conversion to formats such as YAML,
+JSON, CiteProc/CSL, XML (BibTeXML), and RDF (experimental).
 
 For a list of projects using BibTeX-Ruby, take a look at the
 [project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/Projects-Using-BibTeX-Ruby).
@@ -17,7 +17,6 @@ For a list of projects using BibTeX-Ruby, take a look at the
 
 Quickstart
 ----------
-
 Install and load BibTeX-Ruby in an IRB session:
 
     $ [sudo] gem install bibtex-ruby
@@ -96,10 +95,8 @@ Save a bibliography to a file:
     #=> saves the bibliography in a new file
 
 
-
 Compatibility
 -------------
-
 The BibTeX-Ruby gem has been developed and tested on Ruby 1.8 and 1.9; it has
 been confirmed to work with JRuby, Rubinius, and REE, however, there have
 been repeated [issues](https://github.com/inukshuk/bibtex-ruby/issues)
@@ -107,18 +104,17 @@ been repeated [issues](https://github.com/inukshuk/bibtex-ruby/issues)
 implementation.
 
 
-
 Documentation
 -------------
-
 It is very easy to use BibTeX-Ruby. You can use the top level utility methods
-**BibTeX.open** and **BibTeX.parse** to open a '.bib' file or to parse a string
-containing BibTeX contents. By default, BibTeX-Ruby will discard all text outside
-of regular BibTeX elements; however, if you wish to include everything, simply add
-`:include => [:meta_content]` to your invocation of **BibTeX.open** or **BibTeX.parse**.
+**BibTeX.open** and **BibTeX.parse** to open a '.bib' file or to parse a
+string containing BibTeX contents. By default, BibTeX-Ruby will discard all
+text outside of regular BibTeX elements; however, if you wish to include
+everything, simply add `:include => [:meta_content]` to your invocation of
+**BibTeX.open** or **BibTeX.parse**.
 
-Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual entries.
-For example, if you set up your bibliography as follows:
+Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual
+entries. For example, if you set up your bibliography as follows:
 
     b = BibTeX.parse <<-END
     @book{pickaxe,
@@ -130,20 +126,23 @@ For example, if you set up your bibliography as follows:
       year = {2009}
     }
     END
-    
-You could easily access it, using the entry's key, 'pickaxe', like so: `b[:pickaxe]`;
-you also have easy access to individual fields, for example: `b[:pickaxe][:author]`.
-Alternatively, BibTeX-Ruby accepts ghost methods to conveniently access an entry's fields,
-similar to **ActiveRecord::Base**. Therefore, it is equally possible to access the
-'author' field above as `b[:pickaxe].author`.
 
-BibTeX-Ruby wraps all values of fields in an entry are wrapped in Value objects.
-This is necessary to transparently handle different types of values (e.g., strings,
-dates, names etc.). These Value objects are designed to be hardly discernible
-from regular Ruby strings, however, if you ever run into a problem with a field's
-value, simply convert it to a string by calling the `#to_s` method.
+You could easily access it, using the entry's key, 'pickaxe', like so:
+`b[:pickaxe]`; you also have easy access to individual fields, for example:
+`b[:pickaxe][:author]`. Alternatively, BibTeX-Ruby accepts ghost methods to
+conveniently access an entry's fields, similar to **ActiveRecord::Base**.
+Therefore, it is equally possible to access the 'author' field above as
+`b[:pickaxe].author`.
 
-Instead of parsing strings you can also create BibTeX elements directly in Ruby:
+BibTeX-Ruby wraps all values of fields in an entry are wrapped in Value
+objects. This is necessary to transparently handle different types of values
+(e.g., strings, dates, names etc.). These Value objects are designed to be
+hardly discernible from regular Ruby strings, however, if you ever run into a
+problem with a field's value, simply convert it to a string by calling the
+`#to_s` method.
+
+Instead of parsing strings you can also create BibTeX elements directly in
+Ruby:
 
     > bib = BibTeX::Bibliography.new
     
@@ -173,10 +172,11 @@ Or programmatically:
 
 ### Cross References
 
-From version 2.0, BibTeX-Ruby correctly resolves entry cross-references, which
-are commonly used for entries with type `inbook`, `incollection`, and
-`inproceedings`. When an entry has a valid citation key in the field `crossref`,
-BibTeX-Ruby will return any fields inherited from the parent entry:
+From version 2.0, BibTeX-Ruby correctly resolves entry cross-references,
+which are commonly used for entries with type `inbook`, `incollection`,
+and `inproceedings`. When an entry has a valid citation key in the field
+`crossref`, BibTeX-Ruby will return any fields inherited from the parent
+entry:
 
     > b = BibTeX.parse <<-END
     @inbook{fraassen_1989b,
@@ -298,12 +298,12 @@ A shorthand version for replacing all strings in a given bibliography is the
 
 ### Names
 
-Since version 1.3, BibTeX-Ruby features a name parser. You can use the top-level
-`BibTeX.names` utility to quickly parse individual name values. Alternatively,
-you can call `Bibliography.parse_names` to convert all name fields contained
-in the bibliography. When parsing BibTeX files, BibTeX-Ruby will automatically
-convert names; if you do not want the names to be parsed you can set the
-`:parse_names` parser option to false.
+Since version 1.3, BibTeX-Ruby features a name parser. You can use the
+top-level `BibTeX.names` utility to quickly parse individual name values.
+Alternatively, you can call `Bibliography.parse_names` to convert all name
+fields contained in the bibliography. When parsing BibTeX files, BibTeX-Ruby
+will automatically convert names; if you do not want the names to be parsed
+you can set the `:parse_names` parser option to false.
 
 Note that the string replacement and concatenation features described above
 are not supported for name objects; therefore, BibTeX-Ruby tries to replace
@@ -391,20 +391,20 @@ by passing the `:filter` option:
 Furthermore, BibTeX-Ruby allows you to export your bibliography for processing
 by other tools. Currently supported formats include YAML, JSON, and XML.
 
-Of course, you can also export your bibliography back to BibTeX; if you include
-`:meta_content', your export should be identical to the original '.bib' file,
-except for whitespace, blank lines and letter case (BibTeX-Ruby will downcase
-all keys).
+Of course, you can also export your bibliography back to BibTeX; if you
+include `:meta_content', your export should be identical to the original
+'.bib' file, except for whitespace, blank lines and letter case (BibTeX-Ruby
+will downcase all keys).
 
-In order to export your bibliography use **#to\_s**, **#to\_yaml**, **#to\_json**, or
-**#to\_xml**, respectively. For example, the following line constitutes a simple
-BibTeX to YAML converter:
+In order to export your bibliography use **#to\_s**, **#to\_yaml**,
+**#to\_json**, or **#to\_xml**, respectively. For example, the following line
+constitutes a simple BibTeX to YAML converter:
 
     >> BibTeX.open('example.bib').to_yaml
 
 Starting with version 2.0, BibTeX-Ruby's `#to_xml` exports your bibliography
 to the [BibTeXML](http//bibtexml.sf.net/) format. By passing the option
-`:extended => true` you can make use of the BibTeXML's extended  format which
+`:extended => true` you can make use of the BibTeXML's extended format which
 will return individual person elements and name tokens (provided you have
 successfully parsed the names of your bibliography).
 
@@ -448,21 +448,20 @@ and writes the following XML to standard out:
       </bibtex:entry>
     </bibtex:file>
 
-Look at the 'examples' directory for more elaborate examples of a BibTeX to YAML
-and a BibTeX to HTML converter using **#to_citeproc** to format a bibliography
-using [CSL](http://citationstyles.org/).
+Look at the 'examples' directory for more elaborate examples of a BibTeX to
+YAML and a BibTeX to HTML converter using **#to_citeproc** to format a
+bibliography using [CSL](http://citationstyles.org/).
 
 BibTeX-Ruby offers an API which lets you manipulate BibTeX objects (string
 replacement, name parsing etc.); however, sometimes you just want quick access
 to your bibliography's contents. In these cases the **to_hash** method is
-useful (use **to_a** if you are only interested in the bibliography's contents):
-it converts all objects into simple Ruby hashes made up of symbols
+useful (use **to_a** if you are only interested in the bibliography's
+contents): it converts all objects into simple Ruby hashes made up of symbols
 and strings. Furthermore, often you would like to control what sort of quotes
-are used in an export;
-therefore, all conversion methods accept an options hash which lets you define
-what quotes to use (note that BibTeX-Ruby will always use regular double
-quotes if a value consists of more than one token, because these tokens will
-be concatenated using BibTeX's '#' operator).
+are used in an export; therefore, all conversion methods accept an options
+hash which lets you define what quotes to use (note that BibTeX-Ruby will
+always use regular double quotes if a value consists of more than one token,
+because these tokens will be concatenated using BibTeX's '#' operator).
 
     >> BibTeX.parse(<<-END).to_a # implies: :quotes => ['{','}']
     @book{pickaxe,
@@ -496,7 +495,6 @@ quotes; therefore you can simply add the :quotes option with an empty string:
 
 The Parser
 ----------
-
 The BibTeX-Ruby parser is generated using the awesome
 [racc](http://i.loveruby.net/en/projects/racc/) parser generator. You can take
 look at the LALR grammar in the file
@@ -508,7 +506,6 @@ For more information about the BibTeX format and the parser's idiosyncrasies
 
 Contributing
 ------------
-
 The BibTeX-Ruby source code is
 [hosted on GitHub](http://github.com/inukshuk/bibtex-ruby/).
 You can check out a copy of the latest code using Git:
@@ -532,12 +529,11 @@ the bibtex-ruby directory):
 
     $ [sudo] gem install bundler
     $ [sudo] bundle install
-    $ bundle exec cucumber
-    $ bundle exec rake test
+    $ bundle exec rake
 
 To execute the test suite continuously while you're working run:
 
-    $ bundle exec watchr auto.watchr
+    $ bundle exec guard
 
 
 
@@ -546,9 +542,8 @@ Credits
 
 Copyright 2011-2012 [Sylvester Keil](http://sylvester.keil.or.at/).
 
-See the [contributor page on GitHub](https://github.com/inukshuk/bibtex-ruby/contributors)
-for a list of all the awesome developers who have made BibTeX-Ruby
-possible.
+Kudos to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
+who have made BibTeX-Ruby possible.
 
-This software is distributed under the terms and conditions of the GNU GPL. See
-LICENSE for details.
+This software is distributed under the terms and conditions of the GNU GPL.
+See LICENSE for details.

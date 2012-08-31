@@ -1,0 +1,3 @@
+--no-private
+--document
+--exclude lib/bibtex/{name_parser,parser}.rb

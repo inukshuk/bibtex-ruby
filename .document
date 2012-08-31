@@ -1,0 +1,7 @@
+lib/**/*.rb
+LICENSE
+README.md
+- 
+features/**/*.feature
+features/**/*.rb
+test/**/*.rb

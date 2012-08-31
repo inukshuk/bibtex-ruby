@@ -15,17 +15,10 @@ $:.unshift(File.join(File.dirname(__FILE__), './lib'))
 require 'rake/clean'
 require 'rake/testtask'
 
-require 'rdoc/task'
-
 require 'bibtex/version'
 
-RDoc::Task.new(:rdoc => ['clean','racc']) do |rd|
-  rd.main = 'README.md'
-  rd.title = "BibTeX-Ruby Documentation"
-  rd.rdoc_files.include('README.md',"lib/**/*.rb")
-  rd.rdoc_dir = "doc/html"
-  rd.options << '--webcvs=http://github.com/inukshuk/bibtex-ruby/tree/master/'
-end
+require 'yard'
+YARD::Rake::YardocTask.new
 
 Rake::TestTask.new(:test_task) do |t|
   t.libs << 'lib' << 'test'
@@ -111,5 +104,4 @@ CLEAN.include('lib/bibtex/parser.rb')
 CLEAN.include('lib/bibtex/parser.output')
 CLEAN.include('lib/bibtex/name_parser.rb')
 CLEAN.include('lib/bibtex/name_parser.output')
-CLEAN.include('doc/html')
 CLEAN.include('*.gem')

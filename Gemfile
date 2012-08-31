@@ -5,7 +5,8 @@ gemspec
 gem 'rdf', '~>0.3'
 
 group :debug do
-	gem 'debugger', :platforms => [:mri_19]
+	gem 'debugger', :require => false, :platforms => [:mri_19]
+	gem 'ruby-debug', :require => false, :platforms => [:mri_18]
 end
 
 group :test do
@@ -18,6 +19,7 @@ group :extra do
 	gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
 	gem 'guard-minitest'
 	gem 'guard-cucumber'
+	gem 'redcarpet'
 end
 
 group :profile do
@@ -29,4 +31,5 @@ end
 group :development do
   gem 'rake'
   gem 'racc'
+  gem 'yard'
 end

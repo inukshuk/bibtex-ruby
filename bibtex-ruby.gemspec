@@ -9,12 +9,12 @@ Gem::Specification.new do |s|
   s.version     = BibTeX::Version::STRING.dup
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Sylvester Keil']
-  s.email       = ['http://sylvester.keil.or.at']
+  s.email       = ['sylvester@keil.or.at']
   s.homepage    = 'http://inukshuk.github.com/bibtex-ruby'
   s.license     = 'GPL-3'
 
   s.summary     = 'A BibTeX parser, converter and API for Ruby.'
-  s.description = <<-END_DESCRIPTION
+  s.description = <<-END_DESCRIPTION.gsub(/^\s+/, '')
 		BibTeX-Ruby is the Rubyist's swiss-army-knife for all things BibTeX. It
     includes a parser for all common BibTeX objects (@string, @preamble,
     @comment and regular entries) and a sophisticated name parser that
@@ -33,9 +33,7 @@ Gem::Specification.new do |s|
   s.executables  = []
   s.require_path = 'lib'
 
-  s.rdoc_options      = %w{--line-numbers --inline-source --title "BibTeX-Ruby\ Documentation" --main README.md --webcvs=http://github.com/inukshuk/bibtex-ruby/tree/master/}
-  s.extra_rdoc_files  = %w{README.md}
-  
+  s.has_rdoc  = 'yard'
 end
 
 # vim: syntax=ruby
