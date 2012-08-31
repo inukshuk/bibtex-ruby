@@ -1,11 +1,11 @@
 Gemfile
 Gemfile.lock
+Guardfile
 History.txt
 LICENSE
 Manifest
 README.md
 Rakefile
-auto.watchr
 bibtex-ruby.gemspec
 examples
 examples/bib2html.rb
