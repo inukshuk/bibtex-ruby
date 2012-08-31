@@ -56,10 +56,13 @@ end
 # Debugger.start
 
 require 'bibtex/extensions'
-require 'bibtex/compatibility'
+
 require 'bibtex/value'
 require 'bibtex/filters'
 require 'bibtex/name_parser'
+
+require 'bibtex/compatibility'
+
 require 'bibtex/names'
 require 'bibtex/replaceable'
 require 'bibtex/elements'

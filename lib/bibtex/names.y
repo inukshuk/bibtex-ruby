@@ -92,19 +92,18 @@ require 'strscan'
 
 ---- inner
   
-  # Patterns Cache (#37: MacRuby does not cache regular expressions)
   @patterns = {
     :and => /,?\s+and\s+/io,
     :space => /[\t\r\n\s]+/o,
     :comma => /,/o,
     :lower => /[[:lower:]][^\t\r\n\s\{\}\d\\,]*/o,
-    :upper => /[[:upper:]][^\t\r\n\s\{\}\d\\,]*/o,
+    :upper => /[[:upper:]][^\t\r\n\s\{\}\d\\,]*/uo,
     :symbols => /(\d|\\.)+/o,
     :lbrace => /\{/o,
     :rbrace => /\}/o,
     :period => /./o,
     :braces => /[\{\}]/o
-  }.freeze
+  }
   
   class << self
     attr_reader :patterns
