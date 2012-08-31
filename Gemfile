@@ -13,6 +13,7 @@ group :test do
 	gem 'minitest'
 	gem 'minitest-colorize'
   gem 'cucumber', ['~>1.0']
+  gem 'unicode', :platforms => [:mri, :rbx, :mswin, :mingw]
 end
 
 group :extra do
@@ -31,5 +32,5 @@ end
 group :development do
   gem 'rake'
   gem 'racc'
-  gem 'yard'
+  gem 'yard'	
 end
