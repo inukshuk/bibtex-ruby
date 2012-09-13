@@ -14,15 +14,15 @@ module BibTeX
       end
         
       it 'parses all entries' do
-        assert_equal 3, @bib.length
+        assert_equal 4, @bib.length
       end
       
       it 'parses the key values' do
-        assert_equal %w{ key:0 key:1 foo }, @bib.map(&:key)
+        assert_equal %w{ key:0 key:1 foo staudinger }, @bib.map(&:key)
       end
 
       it 'should parse the entry types' do
-        assert_equal [:book, :article, :article], @bib.map(&:type)
+        assert_equal [:book, :article, :article, :commentary], @bib.map(&:type)
       end
       
       it 'should parse all values correctly' do
