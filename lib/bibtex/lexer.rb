@@ -57,8 +57,8 @@ module BibTeX
       :next         => /(^|\n)[\t ]*@[\t ]*/o,
       :entry        => /[a-z\d:_!\.$%&*-]+/io,
       :string       => /string/io,
-      :comment      => /comment/io,
-      :preamble     => /preamble/io,
+      :comment      => /comment\b/io,
+      :preamble     => /preamble\b/io,
       :key          => /[[:alpha:]\d \/:_!$\?\.%&\*-]+,/io,
       :optional_key => /[[:alpha:]\d \/:_!$\?\.%&\*-]*,/io
     }.freeze
