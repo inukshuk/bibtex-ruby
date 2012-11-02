@@ -24,6 +24,7 @@ features/issues/number_keys.feature
 features/issues/parse_months.feature
 features/issues/slash_keys.feature
 features/issues/trailing_comma.feature
+features/issues/whitespace_keys.feature
 features/names.feature
 features/preambles.feature
 features/query.feature
