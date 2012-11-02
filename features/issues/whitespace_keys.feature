@@ -18,5 +18,6 @@ Feature: Whitespace in before cite keys
       year          = {1997},
       pages         = {41--68},
       crossref      = {hall:lived:1997}
-    }		"""
-		Then my bibliography should contain an article with id "brown:family:1997"
+    }
+    """
+		Then my bibliography should contain an incollection with id "brown:family:1997"

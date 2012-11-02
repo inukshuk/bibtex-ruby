@@ -21,11 +21,15 @@ module BibTeX
       Lexer.new.analyse("@misc{foo, }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
     end
 
-    it 'doesn\'t start a comment for types starting with but not equal @comment' do
+    it 'matches KEY tokens after whitespace' do
+      Lexer.new.analyse("@misc{  foo, }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
+    end
+
+    it "doesn't start a comment for types starting with but not equal @comment" do
       Lexer.new.analyse("@commentary{staudinger, }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
     end
 
-    it 'doesn\'t start a preamble for types starting with but not equal @preamble' do
+    it "doesn't start a preamble for types starting with but not equal @preamble" do
       Lexer.new.analyse("@preamblestring{ preamble }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :NAME, :RBRACE, false]
     end
   end
