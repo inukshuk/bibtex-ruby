@@ -1,3 +1,8 @@
+2.1.1 / 2012-11-02
+==================
+
+* Fixed lexer issue with whitespace before cite keys (@lmullen)
+
 2.1.1 / 2012-09-14
 ==================
 
