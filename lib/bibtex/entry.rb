@@ -1,17 +1,17 @@
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2012 Sylvester Keil <sylvester.keil.or.at>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
@@ -21,7 +21,7 @@ module BibTeX
   # Represents a regular BibTeX entry.
   #
   class Entry < Element
-    extend Forwardable    
+    extend Forwardable
     include Enumerable
 
     # Defines the required fields of the standard entry types
@@ -47,11 +47,11 @@ module BibTeX
       :booktitle => :title,
       # :editor => :author
     }.freeze
-    
-    
+
+
     NAME_FIELDS = [:author,:editor,:translator].freeze
     DATE_FIELDS = [:year,:month].freeze
-    
+
     MONTHS = [:jan,:feb,:mar,:apr,:may,:jun,:jul,:aug,:sep,:oct,:nov,:dec].freeze
 
     MONTHS_FILTER = Hash.new do |h,k|
@@ -64,7 +64,7 @@ module BibTeX
         h[k] = Value.new(k)
       end
     end
-    
+
     CSL_FILTER = Hash.new {|h,k|k}.merge(Hash[*%w{
       date      issued
       isbn      ISBN
@@ -82,7 +82,7 @@ module BibTeX
     CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
       authority call-number chapter-number citation-label citation-number
       collection-title container-title DOI edition event event-place
-      first-reference-note-number genre ISBN issue jurisdiction keyword locator 
+      first-reference-note-number genre ISBN issue jurisdiction keyword locator
       medium note number number-of-pages number-of-volumes original-publisher
       original-publisher-place original-title page page-first publisher
       publisher-place references section status title URL version volume
@@ -90,7 +90,7 @@ module BibTeX
       author editor translator recipient interviewer publisher composer
       original-publisher original-author container-author collection-editor
     }.map(&:intern).freeze
-    
+
     CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
       booklet        pamphlet
       conference     paper-conference
@@ -136,29 +136,29 @@ module BibTeX
       article        Article
     }.map(&:intern)]).freeze
 
-    
+
     attr_reader :fields, :type
-    
+
     def_delegators :@fields, :empty?
 
     # Creates a new instance. If a hash is given, the entry is populated accordingly.
     def initialize(attributes = {})
       @fields = {}
-    
+
       self.type = attributes.delete(:type) if attributes.has_key?(:type)
       self.key = attributes.delete(:key) if attributes.has_key?(:key)
-      
+
       add(attributes)
-      
+
       yield self if block_given?
     end
 
     def initialize_copy (other)
       @fields = {}
-      
+
       self.type = other.type
       self.key = other.key
-      
+
       add(other.fields)
     end
 
@@ -177,12 +177,12 @@ module BibTeX
           nil
         end
       end
-      
+
       define_method("#{name}=") do |value|
         add name, value
       end
     end
-    
+
     # call-seq:
     #   entry.each      { |key, value| block } -> entry
     #   entry.each_pair { |key, value| block } -> entry
@@ -201,15 +201,15 @@ module BibTeX
         to_enum
       end
     end
-    
+
     alias each_pair each
-    
-  
+
+
     # Returns the Entry's field name aliases.
     def aliases
       @aliases ||= FIELD_ALIASES.dup
     end
-    
+
     # Sets the Entry's key. If the Entry is currently registered with a
     # Bibliography, re-registers the Entry with the new key; note that this
     # may change the key value if another Entry is already regsitered with
@@ -218,7 +218,7 @@ module BibTeX
     # Returns the new key.
     def key=(key)
       key = key.to_s
-      
+
       if registered?
         bibliography.entries.delete(@key)
         key = register(key)
@@ -228,7 +228,7 @@ module BibTeX
     rescue => e
       raise BibTeXError, "failed to set key to #{key.inspect}: #{e.message}"
     end
-    
+
     def key
       @key ||= default_key
     end
@@ -240,14 +240,14 @@ module BibTeX
     def type=(type)
       @type = type.to_sym
     end
-    
+
     def has_type?(type)
       type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_sym || super
     end
-    
+
     alias type? has_type?
-    
-    
+
+
     def has_field?(*names)
       names.flatten.any? do |name|
         name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
@@ -261,7 +261,7 @@ module BibTeX
         !has_field(name) && has_parent? && parent.provides?(name)
       end
     end
-    
+
     # Returns true if the Entry has a field (or alias) for any of the passed-in names.
     def provides?(*names)
       names.flatten.any? do |name|
@@ -272,20 +272,20 @@ module BibTeX
         end
       end
     end
-    
+
     def provides_or_inherits?(*names)
       provides?(names) || inherits?(names)
     end
-    
+
     # Returns the field value referenced by the passed-in name.
     # For example, this will return the 'title' value for 'booktitle' if a
     # corresponding alias is defined.
     def provide(name)
       return nil unless name.respond_to?(:to_sym)
-      name = name.to_sym      
+      name = name.to_sym
       fields[name] || fields[aliases[name]]
     end
-    
+
     # If the Entry has a cross-reference, copies all referenced all inherited
     # values from the parent.
     #
@@ -294,10 +294,10 @@ module BibTeX
       inherited_fields.each do |name|
         fields[name] = parent.provide(name)
       end
-      
+
       self
     end
-    
+
     # Returns a sorted list of the Entry's field names. If a +filter+ is passed
     # as argument, returns all field names that are also defined by the filter.
     # If the +filter+ is empty, returns all field names.
@@ -306,15 +306,15 @@ module BibTeX
     # a cross-reference, the list will include all inherited fields.
     def field_names(filter = [], include_inherited = true)
       names = fields.keys
-      
+
       if include_inherited && has_parent?
         names.concat(inherited_fields)
       end
-      
+
       unless filter.empty?
         names = names & filter.map(&:to_sym)
       end
-      
+
       names.sort!
       names
     end
@@ -322,21 +322,21 @@ module BibTeX
     # Returns a sorted list of all field names referenced by this Entry's cross-reference.
     def inherited_fields
       return [] unless has_parent?
-      
+
       names = parent.fields.keys - fields.keys
       names.concat(parent.aliases.reject { |k,v| !parent.has_field?(v) }.keys)
       names.sort!
-      
+
       names
     end
-    
-    
+
+
     def method_missing(name, *args, &block)
       case
       when fields.has_key?(name)
         fields[name]
       when name.to_s =~ /^(.+)=$/
-        send(:add, $1.to_sym, args[0])      
+        send(:add, $1.to_sym, args[0])
       when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
         $2 ? convert!($1, &block) : convert($1, &block)
       when has_parent? && parent.provides?(name)
@@ -350,12 +350,12 @@ module BibTeX
       provides?(method.to_sym) || method.to_s.match(/=$/) ||
         method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || (has_parent? && parent.respond_to?(method)) || super
     end
-    
+
     # Returns a copy of the Entry with all the field names renamed.
     def rename(*arguments)
       dup.rename!(*arguments)
     end
-    
+
     # Renames the given field names unless a field with the new name already
     # exists.
     def rename!(*arguments)
@@ -370,16 +370,16 @@ module BibTeX
 
     alias rename_fields rename
     alias rename_fields! rename!
-    
+
     # Returns the value of the field with the given name. If the value is not
     # defined and the entry has cross-reference, returns the cross-referenced
     # value instead.
     def [](name)
       fields[name.to_sym] || parent && parent.provide(name)
     end
-    
+
     alias get []
-    
+
     def fetch(name, default = nil)
       get(name) || block_given? ? yield(name) : default
     end
@@ -395,11 +395,11 @@ module BibTeX
       define_method(contributor) do
         get(contributor)
       end
-      
+
       alias_method "#{contributor}s", contributor
     end
-    
-    
+
+
     # call-seq:
     #   add(:author, "Edgar A. Poe")
     #   add(:author, "Edgar A. Poe", :title, "The Raven")
@@ -413,10 +413,10 @@ module BibTeX
       Hash[*arguments.flatten].each_pair do |name, value|
         fields[name.to_sym] = Value.create(value)
       end
-      
+
       self
     end
-    
+
     alias << add
 
     # Removes the field with a given name from the entry.
@@ -436,7 +436,7 @@ module BibTeX
     def generate_hash(filter = [])
       Digest::MD5.hexdigest(field_names(filter).map { |k| [k, fields[k]] }.flatten.join)
     end
-    
+
     def identifier
       case
       when provides?(:doi)
@@ -449,23 +449,23 @@ module BibTeX
         "urn:bibtex:#{key}"
       end
     end
-    
+
     # Called when the element was added to a bibliography.
     def added_to_bibliography(bibliography)
       super
 
       @key = register(key)
-      
+
       [:parse_names, :parse_months].each do |parser|
         send(parser) if bibliography.options[parser]
       end
-      
+
       if bibliography.options.has_key?(:filter)
         [*bibliography.options[:filter]].each do |filter|
           convert!(filter)
         end
       end
-      
+
       self
     end
 
@@ -480,7 +480,7 @@ module BibTeX
     def registered?
       !!(bibliography && bibliography.entries[key].equal?(self))
     end
-    
+
     # Registers this Entry in the associated Bibliographies entries hash.
     # This method may change the Entry's key, if another entry is already
     # registered with the current key.
@@ -488,13 +488,13 @@ module BibTeX
     # Returns the key or nil if the Entry is not associated with a Bibliography.
     def register(key)
       return nil if bibliography.nil?
-      
+
       k = key.dup
       k.succ! while bibliography.has_key?(k)
       bibliography.entries[k] = self
       k
     end
-    
+
     def replace(*arguments)
       arguments = bibliography.q('@string') if arguments.empty?
       fields.values.each { |v| v.replace(*arguments) }
@@ -509,18 +509,18 @@ module BibTeX
     def month=(month)
       fields[:month] = MONTHS_FILTER[month]
     end
-    
+
     def parse_month
       fields[:month] = MONTHS_FILTER[fields[:month]] if has_field?(:month)
       self
     end
-    
+
     alias parse_months parse_month
-    
+
     def date
       get(:date) || get(:year)
     end
-    
+
     # Parses all name values of the entry. Tries to replace and join the
     # value prior to parsing.
     def parse_names
@@ -535,34 +535,34 @@ module BibTeX
 
       self
     end
-    
+
     # Returns a list of all names (authors, editors, translators).
     def names
       NAME_FIELDS.map { |k| has_field?(k) ? @fields[k].tokens : nil }.flatten.compact
     end
-      
-    
+
+
     # Returns true if the Entry has a valid cross-reference in the Bibliography.
     def has_parent?
       !parent.nil?
     end
 
-    alias has_cross_reference? has_parent?    
+    alias has_cross_reference? has_parent?
 
     # Returns true if the Entry cross-references an Entry which is not
     # registered in the current Bibliography.
     def parent_missing?
       has_field?(:crossref) && !has_parent?
     end
-  
+
     alias cross_reference_missing? parent_missing?
-    
+
     # Returns the cross-referenced Entry from the Bibliography or nil if this
     # Entry does define a cross-reference.
     def parent
       bibliography && bibliography[fields[:crossref]]
     end
-    
+
     alias cross_reference parent
 
 
@@ -571,9 +571,9 @@ module BibTeX
     def has_children?
       !children.empty?
     end
-    
+
     alias cross_referenced? has_children?
-    
+
     # Returns a list of all entries in the Bibliography containing a
     # cross-reference to this entry or [] if there are no references to this
     # entry.
@@ -582,11 +582,11 @@ module BibTeX
     end
 
     alias cross_referenced_by children
-    
+
     def container_title
       get(:booktitle) || get(:journal) || get(:container)
     end
-    
+
     def pages_from
       fetch(:pages, '').split(/\D+/)[0]
     end
@@ -594,13 +594,19 @@ module BibTeX
     def pages_to
       fetch(:pages, '').split(/\D+/)[-1]
     end
-    
+
     # Returns true if this entry is published inside a book, collection or journal
     def contained?
       has_field?(:booktitle, :container, :journal)
     end
-    
-    
+
+		# Returns an array containing the values associated with the given keys.
+		def values_at(*arguments)
+			arguments.map do |key|
+				get key
+			end
+		end
+
     # Returns a duplicate entry with all values converted using the filter.
     # If an optional block is given, only those values will be converted where
     # the block returns true (the block will be called with each key-value pair).
@@ -609,18 +615,18 @@ module BibTeX
     def convert(filter)
       block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
     end
-    
+
     # In-place variant of @see #convert
     def convert!(filter)
       fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
       self
     end
-    
+
     def <=>(other)
       type != other.type ? type <=> other.type : key != other.key ? key <=> other.key : to_s <=> other.to_s
     end
-    
-    
+
+
     # Returns a string of all the entry's fields.
     def content(options = {})
       fields.map { |k,v| "#{k} = #{ fields[k].to_s(options) }" }.join(",\n")
@@ -631,7 +637,7 @@ module BibTeX
       options[:quotes] ||= %w({ })
       ["@#{type}{#{key},", content(options).gsub(/^/,'  '), "}\n"].join("\n")
     end
-    
+
     def to_hash(options = {})
       options[:quotes] ||= %w({ })
       hash = { :key => key, :type => type }
@@ -641,32 +647,32 @@ module BibTeX
 
     def to_citeproc(options = {})
       options[:quotes] ||= []
-    
+
       parse_names
       parse_month
-      
+
       hash = { 'id' => key.to_s, 'type' => CSL_TYPES[type].to_s }
-    
+
       each_pair do |k,v|
         hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
       end
-    
+
       hash['issued'] = citeproc_date
       hash
     end
-    
+
     def issued
       m = MONTHS.find_index(fields[:month].to_s.intern) unless !has_field?(:month)
       m = m + 1 unless m.nil?
-      
+
       Hash['date-parts', [[fields[:year],m].compact.map(&:to_i)]]
     end
-    
+
     alias citeproc_date issued
-    
+
     def to_xml(options = {})
       require 'rexml/document'
-      
+
       xml = REXML::Element.new('bibtex:entry')
       xml.attributes['id'] = key
 
@@ -674,54 +680,54 @@ module BibTeX
 
       fields.each do |key, value|
         field = REXML::Element.new("bibtex:#{key}")
-        
+
         if options[:extended] && value.name?
           value.each { |n| entry.add_element(n.to_xml) }
         else
           field.text = value.to_s(options)
         end
-        
+
         entry.add_element(field)
       end
 
       xml.add_element(entry)
       xml
     end
-    
+
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
     # TODO: improve level of detail captured by export
     def to_rdf(options = {})
       require 'rdf'
-      
+
       bibo = RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
-      
+
       graph = RDF::Graph.new
       entry = RDF::URI.new(identifier)
 
       graph << [entry, RDF.type, bibo[BIBO_TYPES[type]]]
-      
-      [:title, :language].each do |key|        
+
+      [:title, :language].each do |key|
         graph << [entry, RDF::DC[key], get(key).to_s] if field?(key)
       end
 
       graph << [entry, RDF::DC.date, get(:year).to_s] if field?(:year)
-      
+
       if field?(:publisher)
         address = RDF::Vocabulary.new('http://schemas.talis.com/2005/address/schema#')
         pub = RDF::Node.new
 
         graph << [pub, RDF.type, RDF::FOAF[:Organization]]
         graph << [pub, RDF::FOAF.name, get(:publisher)]
-        
+
         graph << [pub, address[:localityName], get(:address)] if field?(:address)
-        
+
         graph << [entry, RDF::DC.published, pub]
       end
 
-      [:doi, :edition, :volume].each do |key|        
+      [:doi, :edition, :volume].each do |key|
         graph << [entry, bibo[key], get(key).to_s] if field?(key)
       end
-      
+
       if has_field?(:pages)
         if get(:pages).to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
           graph << [entry, bibo[:pageStart], $1]
@@ -736,13 +742,13 @@ module BibTeX
 
         graph << [seq, RDF.type, RDF[:Seq]]
         graph << [entry, bibo[:authorList], seq]
-        
+
         authors.each do |author|
           a = RDF::Node.new
-        
+
           graph << [a, RDF.type, RDF::FOAF[:Person]]
-          
-          if author.is_a?(Name)       
+
+          if author.is_a?(Name)
             [:given, :family, :prefix, :suffix].each do |part|
               graph << [a, bibo["#{part}Name"], author.send(part).to_s]
             end
@@ -778,30 +784,30 @@ module BibTeX
           graph << [seq, RDF.li, e]
         end
       end
-      
+
       graph
     rescue LoadError
       BibTeX.log.error "Please gem install rdf for RDF support."
     end
-    
+
     alias to_bibo to_rdf
-    
-    
+
+
 
 
     private
-    
+
     # Returns a default key for this entry.
     def default_key
       k = names[0]
       k = k.respond_to?(:family) ? k.family : k.to_s
       k = k[/[A-Za-z]+/] || 'unknown'
       k << (has_field?(:year) ? year : '-')
-      k << 'a'      
+      k << 'a'
       k.downcase!
       k
     end
-    
-    
+
+
   end
 end
