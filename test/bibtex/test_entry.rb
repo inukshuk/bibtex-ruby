@@ -191,24 +191,24 @@ module BibTeX
       
     end
 
-		describe '#values_at' do
-			it 'returns an empty array by default' do
-				assert_equal [], Entry.new.values_at
-			end
-			
-			it 'returns an empty array when given no arguments' do
-				assert_equal [], Entry.new(:title => 'foo').values_at
-			end
-			
-			it 'returns a nil array if the passed in key is not set' do
-				assert_equal [nil], Entry.new.values_at(:title)
-			end
+    describe '#values_at' do
+      it 'returns an empty array by default' do
+        assert_equal [], Entry.new.values_at
+      end
+      
+      it 'returns an empty array when given no arguments' do
+        assert_equal [], Entry.new(:title => 'foo').values_at
+      end
+      
+      it 'returns a nil array if the passed in key is not set' do
+        assert_equal [nil], Entry.new.values_at(:title)
+      end
 
-			it 'returns an array with the value of the passed in key' do
-				assert_equal ['x'], Entry.new(:title => 'x').values_at(:title)
-				assert_equal ['a', 'b'], Entry.new(:title => 'b', :year => 'a').values_at(:year, :title)
-			end
-		end
+      it 'returns an array with the value of the passed in key' do
+        assert_equal ['x'], Entry.new(:title => 'x').values_at(:title)
+        assert_equal ['a', 'b'], Entry.new(:title => 'b', :year => 'a').values_at(:year, :title)
+      end
+    end
 
     describe 'given an entry' do
       before do

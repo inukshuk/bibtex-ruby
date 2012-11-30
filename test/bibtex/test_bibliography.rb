@@ -3,9 +3,9 @@
 require 'helper'
 
 module BibTeX
-  
+
   class BibliographyTest < MiniTest::Spec
-    
+
     describe 'when newly created' do
       it 'should not be nil' do
         assert Bibliography.new
@@ -20,11 +20,11 @@ module BibTeX
         tmp = Tempfile.new('bibtex')
         tmp.close
         b = BibTeX.open(Test.fixtures(:bibdesk)).save_to(tmp.path)
-        
+
         BibTeX.open(tmp.path) do |bib|
           bib.delete(:rails)
         end
-        
+
         assert_equal b.length - 1, BibTeX.open(tmp.path).length
       end
 
@@ -32,14 +32,14 @@ module BibTeX
 
     describe '.parse' do
       it 'accepts filters' do
-        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'         
+        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'
       end
 
       it 'accepts filters in an array' do
-        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => ['latex'])[0].title.must_be :==, 'ü'         
+        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => ['latex'])[0].title.must_be :==, 'ü'
       end
     end
-    
+
     describe 'given a populated biliography' do
       before do
         @bib = BibTeX.parse <<-END
@@ -78,13 +78,13 @@ module BibTeX
         }
         END
       end
-      
+
       describe '#entries_at' do
         it 'returns a list of all entries identified by the passed-in keys' do
           assert_equal [@bib['segaran2007'], @bib['rails']], @bib.entries_at('segaran2007', :rails)
         end
       end
-      
+
       describe '#extend_initials' do
         it 'extends the initials in matching names' do
           @bib.names.map(&:to_s).wont_include 'Flanagan, Dave'
@@ -92,41 +92,56 @@ module BibTeX
           @bib.names.map(&:to_s).must_include 'Flanagan, Dave'
         end
       end
-      
+
       describe '#extend_initials!' do
         it 'extends the initials of all names to the longest prototype' do
           assert_equal "Ruby, Sam Thomas, Dave Hansson Heinemeier, David Flanagan, David Matsumoto, Y. Segaran, T.",
             @bib.extend_initials!.names.map(&:sort_order).uniq.join(' ')
         end
       end
-      
+
       describe '#unify' do
         it 'sets all fields matching the given pattern to the passed-in value' do
           @bib.unify :publisher, /reilly/i, 'OReilly'
           assert_equal 'OReilly', @bib['segaran2007'].publisher
           assert_equal 'OReilly', @bib['flanagan2008'].publisher
         end
-        
+
         it 'does not change the value of fields that do not match' do
           @bib.unify :publisher, /reilly/i, 'OReilly'
           assert_equal 'The Pragmatic Bookshelf', @bib['rails'].publisher
         end
-        
+
         it 'passes each entry with matching fields to the block if given' do
           years = []
           @bib.unify(:publisher, /reilly/i) { |e| years << e.year.to_s }
           assert_equal ['2007','2008'], years.sort
         end
-        
+
         it 'returns the bibliography' do
           assert_equal @bib, @bib.unify(:publisher, /reilly/i, 'OReilly')
         end
       end
-      
-      it 'supports access by index' do
-        assert_equal 'ruby', @bib[1].keywords 
+
+      describe '#group_by' do
+        it 'returns an empy hash by default' do
+          assert_equal({}, Bibliography.new.group_by)
+          assert_equal({}, Bibliography.new.group_by(:a, :b))
+        end
+
+        it 'returns a hash with all the values set to the empty key' do
+          assert_equal @bib.length, @bib.group_by[''].length
+        end
+
+        it 'uses a the given block to determine the key' do
+          assert_equal @bib.length, (@bib.group_by { 'x'})['x'].length
+        end
       end
-      
+
+      it 'supports access by index' do
+        assert_equal 'ruby', @bib[1].keywords
+      end
+
       it 'supports access by range' do
         assert_equal %w{2008 2007}, @bib[1..2].map(&:year)
       end
@@ -134,7 +149,7 @@ module BibTeX
       it 'supports access by index and offset' do
         assert_equal %w{2008 2007}, @bib[1,2].map(&:year)
       end
-      
+
       it 'supports queries by symbol key' do
         refute_nil @bib[:rails]
         assert_nil @bib[:ruby]
@@ -145,7 +160,7 @@ module BibTeX
         refute_nil @bib.q(:first, :rails)
         assert_nil @bib.q(:first, :railss)
       end
-      
+
       it 'supports queries by string key' do
         refute_nil @bib['rails']
         assert_nil @bib['ruby']
@@ -171,7 +186,7 @@ module BibTeX
         assert_equal 0, @bib[/reilly/].length
         assert_equal 2, @bib[/reilly/i].length
       end
-      
+
       it 'supports queries by type string and conditions' do
         assert_equal 1, @bib['@book[keywords=ruby]'].length
       end
@@ -209,20 +224,20 @@ module BibTeX
         entry.year = '2006'
         assert_equal 0, @bib[entry].length
       end
-      
+
       it 'supports query and additional block' do
         assert_equal 1, @bib.q('@book') { |e| e.keywords.split(/,/).length > 1 }.length
       end
-    
+
       it 'supports saving the bibliography to a file' do
         tmp = Tempfile.new('bibtex')
         tmp.close
         @bib.save_to(tmp.path)
         assert_equal @bib.length, BibTeX.open(tmp.path).length
       end
-      
+
       describe '#query' do
-        
+
         it 'returns all elements when passed no arguments' do
           @bib.query.length.must_be :==, 6
         end
@@ -230,47 +245,47 @@ module BibTeX
         it 'returns all elements when passed :all and an empty condition' do
           @bib.query(:all, '').length.must_be :==, 6
         end
-        
+
         it 'returns all entries when passed a * wildcard' do
           @bib.query('@*').length.must_be :==, 5
         end
-        
+
       end
-      
+
       describe 'given a filter' do
         before do
           @filter = Object
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
         end
-          
+
         it 'supports arbitrary conversions' do
           @bib.convert(@filter)
           assert_equal 'RUBY, RAILS', @bib[:rails].keywords
         end
-        
+
         it 'supports conditional arbitrary conversions' do
           @bib.convert(@filter) { |e| e.key != 'rails' }
           assert_equal 'ruby, rails', @bib[:rails].keywords
           assert_equal 'RUBY', @bib[:flanagan2008].keywords
         end
-        
+
       end
-      
+
       describe 'LaTeX filter' do
         before do
           @bib['rails'].keywords = 'r\\"uby'
         end
-        
+
         it 'converts LaTeX umlauts' do
           @bib.convert(:latex)['rails'].keywords.must_be :==, 'rüby'
         end
-        
+
       end
-      
+
       describe 'BibTeXML export' do
         before { @bibtexml = Tempfile.new('bibtexml') }
         after  { @bibtexml.unlink }
-          
+
         it 'supports exporting to BibTeXML' do
           @bib.to_xml.write(@bibtexml, 2)
           @bibtexml.rewind
@@ -286,10 +301,10 @@ module BibTeX
           xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
           xml.root.get_elements('//bibtex:person').wont_be_empty
         end
-        
+
       end
     end
-        
-    
+
+
   end
 end

@@ -1,17 +1,17 @@
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2012  Sylvester Keil <sylvester.keil.or.at>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
@@ -24,16 +24,16 @@ module BibTeX
   #
   class Bibliography
     extend Forwardable
-    
+
     include Enumerable
     include Comparable
-    
+
     @defaults = { :parse_names => true, :parse_months => true }.freeze
-    
-    class << self    
+
+    class << self
 
       attr_reader :defaults
-      
+
       # Opens and parses the `.bib' file at the given +path+. Returns
       # a new Bibliography instance corresponding to the file, or, if a block
       # is given, yields the instance to the block, ensuring that the file
@@ -71,7 +71,7 @@ module BibTeX
           raise ArgumentError, "failed to parse #{input.inspect}"
         end
       end
-      
+
       # Defines a new accessor that selects elements by type.
       def attr_by_type(*arguments)
         arguments.each do |type|
@@ -80,17 +80,17 @@ module BibTeX
         end
       end
     end
-  
+
     attr_accessor :path
 
     attr_reader :data, :strings, :entries, :errors, :options
 
     attr_by_type :article, :book, :journal, :collection, :preamble,
       :comment, :meta_content
-    
+
     def_delegators :@data, :length, :size, :empty?
     def_delegators :@entries, :key?, :has_key?, :values_at
-    
+
     alias entries_at values_at
 
     # Creates a new bibliography.
@@ -101,7 +101,7 @@ module BibTeX
 
       yield self if block_given?
     end
-    
+
     def initialize_copy(other)
       @options = other.options.dup
       @errors = other.errors.dup
@@ -109,7 +109,7 @@ module BibTeX
       @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
       add(other.data)
     end
-    
+
     # Adds a new element, or a list of new elements to the bibliography.
     # Returns the Bibliography for chainability.
     def add(*arguments)
@@ -118,16 +118,16 @@ module BibTeX
       end
       self
     end
-    
+
     alias << add
     alias push add
-    
+
 
     # Saves the bibliography to the current path.
     def save(options = {})
       save_to(@path, options)
     end
-    
+
     # Saves the bibliography to a file at the given path. Returns the bibliography.
     def save_to(path, options = {})
       options[:quotes] ||= %w({ })
@@ -135,7 +135,7 @@ module BibTeX
       File.open(path, 'w:UTF-8') do |f|
         f.write(to_s(options))
       end
-      
+
       self
     end
 
@@ -148,7 +148,7 @@ module BibTeX
         to_enum
       end
     end
-    
+
 
     def parse_names
       entries.each_value { |e| e.parse_names }
@@ -160,7 +160,7 @@ module BibTeX
       self
     end
 
-    
+
     # Converts all enties using the given filter. If an optional block is given
     # the block is used as a condition (the block will be called with each
     # entry). @see Entry#convert!
@@ -168,10 +168,10 @@ module BibTeX
       entries.each_value do |entry|
         entry.convert!(filter) if !block_given? || yield(entry)
       end
-      
+
       self
     end
-        
+
 
     # Deletes an object, or a list of objects from the bibliography.
     # If a list of objects is to be deleted, you can either supply the list
@@ -184,7 +184,7 @@ module BibTeX
       @data = @data - objects
       objects.length == 1 ? objects[0] : objects
     end
-    
+
     alias remove delete
     alias rm delete
 
@@ -218,7 +218,7 @@ module BibTeX
 
       case
       when arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
-        data[*arguments] 
+        data[*arguments]
       when arguments.length == 1
         case
         when arguments[0].nil?
@@ -248,12 +248,12 @@ module BibTeX
     def valid?
       !errors? && entries.values.all?(&:valid?)
     end
-    
+
     # Returns a list of the names of all authors, editors and translators in the Bibliography.
     def names
       map(&:names).flatten
     end
-    
+
     # Replaces all string symbols which are defined in the bibliography.
     #
     # By default symbols in @string, @preamble and entries are replaced; this
@@ -271,21 +271,21 @@ module BibTeX
       q(filter) { |e| e.replace(@strings.values) }
       self
     end
-    
+
     alias :replace_strings :replace
 
     def join(filter = '')
       q(filter, &:join)
       self
     end
-    
+
     alias join_strings join
 
     def rename(*arguments, &block)
       q('@entry') { |e| e.rename(*arguments, &block) }
       self
     end
-    
+
     # call-seq:
     #   b.extend_initials(['Edgar Allen', 'Poe'], ['Nathaniel', 'Hawthorne'])
     #   #=> Extends the initials in names like 'E.A. Poe' or 'Hawethorne, N.'
@@ -298,10 +298,10 @@ module BibTeX
           name.extend_initials(with_first, for_last)
         end
       end
-      
+
       self
     end
-    
+
     # This method combines all names in the bibliography that look identical
     # when using initials as first names and then tries to extend the first
     # names for all names in each group to the longest available form.
@@ -314,24 +314,24 @@ module BibTeX
       groups = Hash.new do |h,k|
         h[k] = { :prototype => nil, :names => [] }
       end
-      
+
       # group names together
       names.each do |name|
         group = groups[name.sort_order(:initials => true).gsub(/\s+/, '').downcase]
         group[:names] << name
-        
+
         if group[:prototype].nil? || group[:prototype].first.to_s.length < name.first.to_s.length
           group[:prototype] = name
         end
       end
-      
+
       # extend all names in group to prototype
       groups.each_value do |group|
         group[:names].each do |name|
           name.set(group[:prototype])
         end
       end
-      
+
       self
     end
 
@@ -350,21 +350,39 @@ module BibTeX
       else
         Proc.new { |e| e[field] = value }
       end
-      
+
       each_entry do |entry|
         if entry.field?(field) && entry[field].to_s =~ pattern
           block.call(entry)
         end
       end
-            
+
       self
     end
-    
+
+    def group_by(*arguments)
+      groups = Hash.new { |h,k| h[k] = [] }
+
+      hash_function = if block_given?
+        Proc.new
+      else
+        Proc.new do |e|
+          e.values_at(*arguments).compact.join('')
+        end
+      end
+
+      each do |e|
+        groups[hash_function[e]] << e
+      end
+
+      groups
+    end
+
     def sort(*arguments, &block)
       data.sort(*arguments, &block)
       self
     end
-    
+
     # Returns a string representation of the bibliography.
     def to_s(options = {})
       map { |o| o.to_s(options) }.join
@@ -373,42 +391,42 @@ module BibTeX
     def inspect
       "#<#{self.class} data=[#{length}]>"
     end
-    
+
     def to_a(options = {})
       map { |o| o.to_hash(options) }
     end
-    
+
     # Returns a Ruby hash representation of the bibliography.
     def to_hash(options = {})
       { :bibliography => map { |o| o.to_hash(options) } }
     end
-    
+
     # Returns a YAML representation of the bibliography.
     def to_yaml(options = {})
       to_a(options).to_yaml
     end
-    
+
     # Returns a JSON representation of the bibliography.
     def to_json(options = {})
       MultiJson.dump(to_a(options))
     end
-    
+
     # Returns a CiteProc JSON representation of the bibliography. Only BibTeX enrties are exported.
     def to_citeproc(options = {})
       q('@entry').map { |o| o.to_citeproc(options) }
     end
-    
+
     # Returns a REXML::Document representation of the bibliography using the
     # BibTeXML format.
     def to_xml(options = {})
       require 'rexml/document'
-      
+
       xml =  REXML::Document.new
       xml << REXML::XMLDecl.new('1.0','UTF-8')
 
       root = REXML::Element.new('bibtex:file')
       root.add_namespace('bibtex', 'http://bibtexml.sf.net/')
-      
+
       each { |e| root.add_element(e.to_xml(options)) if e.is_a?(Entry) }
 
       xml.add_element(root)
@@ -419,18 +437,18 @@ module BibTeX
     # can be serialized using any of the RDF serializer plugins.
     def to_rdf(options = {})
       require 'rdf'
-      
+
       graph = RDF::Graph.new
 
       q('@entry').each do |entry|
         graph << entry.to_rdf(options)
       end
-      
+
       graph
     rescue LoadError
       BibTeX.log.error "Please gem install rdf for RDF support."
     end
-    
+
     # call-seq:
     #   bib.query()          #=> returns all elements
     #   bib.query('@book')   #=> returns all books
@@ -470,15 +488,15 @@ module BibTeX
       else
         raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)"
       end
-      
+
       filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } :
         Proc.new { |e| e.match?(q) }
 
       send(query_handler(selector), &filter)
     end
-    
+
     alias q query
-    
+
     def each_entry
       if block_given?
         q('@entry').each(&Proc.new)
@@ -486,17 +504,17 @@ module BibTeX
         q('@entry').to_enum
       end
     end
-    
+
     def find_by_type(*types, &block)
       q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
     end
-    
+
     alias find_by_types find_by_type
 
     def <=>(other)
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
-    
+
     # TODO this should be faster than select_duplicates_by
     # def detect_duplicates_by(*arguments)
     # end
@@ -506,19 +524,19 @@ module BibTeX
       q('@entry') do |e|
         d[e.generate_hash(fs)] << e
       end
-      
+
       d.values.dup
     end
-    
+
     alias duplicates select_duplicates_by
-    
+
     def duplicates?
       !select_duplicates_by?.empty?
     end
-    
-    
+
+
     private
-    
+
     def query_handler(selector)
       case selector.to_s
       when /first|distinct|detect/i
@@ -529,6 +547,6 @@ module BibTeX
         :select
       end
     end
-    
+
   end
 end

@@ -600,12 +600,12 @@ module BibTeX
       has_field?(:booktitle, :container, :journal)
     end
 
-		# Returns an array containing the values associated with the given keys.
-		def values_at(*arguments)
-			arguments.map do |key|
-				get key
-			end
-		end
+    # Returns an array containing the values associated with the given keys.
+    def values_at(*arguments)
+      arguments.map do |key|
+        get key
+      end
+    end
 
     # Returns a duplicate entry with all values converted using the filter.
     # If an optional block is given, only those values will be converted where

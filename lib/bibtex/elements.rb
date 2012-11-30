@@ -49,6 +49,9 @@ module BibTeX
     # Returns a string containing the object's content.
     def content(options = {}); ''; end
 
+    # Returns a string containing the object's content.
+    def values_at(*arguments); []; end
+
     # Invokes BibTeX string replacement on this element.
     def replace(*arguments); self; end
 
