@@ -360,19 +360,11 @@ module BibTeX
       self
     end
 
-    def group_by(*arguments)
+    def group_by(*arguments, &block)
       groups = Hash.new { |h,k| h[k] = [] }
 
-      hash_function = if block_given?
-        Proc.new
-      else
-        Proc.new do |e|
-          e.values_at(*arguments).compact.join('')
-        end
-      end
-
-      each do |e|
-        groups[hash_function[e]] << e
+      entries.values.each do |e|
+        groups[e.digest(arguments, &block)] << e
       end
 
       groups
@@ -515,17 +507,12 @@ module BibTeX
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
 
-    # TODO this should be faster than select_duplicates_by
-    # def detect_duplicates_by(*arguments)
-    # end
-
     def select_duplicates_by(*arguments)
-      d, fs = Hash.new([]), arguments.flatten.map(&:to_sym)
-      q('@entry') do |e|
-        d[e.generate_hash(fs)] << e
-      end
+      arguments = [:year, :title] if arguments.empty?
 
-      d.values.dup
+      group_by(*arguments) { |digest|
+        digest.gsub(/\s+/, '').downcase
+      }.values.select { |d| d.length > 1 }
     end
 
     alias duplicates select_duplicates_by

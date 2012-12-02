@@ -87,6 +87,20 @@ module BibTeX
       end
     end
     
+    describe '#merge!' do
+      it 'does not merge duplicates' do
+        n1 = Names.new(@poe)
+        n2 = Names.new(@poe)
+        assert_equal @poe.to_s, n1.merge!(n2).to_s
+      end
+      
+      it 'merges different names' do
+        n1 = Names.new(@poe)
+        n2 = Names.new(Name.new(:last => 'Plato'))
+        assert_equal "#{@poe.to_s} and Plato", n1.merge!(n2).to_s
+      end
+    end
+  
     describe '#extend_initials' do
       it 'extends the first name if the last name and initials match' do
         Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'

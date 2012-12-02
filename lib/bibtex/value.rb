@@ -77,6 +77,22 @@ module BibTeX
       @tokens = other.tokens.dup
     end
     
+    def merge(other)
+      dup.merge!(other)
+    end
+    
+    def merge!(other)
+      other.tokens.each do |token|
+        add token unless include_token?(token)
+      end
+      
+      self
+    end
+
+    def include_token?(token)
+      tokens.include?(token)
+    end
+
     def add(argument)
       case argument
       when Value
@@ -127,10 +143,17 @@ module BibTeX
     #   Value.new('foo', 'bar').join #=> <'foobar'>
     #   Value.new(:foo, 'bar').join  #=> <:foo, 'bar'>
     #
-    # Returns the Value instance with all consecutive String tokens joined.
-    def join
+    # @param {String} separator
+    #
+    # @return {Value} the instance with all consecutive String tokens joined
+    def join(separator = '')
       @tokens = @tokens.inject([]) do |a,b|
-        a[-1].is_a?(::String) && b.is_a?(::String) ? a[-1] += b : a << b; a
+        if a[-1].is_a?(::String) && b.is_a?(::String)
+          a[-1] = [a[-1], b].join(separator)
+        else
+          a << b
+        end
+        a
       end
       self
     end

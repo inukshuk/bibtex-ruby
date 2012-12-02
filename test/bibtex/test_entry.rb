@@ -23,12 +23,12 @@ module BibTeX
       it 'has no cross-reference by default' do
         assert_equal false, Entry.new.has_cross_reference?
       end
-      
+
       it 'is not cross-referenced by default' do
         assert_equal false, Entry.new.cross_referenced?
         Entry.new.cross_referenced_by.must_be_empty
       end
-      
+
       describe 'given a bibliography with cross referenced entries' do
         before do
           @bib = Bibliography.parse <<-END
@@ -37,7 +37,7 @@ module BibTeX
             @incollection{b1, crossref = "b"}
           END
         end
-        
+
         describe '#has_cross_reference?' do
           it 'returns true if the entry has a valid cross-reference' do
             assert_equal true, @bib['a1'].has_cross_reference?
@@ -47,7 +47,7 @@ module BibTeX
             assert_equal false, @bib['b1'].has_cross_reference?
           end
         end
-        
+
         describe '#cross_referenced?' do
           it 'returns true if the entry is cross-referenced by another entry' do
             assert_equal true, @bib['a'].cross_referenced?
@@ -56,23 +56,23 @@ module BibTeX
             assert_equal false, @bib['a1'].cross_referenced?
           end
         end
-        
+
         describe '#cross_referenced_by' do
           it 'returns a list of all entries that cross-reference this entry' do
             @bib['a'].cross_referenced_by.must_include(@bib['a1'])
           end
-          
+
           it 'returns an empty list if there are no cross-references to this entry' do
             @bib['a1'].cross_referenced_by.must_be_empty
           end
         end
-        
+
         describe '#respond_to?' do
           it 'takes into account the inherited attributes' do
             @bib['a1'].respond_to?(:title)
           end
         end
-        
+
         describe 'resolve field values using array accessors #[]' do
           describe 'when a "title" is set in the entry itself' do
             before { @bib['a1'].title = 'A1' }
@@ -80,13 +80,13 @@ module BibTeX
               @bib['a1'].title.must_be :==, 'A1'
             end
           end
-          
+
           describe 'when "title" is undefined for the entry but defined in the reference' do
             it 'returns the referenced title' do
               @bib['a1'].title.must_be :==, @bib['a'].title
             end
           end
-          
+
           describe 'when "booktitle" is undefined for the entry but defined in the reference' do
             before { @bib['a'].booktitle = "A Booktitle" }
             it 'returns the referenced booktitle' do
@@ -99,7 +99,7 @@ module BibTeX
               @bib['a1'].booktitle.must_be :==, @bib['a'].title
             end
           end
-          
+
           it 'does not store referenced values permanently' do
             refute_nil @bib['a1'].booktitle
             assert_nil @bib['a1'].fields[:booktitle]
@@ -109,20 +109,20 @@ module BibTeX
             it 'returns an empty list by default' do
               Entry.new.inherited_fields.must_be_empty
             end
-            
+
             it 'returns an empty list if this entry has no cross-reference' do
               @bib['a'].inherited_fields.must_be_empty
             end
-            
+
             it 'returns an empty list if this entry has a cross-reference but the reference does not exist in the bibliography' do
               @bib['b1'].inherited_fields.must_be_empty
             end
-            
+
             it 'returns a list of all fields not set in the field but in the reference' do
               @bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
             end
           end
-          
+
           describe '#save_inherited_fields' do
             it 'copies referenced values to the entry' do
               @bib['a1'].title = 'a1'
@@ -132,15 +132,15 @@ module BibTeX
             end
           end
         end
-        
+
       end
     end
-    
+
     describe '#names' do
       it 'returns an empty list by default' do
         Entry.new.names.must_be :==, []
       end
-      
+
       it 'returns the author (if set)' do
         Entry.new(:author => 'A').names.must_be :==, %w{ A }
       end
@@ -148,7 +148,7 @@ module BibTeX
       it 'returns all authors (if set)' do
         Entry.new(:author => 'A B and C D').parse_names.names.length.must_be :==, 2
       end
-      
+
       it 'returns the editor (if set)' do
         Entry.new(:editor => 'A').names.must_be :==, %w{ A }
       end
@@ -156,14 +156,14 @@ module BibTeX
       it 'returns the translator (if set)' do
         Entry.new(:translator => 'A').names.must_be :==, %w{ A }
       end
-      
+
     end
-    
+
     describe 'month conversion' do
       before do
         @entry = Entry.new
       end
-      
+
       [[:jan,'January'], [:feb,'February'], [:sep,'September']].each do |m|
         it 'should convert english months' do
           @entry.month = m[1]
@@ -188,18 +188,18 @@ module BibTeX
           assert_equal m[0], @entry.month.v
         end
       end
-      
+
     end
 
     describe '#values_at' do
       it 'returns an empty array by default' do
         assert_equal [], Entry.new.values_at
       end
-      
+
       it 'returns an empty array when given no arguments' do
         assert_equal [], Entry.new(:title => 'foo').values_at
       end
-      
+
       it 'returns a nil array if the passed in key is not set' do
         assert_equal [nil], Entry.new.values_at(:title)
       end
@@ -207,6 +207,21 @@ module BibTeX
       it 'returns an array with the value of the passed in key' do
         assert_equal ['x'], Entry.new(:title => 'x').values_at(:title)
         assert_equal ['a', 'b'], Entry.new(:title => 'b', :year => 'a').values_at(:year, :title)
+      end
+    end
+
+    describe '#digest' do
+      it 'returns an empty string by default' do
+        assert_equal '', Entry.new.digest
+      end
+
+      it 'includes type and all defined fields' do
+        assert_equal 'book', Entry.new(:type => 'book').digest
+        assert_equal 'book|title:foo', Entry.new(:type => 'book', :title => 'foo').digest
+      end
+
+      it 'accepts a filter' do
+        assert_equal 'book|year:2012', Entry.new(:type => 'book', :title => 'foo', :year => 2012).digest([:year])
       end
     end
 
@@ -224,7 +239,7 @@ module BibTeX
           e.parse_names
         end
       end
-      
+
       it 'supports renaming! of field attributes' do
         @entry.rename!(:title => :foo)
         refute @entry.has_field?(:title)
@@ -239,11 +254,11 @@ module BibTeX
 
         assert e.has_field?(:foo)
         refute e.has_field?(:title)
-        
+
         assert_equal 'Moby Dick', @entry[:title]
         assert_equal 'Moby Dick', e[:foo]
       end
-      
+
       it 'supports citeproc export' do
         e = @entry.to_citeproc
         assert_equal 'book', e['type']
@@ -253,13 +268,13 @@ module BibTeX
         assert_equal 'Herman', e['author'][0]['given']
         assert_equal 'Melville', e['author'][0]['family']
       end
-      
+
       describe 'given a filter' do
         before do
           @filter = Object.new
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
         end
-        
+
         it 'supports arbitrary conversion' do
           e = @entry.convert(@filter)
           assert_equal 'MOBY DICK', e.title
@@ -283,19 +298,19 @@ module BibTeX
           assert_equal 'PENGUIN', e.publisher
           assert_equal 'Penguin', @entry.publisher
         end
-        
+
       end
-      
+
       describe 'LaTeX filter' do
         before do
           @entry.title = 'M\\"{o}by Dick'
         end
-        
+
         describe '#convert' do
           it 'converts LaTeX umlauts' do
             @entry.convert(:latex).title.must_be :==, 'Möby Dick'
           end
-          
+
           it 'does not change the original entry' do
             e = @entry.convert(:latex)
             e.wont_be :==, @entry
@@ -307,14 +322,14 @@ module BibTeX
           it 'converts LaTeX umlauts' do
             @entry.convert!(:latex).title.must_be :==, 'Möby Dick'
           end
-          
+
           it 'changes the original entry in-place' do
             e = @entry.convert!(:latex)
             e.must_be :equal?, @entry
             e.title.to_s.length.must_be :==, @entry.title.to_s.length
           end
         end
-        
+
       end
     end
 
@@ -327,16 +342,16 @@ module BibTeX
           e.parse_names
         end
       end
-      
+
       it 'should use non-dropping-particle by default' do
         assert_equal 'van', @entry.to_citeproc['author'][0]['non-dropping-particle']
       end
-      
+
       it 'should accept option to use non-dropping-particle' do
         assert_equal 'van', @entry.to_citeproc(:particle => 'non-dropping-particle')['author'][0]['non-dropping-particle']
       end
     end
-    
+
     def test_simple
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
       refute_nil(bib)
@@ -358,25 +373,25 @@ module BibTeX
       assert_equal('Selected \\emph{Poetry} and `Tales\'', bib.data[0].title)
       assert_equal('Tales and Sketches', bib.data[1].title)
     end
-  
+
     def test_ghost_methods
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
 
       assert_equal 'Poe, Edgar A.', bib[0].author.to_s
-    
+
       expected = 'Poe, Edgar Allen'
       bib.data[0].author = expected
-    
+
       assert_equal expected, bib[0].author.to_s
     end
-  
-    def test_creation_simple    
+
+    def test_creation_simple
       entry = BibTeX::Entry.new
       entry.type = :book
       entry.key = :raven
       entry.author = 'Poe, Edgar A.'
       entry.title = 'The Raven'
-    
+
       assert_equal :book, entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
@@ -390,7 +405,7 @@ module BibTeX
         :author => 'Poe, Edgar A.',
         :title => 'The Raven'
       })
-    
+
       assert_equal :book, entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
@@ -404,38 +419,38 @@ module BibTeX
         e.author = 'Poe, Edgar A.'
         e.title = 'The Raven'
       end
-    
+
       assert_equal :book, entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
     end
-  
+
     def test_sorting
       entries = []
       entries << Entry.new({ :type => 'book', :key => 'raven3', :author => 'Poe, Edgar A.', :title => 'The Raven'})
       entries << Entry.new({ :type => 'book', :key => 'raven2', :author => 'Poe, Edgar A.', :title => 'The Raven'})
       entries << Entry.new({ :type => 'book', :key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Raven'})
       entries << Entry.new({ :type => 'book', :key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Aven'})
-    
+
       entries.sort!
-    
+
       assert_equal ['raven1', 'raven1', 'raven2', 'raven3'], entries.map(&:key)
       assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0,2]
 
     end
-  
+
     describe 'default keys' do
       before {
         @e1 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
         @e2 = Entry.new(:type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
         @e3 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
       }
-  
+
       it 'should return "unknown-a" for an empty Entry' do
         Entry.new.key.must_be :==, 'unknown-a'
       end
-  
+
       it 'should return a key made up of author-year-a if all fields are present' do
         @e1.key.must_be :==, 'poe1996a'
       end
@@ -452,30 +467,30 @@ module BibTeX
         @e3.key.must_be :==, 'poe-a'
       end
     end
-    
+
     describe 'when the entry is added to a Bibliography' do
       before {
         @e = Entry.new
         @bib = Bibliography.new
       }
-      
+
       it 'should register itself with its key' do
         @bib << @e
         @bib.entries.keys.must_include @e.key
       end
-      
+
       describe "when there is already an element registered with the entry's key" do
         before { @bib << Entry.new }
-        
+
         it "should find a suitable key" do
           k = @e.key
           @bib << @e
           @bib.entries.keys.must_include @e.key
           k.wont_be :==, @e.key
         end
-        
+
       end
     end
-    
+
   end
 end

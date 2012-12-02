@@ -153,7 +153,7 @@ module BibTeX
       yield self if block_given?
     end
 
-    def initialize_copy (other)
+    def initialize_copy(other)
       @fields = {}
 
       self.type = other.type
@@ -162,7 +162,25 @@ module BibTeX
       add(other.fields)
     end
 
+    def merge(other, filter = field_names)
+      dup.merge!(other, filter)
+    end
+    
+    def merge!(other, filter = field_names)
+      raise InvalidArgument, "failed to merge entries: type mismatch: #{type} #{other.type}" unless
+        type == other.type
 
+      other.each do |name, value|
+        if has_field?(name)
+          get(name).merge!(value) if filter.include?(name)
+        else
+          add name, value.dup
+        end
+      end
+      
+      self
+    end
+    
     # Generate Accessors for required fields (#52)
 
     REQUIRED_FIELDS.values.flatten.uniq.each do |name|
@@ -433,8 +451,29 @@ module BibTeX
       end
     end
 
-    def generate_hash(filter = [])
-      Digest::MD5.hexdigest(field_names(filter).map { |k| [k, fields[k]] }.flatten.join)
+    # Creates the entry's digest based on the passed-in filters.
+    #
+    # The digest contains the type and all key-value pairs based
+    # on the passed in filter.
+    #
+    # If a block is given, the computed digest will be passed to
+    # the block for post-processing (the entry itself will be passed
+    # as the second parameter).
+    #
+    # @see #field_names
+    #
+    # @param [<Symbol>] the field names to use
+    # @return [String] the digest string
+    def digest(filter = [])
+      names = field_names(filter)
+      digest = type.to_s
+      
+      names.zip(values_at(*names)).each do |key, value|
+        digest << "|#{key}:#{value}"
+      end
+      
+      digest = yield(digest, self) if block_given?
+      digest
     end
 
     def identifier

@@ -129,12 +129,12 @@ module BibTeX
           assert_equal({}, Bibliography.new.group_by(:a, :b))
         end
 
-        it 'returns a hash with all the values set to the empty key' do
-          assert_equal @bib.length, @bib.group_by[''].length
+        it 'returns a hash with all the entries mapped to their default digest' do
+          assert_equal @bib.entries.length, @bib.group_by.length
         end
 
-        it 'uses a the given block to determine the key' do
-          assert_equal @bib.length, (@bib.group_by { 'x'})['x'].length
+        it 'uses the given block to determine the key' do
+          assert_equal @bib.entries.length, (@bib.group_by { 'x' })['x'].length
         end
       end
 
