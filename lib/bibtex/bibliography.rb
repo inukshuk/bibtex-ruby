@@ -317,7 +317,7 @@ module BibTeX
 
       # group names together
       names.each do |name|
-        group = groups[name.sort_order(:initials => true).gsub(/\s+/, '').downcase]
+        group = groups[name.sort_order(:initials => true).downcase]
         group[:names] << name
 
         if group[:prototype].nil? || group[:prototype].first.to_s.length < name.first.to_s.length

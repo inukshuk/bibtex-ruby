@@ -165,7 +165,7 @@ module BibTeX
     def merge(other, filter = field_names)
       dup.merge!(other, filter)
     end
-    
+
     def merge!(other, filter = field_names)
       raise InvalidArgument, "failed to merge entries: type mismatch: #{type} #{other.type}" unless
         type == other.type
@@ -177,10 +177,10 @@ module BibTeX
           add name, value.dup
         end
       end
-      
+
       self
     end
-    
+
     # Generate Accessors for required fields (#52)
 
     REQUIRED_FIELDS.values.flatten.uniq.each do |name|
@@ -467,11 +467,11 @@ module BibTeX
     def digest(filter = [])
       names = field_names(filter)
       digest = type.to_s
-      
+
       names.zip(values_at(*names)).each do |key, value|
         digest << "|#{key}:#{value}"
       end
-      
+
       digest = yield(digest, self) if block_given?
       digest
     end
@@ -690,13 +690,19 @@ module BibTeX
       parse_names
       parse_month
 
-      hash = { 'id' => key.to_s, 'type' => CSL_TYPES[type].to_s }
+      hash = {}
 
       each_pair do |k,v|
         hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
       end
 
+			hash['id'] = key.to_s
+
+			hash['bibtex-type'] = hash['type'] if hash.key?('type')
+			hash['type'] = CSL_TYPES[type].to_s
+
       hash['issued'] = citeproc_date
+
       hash
     end
 
