@@ -346,6 +346,34 @@ Use with caution, though, as this method will treat names as identical
 as long as their initials are the same. That is to say, 'Poe, Eric A.' would
 be extend to 'Poe, Edgar Allen'.
 
+### Duplicates
+
+Large bibliographies often contain duplicate data, i.e., duplicate entries
+which are not completely identical (e.g., authors or editors with first
+names or initials, titles using different casing, different keywords etc.).
+BibTex-Ruby allows you to group your bibliography by any number of fields
+in order to detect such duplicate entries.
+
+    b.select_duplicates_by :year, :title
+    #=> groups the bibliography by using the year and title field as key
+
+    b.duplicates?
+    #=> whether or not the bibliography contains any duplicates
+
+For more complex requirements you can use the `#group_by` method directly.
+This methods accepts a list of arguments whose value will be used for grouping
+and, additionally, a block. The current digest and each individual entry will
+be passed to the block and the block's return value is used as the final
+digest.
+
+The duplicate methods above, for example, do something like this:
+
+    group_by(:year, :title) do |digest, entry|
+      digest.gsub(/\s+/, '').downcase
+    end
+
+You can use this method, for example, to match entries only by their author's
+last name and so on and so forth.
 
 ### Filters
 
