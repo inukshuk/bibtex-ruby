@@ -77,6 +77,7 @@ module BibTeX
       url       URL
       doi       DOI
       year      issued
+      type      genre
     }.map(&:intern)]).freeze
 
     CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
@@ -696,11 +697,10 @@ module BibTeX
         hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
       end
 
-			hash['id'] = key.to_s
-
-			hash['bibtex-type'] = hash['type'] if hash.key?('type')
-			hash['type'] = CSL_TYPES[type].to_s
-
+      hash['id'] = key.to_s
+      hash['type'] = CSL_TYPES[type].to_s
+      hash['genre'] = "Master's thesis" if (!hash.key?('genre') and type.to_s == "mastersthesis")
+      hash['genre'] = "PhD thesis" if (!hash.key?('genre') and type.to_s == "phdthesis")
       hash['issued'] = citeproc_date
 
       hash
