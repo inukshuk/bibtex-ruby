@@ -699,8 +699,16 @@ module BibTeX
 
       hash['id'] = key.to_s
       hash['type'] = CSL_TYPES[type].to_s
-      hash['genre'] = "Master's thesis" if (!hash.key?('genre') and type.to_s == "mastersthesis")
-      hash['genre'] = "PhD thesis" if (!hash.key?('genre') and type.to_s == "phdthesis")
+
+      case type
+      when :mastersthesis
+        hash['genre'] = "Master's thesis"
+      when :phdthesis
+        hash['genre'] = 'PhD thesis'
+      else
+        # empty
+      end unless hash.key?('genre')
+
       hash['issued'] = citeproc_date
 
       hash
