@@ -492,5 +492,35 @@ module BibTeX
       end
     end
 
+    describe '#meet?' do
+      before { @e = Entry.new }
+      
+      it 'returns true for an empty condition list' do
+        assert @e.meet? []
+        assert @e.meet? ['']
+      end
+      
+      it 'it returns true when all conditions hold' do
+        refute @e.meet? ['author = Edgar']
+        
+        @e.author = 'Poe, Edgar A.'
+
+        refute @e.meet? ['author = Edgar']
+        refute @e.meet? ['author = Poe, Edgar']
+        
+        assert @e.meet? ['author = Poe, Edgar A.']
+
+        assert @e.meet? ['author ^= Poe']
+        refute @e.meet? ['author ^= Edgar']
+
+        assert @e.meet? ['author ~= Edgar']
+
+        assert @e.meet? ['author ~= .']
+        
+        assert @e.meet? ['author ^= P\w+']        
+
+      end
+      
+    end
   end
 end

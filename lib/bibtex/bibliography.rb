@@ -448,8 +448,8 @@ module BibTeX
     #   bib.query('@*')      #=> same as above
     #   bib.query(:first, '@book, @article')
     #     #=> returns the first book or article or nil
-    #   bib.query('@book[year=2011], @article)
-    #     #=> returns all books published in 2011 and all articles
+    #   bib.query('@book[year<=2011], @article)
+    #     #=> returns all books published in 2011 or earlier and all articles
     #   bib.query('@book, @article) { |o| o.year == '2011' }
     #     #=> returns all books and articles published in 2011
     #   bib.query('@book[year=2011], @article[year=2011])
