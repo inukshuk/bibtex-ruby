@@ -516,6 +516,7 @@ module BibTeX
         assert @e.meet? ['author ~= Edgar']
 
         assert @e.meet? ['author ~= .']
+        assert @e.meet? ['author ~= [a-z]*']
         
         assert @e.meet? ['author ^= P\w+']        
 
