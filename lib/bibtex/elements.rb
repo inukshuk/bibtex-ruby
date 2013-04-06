@@ -102,8 +102,8 @@ module BibTeX
       when /^\/(.+)\/$/
         to_s.match(Regexp.new($1))
       when /@(\*|\w+)(?:\[([^\]]*)\])?/
-        query.scan(/@(\*|\w+)(?:\[([^\]]*)\])?/).any? do |type, condition|
-          if has_type?(type)
+        query.scan(/(!)?@(\*|\w+)(?:\[([^\]]*)\])?/).any? do |non, type, condition|
+          if (non ? !has_type?(type) : has_type?(type))
             if condition.nil? || condition.empty?
               true
             else

@@ -170,6 +170,16 @@ module BibTeX
         assert_equal 2, @bib['@book'].length
         assert_equal 1, @bib['@article'].length
         assert_equal 0, @bib['@collection'].length
+        assert_equal 1, @bib['@string'].length
+      end
+
+      it 'supports queries by negated type string' do
+        assert_equal 4, @bib['!@book'].length
+        assert_equal 5, @bib['!@article'].length
+        assert_equal 6, @bib['!@collection'].length
+        assert_equal 1, @bib['!@*'].length
+        assert_equal 4, @bib['!@misc'].length
+        assert_equal 5, @bib['!@string'].length
       end
 
       it 'supports queries by type string and selector' do

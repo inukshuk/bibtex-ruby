@@ -211,26 +211,39 @@ query functionality with the exception of yielding to a block. For instance:
     => Returns the second and third elements or nil
     bib[1..2]
     => Same as above
+
     bib[:key]
     => Returns the first entry with key 'key' or nil
     bib['key']
     => Returns all entries with key 'key' or []
+
     bib['@article']
     => Returns all entries of type 'article' or []
+    bib['!@book']
+    => Returns all entries of any type other than 'book' or []
     bib['@preamble']
     => Returns all preamble objects (this is the same as Bibliography#preambles) or []
     bib[/ruby/]
     => Returns all objects that match 'ruby' anywhere or []
+
+    bib['@incollection[booktitle]']
+    => Returns all in-collection entries with a booktitle or []
+
+    # note that the above includes entries inheriting the book title
+    # from a cross-referenced entry!
+    
     bib['@book[keywords=ruby]']
     => Returns all books whose keywords attribute equals 'ruby' or []
     bib['@book[keywords!=ruby]']
     => Returns all books whose keywords attribute does not equal 'ruby'
     bib['@book[keywords/=ruby]']
     => Same as above
+
     bib.q('@book[keywords ^= ruby]')
     => Returns all books whose keywords attribute matches /^ruby/
     bib.q('@book[keywords ~= ruby]')
     => Returns all books whose keywords attribute matches /ruby/
+
     bib.q('@article[year<=2007]')
     => Returns all articles published in 2007 or earlier
     bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }

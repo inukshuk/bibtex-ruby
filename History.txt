@@ -2,6 +2,7 @@
 ==================
 
 * Add attribute-only queries (thanks to @ashinkarov)
+* Add negated queries (thanks to @ashinkarov)
 
 2.2.2 / 2013-15-01
 ==================
