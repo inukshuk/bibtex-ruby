@@ -37,6 +37,7 @@ features/support
 features/support/env.rb
 lib
 lib/bibtex
+lib/bibtex.rb
 lib/bibtex/bibliography.rb
 lib/bibtex/bibtex.y
 lib/bibtex/compatibility.rb
@@ -45,9 +46,9 @@ lib/bibtex/entry.rb
 lib/bibtex/error.rb
 lib/bibtex/extensions.rb
 lib/bibtex/filters
+lib/bibtex/filters.rb
 lib/bibtex/filters/latex.rb
 lib/bibtex/filters/linebreaks.rb
-lib/bibtex/filters.rb
 lib/bibtex/lexer.rb
 lib/bibtex/name_parser.rb
 lib/bibtex/names.rb
@@ -58,7 +59,6 @@ lib/bibtex/ruby.rb
 lib/bibtex/utilities.rb
 lib/bibtex/value.rb
 lib/bibtex/version.rb
-lib/bibtex.rb
 test
 test/benchmark.rb
 test/bibtex
