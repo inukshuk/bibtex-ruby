@@ -227,7 +227,7 @@ module BibTeX
           nil
         when arguments[0].is_a?(Symbol)
           entries[arguments[0]]
-        when arguments[0].is_a?(::String) && arguments[0] !~ /^!?@/
+        when arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@', '!@')
           entries[arguments[0]]
         else
           query(*arguments)
