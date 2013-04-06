@@ -1,6 +1,7 @@
 language: ruby
 bundler_args: --without debug profile extra
 rvm:
+  - 2.0.0
   - 1.9.2
   - 1.9.3
 #  - jruby-18mode
@@ -12,7 +13,7 @@ rvm:
 notifications:
   email:
     recipients:
-      - i@nukshuk.io
+      - sylvester@keil.or.at
     on_success: change
     on_failure: always
 matrix:

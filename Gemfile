@@ -1,11 +1,11 @@
-source :rubygems
+source 'https://rubygems.org'
 gemspec
 
 # RDF Export
 gem 'rdf', '~>0.3'
 
 group :debug do
-	gem 'debugger', :require => false, :platforms => [:mri_19]
+	gem 'debugger', :require => false, :platforms => [:mri_19, :mri_20]
 	gem 'ruby-debug', :require => false, :platforms => [:mri_18]
 end
 
@@ -24,7 +24,7 @@ group :extra do
 end
 
 group :profile do
-	gem 'ruby-prof', ['~>0.10'], :platforms => [:mri_19, :mri_19]
+	gem 'ruby-prof', ['~>0.10'], :platforms => [:mri_19, :mri_20]
 	gem 'gnuplot', ['~>2.4']
 	gem 'simplecov'
 end
