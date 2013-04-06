@@ -70,11 +70,11 @@ module BibTeX
         @string{ foo = "foobar" }
         @misc{flanagan-1,
           title={{Foo Bar}},
-          author={Flanagan, Dav}
+          author={Flanagan, Dav and Thomas Segaran}
         }
         @misc{flanagan-2,
           title={{Foo Bar}},
-          author={Flanagan, David}
+          author={Flanagan, David and Matsumoto, Yukihiro}
         }
         END
       end
@@ -95,7 +95,7 @@ module BibTeX
 
       describe '#extend_initials!' do
         it 'extends the initials of all names to the longest prototype' do
-          assert_equal "Ruby, Sam Thomas, Dave Hansson Heinemeier, David Flanagan, David Matsumoto, Y. Segaran, T.",
+          assert_equal "Ruby, Sam Thomas, Dave Hansson Heinemeier, David Flanagan, David Matsumoto, Yukihiro Segaran, Thomas",
             @bib.extend_initials!.names.map(&:sort_order).uniq.join(' ')
         end
       end
@@ -197,6 +197,11 @@ module BibTeX
 
       it 'supports queries with pattern conditions' do
         assert_equal 1, @bib['@*[keywords~=rails]'].length
+      end
+
+      it 'supports queries with attribute conditions' do
+        assert_equal 2, @bib['@*[keywords]'].length
+        assert_equal 0, @bib['@*[foobar]'].length
       end
 
       it 'supports queries with start-pattern conditions' do
