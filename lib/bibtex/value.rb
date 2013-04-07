@@ -3,17 +3,17 @@
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2012  Sylvester Keil <sylvester.keil.or.at>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
@@ -48,10 +48,10 @@ module BibTeX
   class Value
     extend Forwardable
     include Comparable
-    
+
     attr_reader :tokens
     alias to_a tokens
-    
+
     def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|^dup$|!$/ }
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
@@ -65,27 +65,27 @@ module BibTeX
     def self.create(*args)
       args[0].class < Value && args.size == 1 ? args[0].dup : Value.new(args)
     end
-    
+
     def initialize(*arguments)
       @tokens = []
       arguments.flatten.compact.each do |argument|
         add(argument)
       end
     end
-    
+
     def initialize_copy(other)
       @tokens = other.tokens.dup
     end
-    
+
     def merge(other)
       dup.merge!(other)
     end
-    
+
     def merge!(other)
       other.tokens.each do |token|
         add token unless include_token?(token)
       end
-      
+
       self
     end
 
@@ -110,10 +110,10 @@ module BibTeX
       end
       self
     end
-    
+
     alias << add
     alias push add
-    
+
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
         tokens.each do |part|
@@ -122,7 +122,7 @@ module BibTeX
         self
       end
     end
-    
+
     def replace(*arguments)
       return self unless has_symbol?
       arguments.flatten.each do |argument|
@@ -157,7 +157,7 @@ module BibTeX
       end
       self
     end
-    
+
     # call-seq:
     #   Value.new('foo').to_s                       #=> "foo"
     #   Value.new(:foo).to_s                        #=> "foo"
@@ -189,34 +189,34 @@ module BibTeX
     def value
       atomic? ? @tokens[0] : @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
     end
-    
+
     alias :v :value
 
     def inspect
       "#<#{self.class} #{tokens.map(&:inspect).join(', ')}>"
     end
-    
+
     # Returns true if the Value is empty or consists of a single token.
     def atomic?
       @tokens.length < 2
     end
-    
-    # Returns true if the value is a BibTeX name value. 
+
+    # Returns true if the value is a BibTeX name value.
     def name?; false; end
-    
+
     alias :names? :name?
-    
+
     def to_name
       Names.parse(to_s)
     end
-    
+
     alias to_names to_name
 
-    # Returns true if the Value's content is a date.    
+    # Returns true if the Value's content is a date.
     def date?
       !to_date.nil?
     end
-    
+
     # Returns the string as a date.
     def to_date
       require 'date'
@@ -224,44 +224,43 @@ module BibTeX
     rescue
       nil
     end
-        
+
     # Returns true if the Value's content is numeric.
     def numeric?
       to_s =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
     end
-        
+
     def to_citeproc (options = {})
       to_s(options)
     end
-    
+
     # Returns true if the Value contains at least one symbol.
     def symbol?
       tokens.detect { |v| v.is_a?(Symbol) }
     end
-    
+
     alias has_symbol? symbol?
-    
+
     # Returns all symbols contained in the Value.
     def symbols
       tokens.select { |v| v.is_a?(Symbol) }
     end
-    
-    # Returns a new Value with all string values converted according to the given filter.
-    def convert (filter)
-      dup.convert!(filter)
+
+    # Returns a new Value with all string values converted according to the given filter(s).
+    def convert (*filters)
+      dup.convert!(*filters)
     end
-    
-    # Converts all string values according to the given filter.
-    def convert! (filter)
-      if f = Filters.resolve(filter)
+
+    # Converts all string values according to the given filter(s).
+    def convert! (*filters)
+      filters.flatten.each do |filter|
+        f = Filters.resolve!(filter)
         tokens.map! { |t| f.apply(t) }
-      else
-        raise ArgumentError, "Failed to load filter #{filter.inspect}"
       end
-      
+
       self
     end
-    
+
     def method_missing (name, *args)
       case
       when name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
@@ -270,15 +269,15 @@ module BibTeX
         super
       end
     end
-    
+
     def respond_to? (method)
       method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
     end
-        
+
     def <=> (other)
       to_s <=> other.to_s
     end
-    
+
   end
 
 end

@@ -161,12 +161,14 @@ module BibTeX
     end
 
 
-    # Converts all enties using the given filter. If an optional block is given
+    # Converts all enties using the given filter(s). If an optional block is given
     # the block is used as a condition (the block will be called with each
     # entry). @see Entry#convert!
-    def convert (filter)
+    def convert(*filters)
+      filters = filters.flatten.map { |f| Filters.resolve!(f) }
+
       entries.each_value do |entry|
-        entry.convert!(filter) if !block_given? || yield(entry)
+        entry.convert!(*filters) if !block_given? || yield(entry)
       end
 
       self

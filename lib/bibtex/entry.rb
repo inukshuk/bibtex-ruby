@@ -647,18 +647,23 @@ module BibTeX
       end
     end
 
-    # Returns a duplicate entry with all values converted using the filter.
+    # Returns a duplicate entry with all values converted using the filter(s).
     # If an optional block is given, only those values will be converted where
     # the block returns true (the block will be called with each key-value pair).
     #
     # @see #convert!
-    def convert(filter)
-      block_given? ? dup.convert!(filter, &Proc.new) : dup.convert!(filter)
+    def convert(*filters)
+      block_given? ? dup.convert!(*filters, &Proc.new) : dup.convert!(*filters)
     end
 
     # In-place variant of @see #convert
-    def convert!(filter)
-      fields.each_pair { |k,v| !block_given? || yield(k,v) ? v.convert!(filter) : v }
+    def convert!(*filters)
+      filters = filters.flatten.map { |f| Filters.resolve!(f) }
+
+      fields.each_pair do |k, v|
+        (!block_given? || yield(k, v)) ? v.convert!(*filters) : v
+      end
+
       self
     end
 

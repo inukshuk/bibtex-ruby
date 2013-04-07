@@ -269,21 +269,30 @@ module BibTeX
         assert_equal 'Melville', e['author'][0]['family']
       end
 
-      describe 'given a filter' do
+      describe 'given a filter object or a filter name' do
         before do
           @filter = Object.new
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
+          
+          class SuffixB < BibTeX::Filter
+            def apply(value)
+              value.is_a?(::String) ? "#{value}b" : value
+            end
+          end
         end
 
         it 'supports arbitrary conversion' do
-          e = @entry.convert(@filter)
-          assert_equal 'MOBY DICK', e.title
-          assert_equal 'Moby Dick', @entry.title
+          @entry.convert(@filter).title.must_equal 'MOBY DICK'
+          @entry.convert(:suffixb).title.must_equal 'Moby Dickb'
+        end
+
+        it 'supports multiple filters' do
+          @entry.convert(@filter, :suffixb).title.must_equal 'MOBY DICKb'
+          @entry.convert(:suffixb, @filter).title.must_equal 'MOBY DICKB'
         end
 
         it 'supports arbitrary in-place conversion' do
-          @entry.convert!(@filter)
-          assert_equal 'MOBY DICK', @entry.title
+          @entry.convert!(@filter).title.must_equal 'MOBY DICK'
         end
 
         it 'supports conditional arbitrary in-place conversion' do

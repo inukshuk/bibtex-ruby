@@ -260,17 +260,21 @@ module BibTeX
       end
     end
     
-    def convert(filter)
-      dup.convert!(filter)
+    def convert(*filters)
+      dup.convert!(*filters)
     end
     
-    def convert!(filter)
-      if f = Filters.resolve(filter)
-        each_pair { |k,v| self[k] = f.apply(v) unless v.nil? }
-      else
-        raise ArgumentError, "Failed to load filter #{filter.inspect}"
-      end
+    def convert!(*filters)
+      filters.flatten.each do |filter|
 
+        f = Filters.resolve(filter) ||
+          raise(ArgumentError, "Failed to load filter #{filter.inspect}")
+
+        each_pair do |k, v|
+          self[k] = f.apply(v) unless v.nil?
+        end
+      end
+      
       self
     end
     

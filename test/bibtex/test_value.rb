@@ -98,6 +98,13 @@ module BibTeX
             value.is_a?(::String) ? value.upcase : value
           end
         end
+        
+        class SuffixA < BibTeX::Filter
+          def apply(value)
+            value.is_a?(::String) ? "#{value}a" : value
+          end
+        end
+        
         @values = [Value.new('foo'), Value.new('foo', :bar)]
       end
 
@@ -113,6 +120,12 @@ module BibTeX
         it "converts the value when given the name of a filter" do
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(:upcase).to_s }
           assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert('upcase').to_s }
+          assert_equal ['fooa', '"fooa" # bar'], @values.map { |v| v.convert('suffixa').to_s }
+        end
+
+        it "applies multiple filters in the order passed" do
+          @values.map { |v| v.convert(:upcase, :suffixa).to_s }.must_equal ['FOOa', '"FOOa" # bar']
+          @values.map { |v| v.convert(:suffixa, :upcase).to_s }.must_equal ['FOOA', '"FOOA" # bar']
         end
 
         it "converts the value when using a ghost method" do
@@ -127,6 +140,16 @@ module BibTeX
         it "does not alter the value when using a ghost method" do
           @values.each { |v| v.convert_upcase }
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
+        end
+        
+        it "raises argument error when a filter cannot be resolved" do
+          assert_raises ArgumentError do
+            @values[0].convert(:foo)
+          end
+
+          assert_raises ArgumentError do
+            @values[0].convert(:upcase, :foo)
+          end
         end
       end
 
