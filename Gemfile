@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 gemspec
 
 # RDF Export
+gem 'multi_json'
+gem 'latex-decode'
 gem 'rdf', '~>0.3'
 
 group :debug do
