@@ -87,7 +87,7 @@ Then /^my bibliography should contain an? (\w+) with id "([^"]*)"$/ do |type, id
 end
 
 Then /^the string "([^"]*)" should be "([^"]*)"$/ do |key, value|
-  assert_equal value, @bibliography.strings[key.to_sym].v.to_s
+  assert_equal value, @bibliography.strings[key.to_s].v.to_s
 end
 
 Then /^the entry with key "([^"]*)" should have a field "([^"]*)" with the value "([^"]*)"$/ do |key, field, value|

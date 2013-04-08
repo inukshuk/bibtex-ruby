@@ -71,7 +71,7 @@ module BibTeX
 
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
-      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.intern
+      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.to_sym
     end
 
     # Returns a list of names for that Element. All Elements except Entries return an empty list.
@@ -235,20 +235,19 @@ module BibTeX
 
     # Creates a new instance.
     def initialize(key = nil, value = nil)
-      @key, @value = key.to_sym, Value.new(value)
+      @key, @value = key.to_s, Value.new(value)
       yield self if block_given?
     end
 
     # Sets the string's key (i.e., the symbol identifying the constant).
     def key=(key)
-      raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
-
+      key = key.to_s
       unless bibliography.nil?
         bibliography.strings.delete(@key)
-        bibliography.strings[key.to_sym] = self
+        bibliography.strings[key.to_s] = self
       end
 
-      @key = key.to_sym
+      @key = key
     end
 
     # Retuns the string's value if parameter matches the key; nil otherwise.

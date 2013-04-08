@@ -52,9 +52,9 @@ rule
   
   preamble : PREAMBLE LBRACE string_value RBRACE   { result = BibTeX::Preamble.new(val[2]) }
 
-  string : STRING LBRACE string_assignment RBRACE  { result = BibTeX::String.new(val[2][0],val[2][1]); }
+  string : STRING LBRACE string_assignment RBRACE  { result = BibTeX::String.new(val[2][0], val[2][1]); }
 
-  string_assignment : NAME EQ string_value         { result = [val[0].downcase.to_sym, val[2]] }
+  string_assignment : NAME EQ string_value         { result = [val[0].downcase, val[2]] }
 
   string_value : string_literal                    { result = [val[0]] }
                | string_value SHARP string_literal { result << val[2] }
@@ -67,7 +67,7 @@ rule
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
         | entry_head RBRACE                        { result = val[0] }
 
-  entry_head : NAME LBRACE opt_key                 { result = BibTeX::Entry.new(:type => val[0].downcase.to_sym, :key => val[2]) }
+  entry_head : NAME LBRACE opt_key                 { result = BibTeX::Entry.new(:type => val[0].downcase, :key => val[2]) }
 
   opt_key :                                        { missing_key }
           | KEY
@@ -75,7 +75,7 @@ rule
   assignments : assignment                         { result = val[0] }
               | assignments COMMA assignment       { result.merge!(val[2]) }
 
-  assignment : NAME EQ value                       { result = { val[0].downcase.to_sym => val[2] } }
+  assignment : NAME EQ value                       { result = { val[0].downcase => val[2] } }
 
   value : string_value                             { result = val[0] }
         | NUMBER                                   { result = val[0] }

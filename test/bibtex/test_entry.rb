@@ -119,7 +119,7 @@ module BibTeX
             end
 
             it 'returns a list of all fields not set in the field but in the reference' do
-              @bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
+              @bib['a1'].inherited_fields.must_be :==, %w(booktitle editor title)
             end
           end
 
@@ -127,8 +127,8 @@ module BibTeX
             it 'copies referenced values to the entry' do
               @bib['a1'].title = 'a1'
               @bib['a1'].save_inherited_fields
-              @bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
-              @bib['a1'].fields[:title].wont_be :==, @bib['a'].title
+              @bib['a1'].fields['booktitle'].must_be :==, @bib['a'].title
+              @bib['a1'].fields['title'].wont_be :==, @bib['a'].title
             end
           end
         end

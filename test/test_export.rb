@@ -16,7 +16,7 @@ module BibTeX
       refute_nil(yaml)
       assert_equal(3, yaml.length)
       assert_equal(%w[ dragon pickaxe rails], yaml.map { |y| y[:key] }.sort)
-      assert_equal('{The Facets of Ruby}', yaml[0][:series])
+      assert_equal('{The Facets of Ruby}', yaml[0]['series'])
     end
   
     def test_json

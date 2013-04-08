@@ -97,9 +97,7 @@ module BibTeX
       case argument
       when Value
         @tokens += argument.tokens.dup
-      when ::String
-        @tokens << argument
-      when Symbol
+      when ::String, Symbol
         @tokens << argument
       else
         if argument.respond_to?(:to_s)
@@ -130,7 +128,7 @@ module BibTeX
         when ::String # simulates Ruby's String#replace
           @tokens = [argument]
         when String
-          @tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
+          @tokens = @tokens.map { |v| argument.key == v.to_s ? argument.value.tokens : v }.flatten
         when Hash
           @tokens = @tokens.map { |v| argument[v] || v }
         end

@@ -347,14 +347,14 @@ module_eval(<<'.,.,', 'bibtex.y', 52)
 
 module_eval(<<'.,.,', 'bibtex.y', 54)
   def _reduce_16(val, _values, result)
-     result = BibTeX::String.new(val[2][0],val[2][1]); 
+     result = BibTeX::String.new(val[2][0], val[2][1]); 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 56)
   def _reduce_17(val, _values, result)
-     result = [val[0].downcase.to_sym, val[2]] 
+     result = [val[0].downcase, val[2]] 
     result
   end
 .,.,
@@ -417,7 +417,7 @@ module_eval(<<'.,.,', 'bibtex.y', 67)
 
 module_eval(<<'.,.,', 'bibtex.y', 69)
   def _reduce_26(val, _values, result)
-     result = BibTeX::Entry.new(:type => val[0].downcase.to_sym, :key => val[2]) 
+     result = BibTeX::Entry.new(:type => val[0].downcase, :key => val[2]) 
     result
   end
 .,.,
@@ -447,7 +447,7 @@ module_eval(<<'.,.,', 'bibtex.y', 75)
 
 module_eval(<<'.,.,', 'bibtex.y', 77)
   def _reduce_31(val, _values, result)
-     result = { val[0].downcase.to_sym => val[2] } 
+     result = { val[0].downcase => val[2] } 
     result
   end
 .,.,
