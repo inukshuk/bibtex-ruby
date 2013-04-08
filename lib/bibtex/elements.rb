@@ -151,6 +151,7 @@ module BibTeX
     end
 
     def to_json(options = {})
+      require 'multi_json'
       MultiJson.dump(to_hash(options))
     end
 

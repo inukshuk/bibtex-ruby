@@ -1,6 +1,4 @@
-require 'helper.rb'
-
-require 'yaml'
+require 'helper'
 
 module BibTeX
   class TestString < MiniTest::Unit::TestCase
@@ -12,6 +10,7 @@ module BibTeX
     # end
     
     def test_yaml
+      require 'yaml'
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
       yaml = YAML.load(bib.to_yaml)
       refute_nil(yaml)
@@ -21,6 +20,7 @@ module BibTeX
     end
   
     def test_json
+      require 'multi_json'
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
       json = MultiJson.load(bib.to_json)
       refute_nil(json)
