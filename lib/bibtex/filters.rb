@@ -27,10 +27,14 @@ module BibTeX
   end
 
   module Filters
-    LOAD_PATH = [File.expand_path('..', __FILE__), 'filters'].join('/').freeze
+    LOAD_PATH = File.join(File.dirname(__FILE__), 'filters').freeze
 
     Dir.glob("#{LOAD_PATH}/*.rb").each do |filter|
-      require filter
+      begin
+        require filter
+      rescue LoadError
+        # ignore
+      end
     end
 
     def self.resolve!(filter)
