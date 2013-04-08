@@ -1,9 +1,9 @@
 # encoding: utf-8
 
-require 'bundler'
 begin
+  require 'bundler'
   Bundler.setup
-rescue Bundler::BundlerError => e
+rescue => e
   $stderr.puts e.message
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
@@ -17,8 +17,12 @@ require 'rake/testtask'
 
 require 'bibtex/version'
 
-require 'yard'
-YARD::Rake::YardocTask.new
+begin
+  require 'yard'
+  YARD::Rake::YardocTask.new
+rescue LoadError
+  puts 'You need YARD to compile the documentation'
+end
 
 Rake::TestTask.new(:test_task) do |t|
   t.libs << 'lib' << 'test'
@@ -39,20 +43,20 @@ rescue LoadError
 end
 
 
-task :default => [:test, :features]
+task :default => %w(test features)
 
 desc 'Generates the BibTeX parser'
-task :racc => ['lib/bibtex/parser.rb','lib/bibtex/name_parser.rb']
+task :racc => %w(lib/bibtex/parser.rb lib/bibtex/name_parser.rb)
 
-task :test => ['racc','test_task']
+task :test => %w(racc test_task)
 
-file 'lib/bibtex/parser.output' => ['lib/bibtex/parser.rb']
-file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
+file 'lib/bibtex/parser.output' => 'lib/bibtex/parser.rb'
+file 'lib/bibtex/parser.rb' => 'lib/bibtex/bibtex.y' do
   # sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
   sh 'bundle exec racc -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
 end
 
-file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
+file 'lib/bibtex/name_parser.rb' => 'lib/bibtex/names.y' do
   # sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
   sh 'bundle exec racc -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
@@ -63,20 +67,20 @@ task :console, [:script] do |t,args|
 
   require 'irb'
   require 'bibtex'
-  
+
   IRB.conf[:SCRIPT] = args.script
   IRB.start
 end
 
 
 desc 'Runs the benchmarks (and plots the results)'
-task :benchmark => ['racc'] do
+task :benchmark => :racc do
   require File.expand_path('../test/benchmark.rb', __FILE__)
 end
-task :bm => ['benchmark']
+task :bm => :benchmark
 
 desc 'Runs the profiler'
-task :profile => ['racc'] do
+task :profile => :racc do
   require File.expand_path('../test/profile.rb', __FILE__)
 end
 
