@@ -55,7 +55,6 @@ lib/bibtex/names.rb
 lib/bibtex/names.y
 lib/bibtex/parser.rb
 lib/bibtex/replaceable.rb
-lib/bibtex/ruby.rb
 lib/bibtex/utilities.rb
 lib/bibtex/value.rb
 lib/bibtex/version.rb
