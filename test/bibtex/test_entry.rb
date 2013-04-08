@@ -119,7 +119,7 @@ module BibTeX
             end
 
             it 'returns a list of all fields not set in the field but in the reference' do
-              @bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
+              @bib['a1'].inherited_fields.must_be :==, %w(booktitle editor title)
             end
           end
 
@@ -127,8 +127,8 @@ module BibTeX
             it 'copies referenced values to the entry' do
               @bib['a1'].title = 'a1'
               @bib['a1'].save_inherited_fields
-              @bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
-              @bib['a1'].fields[:title].wont_be :==, @bib['a'].title
+              @bib['a1'].fields['booktitle'].must_be :==, @bib['a'].title
+              @bib['a1'].fields['title'].wont_be :==, @bib['a'].title
             end
           end
         end
@@ -164,28 +164,28 @@ module BibTeX
         @entry = Entry.new
       end
 
-      [[:jan,'January'], [:feb,'February'], [:sep,'September']].each do |m|
+      [%w(jan January), %w(feb February), %w(sep September)].each do |m|
         it 'should convert english months' do
           @entry.month = m[1]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
       end
 
-      [[:jan,:jan], [:feb,:feb], [:sep,:sep]].each do |m|
+      [%w(jan jan), %w(feb feb), %w(sep sep)].each do |m|
         it 'should convert bibtex abbreviations' do
           @entry.month = m[1]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
       end
 
-      [[:jan,1], [:feb,2], [:sep,9]].each do |m|
+      [['jan',1], ['feb',2], ['sep',9]].each do |m|
         it 'should convert numbers' do
           @entry.month = m[1]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
         it 'should convert numbers when parsing' do
           @entry = Entry.parse("@misc{id, month = #{m[1]}}")[0]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
       end
 
@@ -370,9 +370,9 @@ module BibTeX
       assert_equal('key:0', bib.data[0].key)
       assert_equal('key:1', bib.data[1].key)
       assert_equal('foo', bib.data[2].key)
-      assert_equal(:book, bib.data[0].type)
-      assert_equal(:article, bib.data[1].type)
-      assert_equal(:article, bib.data[2].type)
+      assert_equal('book', bib.data[0].type)
+      assert_equal('article', bib.data[1].type)
+      assert_equal('article', bib.data[2].type)
       assert_equal('Poe, Edgar A.', bib.data[0][:author].to_s)
       assert_equal('Hawthorne, Nathaniel', bib.data[1][:author].to_s)
       assert_equal('2003', bib.data[0][:year])
@@ -401,7 +401,7 @@ module BibTeX
       entry.author = 'Poe, Edgar A.'
       entry.title = 'The Raven'
 
-      assert_equal :book, entry.type
+      assert_equal 'book', entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
@@ -415,7 +415,7 @@ module BibTeX
         :title => 'The Raven'
       })
 
-      assert_equal :book, entry.type
+      assert_equal 'book', entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
@@ -423,13 +423,13 @@ module BibTeX
 
     def test_creation_from_block
       entry = BibTeX::Entry.new do |e|
-        e.type = :book
+        e.type = 'book'
         e.key = 'raven'
         e.author = 'Poe, Edgar A.'
         e.title = 'The Raven'
       end
 
-      assert_equal :book, entry.type
+      assert_equal 'book', entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title

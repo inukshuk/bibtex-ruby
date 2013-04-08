@@ -15,11 +15,11 @@ module BibTeX
       end
       
       it 'accepts a Hash and returns an Entry' do
-        Element.parse({ :type => :book })[0].type.must_be :==, :book
+        Element.parse({ :type => :book })[0].type.must_be :==, 'book'
       end
       
       it 'accepts an array of hashes' do
-        Element.parse([{ :type => :book }, { :type => :misc }])[1].type.must_be :==, :misc
+        Element.parse([{ :type => :book }, { :type => :misc }])[1].type.must_be :==, 'misc'
       end
       
     end

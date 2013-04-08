@@ -70,8 +70,8 @@ module BibTeX
       true
     end
     
-    alias names? name?
-    alias symbol? numeric?
+    alias_method :names?, :name?
+    alias_method :symbol?, :numeric?
     
     def to_name
       self
@@ -97,8 +97,8 @@ module BibTeX
       self
     end
     
-    alias << add
-    alias push add
+    alias_method :<<, :add
+    alias_method :push, :add
     
     [:convert!, :rename_if, :rename_unless, :extend_initials].each do |method_id|
       define_method(method_id) do |*arguments|
@@ -215,7 +215,7 @@ module BibTeX
       [options[:initials] ? initials : first, prefix, last, suffix].compact.join(' ')
     end
     
-    alias display display_order
+    alias_method :display, :display_order
     
     # call-seq:
     #   name.sort_order #=> 'Poe, Edgar Allen'
@@ -226,7 +226,7 @@ module BibTeX
       [[prefix, last].compact.join(' '), suffix, options[:initials] ? initials : first].compact.join(', ')
     end
     
-    alias to_s sort_order
+    alias_method :to_s, :sort_order
         
     def <=>(other)
       other.is_a?(Name) ? sort_order <=> other.sort_order : super
@@ -287,14 +287,14 @@ module BibTeX
       hash
     end
     
-    alias family last
-    alias family= last=    
-    alias given first
-    alias given= first=
-    alias jr suffix
-    alias jr= suffix=
-    alias von prefix
-    alias von= prefix=    
+    alias_method :family, :last
+    alias_method :family=, :last=    
+    alias_method :given, :first
+    alias_method :given=, :first=
+    alias_method :jr, :suffix
+    alias_method :jr=, :suffix=
+    alias_method :von, :prefix
+    alias_method :von=, :prefix=    
    
   end
 end

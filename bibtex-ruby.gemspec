@@ -24,9 +24,6 @@ Gem::Specification.new do |s|
     instructions to unicode; if you are in a hurry, it also allows for easy
     export/conversion to formats such as YAML, JSON, CSL, and XML (BibTeXML).
 	END_DESCRIPTION
-	
-  s.add_runtime_dependency('latex-decode', ['>=0.0.6'])
-  s.add_runtime_dependency('multi_json', ['~>1.3'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)
   s.test_files   = Dir.glob('test/**/test*.rb')

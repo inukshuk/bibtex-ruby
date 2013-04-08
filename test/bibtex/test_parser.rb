@@ -22,7 +22,7 @@ module BibTeX
       end
 
       it 'should parse the entry types' do
-        assert_equal [:book, :article, :article, :commentary], @bib.map(&:type)
+        assert_equal %w(book article article commentary), @bib.map(&:type)
       end
       
       it 'should parse all values correctly' do
@@ -57,7 +57,7 @@ module BibTeX
       
       it 'tolerates missing key with :allow_missing_keys set' do
         input = "@misc{title = {Crime and Punishment}}"       
-        assert_equal :misc, Parser.new({
+        assert_equal 'misc', Parser.new({
           :debug => false, :strict => false, :allow_missing_keys => true
         }).parse(input)[0].type
       end

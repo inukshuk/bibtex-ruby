@@ -26,42 +26,42 @@ module BibTeX
 
     # Defines the required fields of the standard entry types
     REQUIRED_FIELDS = Hash.new([]).merge({
-      :article       => [:author,:title,:journal,:year],
-      :book          => [[:author,:editor],:title,:publisher,:year],
-      :booklet       => [:title],
-      :conference    => [:author,:title,:booktitle,:year],
-      :inbook        => [[:author,:editor],:title,[:chapter,:pages],:publisher,:year],
-      :incollection  => [:author,:title,:booktitle,:publisher,:year],
-      :inproceedings => [:author,:title,:booktitle,:year],
-      :manual        => [:title],
-      :mastersthesis => [:author,:title,:school,:year],
-      :misc          => [],
-      :phdthesis     => [:author,:title,:school,:year],
-      :proceedings   => [:title,:year],
-      :techreport    => [:author,:title,:institution,:year],
-      :unpublished   => [:author,:title,:note]
+      'article'       => %w(author title journal year),
+      'book'          => [%w(author editor), *%w(title publisher year)],
+      'booklet'       => %w(title),
+      'conference'    => %w(author title booktitle year),
+      'inbook'        => [%w(author editor), %w(chapter pages), *%w(title publisher year)],
+      'incollection'  => %w(author title booktitle publisher year),
+      'inproceedings' => %w(author title booktitle year),
+      'manual'        => %w(title),
+      'mastersthesis' => %w(author title school year),
+      'misc'          => [],
+      'phdthesis'     => %w(author title school year),
+      'proceedings'   => %w(title year),
+      'techreport'    => %w(author title institution year),
+      'unpublished'   => %w(author title note)
     }).freeze
 
     # Defines the default fallbacks for values defined in cross-references
     FIELD_ALIASES = {
-      :booktitle => :title,
-      # :editor => :author
+      'booktitle' => 'title',
+      # 'editor' => 'author'
     }.freeze
 
 
-    NAME_FIELDS = [:author,:editor,:translator].freeze
-    DATE_FIELDS = [:year,:month].freeze
+    NAME_FIELDS = %w(author editor translator).freeze
+    DATE_FIELDS = %w(year month).freeze
 
     MONTHS = [:jan,:feb,:mar,:apr,:may,:jun,:jul,:aug,:sep,:oct,:nov,:dec].freeze
 
     MONTHS_FILTER = Hash.new do |h,k|
       case k.to_s.strip
-      when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
-        h[k] = Value.new(k.to_s[0,3].downcase.to_sym)
-      when /^\d\d?$/
-        h[k] = Value.new(MONTHS[k.to_i - 1] || k)
+      when /\A(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
+        h[k] = k.to_s[0,3].downcase.to_sym
+      when /\A\d\d?\Z/
+        h[k] = MONTHS[k.to_i - 1] || k
       else
-        h[k] = Value.new(k)
+        h[k] = k
       end
     end
 
@@ -78,7 +78,7 @@ module BibTeX
       doi       DOI
       year      issued
       type      genre
-    }.map(&:intern)]).freeze
+    }]).freeze
 
     CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
       authority call-number chapter-number citation-label citation-number
@@ -90,7 +90,7 @@ module BibTeX
       year-suffix accessed container event-date issued original-date
       author editor translator recipient interviewer publisher composer
       original-publisher original-author container-author collection-editor
-    }.map(&:intern).freeze
+    }.freeze
 
     CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
       booklet        pamphlet
@@ -106,7 +106,7 @@ module BibTeX
       techreport     report
       unpublished    manuscript
       article        article-journal
-    }.map(&:intern)]).freeze
+    }]).freeze
 
     BIBO_FIELDS = Hash[*%w{
       pages      pages
@@ -117,7 +117,7 @@ module BibTeX
       edition    edition
       abstract   abstract
       volume     volume
-    }.map(&:intern)].freeze
+    }].freeze
 
     BIBO_TYPES = Hash.new(:Document).merge(Hash[*%w{
       booklet        Book
@@ -135,8 +135,7 @@ module BibTeX
       periodical     Periodical
       unpublished    Manuscript
       article        Article
-    }.map(&:intern)]).freeze
-
+    }]).freeze
 
     attr_reader :fields, :type
 
@@ -198,7 +197,7 @@ module BibTeX
       end
 
       define_method("#{name}=") do |value|
-        add name, value
+        self[name] = value
       end
     end
 
@@ -221,8 +220,7 @@ module BibTeX
       end
     end
 
-    alias each_pair each
-
+    alias_method :each_pair, :each
 
     # Returns the Entry's field name aliases.
     def aliases
@@ -252,28 +250,28 @@ module BibTeX
       @key ||= default_key
     end
 
-    alias id key
-    alias id= key=
+    alias_method :id, :key
+    alias_method :id=, :key=
 
     # Sets the type of the entry.
     def type=(type)
-      @type = type.to_sym
+      @type = type.to_s
     end
 
     def has_type?(type)
-      type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_sym || super
+      type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_s || super
     end
 
-    alias type? has_type?
+    alias_method :type?, :has_type?
 
 
     def has_field?(*names)
       names.flatten.any? do |name|
-        name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
+        fields.has_key?(name.to_s)
       end
     end
 
-    alias field? has_field?
+    alias_method :field?, :has_field?
 
     def inherits?(*names)
       names.flatten.any? do |name|
@@ -284,11 +282,7 @@ module BibTeX
     # Returns true if the Entry has a field (or alias) for any of the passed-in names.
     def provides?(*names)
       names.flatten.any? do |name|
-        if name.respond_to?(:to_sym)
-          has_field?(name) || has_field?(aliases[name.to_sym])
-        else
-          false
-        end
+        has_field?(name) || has_field?(aliases[name.to_s])
       end
     end
 
@@ -300,8 +294,7 @@ module BibTeX
     # For example, this will return the 'title' value for 'booktitle' if a
     # corresponding alias is defined.
     def provide(name)
-      return nil unless name.respond_to?(:to_sym)
-      name = name.to_sym
+      name = name.to_s
       fields[name] || fields[aliases[name]]
     end
 
@@ -331,7 +324,7 @@ module BibTeX
       end
 
       unless filter.empty?
-        names = names & filter.map(&:to_sym)
+        names = names & filter.map(&:to_s)
       end
 
       names.sort!
@@ -351,11 +344,12 @@ module BibTeX
 
 
     def method_missing(name, *args, &block)
+      name = name.to_s
       case
       when fields.has_key?(name)
         fields[name]
-      when name.to_s =~ /^(.+)=$/
-        send(:add, $1.to_sym, args[0])
+      when name =~ /^(.+)=$/
+        self[$1] = args[0]
       when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
         $2 ? convert!($1, &block) : convert($1, &block)
       when has_parent? && parent.provides?(name)
@@ -366,7 +360,8 @@ module BibTeX
     end
 
     def respond_to?(method)
-      provides?(method.to_sym) || method.to_s.match(/=$/) ||
+      method = method.to_s
+      provides?(method) || method.match(/=$/) ||
         method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || (has_parent? && parent.respond_to?(method)) || super
     end
 
@@ -379,6 +374,7 @@ module BibTeX
     # exists.
     def rename!(*arguments)
       Hash[*arguments.flatten].each_pair do |from,to|
+        from, to = from.to_s, to.to_s
         if fields.has_key?(from) && !fields.has_key?(to)
           fields[to] = fields[from]
           fields.delete(from)
@@ -387,17 +383,17 @@ module BibTeX
       self
     end
 
-    alias rename_fields rename
-    alias rename_fields! rename!
+    alias_method :rename_fields, :rename
+    alias_method :rename_fields!, :rename!
 
     # Returns the value of the field with the given name. If the value is not
     # defined and the entry has cross-reference, returns the cross-referenced
     # value instead.
     def [](name)
-      fields[name.to_sym] || parent && parent.provide(name)
+      fields[name.to_s] || parent && parent.provide(name)
     end
 
-    alias get []
+    alias_method :get, :[]
 
     def fetch(name, default = nil)
       get(name) || block_given? ? yield(name) : default
@@ -406,7 +402,7 @@ module BibTeX
     # Adds a new field (name-value pair) to the entry.
     # Returns the new value.
     def []=(name, value)
-      add(name.to_sym, value)
+      fields[name.to_s] = Value.create(value)
     end
 
     # Author, Editor and Translator readers
@@ -430,18 +426,18 @@ module BibTeX
     # Returns the entry for chainability.
     def add(*arguments)
       Hash[*arguments.flatten].each_pair do |name, value|
-        fields[name.to_sym] = Value.create(value)
+        self[name] = value
       end
 
       self
     end
 
-    alias << add
+    alias_method :<<, :add
 
     # Removes the field with a given name from the entry.
     # Returns the value of the deleted field; nil if the field was not set.
     def delete(name)
-      fields.delete(name.to_sym)
+      fields.delete(name.to_s)
     end
 
     # Returns false if the entry is one of the standard entry types and does not have
@@ -463,7 +459,7 @@ module BibTeX
     #
     # @see #field_names
     #
-    # @param [<Symbol>] the field names to use
+    # @param [<String>] the field names to use
     # @return [String] the digest string
     def digest(filter = [])
       names = field_names(filter)
@@ -547,15 +543,15 @@ module BibTeX
     end
 
     def month=(month)
-      fields[:month] = MONTHS_FILTER[month]
+      self['month'] = MONTHS_FILTER[month]
     end
 
     def parse_month
-      fields[:month] = MONTHS_FILTER[fields[:month]] if has_field?(:month)
+      self['month'] = MONTHS_FILTER[fields['month']] if has_field?('month')
       self
     end
 
-    alias parse_months parse_month
+    alias_method :parse_months, :parse_month
 
     def date
       get(:date) || get(:year)
@@ -587,7 +583,7 @@ module BibTeX
       !parent.nil?
     end
 
-    alias has_cross_reference? has_parent?
+    alias_method :has_cross_reference?, :has_parent?
 
     # Returns true if the Entry cross-references an Entry which is not
     # registered in the current Bibliography.
@@ -595,15 +591,15 @@ module BibTeX
       has_field?(:crossref) && !has_parent?
     end
 
-    alias cross_reference_missing? parent_missing?
+    alias_method :cross_reference_missing?, :parent_missing?
 
     # Returns the cross-referenced Entry from the Bibliography or nil if this
     # Entry does define a cross-reference.
     def parent
-      bibliography && bibliography[fields[:crossref]]
+      bibliography && bibliography[fields['crossref']]
     end
 
-    alias cross_reference parent
+    alias_method :cross_reference, :parent
 
 
     # Returns true if the entry is cross-referenced by another entry in the
@@ -612,7 +608,7 @@ module BibTeX
       !children.empty?
     end
 
-    alias cross_referenced? has_children?
+    alias_method :cross_referenced?, :has_children?
 
     # Returns a list of all entries in the Bibliography containing a
     # cross-reference to this entry or [] if there are no references to this
@@ -621,7 +617,7 @@ module BibTeX
       bibliography && bibliography.q("@entry[crossref=#{key}]") or []
     end
 
-    alias cross_referenced_by children
+    alias_method :cross_referenced_by, :children
 
     def container_title
       get(:booktitle) || get(:journal) || get(:container)
@@ -720,13 +716,13 @@ module BibTeX
     end
 
     def issued
-      m = MONTHS.find_index(fields[:month].to_s.intern) unless !has_field?(:month)
+      m = MONTHS.find_index(fields['month'].to_sym) unless !has_field?(:month)
       m = m + 1 unless m.nil?
 
-      Hash['date-parts', [[fields[:year],m].compact.map(&:to_i)]]
+      Hash['date-parts', [[fields['year'],m].compact.map(&:to_i)]]
     end
 
-    alias citeproc_date issued
+    alias_method :citeproc_date, :issued
 
     def to_xml(options = {})
       require 'rexml/document'
@@ -848,9 +844,7 @@ module BibTeX
       BibTeX.log.error "Please gem install rdf for RDF support."
     end
 
-    alias to_bibo to_rdf
-
-
+    alias_method :to_bibo, :to_rdf
 
 
     private

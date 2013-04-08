@@ -19,10 +19,6 @@
 require 'digest/md5'
 require 'forwardable'
 require 'logger'
-require 'open-uri'
-
-require 'multi_json'
-
 require 'bibtex/version'
 
 # = BibTeX

@@ -71,7 +71,7 @@ module BibTeX
 
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
-      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.intern
+      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase
     end
 
     # Returns a list of names for that Element. All Elements except Entries return an empty list.
@@ -80,7 +80,7 @@ module BibTeX
     end
 
     def has_type?(type)
-      self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
+      self.type == type.to_s || defined?(type) == 'constant' && is_a?(type)
     end
 
     [:entry, :book, :article, :collection, :string, :preamble, :comment].each do |type|
@@ -93,7 +93,7 @@ module BibTeX
       return true if query.nil? || query.respond_to?(:empty?) && query.empty?
 
       case query
-      when Symbol
+      when ::Symbol
         query.to_s == id.to_s
       when Element
         query == self
@@ -118,18 +118,18 @@ module BibTeX
       end
     end
 
-    alias === matches?
-    alias match? matches?
+    alias_method :===, :matches?
+    alias_method :match?, :matches?
 
     def meets_all?(*conditions)
       meets? conditions.flatten, :all?
     end
-    alias meet_all? meets_all?
+    alias_method :meet_all?, :meets_all?
 
     def meets_any?(*conditions)
       meets? conditions.flatten, :any?
     end
-    alias meet_any? meets_any?
+    alias_method :meet_any?, :meets_any?
 
     # Returns true if the element meets all or any of the given conditions.
     def meets?(conditions, op = :all?)
@@ -137,9 +137,9 @@ module BibTeX
         meets_condition? condition
       end
     end
-    alias meet? meets?
+    alias_method :meet?, :meets?
 
-    alias to_s content
+    alias_method :to_s, :content
 
     def to_hash(options = {})
       { type => content }
@@ -151,6 +151,7 @@ module BibTeX
     end
 
     def to_json(options = {})
+      require 'multi_json'
       MultiJson.dump(to_hash(options))
     end
 
@@ -234,20 +235,19 @@ module BibTeX
 
     # Creates a new instance.
     def initialize(key = nil, value = nil)
-      @key, @value = key.to_sym, Value.new(value)
+      @key, @value = key.to_s, Value.new(value)
       yield self if block_given?
     end
 
     # Sets the string's key (i.e., the symbol identifying the constant).
     def key=(key)
-      raise(ArgumentError, "keys must be convertible to Symbol; was: #{type.class.name}.") unless type.respond_to?(:to_sym)
-
+      key = key.to_s
       unless bibliography.nil?
         bibliography.strings.delete(@key)
-        bibliography.strings[key.to_sym] = self
+        bibliography.strings[key.to_s] = self
       end
 
-      @key = key.to_sym
+      @key = key
     end
 
     # Retuns the string's value if parameter matches the key; nil otherwise.

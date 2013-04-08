@@ -83,11 +83,11 @@ Then /^my bibliography should contain (\d+) (\w+) published in (\d+)$/ do |count
 end
 
 Then /^my bibliography should contain an? (\w+) with id "([^"]*)"$/ do |type, id|
-  assert_equal @bibliography[id.to_sym].type, type.to_sym
+  assert_equal @bibliography[id.to_sym].type, type
 end
 
 Then /^the string "([^"]*)" should be "([^"]*)"$/ do |key, value|
-  assert_equal value, @bibliography.strings[key.to_sym].v.to_s
+  assert_equal value, @bibliography.strings[key.to_s].v.to_s
 end
 
 Then /^the entry with key "([^"]*)" should have a field "([^"]*)" with the value "([^"]*)"$/ do |key, field, value|

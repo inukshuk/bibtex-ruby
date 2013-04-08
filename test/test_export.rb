@@ -1,6 +1,4 @@
-require 'helper.rb'
-
-require 'yaml'
+require 'helper'
 
 module BibTeX
   class TestString < MiniTest::Unit::TestCase
@@ -12,15 +10,17 @@ module BibTeX
     # end
     
     def test_yaml
+      require 'yaml'
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
       yaml = YAML.load(bib.to_yaml)
       refute_nil(yaml)
       assert_equal(3, yaml.length)
       assert_equal(%w[ dragon pickaxe rails], yaml.map { |y| y[:key] }.sort)
-      assert_equal('{The Facets of Ruby}', yaml[0][:series])
+      assert_equal('{The Facets of Ruby}', yaml[0]['series'])
     end
   
     def test_json
+      require 'multi_json'
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
       json = MultiJson.load(bib.to_json)
       refute_nil(json)

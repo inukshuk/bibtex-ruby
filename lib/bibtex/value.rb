@@ -22,6 +22,10 @@ require 'forwardable'
 
 module BibTeX
 
+  class Symbol < ::String
+    alias_method :inspect, :to_s
+  end
+
   #
   # A BibTeX Value is something very much like a string. In BibTeX files it
   # can appear on the right hand side of @string or @entry field assignments
@@ -50,7 +54,7 @@ module BibTeX
     include Comparable
 
     attr_reader :tokens
-    alias to_a tokens
+    alias_method :to_a, :tokens
 
     def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|^dup$|!$/ }
     def_delegators :@tokens, :[], :length
@@ -97,22 +101,18 @@ module BibTeX
       case argument
       when Value
         @tokens += argument.tokens.dup
-      when ::String
-        @tokens << argument
-      when Symbol
+      when ::Symbol
+        @tokens << Symbol.new(argument.to_s)
+      when ::String, Symbol
         @tokens << argument
       else
-        if argument.respond_to?(:to_s)
-          @tokens << argument.to_s
-        else
-          raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
-        end
+        @tokens << argument.to_s
       end
       self
     end
 
-    alias << add
-    alias push add
+    alias_method :<<, :add
+    alias_method :push, :add
 
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
@@ -130,7 +130,7 @@ module BibTeX
         when ::String # simulates Ruby's String#replace
           @tokens = [argument]
         when String
-          @tokens = @tokens.map { |v| argument.key == v ? argument.value.tokens : v }.flatten
+          @tokens = @tokens.map { |v| argument.key == v.to_s ? argument.value.tokens : v }.flatten
         when Hash
           @tokens = @tokens.map { |v| argument[v] || v }
         end
@@ -187,10 +187,10 @@ module BibTeX
     # joined by a '#', additionally, all string tokens will be turned into
     # string literals (i.e., delimitted by quotes).
     def value
-      atomic? ? @tokens[0] : @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
+      atomic? ? @tokens[0] : @tokens.map(&:inspect).join(' # ')
     end
 
-    alias :v :value
+    alias_method :v, :value
 
     def inspect
       "#<#{self.class} #{tokens.map(&:inspect).join(', ')}>"
@@ -204,13 +204,13 @@ module BibTeX
     # Returns true if the value is a BibTeX name value.
     def name?; false; end
 
-    alias :names? :name?
+    alias_method :names?, :name?
 
     def to_name
       Names.parse(to_s)
     end
 
-    alias to_names to_name
+    alias_method :to_names, :to_name
 
     # Returns true if the Value's content is a date.
     def date?
@@ -238,8 +238,7 @@ module BibTeX
     def symbol?
       tokens.detect { |v| v.is_a?(Symbol) }
     end
-
-    alias has_symbol? symbol?
+    alias_method :has_symbol?, :symbol?
 
     # Returns all symbols contained in the Value.
     def symbols

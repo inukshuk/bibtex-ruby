@@ -10,14 +10,14 @@ module BibTeX
       it 'should should not be empty' do
         assert_equal 1, @bib.length
       end
-      it 'should have a symbol as key' do
-        assert_equal :foo, @bib[0].key
+      it 'should have a string as key' do
+        assert_equal 'foo', @bib[0].key
       end
       it 'should have a value string' do
         assert_equal 'bar', @bib[0].value.to_s
       end
       it 'should have been registered' do
-        refute @bib.strings[:foo].nil?
+        refute @bib.strings['foo'].nil?
       end
     end
 
