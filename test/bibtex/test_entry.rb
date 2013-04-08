@@ -370,9 +370,9 @@ module BibTeX
       assert_equal('key:0', bib.data[0].key)
       assert_equal('key:1', bib.data[1].key)
       assert_equal('foo', bib.data[2].key)
-      assert_equal(:book, bib.data[0].type)
-      assert_equal(:article, bib.data[1].type)
-      assert_equal(:article, bib.data[2].type)
+      assert_equal('book', bib.data[0].type)
+      assert_equal('article', bib.data[1].type)
+      assert_equal('article', bib.data[2].type)
       assert_equal('Poe, Edgar A.', bib.data[0][:author].to_s)
       assert_equal('Hawthorne, Nathaniel', bib.data[1][:author].to_s)
       assert_equal('2003', bib.data[0][:year])
@@ -401,7 +401,7 @@ module BibTeX
       entry.author = 'Poe, Edgar A.'
       entry.title = 'The Raven'
 
-      assert_equal :book, entry.type
+      assert_equal 'book', entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
@@ -415,7 +415,7 @@ module BibTeX
         :title => 'The Raven'
       })
 
-      assert_equal :book, entry.type
+      assert_equal 'book', entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title
@@ -423,13 +423,13 @@ module BibTeX
 
     def test_creation_from_block
       entry = BibTeX::Entry.new do |e|
-        e.type = :book
+        e.type = 'book'
         e.key = 'raven'
         e.author = 'Poe, Edgar A.'
         e.title = 'The Raven'
       end
 
-      assert_equal :book, entry.type
+      assert_equal 'book', entry.type
       assert_equal 'raven', entry.key
       assert_equal 'Poe, Edgar A.', entry.author
       assert_equal 'The Raven', entry.title

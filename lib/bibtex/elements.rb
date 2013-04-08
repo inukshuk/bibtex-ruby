@@ -71,7 +71,7 @@ module BibTeX
 
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
-      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.to_sym
+      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase
     end
 
     # Returns a list of names for that Element. All Elements except Entries return an empty list.
@@ -80,7 +80,7 @@ module BibTeX
     end
 
     def has_type?(type)
-      self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
+      self.type == type.to_s || defined?(type) == 'constant' && is_a?(type)
     end
 
     [:entry, :book, :article, :collection, :string, :preamble, :comment].each do |type|

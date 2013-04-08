@@ -26,20 +26,20 @@ module BibTeX
 
     # Defines the required fields of the standard entry types
     REQUIRED_FIELDS = Hash.new([]).merge({
-      :article       => %w(author title journal year),
-      :book          => [%w(author editor), *%w(title publisher year)],
-      :booklet       => %w(title),
-      :conference    => %w(author title booktitle year),
-      :inbook        => [%w(author editor), %w(chapter pages), *%w(title publisher year)],
-      :incollection  => %w(author title booktitle publisher year),
-      :inproceedings => %w(author title booktitle year),
-      :manual        => %w(title),
-      :mastersthesis => %w(author title school year),
-      :misc          => [],
-      :phdthesis     => %w(author title school year),
-      :proceedings   => %w(title year),
-      :techreport    => %w(author title institution year),
-      :unpublished   => %w(author title note)
+      'article'       => %w(author title journal year),
+      'book'          => [%w(author editor), *%w(title publisher year)],
+      'booklet'       => %w(title),
+      'conference'    => %w(author title booktitle year),
+      'inbook'        => [%w(author editor), %w(chapter pages), *%w(title publisher year)],
+      'incollection'  => %w(author title booktitle publisher year),
+      'inproceedings' => %w(author title booktitle year),
+      'manual'        => %w(title),
+      'mastersthesis' => %w(author title school year),
+      'misc'          => [],
+      'phdthesis'     => %w(author title school year),
+      'proceedings'   => %w(title year),
+      'techreport'    => %w(author title institution year),
+      'unpublished'   => %w(author title note)
     }).freeze
 
     # Defines the default fallbacks for values defined in cross-references
@@ -256,11 +256,11 @@ module BibTeX
 
     # Sets the type of the entry.
     def type=(type)
-      @type = type.to_sym
+      @type = type.to_s
     end
 
     def has_type?(type)
-      type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_sym || super
+      type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_s || super
     end
 
     alias type? has_type?

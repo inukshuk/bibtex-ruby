@@ -19,7 +19,7 @@ module BibTeX
     def test_validation
       log_level = BibTeX.log.level
       BibTeX.log.level = Logger::ERROR
-      
+
       refute BibTeX.parse(%q[ @book{ id, author = {Poe, Edgar Allen}, title = "Ligeia" } ]).valid?
       assert BibTeX.parse(%q[ @book{ id, author = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } ]).valid?
       assert BibTeX.parse(%q[ @book{ id, editor = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } ]).valid?

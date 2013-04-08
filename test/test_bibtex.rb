@@ -28,11 +28,11 @@ module BibTeX
       assert_equal(15, bib.length)
       assert_equal([BibTeX::Entry,BibTeX::Comment,BibTeX::String,BibTeX::Preamble], bib.data.map(&:class).uniq)
       assert_equal('py03', bib.data[0].key)
-      assert_equal(:article, bib[:py03].type)
+      assert_equal('article', bib[:py03].type)
       assert_equal("D\\'ecoret, Xavier", bib[:py03][:author].to_s)
       assert_equal('PyBiTex', bib[:py03][:title])
       assert_equal('2003', bib[:py03][:year])
-      assert_equal(:article, bib[:key03].type)
+      assert_equal('article', bib[:key03].type)
       assert_equal('A {bunch {of} braces {in}} title', bib[:key03][:title])
       #TODO missing assertions
     end
