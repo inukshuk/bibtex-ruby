@@ -118,18 +118,18 @@ module BibTeX
       end
     end
 
-    alias === matches?
-    alias match? matches?
+    alias_method :===, :matches?
+    alias_method :match?, :matches?
 
     def meets_all?(*conditions)
       meets? conditions.flatten, :all?
     end
-    alias meet_all? meets_all?
+    alias_method :meet_all?, :meets_all?
 
     def meets_any?(*conditions)
       meets? conditions.flatten, :any?
     end
-    alias meet_any? meets_any?
+    alias_method :meet_any?, :meets_any?
 
     # Returns true if the element meets all or any of the given conditions.
     def meets?(conditions, op = :all?)
@@ -137,9 +137,9 @@ module BibTeX
         meets_condition? condition
       end
     end
-    alias meet? meets?
+    alias_method :meet?, :meets?
 
-    alias to_s content
+    alias_method :to_s, :content
 
     def to_hash(options = {})
       { type => content }

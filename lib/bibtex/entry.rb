@@ -220,8 +220,7 @@ module BibTeX
       end
     end
 
-    alias each_pair each
-
+    alias_method :each_pair, :each
 
     # Returns the Entry's field name aliases.
     def aliases
@@ -251,8 +250,8 @@ module BibTeX
       @key ||= default_key
     end
 
-    alias id key
-    alias id= key=
+    alias_method :id, :key
+    alias_method :id=, :key=
 
     # Sets the type of the entry.
     def type=(type)
@@ -263,7 +262,7 @@ module BibTeX
       type.to_s.match(/^(?:entry|\*)$/i) || @type == type.to_s || super
     end
 
-    alias type? has_type?
+    alias_method :type?, :has_type?
 
 
     def has_field?(*names)
@@ -272,7 +271,7 @@ module BibTeX
       end
     end
 
-    alias field? has_field?
+    alias_method :field?, :has_field?
 
     def inherits?(*names)
       names.flatten.any? do |name|
@@ -384,8 +383,8 @@ module BibTeX
       self
     end
 
-    alias rename_fields rename
-    alias rename_fields! rename!
+    alias_method :rename_fields, :rename
+    alias_method :rename_fields!, :rename!
 
     # Returns the value of the field with the given name. If the value is not
     # defined and the entry has cross-reference, returns the cross-referenced
@@ -394,7 +393,7 @@ module BibTeX
       fields[name.to_s] || parent && parent.provide(name)
     end
 
-    alias get []
+    alias_method :get, :[]
 
     def fetch(name, default = nil)
       get(name) || block_given? ? yield(name) : default
@@ -433,7 +432,7 @@ module BibTeX
       self
     end
 
-    alias << add
+    alias_method :<<, :add
 
     # Removes the field with a given name from the entry.
     # Returns the value of the deleted field; nil if the field was not set.
@@ -552,7 +551,7 @@ module BibTeX
       self
     end
 
-    alias parse_months parse_month
+    alias_method :parse_months, :parse_month
 
     def date
       get(:date) || get(:year)
@@ -584,7 +583,7 @@ module BibTeX
       !parent.nil?
     end
 
-    alias has_cross_reference? has_parent?
+    alias_method :has_cross_reference?, :has_parent?
 
     # Returns true if the Entry cross-references an Entry which is not
     # registered in the current Bibliography.
@@ -592,7 +591,7 @@ module BibTeX
       has_field?(:crossref) && !has_parent?
     end
 
-    alias cross_reference_missing? parent_missing?
+    alias_method :cross_reference_missing?, :parent_missing?
 
     # Returns the cross-referenced Entry from the Bibliography or nil if this
     # Entry does define a cross-reference.
@@ -600,7 +599,7 @@ module BibTeX
       bibliography && bibliography[fields['crossref']]
     end
 
-    alias cross_reference parent
+    alias_method :cross_reference, :parent
 
 
     # Returns true if the entry is cross-referenced by another entry in the
@@ -609,7 +608,7 @@ module BibTeX
       !children.empty?
     end
 
-    alias cross_referenced? has_children?
+    alias_method :cross_referenced?, :has_children?
 
     # Returns a list of all entries in the Bibliography containing a
     # cross-reference to this entry or [] if there are no references to this
@@ -618,7 +617,7 @@ module BibTeX
       bibliography && bibliography.q("@entry[crossref=#{key}]") or []
     end
 
-    alias cross_referenced_by children
+    alias_method :cross_referenced_by, :children
 
     def container_title
       get(:booktitle) || get(:journal) || get(:container)
@@ -723,7 +722,7 @@ module BibTeX
       Hash['date-parts', [[fields['year'],m].compact.map(&:to_i)]]
     end
 
-    alias citeproc_date issued
+    alias_method :citeproc_date, :issued
 
     def to_xml(options = {})
       require 'rexml/document'
@@ -845,9 +844,7 @@ module BibTeX
       BibTeX.log.error "Please gem install rdf for RDF support."
     end
 
-    alias to_bibo to_rdf
-
-
+    alias_method :to_bibo, :to_rdf
 
 
     private

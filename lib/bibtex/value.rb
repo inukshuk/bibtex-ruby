@@ -23,9 +23,7 @@ require 'forwardable'
 module BibTeX
 
   class Symbol < ::String
-    def inspect
-      to_s
-    end
+    alias_method :inspect, :to_s
   end
 
   #
@@ -56,7 +54,7 @@ module BibTeX
     include Comparable
 
     attr_reader :tokens
-    alias to_a tokens
+    alias_method :to_a, :tokens
 
     def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|^dup$|!$/ }
     def_delegators :@tokens, :[], :length
@@ -113,8 +111,8 @@ module BibTeX
       self
     end
 
-    alias << add
-    alias push add
+    alias_method :<<, :add
+    alias_method :push, :add
 
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
@@ -192,7 +190,7 @@ module BibTeX
       atomic? ? @tokens[0] : @tokens.map(&:inspect).join(' # ')
     end
 
-    alias :v :value
+    alias_method :v, :value
 
     def inspect
       "#<#{self.class} #{tokens.map(&:inspect).join(', ')}>"
@@ -206,13 +204,13 @@ module BibTeX
     # Returns true if the value is a BibTeX name value.
     def name?; false; end
 
-    alias :names? :name?
+    alias_method :names?, :name?
 
     def to_name
       Names.parse(to_s)
     end
 
-    alias to_names to_name
+    alias_method :to_names, :to_name
 
     # Returns true if the Value's content is a date.
     def date?
@@ -240,7 +238,7 @@ module BibTeX
     def symbol?
       tokens.detect { |v| v.is_a?(Symbol) }
     end
-    alias has_symbol? symbol?
+    alias_method :has_symbol?, :symbol?
 
     # Returns all symbols contained in the Value.
     def symbols

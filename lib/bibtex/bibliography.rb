@@ -91,7 +91,7 @@ module BibTeX
     def_delegators :@data, :length, :size, :empty?
     def_delegators :@entries, :key?, :has_key?, :values_at
 
-    alias entries_at values_at
+    alias_method :entries_at, :values_at
 
     # Creates a new bibliography.
     def initialize(options = {})
@@ -119,8 +119,8 @@ module BibTeX
       self
     end
 
-    alias << add
-    alias push add
+    alias_method :<<, :add
+    alias_method :push, :add
 
 
     # Saves the bibliography to the current path.
@@ -187,8 +187,8 @@ module BibTeX
       objects.length == 1 ? objects[0] : objects
     end
 
-    alias remove delete
-    alias rm delete
+    alias_method :remove, :delete
+    alias_method :rm, :delete
 
 
     # call-seq:
@@ -274,14 +274,14 @@ module BibTeX
       self
     end
 
-    alias :replace_strings :replace
+    alias_method :replace_strings, :replace
 
     def join(filter = '')
       q(filter, &:join)
       self
     end
 
-    alias join_strings join
+    alias_method :join_strings, :join
 
     def rename(*arguments, &block)
       q('@entry') { |e| e.rename(*arguments, &block) }
@@ -489,7 +489,7 @@ module BibTeX
       send(query_handler(selector), &filter)
     end
 
-    alias q query
+    alias_method :q, :query
 
     def each_entry
       if block_given?
@@ -503,7 +503,7 @@ module BibTeX
       q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
     end
 
-    alias find_by_types find_by_type
+    alias_method :find_by_types, :find_by_type
 
     def <=>(other)
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
@@ -517,7 +517,7 @@ module BibTeX
       }.values.select { |d| d.length > 1 }
     end
 
-    alias duplicates select_duplicates_by
+    alias_method :duplicates, :select_duplicates_by
 
     def duplicates?
       !select_duplicates_by?.empty?

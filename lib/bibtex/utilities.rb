@@ -47,9 +47,9 @@ module BibTeX
       Names.parse(string)
     end
     
-    alias :name :names
-    alias :parse_name :names
-    alias :parse_names :names
+    alias_method :name, :names
+    alias_method :parse_name, :names
+    alias_method :parse_names, :names
     
   end
 

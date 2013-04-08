@@ -46,7 +46,7 @@ module BibTeX
 			self
 		end
 		
-    alias :v :value
+    alias_method :v, :value
     
   end
 end

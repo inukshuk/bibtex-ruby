@@ -21,9 +21,8 @@ module BibTeX
       value
     end
 
-    alias convert apply
-    alias << apply
-
+    alias_method :convert, :apply
+    alias_method :<<, :apply
   end
 
   module Filters
