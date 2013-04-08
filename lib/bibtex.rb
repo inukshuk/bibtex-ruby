@@ -19,8 +19,6 @@
 require 'digest/md5'
 require 'forwardable'
 require 'logger'
-require 'open-uri'
-
 require 'bibtex/version'
 
 # = BibTeX
