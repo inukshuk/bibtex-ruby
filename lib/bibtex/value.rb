@@ -22,6 +22,12 @@ require 'forwardable'
 
 module BibTeX
 
+  class Symbol < ::String
+    def inspect
+      to_s
+    end
+  end
+
   #
   # A BibTeX Value is something very much like a string. In BibTeX files it
   # can appear on the right hand side of @string or @entry field assignments
@@ -97,14 +103,12 @@ module BibTeX
       case argument
       when Value
         @tokens += argument.tokens.dup
+      when ::Symbol
+        @tokens << Symbol.new(argument.to_s)
       when ::String, Symbol
         @tokens << argument
       else
-        if argument.respond_to?(:to_s)
-          @tokens << argument.to_s
-        else
-          raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
-        end
+        @tokens << argument.to_s
       end
       self
     end
@@ -185,7 +189,7 @@ module BibTeX
     # joined by a '#', additionally, all string tokens will be turned into
     # string literals (i.e., delimitted by quotes).
     def value
-      atomic? ? @tokens[0] : @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
+      atomic? ? @tokens[0] : @tokens.map(&:inspect).join(' # ')
     end
 
     alias :v :value
@@ -236,7 +240,6 @@ module BibTeX
     def symbol?
       tokens.detect { |v| v.is_a?(Symbol) }
     end
-
     alias has_symbol? symbol?
 
     # Returns all symbols contained in the Value.

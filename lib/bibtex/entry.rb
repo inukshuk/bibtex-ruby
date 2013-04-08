@@ -460,7 +460,7 @@ module BibTeX
     #
     # @see #field_names
     #
-    # @param [<Symbol>] the field names to use
+    # @param [<String>] the field names to use
     # @return [String] the digest string
     def digest(filter = [])
       names = field_names(filter)

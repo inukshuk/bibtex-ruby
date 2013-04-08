@@ -227,7 +227,7 @@ Racc_token_to_s_table = [
   "content",
   "string_value",
   "string_assignment",
-  "string_literal",
+  "symbol",
   "entry_head",
   "assignments",
   "opt_key",
@@ -375,7 +375,7 @@ module_eval(<<'.,.,', 'bibtex.y', 59)
 
 module_eval(<<'.,.,', 'bibtex.y', 61)
   def _reduce_20(val, _values, result)
-     result = val[0].downcase.to_sym 
+     result = BibTeX::Symbol.new(val[0].downcase) 
     result
   end
 .,.,

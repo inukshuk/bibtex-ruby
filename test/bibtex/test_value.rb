@@ -95,13 +95,13 @@ module BibTeX
       before do
         class Upcase < BibTeX::Filter
           def apply(value)
-            value.is_a?(::String) ? value.upcase : value
+            BibTeX::Symbol === value ? value : value.upcase
           end
         end
         
         class SuffixA < BibTeX::Filter
           def apply(value)
-            value.is_a?(::String) ? "#{value}a" : value
+            BibTeX::Symbol === value ? value : "#{value}a"
           end
         end
         

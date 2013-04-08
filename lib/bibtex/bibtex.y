@@ -56,12 +56,12 @@ rule
 
   string_assignment : NAME EQ string_value         { result = [val[0].downcase, val[2]] }
 
-  string_value : string_literal                    { result = [val[0]] }
-               | string_value SHARP string_literal { result << val[2] }
+  string_value : symbol                    { result = [val[0]] }
+               | string_value SHARP symbol { result << val[2] }
 
-  string_literal : NAME                            { result = val[0].downcase.to_sym }
-                 | LBRACE content RBRACE           { result = val[1] }
-                 | STRING_LITERAL                  { result = val[0] }
+  symbol : NAME                            { result = BibTeX::Symbol.new(val[0].downcase) }
+         | LBRACE content RBRACE           { result = val[1] }
+         | STRING_LITERAL                  { result = val[0] }
 
   entry : entry_head assignments RBRACE            { result = val[0] << val[1] }
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }

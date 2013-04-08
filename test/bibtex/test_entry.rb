@@ -164,28 +164,28 @@ module BibTeX
         @entry = Entry.new
       end
 
-      [[:jan,'January'], [:feb,'February'], [:sep,'September']].each do |m|
+      [%w(jan January), %w(feb February), %w(sep September)].each do |m|
         it 'should convert english months' do
           @entry.month = m[1]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
       end
 
-      [[:jan,:jan], [:feb,:feb], [:sep,:sep]].each do |m|
+      [%w(jan jan), %w(feb feb), %w(sep sep)].each do |m|
         it 'should convert bibtex abbreviations' do
           @entry.month = m[1]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
       end
 
-      [[:jan,1], [:feb,2], [:sep,9]].each do |m|
+      [['jan',1], ['feb',2], ['sep',9]].each do |m|
         it 'should convert numbers' do
           @entry.month = m[1]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
         it 'should convert numbers when parsing' do
           @entry = Entry.parse("@misc{id, month = #{m[1]}}")[0]
-          assert_equal m[0], @entry.month.v
+          assert_equal BibTeX::Symbol.new(m[0]), @entry.month.v
         end
       end
 

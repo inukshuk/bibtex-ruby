@@ -93,7 +93,7 @@ module BibTeX
       return true if query.nil? || query.respond_to?(:empty?) && query.empty?
 
       case query
-      when Symbol
+      when ::Symbol
         query.to_s == id.to_s
       when Element
         query == self
