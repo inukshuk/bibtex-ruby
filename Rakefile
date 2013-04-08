@@ -50,7 +50,6 @@ task :racc => %w(lib/bibtex/parser.rb lib/bibtex/name_parser.rb)
 
 task :test => %w(racc test_task)
 
-file 'lib/bibtex/parser.output' => 'lib/bibtex/parser.rb'
 file 'lib/bibtex/parser.rb' => 'lib/bibtex/bibtex.y' do
   # sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
   sh 'bundle exec racc -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
@@ -106,8 +105,4 @@ task :release => ['build'] do
   system "gem push bibtex-ruby-#{BibTeX::Version::STRING}.gem"
 end
 
-CLEAN.include('lib/bibtex/parser.rb')
-CLEAN.include('lib/bibtex/parser.output')
-CLEAN.include('lib/bibtex/name_parser.rb')
-CLEAN.include('lib/bibtex/name_parser.output')
 CLEAN.include('*.gem')
