@@ -10,10 +10,10 @@ group :debug do
 end
 
 group :test do
-	gem 'minitest'
-#	gem 'minitest-colorize'
+	gem 'minitest', '~>4.0'
+  gem 'minitest-colorize'
   gem 'cucumber', ['~>1.0']
-  gem 'unicode', :platforms => [:mri, :rbx, :mswin, :mingw]
+  gem 'unicode', :platforms => [:rbx, :mswin, :mingw, :mri_19, :mri_20]
 end
 
 group :extra do

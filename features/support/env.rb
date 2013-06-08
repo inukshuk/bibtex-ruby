@@ -11,7 +11,7 @@ rescue LoadError
 end
 
 require 'bibtex'
-require 'minitest/unit'
+require 'minitest/autorun'
 
 World do
   extend Minitest::Assertions
