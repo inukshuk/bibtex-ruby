@@ -11,7 +11,7 @@ end
 
 group :test do
 	gem 'minitest'
-	gem 'minitest-colorize'
+#	gem 'minitest-colorize'
   gem 'cucumber', ['~>1.0']
   gem 'unicode', :platforms => [:mri, :rbx, :mswin, :mingw]
 end
