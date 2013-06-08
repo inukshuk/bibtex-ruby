@@ -3,7 +3,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class EntryTest < MiniTest::Spec
+  class EntryTest < Minitest::Spec
 
     describe 'a new entry' do
       it "won't be nil" do

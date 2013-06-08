@@ -1,7 +1,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class ValueTest < MiniTest::Spec
+  class ValueTest < Minitest::Spec
 
     describe "::create" do
       it "should return a duplicate when called with a Value subclass" do

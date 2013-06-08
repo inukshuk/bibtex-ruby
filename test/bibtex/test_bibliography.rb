@@ -4,7 +4,7 @@ require 'helper'
 
 module BibTeX
 
-  class BibliographyTest < MiniTest::Spec
+  class BibliographyTest < Minitest::Spec
 
     describe 'when newly created' do
       it 'should not be nil' do

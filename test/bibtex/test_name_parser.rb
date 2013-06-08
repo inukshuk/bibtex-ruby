@@ -1,7 +1,7 @@
 require 'helper'
 
 module BibTeX
-  class NameParserTest < MiniTest::Spec
+  class NameParserTest < Minitest::Spec
 
     describe "parse a number of entries having a 'van' or 'van den' name prefix" do
       before do

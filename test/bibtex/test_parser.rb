@@ -1,7 +1,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class ParserTest < MiniTest::Spec
+  class ParserTest < Minitest::Spec
     
     describe 'given a set of valid @entries' do
       before do

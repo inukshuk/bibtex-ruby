@@ -1,7 +1,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class FiltersTest < MiniTest::Spec
+  class FiltersTest < Minitest::Spec
     
     it "should Filters should be singleton classes" do
       assert_equal false, Filter.respond_to?(:new)

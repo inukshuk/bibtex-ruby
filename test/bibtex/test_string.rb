@@ -1,7 +1,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class StringTest < MiniTest::Spec
+  class StringTest < Minitest::Spec
 
     describe 'when parsing a simple string' do
       before do

@@ -3,7 +3,7 @@
 require 'helper'
 
 module BibTeX
-  class NamesTest < MiniTest::Spec
+  class NamesTest < Minitest::Spec
     
     before do
       @poe = Name.new(:first => 'Edgar Allen', :last => 'Poe')

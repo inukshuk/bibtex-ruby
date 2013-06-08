@@ -2,7 +2,7 @@ require 'helper'
 
 module BibTeX
   
-  class ElementTest < MiniTest::Spec
+  class ElementTest < Minitest::Spec
     
     describe '.parse' do
       
@@ -26,7 +26,7 @@ module BibTeX
     
   end
 
-  class PreambleTest < MiniTest::Spec
+  class PreambleTest < Minitest::Spec
     
     describe 'a new preamble instance' do
       before do

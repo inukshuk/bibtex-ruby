@@ -14,5 +14,5 @@ require 'bibtex'
 require 'minitest/unit'
 
 World do
-  extend MiniTest::Assertions
+  extend Minitest::Assertions
 end
