@@ -48,6 +48,13 @@ module BibTeX
         assert bib[:"George Martin06"]
       end
 
+      it 'handles plus symbols in keys' do
+        input = "@Misc{foo+bar,title = {Foobar}}"
+        bib = Parser.new(:debug => false, :strict => false).parse(input)
+        assert_equal "foo+bar", bib.first.key
+        assert bib[:"foo+bar"]
+      end
+
       it 'fails when there is no cite-key' do
         input = "@misc{title = {Crime and Punishment}}"       
         assert_raises ParseError do
