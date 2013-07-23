@@ -134,7 +134,7 @@ conveniently access an entry's fields, similar to **ActiveRecord::Base**.
 Therefore, it is equally possible to access the 'author' field above as
 `b[:pickaxe].author`.
 
-BibTeX-Ruby wraps all values of fields in an entry are wrapped in Value
+BibTeX-Ruby wraps all values of fields in an entry in Value
 objects. This is necessary to transparently handle different types of values
 (e.g., strings, dates, names etc.). These Value objects are designed to be
 hardly discernible from regular Ruby strings, however, if you ever run into a
