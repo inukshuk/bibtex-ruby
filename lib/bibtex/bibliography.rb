@@ -513,6 +513,10 @@ module BibTeX
       arguments = [:year, :title] if arguments.empty?
 
       group_by(*arguments) { |digest|
+
+        # 1.8 compatibility
+        digest = digest[0] if digest.is_a?(Array)
+
         digest.gsub(/\s+/, '').downcase
       }.values.select { |d| d.length > 1 }
     end

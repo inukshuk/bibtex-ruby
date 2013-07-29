@@ -1,10 +1,9 @@
 begin
-  if RUBY_VERSION > '1.8'
+  if RUBY_VERSION >= '1.9'
     require 'debugger'
     require 'simplecov'
   else
-    require 'ruby-debug'
-    Debugger.start
+    # require 'debug'
   end  
 rescue LoadError
   # ignore
