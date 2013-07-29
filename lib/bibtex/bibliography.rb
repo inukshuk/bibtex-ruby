@@ -520,7 +520,7 @@ module BibTeX
     alias duplicates select_duplicates_by
 
     def duplicates?
-      !select_duplicates_by?.empty?
+      !select_duplicates_by.empty?
     end
 
 
