@@ -12,3 +12,5 @@ lib/bibtex/name_parser.rb
 lib/bibtex/name_parser.output
 Gemfile.lock
 coverage
+
+.DS_Store
