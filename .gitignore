@@ -14,5 +14,5 @@ Gemfile.lock
 coverage
 
 .DS_Store
-.ruby_version
+.ruby-version
 
