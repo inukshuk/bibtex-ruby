@@ -267,6 +267,18 @@ module BibTeX
 
       end
 
+      describe 'duplicates' do
+
+        it 'understands select_duplicates_by' do
+          assert_equal 1, @bib.select_duplicates_by.length
+        end
+
+        it 'understands duplicates?' do
+          assert @bib.duplicates?
+        end
+
+      end
+
       describe 'given a filter' do
         before do
           @filter = Object
