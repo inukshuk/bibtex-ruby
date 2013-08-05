@@ -107,7 +107,12 @@ module BibTeX
       @errors = other.errors.dup
       @data, @strings = [], {}
       @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
-      add(other.data)
+
+      other.each do |element|
+        add element.dup
+      end
+
+      self
     end
 
     # Adds a new element, or a list of new elements to the bibliography.
@@ -561,6 +566,12 @@ module BibTeX
       end
 
       self
+    end
+
+    # Experimental!
+    # Returns a new Bibliography with all duplicates removed.
+    def uniq(*arguments, &block)
+      dup.uniq!
     end
 
     private
