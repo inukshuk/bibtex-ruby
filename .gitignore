@@ -6,9 +6,7 @@
 doc/**/*
 .yardoc
 .bundle
-lib/bibtex/parser.rb
 lib/bibtex/parser.output
-lib/bibtex/name_parser.rb
 lib/bibtex/name_parser.output
 Gemfile.lock
 coverage
