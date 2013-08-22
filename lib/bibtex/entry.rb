@@ -720,10 +720,18 @@ module BibTeX
     end
 
     def issued
-      m = MONTHS.find_index(fields[:month].to_s.intern) unless !has_field?(:month)
-      m = m + 1 unless m.nil?
+      return unless has_field?(:year)
+      
+      parts = [fields[:year].to_s]
 
-      Hash['date-parts', [[fields[:year],m].compact.map(&:to_i)]]
+      return { 'literal' => parts[0] } unless parts[0] =~ /^\d+$/
+
+      if has_field?(:month)
+        parts.push MONTHS.find_index(fields[:month].to_s.intern)
+        parts[1] = parts[1] + 1 unless parts[1].nil?
+      end
+
+      { 'date-parts' => [parts.compact.map(&:to_i)] }
     end
 
     alias citeproc_date issued
