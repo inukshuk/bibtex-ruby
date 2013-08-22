@@ -107,7 +107,12 @@ module BibTeX
       @errors = other.errors.dup
       @data, @strings = [], {}
       @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
-      add(other.data)
+
+      other.each do |element|
+        add element.dup
+      end
+
+      self
     end
 
     # Adds a new element, or a list of new elements to the bibliography.
@@ -511,18 +516,63 @@ module BibTeX
 
     def select_duplicates_by(*arguments)
       arguments = [:year, :title] if arguments.empty?
+      block = Proc.new if block_given?
 
-      group_by(*arguments) { |digest|
+      group_by(*arguments) { |digest, entry|
+
+        # 1.8 compatibility
+        # digest = digest[0] if digest.is_a?(Array)
+
         digest.gsub(/\s+/, '').downcase
+        digest = block.call(disgest, entry) unless block.nil?
+        digest
+
       }.values.select { |d| d.length > 1 }
     end
 
     alias duplicates select_duplicates_by
 
     def duplicates?
-      !select_duplicates_by?.empty?
+      !select_duplicates_by.empty?
     end
 
+    # call-seq:
+    #   bib.uniq!                                 -> bib
+    #   bib.uniq!(:title, :year)                  -> bib
+    #   bib.uniq! { |digest, entry| ... }         -> bib
+    #   bib.uniq!(:title) { |digest, entry| ... } -> bib
+    #
+    # Removes duplicate entries from the Bibliography.
+    #
+    # All arguments given will be used to calculate a digest
+    # for each entry. If a block is given, it will be be passed
+    # the computed digest as well as each entry; the block
+    # must then yield the final digest that will be used to
+    # compute duplicates.
+    #
+    # This method will always retain the first entry and will
+    # discard subsequent duplicates on the basis of each entry's
+    # digest.
+    #
+    # @see Entry#digest
+    # @see @duplicates_by
+    #
+    def uniq!(*arguments, &block)
+      select_duplicates_by(*arguments, &block).each do |dupes|
+        dupes.shift
+        dupes.each do |dupe|
+          self.remove dupe
+        end
+      end
+
+      self
+    end
+
+    # Experimental!
+    # Returns a new Bibliography with all duplicates removed.
+    def uniq(*arguments, &block)
+      dup.uniq!
+    end
 
     private
 

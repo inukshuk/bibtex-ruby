@@ -85,7 +85,7 @@ desc 'Updates the Manifest file'
 task :manifest => ['clean', 'racc'] do
   m = File.open('Manifest', 'w')
   m.print FileList['**/*'].reject{ |f|
-    f.start_with?('coverage') || f.end_with?('rbc')
+    f.start_with?('coverage') || f =~ /(rbc|swp|~|lock)$/
   }.join("\n")
   m.close
 end

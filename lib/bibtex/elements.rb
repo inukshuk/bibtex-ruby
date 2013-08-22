@@ -151,6 +151,10 @@ module BibTeX
     end
 
     def to_json(options = {})
+      # Some JSON implementations pass an argument
+      # to this method.
+      options = {} unless options.is_a?(::Hash)
+
       MultiJson.dump(to_hash(options))
     end
 

@@ -150,6 +150,18 @@ module BibTeX
 
     end
     
+    describe 'year values' do
+      it 'parses non-numeric year literals' do
+        assert_equal 'to appear',
+          Parser.new.parse("@article{x,  year = {to appear}}")['x'].year.to_s
+      end
+
+      it 'parses numeric year literals' do
+        assert_equal 1993,
+          Parser.new.parse("@article{x,  year = { 1993 }}")['x'].year.to_i
+      end
+    end
+
     describe 'given an entry with missing commas between fields' do
       before do
         @level = BibTeX.log.level

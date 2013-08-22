@@ -267,6 +267,49 @@ module BibTeX
 
       end
 
+      describe 'duplicates' do
+
+        it 'understands select_duplicates_by' do
+          assert_equal 1, @bib.select_duplicates_by.length
+        end
+
+        it 'understands duplicates?' do
+          assert @bib.duplicates?
+        end
+
+      end
+
+      describe '#uniq!' do
+        before do
+          @a = BibTeX.parse <<-END
+            @book{b1,
+              title = {FOO},
+              year = {2013},
+              author = {Doe, John}}
+            @book{b2,
+              title = {BAR},
+              year = {2013},
+              author = {Doe, John}}
+          END
+          @b = BibTeX.parse <<-END
+            @book{b3,
+              title = {FOO},
+              year = {2013},
+              author = {Doe, Jane}}
+          END
+        end
+
+        it 'returns the bibliography unchanged if there are no duplicates' do
+          assert @a.length == @a.uniq!.length
+          assert @b.length == @b.uniq!.length
+        end
+
+        it 'removes duplicate entries and returns the bibliography' do
+          assert @a.length > @a.uniq!(:author).length
+        end
+
+      end
+
       describe 'given a filter' do
         before do
           @filter = Object
