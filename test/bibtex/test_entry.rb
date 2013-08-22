@@ -269,6 +269,11 @@ module BibTeX
         assert_equal 'Melville', e['author'][0]['family']
       end
 
+      it 'support literal dates in citeproc export' do
+        @entry.year = 'Test'
+        assert_equal({ :literal => 'Test' }, @entry.issued)
+      end
+
       describe 'given a filter object or a filter name' do
         before do
           @filter = Object.new
