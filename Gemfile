@@ -4,6 +4,8 @@ gemspec
 # RDF Export
 gem 'rdf', '~>0.3'
 
+gem 'iconv'
+
 group :debug do
 	gem 'debugger', :require => false, :platforms => [:mri_19, :mri_20]
 	gem 'ruby-debug', :require => false, :platforms => [:mri_18]
