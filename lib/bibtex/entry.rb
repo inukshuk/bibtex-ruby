@@ -862,17 +862,12 @@ module BibTeX
 
 
     private
-    
-    # Returns +str+ transliterated containing only ASCII characters.
-    def transliterate(str)
-      (@iconv ||= Iconv.open('ascii//translit//ignore', 'utf-8')).iconv(str)
-    end
 
     # Returns a default key for this entry.
     def default_key
       k = names[0]
       k = k.respond_to?(:family) ? k.family : k.to_s
-      k = transliterate(k)
+      k = BibTeX.transliterate(k)
       k = k[/[A-Za-z]+/] || 'unknown'
       k << (has_field?(:year) ? year : '-')
       k << 'a'
