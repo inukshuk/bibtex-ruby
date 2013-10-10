@@ -30,6 +30,26 @@ When /^I convert all entries using the filter "([^"]*)"$/ do |filter|
   @bibliography.convert(filter)
 end
 
+When /^I create an entry with these elements:$/ do |table|
+  @bibliography = BibTeX::Bibliography.new
+  entry = BibTeX::Entry.new
+  table.hashes.first.each_pair do |field, value|
+    entry[field.to_sym] = value
+  end
+  @bibliography << entry.parse_names
+end
+
+When /^I create entries with these elements:$/ do |table|
+  @bibliography = BibTeX::Bibliography.new
+  table.hashes.each do |entries|
+    entry = BibTeX::Entry.new
+    entries.each_pair do |field, value|
+      entry[field.to_sym] = value
+    end
+    @bibliography << entry.parse_names
+  end
+end
+
 
 Then /^my bibliography should contain the following objects:$/ do |table|
   @bibliography.each_with_index do |object, index|
