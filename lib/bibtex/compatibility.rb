@@ -21,7 +21,7 @@ module BibTeX
   begin
     require 'iconv'
 
-    @iconv = Iconv.open('ascii//translit//ignore', 'utf-8')
+    @iconv = Iconv.new('ascii//translit//ignore', 'utf-8')
 
     def self.transliterate(str)
       @iconv.iconv(str)
@@ -35,5 +35,4 @@ module BibTeX
       str.gsub(/[äöüÄÖÜß]/, @iconv_replacements)
     end
   end
-  
 end

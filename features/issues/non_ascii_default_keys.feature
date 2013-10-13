@@ -7,12 +7,12 @@ Feature: Parse BibTeX files and convert LaTeX to Unicode
 		When I create an entry with these elements:
 			| type | author           | title | location | year |
 			| book | Christian Müller | Title | Berlin   | 2013 |
-		Then my bibliography should contain an entry with key "mueller2013a"
+		Then my bibliography should contain an entry with a key like "mu.?ller2013a"
 
 	Scenario: Multiple entries with an author whose name contains non-ASCII characters
 		When I create entries with these elements:
 			| type | author           | title        | location | year |
 			| book | Christian Müller | First Title  | Berlin   | 2013 |
 			| book | Christian Müller | Second Title | Berlin   | 2013 |
-		Then my bibliography should contain an entry with key "mueller2013a"
-		And my bibliography should contain an entry with key "mueller2013b"
+		Then my bibliography should contain an entry with a key like "mu.?ller2013a"
+		And my bibliography should contain an entry with a key like "mu.?ller2013b"
