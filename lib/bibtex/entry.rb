@@ -868,7 +868,7 @@ module BibTeX
       k = names[0]
       k = k.respond_to?(:family) ? k.family : k.to_s
       k = BibTeX.transliterate(k)
-      k = k[/[A-Za-z]+/] || 'unknown'
+      k = k[/[A-Za-z-]+/] || 'unknown'
       k << (has_field?(:year) ? year : '-')
       k << 'a'
       k.downcase!

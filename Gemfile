@@ -19,8 +19,8 @@ end
 
 group :extra do
 	gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
-	gem 'guard-minitest'
-	gem 'guard-cucumber'
+	gem 'guard-minitest', :platforms => [:ruby_20]
+	gem 'guard-cucumber', :platforms => [:ruby_20]
 	gem 'redcarpet', :platforms => [:rbx, :mri_20, :mri_19]
 end
 
