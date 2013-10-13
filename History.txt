@@ -1,3 +1,8 @@
+2.3.5 / 2013-10-13
+==================
+
+* Added transliteration support to default key generator (@cruessler)
+
 2.3.4 / 2013-08-22
 ==================
 
