@@ -34,5 +34,5 @@ group :development do
   gem 'rake'
   gem 'racc'
   gem 'yard'	
-  gem 'iconv'
+  gem 'iconv', :platforms => [:ruby_20]
 end
