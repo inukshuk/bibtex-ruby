@@ -46,8 +46,8 @@ module BibTeX
       :braces       => /\{|\}/o,
       :eq           => /\s*=\s*/o,
       :comma        => /\s*,\s*/o,
-      :number       => /\d+/o,
-      :name         => /[[:alpha:]\d\/:_!$\?\.%&\*-]+/io,
+      :number       => /[[:digit:]]+/o,
+      :name         => /[[:alpha:][:digit:]\/:_!$\?\.%&\*-]+/io,
       :quote        => /\s*"/o,
       :unquote      => /[\{\}"]/o,
       :sharp        => /\s*#\s*/o,
@@ -59,8 +59,8 @@ module BibTeX
       :string       => /string/io,
       :comment      => /comment\b/io,
       :preamble     => /preamble\b/io,
-      :key          => /\s*[[:alpha:]\d \/:_!$\?\.%+&\*-]+,/io,
-      :optional_key => /\s*[[:alpha:]\d \/:_!$\?\.%+&\*-]*,/io
+      :key          => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+&\*-]+,/io,
+      :optional_key => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+&\*-]*,/io
     }.freeze
     
     MODE = Hash.new(:meta).merge({
