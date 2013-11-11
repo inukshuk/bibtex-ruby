@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'helper.rb'
 
 module BibTeX
@@ -19,6 +21,10 @@ module BibTeX
 
     it 'matches KEY tokens' do
       Lexer.new.analyse("@misc{foo, }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
+    end
+
+    it 'matches KEY tokens with non-ascii characters' do
+      Lexer.new.analyse("@misc{löwe, }").symbols.must_be :==, [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
     end
 
     it 'matches KEY tokens after whitespace' do
