@@ -377,8 +377,13 @@ module BibTeX
       groups
     end
 
-    def sort(*arguments, &block)
-      data.sort(*arguments, &block)
+    def sort!(*arguments, &block)
+      data.sort!(*arguments, &block)
+      self
+    end
+
+    def sort_by!(*arguments, &block)
+      data.sort_by!(*arguments, &block)
       self
     end
 
