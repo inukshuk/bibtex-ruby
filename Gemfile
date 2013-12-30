@@ -32,7 +32,7 @@ end
 
 group :development do
   gem 'rake'
-  gem 'racc'
+  gem 'racc', :platforms => [:mri_20, :mri_19]
   gem 'yard'	
   gem 'iconv', :platforms => [:ruby_20]
 end
