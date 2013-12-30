@@ -19,6 +19,8 @@ features/issues/crossref.feature
 features/issues/latex_filter.feature
 features/issues/multiline_strings.feature
 features/issues/name_parsing.feature
+features/issues/non_ascii_default_keys.feature
+features/issues/non_ascii_keys.feature
 features/issues/number_keys.feature
 features/issues/parse_months.feature
 features/issues/slash_keys.feature
