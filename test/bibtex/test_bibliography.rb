@@ -329,6 +329,60 @@ module BibTeX
 
       end
 
+      describe 'sorting' do
+
+        before do 
+          @small_bib = BibTeX.parse <<-END
+        @book{flanagan2008,
+          title={{The ruby programming language}},
+          author={Flanagan, D. and Matsumoto, Y.},
+          keywords = {ruby},
+          year={2008},
+          publisher={O'Reilly}
+        }
+        @book{rails,
+          address = {Raleigh, North Carolina},
+          author = {Ruby, Sam, and Thomas, Dave, and Hansson Heinemeier, David},
+          booktitle = {Agile Web Development with Rails},
+          edition = {third},
+          keywords = {ruby, rails},
+          publisher = {The Pragmatic Bookshelf},
+          series = {The Facets of Ruby},
+          title = {Agile Web Development with Rails},
+          year = {2009}
+        }
+        @article{segaran2007,
+          title={{Programming collective intelligence}},
+          author={Segaran, T.},
+          year={2007},
+          publisher={O'Reilly}
+        }
+        END
+      end
+
+        it 'can be sorted destructively' do
+          @small_bib.sort!         
+          @small_bib.map(&:key).must_equal [ 'segaran2007', 'flanagan2008', 'rails']
+        end
+
+        it 'can be sorted by field destructively' do
+          @small_bib.sort_by! { |e| -e[:year].to_i }
+          @small_bib.map(&:key).must_equal [  'rails', 'flanagan2008', 'segaran2007' ]
+        end
+
+        it 'can be sorted non-destructively' do
+          sorted_entries = @small_bib.sort
+          sorted_entries.map(&:key).must_equal [ 'segaran2007', 'flanagan2008', 'rails']
+          @small_bib.map(&:key).must_equal [  'flanagan2008', 'rails', 'segaran2007']
+        end
+
+        it 'can be sorted by field non-destructively' do
+          sorted_entries = @small_bib.sort_by { |e| -e[:year].to_i }
+          sorted_entries.map(&:key).must_equal [  'rails', 'flanagan2008', 'segaran2007' ]
+          @small_bib.map(&:key).must_equal [  'flanagan2008', 'rails', 'segaran2007']
+        end
+      end
+
       describe 'LaTeX filter' do
         before do
           @bib['rails'].keywords = 'r\\"uby'
