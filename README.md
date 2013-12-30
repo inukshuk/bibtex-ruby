@@ -97,11 +97,15 @@ Save a bibliography to a file:
 
 Compatibility
 -------------
-The BibTeX-Ruby gem has been developed and tested on Ruby 1.8 and 1.9; it has
-been confirmed to work with JRuby, Rubinius, and REE, however, there have
-been repeated [issues](https://github.com/inukshuk/bibtex-ruby/issues)
+The BibTeX-Ruby gem has been developed and tested on Ruby 2.x, 1.9.3, and 1.8;
+it has been confirmed to work with JRuby, Rubinius, and REE, however, there
+have been repeated [issues](https://github.com/inukshuk/bibtex-ruby/issues)
 (performance mostly) with MacRuby caused by MacRuby's current StringScanner
 implementation.
+
+Starting with BibTeX-Ruby version 3.0, support for Ruby versions 1.9.2 and
+earlier has been dropped; most features will likely continue to work, but
+compliance with old Rubies is not a priority going forward.
 
 
 Documentation
