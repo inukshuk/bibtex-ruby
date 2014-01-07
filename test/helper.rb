@@ -6,7 +6,6 @@ end
 
 begin
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
-    require 'rubysl-test-unit'
     require 'rubinius-debugger'
   else
     require 'debugger'
@@ -16,7 +15,8 @@ rescue LoadError
 end
 
 require 'minitest/autorun'
-require 'minitest/colorize'
+require 'minitest/rg'
+
 require 'tempfile'
 
 require 'bibtex'

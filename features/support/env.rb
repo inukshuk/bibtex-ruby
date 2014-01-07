@@ -6,7 +6,6 @@ end
 
 begin
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
-    require 'rubysl-test-unit'
     require 'rubinius-debugger'
   else
     require 'debugger'
@@ -16,8 +15,17 @@ rescue LoadError
 end
 
 require 'bibtex'
-require 'minitest/autorun'
+require 'minitest'
 
-World do
-  extend Minitest::Assertions
+module Cucumber
+  module MiniTestAssertions
+    def self.extended(base)
+      base.extend(MiniTest::Assertions)
+      base.assertions = 0
+    end
+
+    attr_accessor :assertions
+  end
 end
+
+World(Cucumber::MiniTestAssertions)
