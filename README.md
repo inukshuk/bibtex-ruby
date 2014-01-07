@@ -64,7 +64,7 @@ look the same in their `#sort_order(:initials => true)` form.
 Unify certain fields across the bibliography:
 
     b.unify :publisher, /o'?reilly/i, "O'Reilly"
-    
+
     b.unify :publisher, /^penguin/i do |entry|
       entry.publisher = 'Penguin Books'
       entry.address = 'London'
