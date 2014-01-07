@@ -3,7 +3,7 @@ require 'helper.rb'
 require 'yaml'
 
 module BibTeX
-  class TestString < Minitest::Unit::TestCase
+  class TestString < Minitest::Test
 
     # def test_yaml_roundtrip
     #   b1 = BibTeX.open(Test.fixtures(:bibdesk))

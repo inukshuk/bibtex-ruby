@@ -18,9 +18,9 @@ require 'bibtex'
 require 'minitest'
 
 module Cucumber
-  module MiniTestAssertions
+  module MinitestAssertions
     def self.extended(base)
-      base.extend(MiniTest::Assertions)
+      base.extend(Minitest::Assertions)
       base.assertions = 0
     end
 
@@ -28,4 +28,4 @@ module Cucumber
   end
 end
 
-World(Cucumber::MiniTestAssertions)
+World(Cucumber::MinitestAssertions)
