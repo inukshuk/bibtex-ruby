@@ -1,6 +1,6 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010-2013	Sylvester Keil <sylvester.keil.or.at>
+# Copyright (C) 2010-2014	Sylvester Keil <sylvester.keil.or.at>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ require 'bibtex/version'
 # +Preamble+, +Comment+, and +Entry+.
 #
 # Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
-# Copyright:: Copyright (c) 2010-2011 Sylvester Keil
+# Copyright:: Copyright (c) 2010-2014 Sylvester Keil
 # License:: GNU GPL 3.0
 #
 module BibTeX
