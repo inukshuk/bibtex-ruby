@@ -155,7 +155,7 @@ module BibTeX
       # to this method.
       options = {} unless options.is_a?(::Hash)
 
-      MultiJson.dump(to_hash(options))
+      ::JSON.dump(to_hash(options))
     end
 
     def to_xml(options = {})
