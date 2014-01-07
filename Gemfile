@@ -14,8 +14,9 @@ group :debug do
 end
 
 group :test do
-	gem 'minitest', '~>5.0'
-  gem 'minitest-rg'
+	gem 'minitest', '~>4.7', :require => false
+  gem 'rubysl-test-unit', '~>2.0', :platforms => :rbx
+  gem 'minitest-ansi'
   gem 'cucumber', '~>1.3'
   gem 'unicode', '~>0.4', :platforms => [:rbx, :mswin, :mingw, :mri_19, :mri_20, :mri_21]
 end

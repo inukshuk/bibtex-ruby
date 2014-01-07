@@ -1,7 +1,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class TestBibtex < Minitest::Test
+  class TestBibtex < Minitest::Unit::TestCase
   
     def setup
     end
