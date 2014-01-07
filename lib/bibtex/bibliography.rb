@@ -382,6 +382,10 @@ module BibTeX
       self
     end
 
+    def sort(*arguments, &block)
+      dup.sort!(*arguments, &block)
+    end
+
     def sort_by!(*arguments, &block)
       data.sort_by!(*arguments, &block)
       self

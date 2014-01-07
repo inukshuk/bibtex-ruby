@@ -4,6 +4,8 @@ gemspec
 gem 'rdf', '~>0.3'
 gem 'json', '~>1.8', :platforms => [:mri_18, :jruby, :rbx]
 
+gem 'rubysl', '~>2.0', :platforms => :rbx
+
 group :debug do
 	gem 'debugger', :require => false, :platforms => [:mri_19, :mri_20, :mri_21]
 	gem 'ruby-debug', :require => false, :platforms => [:mri_18]
@@ -16,6 +18,7 @@ group :test do
   gem 'minitest-colorize'
   gem 'cucumber', '~>1.3'
   gem 'unicode', '~>0.4', :platforms => [:rbx, :mswin, :mingw, :mri_19, :mri_20, :mri_21]
+  gem 'rubysl-test-unit', '~>2.0', :platforms => :rbx
 end
 
 group :extra do
@@ -32,6 +35,7 @@ group :profile do
 	gem 'ruby-prof', '~>0.14', :platforms => [:mri_19, :mri_20, :mri_21]
 	gem 'gnuplot', '~>2.4', :platforms => [:mri_19, :mri_20, :mri_21]
 	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby_21, :ruby_20]
+  gem 'rubinius-coverage', :require => false, :platforms => :rbx
 end
 
 group :development do

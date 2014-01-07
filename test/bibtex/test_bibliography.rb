@@ -361,7 +361,7 @@ module BibTeX
       end
 
         it 'can be sorted destructively' do
-          @small_bib.sort!         
+          @small_bib.sort!
           @small_bib.map(&:key).must_equal [ 'segaran2007', 'flanagan2008', 'rails']
         end
 

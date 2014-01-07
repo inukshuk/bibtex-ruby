@@ -1,10 +1,15 @@
-begin  
-  if RUBY_VERSION > '1.8'
-    require 'debugger'
-    require 'simplecov'
+begin
+  require 'simplecov'
+rescue LoadError
+  # ignore
+end
+
+begin
+  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
+    require 'rubysl-test-unit'
+    require 'rubinius-debugger'
   else
-    require 'ruby-debug'
-    Debugger.start
+    require 'debugger'
   end
 rescue LoadError
   # ignore
