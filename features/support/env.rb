@@ -7,6 +7,11 @@ end
 begin
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
     require 'rubinius-debugger'
+
+    # We currently need this for RBX to work
+    # but can't specify Gemfile dependency
+    # because of minitest 4/5 version mismatch!
+    require 'test/unit'
   else
     require 'debugger'
   end
