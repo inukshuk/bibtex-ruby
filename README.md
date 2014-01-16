@@ -450,7 +450,7 @@ constitutes a simple BibTeX to YAML converter:
     >> BibTeX.open('example.bib').to_yaml
 
 Starting with version 2.0, BibTeX-Ruby's `#to_xml` exports your bibliography
-to the [BibTeXML](http//bibtexml.sf.net/) format. By passing the option
+to the [BibTeXML](http://bibtexml.sf.net/) format. By passing the option
 `:extended => true` you can make use of the BibTeXML's extended format which
 will return individual person elements and name tokens (provided you have
 successfully parsed the names of your bibliography).
@@ -554,13 +554,13 @@ For more information about the BibTeX format and the parser's idiosyncrasies
 Contributing
 ------------
 The BibTeX-Ruby source code is
-[hosted on GitHub](http://github.com/inukshuk/bibtex-ruby/).
+[hosted on GitHub](https://github.com/inukshuk/bibtex-ruby/).
 You can check out a copy of the latest code using Git:
 
     $ git clone https://github.com/inukshuk/bibtex-ruby.git
 
 If you've found a bug or have a question, please open an issue on the
-[BibTeX-Ruby issue tracker](http://github.com/inukshuk/bibtex-ruby/issues).
+[BibTeX-Ruby issue tracker](https://github.com/inukshuk/bibtex-ruby/issues).
 For extra credit, clone the BibTeX-Ruby repository, write a failing
 example, or cucumber feature, fix the bug and submit a pull request (for
 useful examples, take a look at the cucumber features in the
