@@ -108,36 +108,6 @@ module BibTeX
       article        article-journal
     }.map(&:intern)]).freeze
 
-    BIBO_FIELDS = Hash[*%w{
-      pages      pages
-      number     issue
-      isbn       isbn
-      issn       issn
-      doi        doi
-      edition    edition
-      abstract   abstract
-      volume     volume
-    }.map(&:intern)].freeze
-
-    BIBO_TYPES = Hash.new(:Document).merge(Hash[*%w{
-      booklet        Book
-      book           Book
-      conference     Conference
-      inbook         Article
-      incollection   Article
-      inproceedings  Article
-      manual         Manual
-      mastersthesis  Thesis
-      phdthesis      Thesis
-      proceedings    Proceedings
-      techreport     Report
-      journal        Journal
-      periodical     Periodical
-      unpublished    Manuscript
-      article        Article
-    }.map(&:intern)]).freeze
-
-
     attr_reader :fields, :type
 
     def_delegators :@fields, :empty?
@@ -761,105 +731,10 @@ module BibTeX
     end
 
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
-    # TODO: improve level of detail captured by export
     def to_rdf(options = {})
-      require 'rdf'
-
-      bibo = RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
-
-      graph = RDF::Graph.new
-      entry = RDF::URI.new(identifier)
-
-      graph << [entry, RDF.type, bibo[BIBO_TYPES[type]]]
-
-      [:title, :language].each do |key|
-        graph << [entry, RDF::DC[key], get(key).to_s] if field?(key)
-      end
-
-      graph << [entry, RDF::DC.date, get(:year).to_s] if field?(:year)
-
-      if field?(:publisher)
-        address = RDF::Vocabulary.new('http://schemas.talis.com/2005/address/schema#')
-        pub = RDF::Node.new
-
-        graph << [pub, RDF.type, RDF::FOAF[:Organization]]
-        graph << [pub, RDF::FOAF.name, get(:publisher)]
-
-        graph << [pub, address[:localityName], get(:address)] if field?(:address)
-
-        graph << [entry, RDF::DC.published, pub]
-      end
-
-      [:doi, :edition, :volume].each do |key|
-        graph << [entry, bibo[key], get(key).to_s] if field?(key)
-      end
-
-      if has_field?(:pages)
-        if get(:pages).to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
-          graph << [entry, bibo[:pageStart], $1]
-          graph << [entry, bibo[:pageEnd], $2]
-        else
-          graph << [entry, bibo[:pages], get(:pages).to_s]
-        end
-      end
-
-      if has_field?(:author)
-        seq = RDF::Node.new
-
-        graph << [seq, RDF.type, RDF[:Seq]]
-        graph << [entry, bibo[:authorList], seq]
-
-        authors.each do |author|
-          a = RDF::Node.new
-
-          graph << [a, RDF.type, RDF::FOAF[:Person]]
-
-          if author.is_a?(Name)
-            [:given, :family, :prefix, :suffix].each do |part|
-              graph << [a, bibo["#{part}Name"], author.send(part).to_s]
-            end
-          else
-            graph << [a, RDF::FOAF.name, author.to_s]
-          end
-
-          graph << [entry, RDF::DC.creator, a]
-          graph << [seq, RDF.li, a]
-        end
-      end
-
-      if has_field?(:editor)
-        seq = RDF::Node.new
-
-        graph << [seq, RDF.type, RDF[:Seq]]
-        graph << [entry, bibo[:editorList], seq]
-
-        editors.each do |editor|
-          e = RDF::Node.new
-
-          graph << [e, RDF.type, RDF::FOAF[:Person]]
-
-          if editor.is_a?(Name)
-            [:given, :family, :prefix, :suffix].each do |part|
-              graph << [e, bibo["#{part}Name"], editor.send(part).to_s]
-            end
-          else
-            graph << [e, RDF::FOAF.name, editor.to_s]
-          end
-
-          graph << [entry, bibo.editor, a]
-          graph << [seq, RDF.li, e]
-        end
-      end
-
-      graph
-    rescue LoadError
-      BibTeX.log.error "Please gem install rdf for RDF support."
     end
 
     alias to_bibo to_rdf
-
-
-
 
     private
 
