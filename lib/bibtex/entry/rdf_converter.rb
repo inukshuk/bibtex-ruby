@@ -120,6 +120,17 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, RDF::DC.language, bibtex[:language].to_s] if bibtex.field?(:language)
   end
 
+  def number
+    return unless bibtex.field?(:number)
+
+    case bibtex.type
+    when :techreport || :manual || :unpublished
+      graph << [entry, bibo[:number], bibtex[:number].to_s]
+    else
+      graph << [entry, bibo[:issue], bibtex[:number].to_s]
+    end
+  end
+
   def pages
     return unless bibtex.field?(:pages)
 
