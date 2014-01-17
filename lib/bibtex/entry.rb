@@ -732,6 +732,7 @@ module BibTeX
 
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
     def to_rdf(options = {})
+      RDFConverter.convert(self)
     end
 
     alias to_bibo to_rdf
