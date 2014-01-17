@@ -120,6 +120,17 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, RDF::DC.language, bibtex[:language].to_s] if bibtex.field?(:language)
   end
 
+  def note
+    return unless bibtex.field?(:note)
+
+    pub = RDF::Node.new
+    graph << [pub, RDF.type, bibo[:Note]]
+    graph << [pub, bibo[:content], bibtex[:note]]
+
+
+    graph << [entry, bibo[:annotates], pub]
+  end
+
   def number
     return unless bibtex.field?(:number)
 
