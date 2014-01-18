@@ -1,9 +1,3 @@
-begin
-  require 'rdf'
-rescue LoadError
-  BibTeX.log.error 'Please gem install rdf for RDF support.'
-end
-
 class BibTeX::Entry::RDFConverter
   BIBO_TYPES = Hash.new(:Document).merge(Hash[*%w{
     article        Article

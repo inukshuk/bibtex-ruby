@@ -732,7 +732,11 @@ module BibTeX
 
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
     def to_rdf(options = {})
-      RDFConverter.convert(self)
+      if defined?(::RDF)
+        RDFConverter.convert(self)
+      else
+        BibTeX.log.error 'Please `gem install rdf` for RDF support.'
+      end
     end
 
     alias to_bibo to_rdf
