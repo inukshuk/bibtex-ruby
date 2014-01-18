@@ -174,7 +174,7 @@ class BibTeX::Entry::RDFConverter
     case bibtex.type
     when :mastersthesis
       # ms = masters degree in science
-      # On only ma and ms available. Simply chose one.
+      # Only ma and ms available. We simply chose one.
       graph << [entry, bibo[:degree], bibo['degrees/ms']]
     when :phdthesis
       graph << [entry, bibo[:degree], bibo['degrees/phd']]
