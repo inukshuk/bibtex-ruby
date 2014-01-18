@@ -26,19 +26,19 @@ class BibTeX::Entry::RDFConverter
   # converts a BibTeX entry to RDF
   # @return [RDF::Graph] the RDF graph of this entry
   def self.convert(bibtex)
-    new(bibtex).output
+    new(bibtex).convert!
   end
 
   # @param [BibTeX::Entry] the entry to convert
   def initialize(bibtex)
     @bibtex = bibtex
-
-    methods = self.class.instance_methods(false) - [:output]
-    methods.each { |m| send(m) }
   end
 
   # @return [RDF::Graph] the RDF graph of this entry
-  def output
+  def convert!
+    methods = self.class.instance_methods(false) - [:output]
+    methods.each { |m| send(m) }
+
     graph
   end
 
