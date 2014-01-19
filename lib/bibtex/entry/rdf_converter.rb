@@ -37,6 +37,9 @@ class BibTeX::Entry::RDFConverter
 
   # @return [RDF::Graph] the RDF graph of this entry
   def convert!
+    bibtex.parse_names
+    bibtex.parse_month
+
     methods = self.class.instance_methods(false) - [:convert!]
     methods.each { |m| send(m) }
     run_fallback
