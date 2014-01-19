@@ -374,6 +374,14 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def url
+    return unless bibtex.field?(:url)
+    remove_from_fallback(:url)
+
+    graph << [entry, RDF::DC.uri, bibtex[:url].to_s]
+    graph << [entry, bibo[:uri], bibtex[:url].to_s]
+  end
+
   def volume
     return unless bibtex.field?(:volume)
     remove_from_fallback(:volume)
