@@ -145,7 +145,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex[:howpublished] =~ /^#{URI::regexp}$/
 
     remove_from_fallback(:howpublished)
-    graph << [entry, RDF::DC.uri, bibtex[:howpublished].to_s]
+    graph << [entry, RDF::DC.URI, bibtex[:howpublished].to_s]
     graph << [entry, bibo[:uri], bibtex[:howpublished].to_s]
   end
 
@@ -231,8 +231,8 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:location)
     remove_from_fallback(:location)
 
-    graph << [entry, RDF::DC.location, bibtex[:location].to_s]
-    if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
+    graph << [entry, RDF::DC.Location, bibtex[:location].to_s]
+    if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
       event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
       graph << [entry, event[:place], org]
     end
@@ -275,7 +275,7 @@ class BibTeX::Entry::RDFConverter
     org = agent(bibtex[:organization]) { create_agent(bibtex[:organization].to_s, :Organization) }
 
     graph << [entry, RDF::DC.contributor, org]
-    graph << [entry, bibo[:organizer], org] if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
+    graph << [entry, bibo[:organizer], org] if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
   end
 
   def pages
@@ -389,7 +389,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:translator)
     remove_from_fallback(:translator)
 
-    node = agent(name) { create_agent(bibtex[:translator].to_s, :Person) }
+    node = agent(bibtex[:translator]) { create_agent(bibtex[:translator].to_s, :Person) }
 
     graph << [entry, RDF::DC.contributor, node]
     graph << [entry, bibo[:translator], node]
@@ -410,7 +410,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:url)
     remove_from_fallback(:url)
 
-    graph << [entry, RDF::DC.uri, bibtex[:url].to_s]
+    graph << [entry, RDF::DC.URI, bibtex[:url].to_s]
     graph << [entry, bibo[:uri], bibtex[:url].to_s]
   end
 
