@@ -209,9 +209,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:organization)
     remove_from_fallback(:organization)
 
-    org = RDF::Node.new
-    graph << [org, RDF.type, RDF::FOAF[:Organization]]
-    graph << [org, RDF::FOAF.name, bibtex[:organization].to_s]
+    org = agent(bibtex[:organization]) { create_agent(bibtex[:organization].to_s, :Organization) }
 
     graph << [entry, RDF::DC.contributor, org]
     if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
