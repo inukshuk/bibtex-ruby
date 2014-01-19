@@ -39,7 +39,7 @@ class BibTeX::Entry::RDFConverter
   def convert!
     methods = self.class.instance_methods(false) - [:convert!]
     methods.each { |m| send(m) }
-    fallback
+    run_fallback
 
     graph
   end
@@ -480,17 +480,19 @@ class BibTeX::Entry::RDFConverter
     node
   end
 
-  def remove_from_fallback(*fields)
+  def fallback
     @fallback ||= bibtex.fields.keys
-
-    fields.each { |field| @fallback.delete(field) }
   end
 
-  def fallback
-    return if @fallback.empty?
+  def remove_from_fallback(*fields)
+    fields.each { |field| fallback.delete(field) }
+  end
+
+  def run_fallback
+    return if fallback.empty?
 
     ml = RDF::Vocabulary.new('http://bibtexml.sf.net/')
-    @fallback.each do |field|
+    fallback.each do |field|
       graph << [entry, ml[field], bibtex[field]]
     end
   end
