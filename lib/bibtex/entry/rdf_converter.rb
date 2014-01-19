@@ -333,7 +333,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def series
-    return unless bibtex.field(:series)
+    return unless bibtex.field?(:series)
     remove_from_fallback(:series)
     return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:series]
     return if bibtex.has_parent? && bibtex.parent[:series] == bibtex[:series]
