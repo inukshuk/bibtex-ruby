@@ -208,6 +208,7 @@ class BibTeX::Entry::RDFConverter
     end
 
     graph << [entry, RDF::DC.publisher, pub]
+    graph << [entry, bibo[:publisher], pub]
   end
 
   def thesis_degree
