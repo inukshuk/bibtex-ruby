@@ -95,6 +95,13 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def copyright
+    return unless bibtex.field?(:copyright)
+    remove_from_fallback(:copyright)
+
+    graph << [entry, RDF::DC.rightsHolder, bibtex[:copyright].to_s]
+  end
+
   def doi
     return unless bibtex.field?(:doi)
     remove_from_fallback(:doi)
