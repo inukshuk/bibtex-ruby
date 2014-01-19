@@ -240,6 +240,16 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:publisher], pub]
   end
 
+  def series
+    return unless bibtex.field(:series)
+    remove_from_fallback(:series)
+    return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:series]
+    return if bibtex.has_parent? && bibtex.parent[:series] == bibtex[:series]
+    return if bibtex.has_parent? && bibtex.parent[:issn] == bibtex[:issn]
+
+    graph << [entry, RDF::DC.isPartOf, bibtex[:series].to_s]
+  end
+
   def thesis_degree
     return unless BIBO_TYPES[bibtex.type] == :Thesis
 
