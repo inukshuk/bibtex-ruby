@@ -58,17 +58,7 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:authorList], seq]
 
     bibtex[:author].each do |name|
-      node = RDF::Node.new
-
-      graph << [node, RDF.type, RDF::FOAF[:Person]]
-
-      if name.is_a?(BibTeX::Name)
-        [:given, :family, :prefix, :suffix].each do |part|
-          graph << [node, bibo["#{part}Name"], name.send(part).to_s] unless name.send(part).nil?
-        end
-      else
-        graph << [node, RDF::FOAF.name, name.to_s]
-      end
+      node = agent(name) { create_agent(name, :Person) }
 
       graph << [entry, RDF::DC.creator, node]
       graph << [seq, RDF.li, node]
@@ -125,17 +115,7 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:editorList], seq]
 
     bibtex[:editor].each do |name|
-      node = RDF::Node.new
-
-      graph << [node, RDF.type, RDF::FOAF[:Person]]
-
-      if name.is_a?(BibTeX::Name)
-        [:given, :family, :prefix, :suffix].each do |part|
-          graph << [node, bibo["#{part}Name"], name.send(part).to_s] unless name.send(part).nil?
-        end
-      else
-        graph << [node, RDF::FOAF.name, name.to_s]
-      end
+      node = agent(name) { create_agent(name, :Person) }
 
       graph << [entry, bibo.name, node]
       graph << [seq, RDF.li, node]
@@ -368,6 +348,25 @@ class BibTeX::Entry::RDFConverter
 
   def graph
     @graph ||= RDF::Graph.new
+  end
+
+  def agent(key, &block)
+    @agent ||= {}
+    @agent[key] ||= yield
+  end
+
+  def create_agent(name, type)
+    node = RDF::Node.new
+
+    graph << [node, RDF.type, RDF::FOAF[type]]
+    graph << [node, RDF::FOAF.name, name.to_s]
+
+    if name.is_a?(BibTeX::Name)
+      [:given, :family, :prefix, :suffix].each do |part|
+        graph << [node, bibo["#{part}Name"], name.send(part).to_s] unless name.send(part).nil?
+    end
+
+    node
   end
 
   def remove_from_fallback(*fields)
