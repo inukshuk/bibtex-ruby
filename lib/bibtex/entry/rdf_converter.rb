@@ -268,6 +268,15 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:publisher], org]
   end
 
+  def school
+    return unless bibtex.field?(:school)
+    remove_from_fallback(:school)
+
+    org = agent(bibtex[:school]) { create_agent(bibtex[:school].to_s, :Organization) }
+
+    graph << [entry, RDF::DC.contributor, org]
+  end
+
   def series
     return unless bibtex.field(:series)
     remove_from_fallback(:series)
