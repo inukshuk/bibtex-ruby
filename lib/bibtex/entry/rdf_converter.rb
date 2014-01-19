@@ -389,6 +389,13 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:volume], bibtex[:volume].to_s]
   end
 
+  def volumes
+    return unless bibtex.field?(:volumes)
+    remove_from_fallback(:volumes)
+
+    graph << [entry, bibo[:numVolumes], bibtex[:volumes].to_s]
+  end
+
   def year
     return unless bibtex.field?(:year)
     remove_from_fallback(:year, :month)
