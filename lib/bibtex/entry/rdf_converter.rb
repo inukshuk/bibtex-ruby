@@ -122,7 +122,12 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:isbn)
 
     graph << [entry, bibo[:isbn], bibtex[:isbn].to_s]
-    graph << [entry, RDF::DC.identifier, "urn:isbn:#{bibtex[:isbn].to_s}"]
+
+    if bibtex.contained?
+      graph << [entry, RDF::DC.isPartOf, "urn:isbn:#{bibtex[:isbn].to_s}"]
+    else
+      graph << [entry, RDF::DC.identifier, "urn:isbn:#{bibtex[:isbn].to_s}"]
+    end
   end
 
   def issn
@@ -130,7 +135,11 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:issn)
 
     graph << [entry, bibo[:issn], bibtex[:issn].to_s]
-    graph << [entry, RDF::DC.identifier, "urn:issn:#{bibtex[:issn].to_s}"]
+    if bibtex.contained?
+      graph << [entry, RDF::DC.isPartOf, "urn:issn:#{bibtex[:issn].to_s}"]
+    else
+      graph << [entry, RDF::DC.identifier, "urn:issn:#{bibtex[:issn].to_s}"]
+    end
   end
 
   def journal
