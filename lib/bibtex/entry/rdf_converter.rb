@@ -137,7 +137,8 @@ class BibTeX::Entry::RDFConverter
     source << bibtex[:journal].to_s
     source << "Vol. #{bibtex[:volume].to_s}" if bibtex.field?(:volume)
     source << "No. #{bibtex[:number].to_s}" if bibtex.field?(:number)
-    source << "pp. #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
+    pagination = bibtex[:pagination] || 'pp.'
+    source << "#{pagination.to_s} #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
     graph << [entry, RDF::DC.source, source.join(', ')]
   end
 
