@@ -122,6 +122,15 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def institution
+    return unless bibtex.field?(:institution)
+    remove_from_fallback(:institution)
+
+    org = agent(bibtex[:institution]) { create_agent(bibtex[:institution].to_s, :Organization) }
+
+    graph << [entry, RDF::DC.contributor, org]
+  end
+
   def isbn
     return unless bibtex.field?(:isbn)
     remove_from_fallback(:isbn)
