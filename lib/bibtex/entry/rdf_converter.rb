@@ -237,20 +237,26 @@ class BibTeX::Entry::RDFConverter
   end
 
   def publisher
-    return unless bibtex.field?(:publisher)
+    return unless bibtex.field?(:publisher) || bibtex.field?(:organization) || bibtex.field?(:school)
     remove_from_fallback(:publisher, :address)
 
-    pub = RDF::Node.new
-    graph << [pub, RDF.type, RDF::FOAF[:Organization]]
-    graph << [pub, RDF::FOAF.name, bibtex[:publisher]]
+    org =
+      case
+      when bibtex.field?(:publisher)
+        agent(bibtex[:publisher]) { create_agent(bibtex[:publisher].to_s, :Organization) }
+      when bibtex.field?(:organization)
+        agent(bibtex[:organization]) { create_agent(bibtex[:organization].to_s, :Organization) }
+      when bibtex.field?(:school)
+        agent(bibtex[:school]) { create_agent(bibtex[:school].to_s, :Organization) }
+      end
 
     if bibtex.field?(:address)
       address = RDF::Vocabulary.new('http://schemas.talis.com/2005/address/schema#')
-      graph << [pub, address[:localityName], bibtex[:address]]
+      graph << [org, address[:localityName], bibtex[:address]]
     end
 
-    graph << [entry, RDF::DC.publisher, pub]
-    graph << [entry, bibo[:publisher], pub]
+    graph << [entry, RDF::DC.publisher, org]
+    graph << [entry, bibo[:publisher], org]
   end
 
   def series
