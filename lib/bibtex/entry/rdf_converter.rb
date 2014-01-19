@@ -37,11 +37,15 @@ class BibTeX::Entry::RDFConverter
   end
 
   def abstract
-    graph << [entry, RDF::DC.abstract, bibtex[:abstract].to_s] if bibtex.field?(:abstract)
+    return unless bibtex.field?(:abstract)
+    remove_from_fallback(:abstract)
+
+    graph << [entry, RDF::DC.abstract, bibtex[:abstract].to_s]
   end
 
   def author
     return unless bibtex.field?(:author)
+    remove_from_fallback(:author)
 
     seq = RDF::Node.new
 
@@ -67,15 +71,22 @@ class BibTeX::Entry::RDFConverter
   end
 
   def doi
-    graph << [entry, bibo[:doi], bibtex[:doi].to_s] if bibtex.field?(:doi)
+    return unless bibtex.field?(:doi)
+    remove_from_fallback(:doi)
+
+    graph << [entry, bibo[:doi], bibtex[:doi].to_s]
   end
 
   def edition
-    graph << [entry, bibo[:edition], bibtex[:edition].to_s] if bibtex.field?(:edition)
+    return unless bibtex.field?(:edition)
+    remove_from_fallback(:edition)
+
+    graph << [entry, bibo[:edition], bibtex[:edition].to_s]
   end
 
   def editor
     return unless bibtex.field?(:editor)
+    remove_from_fallback(:editor)
 
     seq = RDF::Node.new
 
@@ -101,21 +112,31 @@ class BibTeX::Entry::RDFConverter
   end
 
   def isbn
-    graph << [entry, bibo[:isbn], bibtex[:isbn].to_s] if bibtex.field?(:isbn)
+    return unless bibtex.field?(:isbn)
+    remove_from_fallback(:isbn)
+
+    graph << [entry, bibo[:isbn], bibtex[:isbn].to_s]
   end
 
   def issn
-    graph << [entry, bibo[:issn], bibtex[:issn].to_s] if bibtex.field?(:issn)
+    return unless bibtex.field?(:issn)
+    remove_from_fallback(:issn)
+
+    graph << [entry, bibo[:issn], bibtex[:issn].to_s]
   end
 
   def language
+    return unless bibtex.field?(:language)
+    remove_from_fallback(:language)
+
     bibtex[:language] = 'german' if bibtex[:language] == 'ngerman'
 
-    graph << [entry, RDF::DC.language, bibtex[:language].to_s] if bibtex.field?(:language)
+    graph << [entry, RDF::DC.language, bibtex[:language].to_s]
   end
 
   def note
     return unless bibtex.field?(:note)
+    remove_from_fallback(:note)
 
     pub = RDF::Node.new
     graph << [pub, RDF.type, bibo[:Note]]
@@ -127,6 +148,7 @@ class BibTeX::Entry::RDFConverter
 
   def number
     return unless bibtex.field?(:number)
+    remove_from_fallback(:number)
 
     case bibtex.type
     when :techreport || :manual || :unpublished
@@ -138,6 +160,7 @@ class BibTeX::Entry::RDFConverter
 
   def pages
     return unless bibtex.field?(:pages)
+    remove_from_fallback(:pages)
 
     if bibtex[:pages].to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
       graph << [entry, bibo[:pageStart], $1]
@@ -149,6 +172,7 @@ class BibTeX::Entry::RDFConverter
 
   def publisher
     return unless bibtex.field?(:publisher)
+    remove_from_fallback(:publisher, :address)
 
     pub = RDF::Node.new
     graph << [pub, RDF.type, RDF::FOAF[:Organization]]
@@ -177,6 +201,7 @@ class BibTeX::Entry::RDFConverter
 
   def title
     return unless bibtex.field?(:title) || bibtex.field?(:subtitle)
+    remove_from_fallback(:title) unless bibtex.field?(:subtitle)
 
     title = [bibtex[:title].to_s, bibtex[:subtitle].to_s].join(': ')
     graph << [entry, RDF::DC.title, title]
@@ -187,11 +212,15 @@ class BibTeX::Entry::RDFConverter
   end
 
   def volume
-    graph << [entry, bibo[:volume], bibtex[:volume].to_s] if bibtex.field?(:volume)
+    return unless bibtex.field?(:volume)
+    remove_from_fallback(:volume)
+
+    graph << [entry, bibo[:volume], bibtex[:volume].to_s]
   end
 
   def year
     return unless bibtex.field?(:year)
+    remove_from_fallback(:year, :month)
 
     date = [bibtex[:year].to_s, bibtex[:month].to_s].join('-')
 
@@ -218,5 +247,11 @@ class BibTeX::Entry::RDFConverter
 
   def graph
     @graph ||= RDF::Graph.new
+  end
+
+  def remove_from_fallback(*fields)
+    @fallback ||= bibtex.fields.keys
+
+    fields.each { |field| @fallback.delete(field) }
   end
 end
