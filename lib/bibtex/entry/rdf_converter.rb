@@ -92,6 +92,14 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:chapter], bibtex[:chapter].to_s]
   end
 
+  def children
+    return unless bibtex.has_children?
+
+    bibtex.children.each do |child|
+      graph << [entry, RDF::DC.hasPart, child.to_rdf]
+    end
+  end
+
   def doi
     return unless bibtex.field?(:doi)
     remove_from_fallback(:doi)
@@ -230,6 +238,8 @@ class BibTeX::Entry::RDFConverter
   end
 
   def parent
+    return unless bibtex.has_parent?
+
     graph << [entry, RDF::DC.isPartOf, bibtex.parent.to_rdf]
   end
 
