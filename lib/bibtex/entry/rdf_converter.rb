@@ -158,6 +158,7 @@ class BibTeX::Entry::RDFConverter
 
   def journal
     return unless bibtex.field?(:journal)
+    remove_from_fallback(:journal)
 
     source = []
     source << bibtex[:journal].to_s
@@ -166,6 +167,15 @@ class BibTeX::Entry::RDFConverter
     pagination = bibtex[:pagination] || 'pp.'
     source << "#{pagination.to_s} #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
     graph << [entry, RDF::DC.source, source.join(', ')]
+
+    return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:journal]
+    return if bibtex.has_parent? && bibtex.parent[:issn] == bibtex[:issn]
+
+    journal = RDF::Node.new
+    graph << [journal, RDF.type, bibo[:Journal]]
+    graph << [journal, RDF::DC.title, bibtex[:journal].to_s]
+
+    graph << [entry, RDF::DC.isPartOf, journal]
   end
 
   def key
