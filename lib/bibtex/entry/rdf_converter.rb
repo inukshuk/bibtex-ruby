@@ -46,6 +46,7 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:abstract)
 
     graph << [entry, RDF::DC.abstract, bibtex[:abstract].to_s]
+    graph << [entry, bibo[:abstract], bibtex[:abstract].to_s]
   end
 
   def author
