@@ -210,10 +210,24 @@ class BibTeX::Entry::RDFConverter
     when :mastersthesis
       # ms = masters degree in science
       # Only ma and ms available. We simply chose one.
-      graph << [entry, bibo[:degree], bibo['degrees/ms']]
+      degree = bibo['degrees/ms']
     when :phdthesis
-      graph << [entry, bibo[:degree], bibo['degrees/phd']]
+      degree = bibo['degrees/phd']
     end
+    case bibtex[:type]
+    when 'mathesis'
+      degree = bibo['degrees/ma']
+    when 'phdthesis'
+      degree = bibo['degrees/phd']
+    when /Bachelor['s]{0,2} Thesis/i
+      degree = "Bachelor's Thesis"
+    when /Diplomarbeit/i
+      degree = bibo['degrees/ms']
+    when /Magisterarbeit/i
+      degree = bibo['degrees/ma']
+    end
+
+    graph << [entry, bibo[:degree], degree] unless degree.nil?
   end
 
   def title
