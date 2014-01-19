@@ -363,6 +363,16 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:shortTitle], bibtex[:title].to_s] if bibtex.field?(:subtitle)
   end
 
+  def translator
+    return unless bibtex.field?(:translator)
+    remove_from_fallback(:translator)
+
+    node = agent(name) { create_agent(bibtex[:translator].to_s, :Person) }
+
+    graph << [entry, RDF::DC.contributor, node]
+    graph << [entry, bibo[:translator], node]
+  end
+
   def type
     graph << [entry, RDF.type, bibo[BIBO_TYPES[bibtex.type]]]
 
