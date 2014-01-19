@@ -10,6 +10,10 @@ class BibTeX::Entry::RDFConverter
     manual         Manual
     mastersthesis  Thesis
     phdthesis      Thesis
+    thesis         Thesis
+    patent         Patent
+    collection     Collection
+    online         Website
     proceedings    Proceedings
     techreport     Report
     journal        Journal
