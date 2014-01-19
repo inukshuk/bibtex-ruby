@@ -219,6 +219,10 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def parent
+    graph << [entry, RDF::DC.isPartOf, bibtex.parent.to_rdf]
+  end
+
   def publisher
     return unless bibtex.field?(:publisher)
     remove_from_fallback(:publisher, :address)
