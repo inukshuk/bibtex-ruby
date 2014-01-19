@@ -212,6 +212,17 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, RDF::DC.language, bibtex[:language].to_s]
   end
 
+  def location
+    return unless bibtex.field?(:location)
+    remove_from_fallback(:location)
+
+    graph << [entry, RDF::DC.location, bibtex[:location].to_s]
+    if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
+      event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
+      graph << [entry, event[:place], org]
+    end
+  end
+
   def note
     return unless bibtex.field?(:note)
     remove_from_fallback(:note)
