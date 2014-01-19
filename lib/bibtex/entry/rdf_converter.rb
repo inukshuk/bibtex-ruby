@@ -234,10 +234,7 @@ class BibTeX::Entry::RDFConverter
     org = agent(bibtex[:organization]) { create_agent(bibtex[:organization].to_s, :Organization) }
 
     graph << [entry, RDF::DC.contributor, org]
-    if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
-      event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
-      graph << [entry, event[:hasAgent], org]
-    end
+    graph << [entry, bibo[:organizer], org] if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
   end
 
   def pages
