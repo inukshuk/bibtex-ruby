@@ -276,6 +276,13 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def pagetotal
+    return unless bibtex.field?(:pagetotal)
+    remove_from_fallback(:pagetotal)
+
+    graph << [entry, bibo[:numPages], bibtex[:pagetotal].to_s]
+  end
+
   def parent
     return unless bibtex.has_parent?
 
