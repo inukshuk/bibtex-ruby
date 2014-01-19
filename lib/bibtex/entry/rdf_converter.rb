@@ -1,24 +1,24 @@
 class BibTeX::Entry::RDFConverter
   BIBO_TYPES = Hash[*%w{
     article        Article
-    booklet        Book
     book           Book
+    booklet        Book
+    collection     Collection
     conference     AcademicArticle
     inbook         BookSection
     incollection   BookSection
     inproceedings  AcademicArticle
+    journal        Journal
     manual         Manual
     mastersthesis  Thesis
-    phdthesis      Thesis
-    thesis         Thesis
-    patent         Patent
-    collection     Collection
     online         Website
-    proceedings    Proceedings
-    techreport     Report
-    standard       Standard
-    journal        Journal
+    patent         Patent
     periodical     Periodical
+    phdthesis      Thesis
+    proceedings    Proceedings
+    standard       Standard
+    techreport     Report
+    thesis         Thesis
     unpublished    Manuscript
   }.map(&:intern)].freeze
 
