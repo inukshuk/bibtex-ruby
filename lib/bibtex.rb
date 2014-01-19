@@ -67,6 +67,7 @@ require 'bibtex/names'
 require 'bibtex/replaceable'
 require 'bibtex/elements'
 require 'bibtex/entry'
+require 'bibtex/entry/bibtexml_converter'
 begin
   require 'rdf'
   require 'bibtex/entry/rdf_converter'

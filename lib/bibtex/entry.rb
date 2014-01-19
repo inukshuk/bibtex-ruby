@@ -707,27 +707,7 @@ module BibTeX
     alias citeproc_date issued
 
     def to_xml(options = {})
-      require 'rexml/document'
-
-      xml = REXML::Element.new('bibtex:entry')
-      xml.attributes['id'] = key
-
-      entry = REXML::Element.new("bibtex:#{type}")
-
-      fields.each do |key, value|
-        field = REXML::Element.new("bibtex:#{key}")
-
-        if options[:extended] && value.name?
-          value.each { |n| entry.add_element(n.to_xml) }
-        else
-          field.text = value.to_s(options)
-        end
-
-        entry.add_element(field)
-      end
-
-      xml.add_element(entry)
-      xml
+      BibTeXMLConverter.convert(self, options)
     end
 
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
