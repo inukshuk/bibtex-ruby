@@ -65,49 +65,6 @@ module BibTeX
       end
     end
 
-    CSL_FILTER = Hash.new {|h,k|k}.merge(Hash[*%w{
-      date      issued
-      isbn      ISBN
-      booktitle container-title
-      journal   container-title
-      series    collection-title
-      address   publisher-place
-      pages     page
-      number    issue
-      url       URL
-      doi       DOI
-      year      issued
-      type      genre
-    }.map(&:intern)]).freeze
-
-    CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
-      authority call-number chapter-number citation-label citation-number
-      collection-title container-title DOI edition event event-place
-      first-reference-note-number genre ISBN issue jurisdiction keyword locator
-      medium note number number-of-pages number-of-volumes original-publisher
-      original-publisher-place original-title page page-first publisher
-      publisher-place references section status title URL version volume
-      year-suffix accessed container event-date issued original-date
-      author editor translator recipient interviewer publisher composer
-      original-publisher original-author container-author collection-editor
-    }.map(&:intern).freeze
-
-    CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
-      booklet        pamphlet
-      conference     paper-conference
-      inbook         chapter
-      incollection   chapter
-      inproceedings  paper-conference
-      manual         book
-      mastersthesis  thesis
-      misc           article
-      phdthesis      thesis
-      proceedings    paper-conference
-      techreport     report
-      unpublished    manuscript
-      article        article-journal
-    }.map(&:intern)]).freeze
-
     attr_reader :fields, :type
 
     def_delegators :@fields, :empty?
@@ -661,50 +618,8 @@ module BibTeX
     end
 
     def to_citeproc(options = {})
-      options[:quotes] ||= []
-
-      parse_names
-      parse_month
-
-      hash = {}
-
-      each_pair do |k,v|
-        hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
-      end
-
-      hash['id'] = key.to_s
-      hash['type'] = CSL_TYPES[type].to_s
-
-      case type
-      when :mastersthesis
-        hash['genre'] = "Master's thesis"
-      when :phdthesis
-        hash['genre'] = 'PhD thesis'
-      else
-        # empty
-      end unless hash.key?('genre')
-
-      hash['issued'] = citeproc_date
-
-      hash
+      CiteProcConverter.convert(self, options)
     end
-
-    def issued
-      return unless has_field?(:year)
-      
-      parts = [fields[:year].to_s]
-
-      return { 'literal' => parts[0] } unless parts[0] =~ /^\d+$/
-
-      if has_field?(:month)
-        parts.push MONTHS.find_index(fields[:month].to_s.intern)
-        parts[1] = parts[1] + 1 unless parts[1].nil?
-      end
-
-      { 'date-parts' => [parts.compact.map(&:to_i)] }
-    end
-
-    alias citeproc_date issued
 
     def to_xml(options = {})
       BibTeXMLConverter.convert(self, options)
