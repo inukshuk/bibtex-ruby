@@ -158,6 +158,15 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, RDF::DC.identifier, "urn:bibtex:#{bibtex.key}"]
   end
 
+  def keywords
+    return unless bibtex.field?(:keywords)
+    remove_from_fallback(:keywords)
+
+    bibtex[:keywords].to_s.split(/\s*,\s*/).each do |keyword|
+      graph << [entry, RDF::DC.subject, keyword]
+    end
+  end
+
   def language
     return unless bibtex.field?(:language)
     remove_from_fallback(:language)
