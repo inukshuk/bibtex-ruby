@@ -223,6 +223,13 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def lccn
+    return unless bibtex.field?(:lccn)
+    remove_from_fallback(:lccn)
+
+    graph << [entry, bibo[:lccn], bibtex[:lccn].to_s]
+  end
+
   def note
     return unless bibtex.field?(:note)
     remove_from_fallback(:note)
