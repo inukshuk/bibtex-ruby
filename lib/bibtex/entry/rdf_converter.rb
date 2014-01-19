@@ -80,6 +80,7 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:doi)
 
     graph << [entry, bibo[:doi], bibtex[:doi].to_s]
+    graph << [entry, RDF::DC.identifier, "doi:#{bibtex[:doi].to_s}"]
   end
 
   def edition
@@ -121,6 +122,7 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:isbn)
 
     graph << [entry, bibo[:isbn], bibtex[:isbn].to_s]
+    graph << [entry, RDF::DC.identifier, "urn:isbn:#{bibtex[:isbn].to_s}"]
   end
 
   def issn
@@ -128,6 +130,7 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:issn)
 
     graph << [entry, bibo[:issn], bibtex[:issn].to_s]
+    graph << [entry, RDF::DC.identifier, "urn:issn:#{bibtex[:issn].to_s}"]
   end
 
   def journal
@@ -140,6 +143,10 @@ class BibTeX::Entry::RDFConverter
     pagination = bibtex[:pagination] || 'pp.'
     source << "#{pagination.to_s} #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
     graph << [entry, RDF::DC.source, source.join(', ')]
+  end
+
+  def key
+    graph << [entry, RDF::DC.identifier, "urn:bibtex:#{bibtex.key}"]
   end
 
   def language
