@@ -368,6 +368,7 @@ class BibTeX::Entry::RDFConverter
     if name.is_a?(BibTeX::Name)
       [:given, :family, :prefix, :suffix].each do |part|
         graph << [node, bibo["#{part}Name"], name.send(part).to_s] unless name.send(part).nil?
+      end
     end
 
     node
