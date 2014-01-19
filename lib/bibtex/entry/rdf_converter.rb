@@ -1,3 +1,5 @@
+require 'uri/common'
+
 class BibTeX::Entry::RDFConverter
   BIBO_TYPES = Hash[*%w{
     article        Article
@@ -133,6 +135,15 @@ class BibTeX::Entry::RDFConverter
       graph << [entry, bibo.name, node]
       graph << [seq, RDF.li, node]
     end
+  end
+
+  def howpublished
+    return unless bibtex.field?(:howpublished)
+    return unless bibtex[:howpublished] =~ /^#{URI::regexp}$/
+
+    remove_from_fallback(:howpublished)
+    graph << [entry, RDF::DC.uri, bibtex[:howpublished].to_s]
+    graph << [entry, bibo[:uri], bibtex[:howpublished].to_s]
   end
 
   def institution
