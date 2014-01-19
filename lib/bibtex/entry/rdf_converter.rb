@@ -75,6 +75,13 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def chapter
+    return unless bibtex.field?(:chapter)
+    remove_from_fallback(:chapter)
+
+    graph << [entry, bibo[:chapter], bibtex[:chapter].to_s]
+  end
+
   def doi
     return unless bibtex.field?(:doi)
     remove_from_fallback(:doi)
