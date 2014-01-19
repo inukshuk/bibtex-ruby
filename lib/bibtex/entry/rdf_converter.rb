@@ -225,6 +225,21 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def organization
+    return unless bibtex.field?(:organization)
+    remove_from_fallback(:organization)
+
+    org = RDF::Node.new
+    graph << [org, RDF.type, RDF::FOAF[:Organization]]
+    graph << [org, RDF::FOAF.name, bibtex[:organization].to_s]
+
+    graph << [entry, RDF::DC.contributor, org]
+    if [:proceedings, :inproceedings, :conference].any?(bibtex.type)
+      event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
+      graph << [entry, event[:hasAgent], org]
+    end
+  end
+
   def pages
     return unless bibtex.field?(:pages)
     remove_from_fallback(:pages)
