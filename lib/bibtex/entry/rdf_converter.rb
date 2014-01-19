@@ -126,6 +126,17 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:issn], bibtex[:issn].to_s]
   end
 
+  def journal
+    return unless bibtex.field?(:journal)
+
+    source = []
+    source << bibtex[:journal].to_s
+    source << "Vol. #{bibtex[:volume].to_s}" if bibtex.field?(:volume)
+    source << "No. #{bibtex[:number].to_s}" if bibtex.field?(:number)
+    source << "pp. #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
+    graph << [entry, RDF::DC.source, source.join(', ')]
+  end
+
   def language
     return unless bibtex.field?(:language)
     remove_from_fallback(:language)
