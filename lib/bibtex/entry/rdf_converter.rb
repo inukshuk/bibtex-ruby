@@ -75,6 +75,16 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def booktitle
+    return unless bibtex.field?(:booktitle)
+    remove_from_fallback(:booktitle)
+    return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:booktitle]
+    return if bibtex.has_parent? && bibtex.parent[:booktitle] == bibtex[:booktitle]
+    return if bibtex.has_parent? && bibtex.parent[:isbn] == bibtex[:isbn]
+
+    graph << [entry, RDF::DC.isPartOf, bibtex[:booktitle].to_s]
+  end
+
   def chapter
     return unless bibtex.field?(:chapter)
     remove_from_fallback(:chapter)
