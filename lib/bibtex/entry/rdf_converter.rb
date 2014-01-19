@@ -72,7 +72,11 @@ class BibTeX::Entry::RDFConverter
     return if bibtex.has_parent? && bibtex.parent[:booktitle] == bibtex[:booktitle]
     return if bibtex.has_parent? && bibtex.parent[:isbn] == bibtex[:isbn]
 
-    graph << [entry, RDF::DC.isPartOf, bibtex[:booktitle].to_s]
+    series = RDF::Node.new
+    graph << [series, RDF.type, bibo[:Document]]
+    graph << [series, RDF::DC.title, bibtex[:booktitle].to_s]
+
+    graph << [entry, RDF::DC.isPartOf, series]
   end
 
   def chapter
@@ -208,7 +212,6 @@ class BibTeX::Entry::RDFConverter
     graph << [pub, RDF.type, bibo[:Note]]
     graph << [pub, bibo[:content], bibtex[:note]]
 
-
     graph << [entry, bibo[:annotates], pub]
   end
 
@@ -294,7 +297,11 @@ class BibTeX::Entry::RDFConverter
     return if bibtex.has_parent? && bibtex.parent[:series] == bibtex[:series]
     return if bibtex.has_parent? && bibtex.parent[:issn] == bibtex[:issn]
 
-    graph << [entry, RDF::DC.isPartOf, bibtex[:series].to_s]
+    series = RDF::Node.new
+    graph << [series, RDF.type, bibo[:MultiVolumeBook]]
+    graph << [series, RDF::DC.title, bibtex[:series].to_s]
+
+    graph << [entry, RDF::DC.isPartOf, series]
   end
 
   def thesis_degree
