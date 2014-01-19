@@ -1,5 +1,5 @@
 class BibTeX::Entry::RDFConverter
-  BIBO_TYPES = Hash.new(:Document).merge(Hash[*%w{
+  BIBO_TYPES = Hash[*%w{
     article        Article
     booklet        Book
     book           Book
@@ -20,7 +20,7 @@ class BibTeX::Entry::RDFConverter
     journal        Journal
     periodical     Periodical
     unpublished    Manuscript
-  }.map(&:intern)]).freeze
+  }.map(&:intern)].freeze
 
   # converts a BibTeX entry to RDF
   # @return [RDF::Graph] the RDF graph of this entry
@@ -336,7 +336,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def thesis_degree
-    return unless BIBO_TYPES[bibtex.type] == :Thesis
+    return unless bibo_class == :Thesis
 
     case bibtex.type
     when :mastersthesis
@@ -382,7 +382,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def type
-    graph << [entry, RDF.type, bibo[BIBO_TYPES[bibtex.type]]]
+    graph << [entry, RDF.type, bibo_class]
 
     case bibtex.type
     when :proceedings, :journal
@@ -435,6 +435,10 @@ class BibTeX::Entry::RDFConverter
 
   def bibo
     @bibo ||= RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
+  end
+
+  def bibo_class
+    BIBO_TYPES[bibtex[:type]] || BIBO_TYPES[bibtex.type] || :Document
   end
 
   def entry
