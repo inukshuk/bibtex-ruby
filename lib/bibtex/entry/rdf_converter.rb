@@ -210,6 +210,13 @@ class BibTeX::Entry::RDFConverter
 
   def type
     graph << [entry, RDF.type, bibo[BIBO_TYPES[bibtex.type]]]
+
+    case bibtex.type
+    when :proceedings, :journal
+      graph << [entry, RDF::DC.type, 'Collection']
+    else
+      graph << [entry, RDF::DC.type, 'Text']
+    end
   end
 
   def volume
