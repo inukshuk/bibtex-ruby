@@ -16,6 +16,7 @@ class BibTeX::Entry::RDFConverter
     online         Website
     proceedings    Proceedings
     techreport     Report
+    standard       Standard
     journal        Journal
     periodical     Periodical
     unpublished    Manuscript
