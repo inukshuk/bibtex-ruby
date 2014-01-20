@@ -31,9 +31,10 @@ class BibTeX::Entry::RDFConverter
   end
 
   # @param [BibTeX::Entry] the entry to convert
-  def initialize(bibtex, graph = RDF::Graph.new)
+  def initialize(bibtex, graph = RDF::Graph.new, agent = {})
     @bibtex = bibtex
     @graph = graph
+    @agent = agent
   end
 
   # @return [RDF::Graph] the RDF graph of this entry
@@ -461,9 +462,13 @@ class BibTeX::Entry::RDFConverter
     @entry ||= RDF::URI.new(bibtex.identifier)
   end
 
-  def agent(key, &block)
-    @agent ||= {}
-    @agent[key] ||= yield
+  def agent(key = nil, &block)
+    if key.nil?
+      @agent
+    else
+      key = key.respond_to?(:to_hash) ? key.to_hash : key
+      @agent[key] ||= yield
+    end
   end
 
   def create_agent(name, type)
