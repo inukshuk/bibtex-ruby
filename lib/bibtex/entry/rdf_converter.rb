@@ -5,6 +5,7 @@ class BibTeX::Entry::RDFConverter
     bdsk-file-1
     bdsk-file-2
     bdsk-file-3
+    bdsk-file-4
   ).map(&:intern).freeze
 
   BIBO_TYPES = Hash[*%w{
