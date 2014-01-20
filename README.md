@@ -468,32 +468,34 @@ successfully parsed the names of your bibliography).
 This example parse a BibTeX entry, formats it as extended BibTeXML,
 and writes the following XML to standard out:
 
-    <?xml version='1.0' encoding='UTF-8'?>
-    <bibtex:file xmlns:bibtex='http://bibtexml.sf.net/'>
-      <bibtex:entry id='pickaxe'>
-        <bibtex:book>
-          <bibtex:address>Raleigh, North Carolina</bibtex:address>
-          <bibtex:person>
-            <bibtex:first>Dave</bibtex:first>
-            <bibtex:last>Thomas</bibtex:last>
-          </bibtex:person>
-          <bibtex:person>
-            <bibtex:first>Chad</bibtex:first>
-            <bibtex:last>Fowler</bibtex:last>
-          </bibtex:person>
-          <bibtex:person>
-            <bibtex:first>Andy</bibtex:first>
-            <bibtex:last>Hunt</bibtex:last>
-          </bibtex:person>
-          <bibtex:author/>
-          <bibtex:publisher>The Pragmatic Bookshelf</bibtex:publisher>
-          <bibtex:title>
-            Programming Ruby 1.9: The Pragmatic Programmer&apos;s Guide
-          </bibtex:title>
-          <bibtex:year>2009</bibtex:year>
-        </bibtex:book>
-      </bibtex:entry>
-    </bibtex:file>
+```xml
+<?xml version='1.0' encoding='UTF-8'?>
+<bibtex:file xmlns:bibtex='http://bibtexml.sf.net/'>
+  <bibtex:entry id='pickaxe'>
+    <bibtex:book>
+      <bibtex:address>Raleigh, North Carolina</bibtex:address>
+      <bibtex:person>
+        <bibtex:first>Dave</bibtex:first>
+        <bibtex:last>Thomas</bibtex:last>
+      </bibtex:person>
+      <bibtex:person>
+        <bibtex:first>Chad</bibtex:first>
+        <bibtex:last>Fowler</bibtex:last>
+      </bibtex:person>
+      <bibtex:person>
+        <bibtex:first>Andy</bibtex:first>
+        <bibtex:last>Hunt</bibtex:last>
+      </bibtex:person>
+      <bibtex:author/>
+      <bibtex:publisher>The Pragmatic Bookshelf</bibtex:publisher>
+      <bibtex:title>
+        Programming Ruby 1.9: The Pragmatic Programmer&apos;s Guide
+      </bibtex:title>
+      <bibtex:year>2009</bibtex:year>
+    </bibtex:book>
+  </bibtex:entry>
+</bibtex:file>
+```
 
 Look at the 'examples' directory for more elaborate examples of a BibTeX to
 YAML and a BibTeX to HTML converter using **#to_citeproc** to format a
