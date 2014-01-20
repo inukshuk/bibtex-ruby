@@ -450,7 +450,7 @@ constitutes a simple BibTeX to YAML converter:
     >> BibTeX.open('example.bib').to_yaml
 
 Starting with version 2.0, BibTeX-Ruby's `#to_xml` exports your bibliography
-to the [BibTeXML](http//bibtexml.sf.net/) format. By passing the option
+to the [BibTeXML](http://bibtexml.sf.net/) format. By passing the option
 `:extended => true` you can make use of the BibTeXML's extended format which
 will return individual person elements and name tokens (provided you have
 successfully parsed the names of your bibliography).
@@ -468,32 +468,34 @@ successfully parsed the names of your bibliography).
 This example parse a BibTeX entry, formats it as extended BibTeXML,
 and writes the following XML to standard out:
 
-    <?xml version='1.0' encoding='UTF-8'?>
-    <bibtex:file xmlns:bibtex='http://bibtexml.sf.net/'>
-      <bibtex:entry id='pickaxe'>
-        <bibtex:book>
-          <bibtex:address>Raleigh, North Carolina</bibtex:address>
-          <bibtex:person>
-            <bibtex:first>Dave</bibtex:first>
-            <bibtex:last>Thomas</bibtex:last>
-          </bibtex:person>
-          <bibtex:person>
-            <bibtex:first>Chad</bibtex:first>
-            <bibtex:last>Fowler</bibtex:last>
-          </bibtex:person>
-          <bibtex:person>
-            <bibtex:first>Andy</bibtex:first>
-            <bibtex:last>Hunt</bibtex:last>
-          </bibtex:person>
-          <bibtex:author/>
-          <bibtex:publisher>The Pragmatic Bookshelf</bibtex:publisher>
-          <bibtex:title>
-            Programming Ruby 1.9: The Pragmatic Programmer&apos;s Guide
-          </bibtex:title>
-          <bibtex:year>2009</bibtex:year>
-        </bibtex:book>
-      </bibtex:entry>
-    </bibtex:file>
+```xml
+<?xml version='1.0' encoding='UTF-8'?>
+<bibtex:file xmlns:bibtex='http://bibtexml.sf.net/'>
+  <bibtex:entry id='pickaxe'>
+    <bibtex:book>
+      <bibtex:address>Raleigh, North Carolina</bibtex:address>
+      <bibtex:person>
+        <bibtex:first>Dave</bibtex:first>
+        <bibtex:last>Thomas</bibtex:last>
+      </bibtex:person>
+      <bibtex:person>
+        <bibtex:first>Chad</bibtex:first>
+        <bibtex:last>Fowler</bibtex:last>
+      </bibtex:person>
+      <bibtex:person>
+        <bibtex:first>Andy</bibtex:first>
+        <bibtex:last>Hunt</bibtex:last>
+      </bibtex:person>
+      <bibtex:author/>
+      <bibtex:publisher>The Pragmatic Bookshelf</bibtex:publisher>
+      <bibtex:title>
+        Programming Ruby 1.9: The Pragmatic Programmer&apos;s Guide
+      </bibtex:title>
+      <bibtex:year>2009</bibtex:year>
+    </bibtex:book>
+  </bibtex:entry>
+</bibtex:file>
+```
 
 Look at the 'examples' directory for more elaborate examples of a BibTeX to
 YAML and a BibTeX to HTML converter using **#to_citeproc** to format a
@@ -554,13 +556,13 @@ For more information about the BibTeX format and the parser's idiosyncrasies
 Contributing
 ------------
 The BibTeX-Ruby source code is
-[hosted on GitHub](http://github.com/inukshuk/bibtex-ruby/).
+[hosted on GitHub](https://github.com/inukshuk/bibtex-ruby/).
 You can check out a copy of the latest code using Git:
 
     $ git clone https://github.com/inukshuk/bibtex-ruby.git
 
 If you've found a bug or have a question, please open an issue on the
-[BibTeX-Ruby issue tracker](http://github.com/inukshuk/bibtex-ruby/issues).
+[BibTeX-Ruby issue tracker](https://github.com/inukshuk/bibtex-ruby/issues).
 For extra credit, clone the BibTeX-Ruby repository, write a failing
 example, or cucumber feature, fix the bug and submit a pull request (for
 useful examples, take a look at the cucumber features in the

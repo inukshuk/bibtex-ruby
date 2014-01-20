@@ -67,7 +67,17 @@ require 'bibtex/names'
 require 'bibtex/replaceable'
 require 'bibtex/elements'
 require 'bibtex/entry'
+require 'bibtex/entry/bibtexml_converter'
+require 'bibtex/entry/citeproc_converter'
 require 'bibtex/error'
 require 'bibtex/parser'
 require 'bibtex/bibliography'
 require 'bibtex/utilities'
+
+begin
+  require 'rdf'
+  require 'bibtex/entry/rdf_converter'
+  require 'bibtex/bibliography/rdf_converter'
+rescue LoadError
+# ignored
+end

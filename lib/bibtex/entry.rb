@@ -65,79 +65,6 @@ module BibTeX
       end
     end
 
-    CSL_FILTER = Hash.new {|h,k|k}.merge(Hash[*%w{
-      date      issued
-      isbn      ISBN
-      booktitle container-title
-      journal   container-title
-      series    collection-title
-      address   publisher-place
-      pages     page
-      number    issue
-      url       URL
-      doi       DOI
-      year      issued
-      type      genre
-    }.map(&:intern)]).freeze
-
-    CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
-      authority call-number chapter-number citation-label citation-number
-      collection-title container-title DOI edition event event-place
-      first-reference-note-number genre ISBN issue jurisdiction keyword locator
-      medium note number number-of-pages number-of-volumes original-publisher
-      original-publisher-place original-title page page-first publisher
-      publisher-place references section status title URL version volume
-      year-suffix accessed container event-date issued original-date
-      author editor translator recipient interviewer publisher composer
-      original-publisher original-author container-author collection-editor
-    }.map(&:intern).freeze
-
-    CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
-      booklet        pamphlet
-      conference     paper-conference
-      inbook         chapter
-      incollection   chapter
-      inproceedings  paper-conference
-      manual         book
-      mastersthesis  thesis
-      misc           article
-      phdthesis      thesis
-      proceedings    paper-conference
-      techreport     report
-      unpublished    manuscript
-      article        article-journal
-    }.map(&:intern)]).freeze
-
-    BIBO_FIELDS = Hash[*%w{
-      pages      pages
-      number     issue
-      isbn       isbn
-      issn       issn
-      doi        doi
-      edition    edition
-      abstract   abstract
-      volume     volume
-    }.map(&:intern)].freeze
-
-    BIBO_TYPES = Hash.new(:Document).merge(Hash[*%w{
-      booklet        Book
-      book           Book
-      conference     Conference
-      inbook         Article
-      incollection   Article
-      inproceedings  Article
-      manual         Manual
-      mastersthesis  Thesis
-      phdthesis      Thesis
-      proceedings    Proceedings
-      techreport     Report
-      journal        Journal
-      periodical     Periodical
-      unpublished    Manuscript
-      article        Article
-    }.map(&:intern)]).freeze
-
-
     attr_reader :fields, :type
 
     def_delegators :@fields, :empty?
@@ -637,7 +564,8 @@ module BibTeX
 
     # Returns true if this entry is published inside a book, collection or journal
     def contained?
-      has_field?(:booktitle, :container, :journal)
+      has_field?(:container, :journal) ||
+        has_field?(:booktitle) && get(:booktitle) != get(:title)
     end
 
     # Returns an array containing the values associated with the given keys.
@@ -691,175 +619,23 @@ module BibTeX
     end
 
     def to_citeproc(options = {})
-      options[:quotes] ||= []
-
-      parse_names
-      parse_month
-
-      hash = {}
-
-      each_pair do |k,v|
-        hash[CSL_FILTER[k].to_s] = v.to_citeproc(options) unless DATE_FIELDS.include?(k)
-      end
-
-      hash['id'] = key.to_s
-      hash['type'] = CSL_TYPES[type].to_s
-
-      case type
-      when :mastersthesis
-        hash['genre'] = "Master's thesis"
-      when :phdthesis
-        hash['genre'] = 'PhD thesis'
-      else
-        # empty
-      end unless hash.key?('genre')
-
-      hash['issued'] = citeproc_date
-
-      hash
+      CiteProcConverter.convert(self, options)
     end
-
-    def issued
-      return unless has_field?(:year)
-      
-      parts = [fields[:year].to_s]
-
-      return { 'literal' => parts[0] } unless parts[0] =~ /^\d+$/
-
-      if has_field?(:month)
-        parts.push MONTHS.find_index(fields[:month].to_s.intern)
-        parts[1] = parts[1] + 1 unless parts[1].nil?
-      end
-
-      { 'date-parts' => [parts.compact.map(&:to_i)] }
-    end
-
-    alias citeproc_date issued
 
     def to_xml(options = {})
-      require 'rexml/document'
-
-      xml = REXML::Element.new('bibtex:entry')
-      xml.attributes['id'] = key
-
-      entry = REXML::Element.new("bibtex:#{type}")
-
-      fields.each do |key, value|
-        field = REXML::Element.new("bibtex:#{key}")
-
-        if options[:extended] && value.name?
-          value.each { |n| entry.add_element(n.to_xml) }
-        else
-          field.text = value.to_s(options)
-        end
-
-        entry.add_element(field)
-      end
-
-      xml.add_element(entry)
-      xml
+      BibTeXMLConverter.convert(self, options)
     end
 
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
-    # TODO: improve level of detail captured by export
     def to_rdf(options = {})
-      require 'rdf'
-
-      bibo = RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
-
-      graph = RDF::Graph.new
-      entry = RDF::URI.new(identifier)
-
-      graph << [entry, RDF.type, bibo[BIBO_TYPES[type]]]
-
-      [:title, :language].each do |key|
-        graph << [entry, RDF::DC[key], get(key).to_s] if field?(key)
+      if defined?(::RDF)
+        RDFConverter.convert(self)
+      else
+        BibTeX.log.error 'Please `gem install rdf` for RDF support.'
       end
-
-      graph << [entry, RDF::DC.date, get(:year).to_s] if field?(:year)
-
-      if field?(:publisher)
-        address = RDF::Vocabulary.new('http://schemas.talis.com/2005/address/schema#')
-        pub = RDF::Node.new
-
-        graph << [pub, RDF.type, RDF::FOAF[:Organization]]
-        graph << [pub, RDF::FOAF.name, get(:publisher)]
-
-        graph << [pub, address[:localityName], get(:address)] if field?(:address)
-
-        graph << [entry, RDF::DC.published, pub]
-      end
-
-      [:doi, :edition, :volume].each do |key|
-        graph << [entry, bibo[key], get(key).to_s] if field?(key)
-      end
-
-      if has_field?(:pages)
-        if get(:pages).to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
-          graph << [entry, bibo[:pageStart], $1]
-          graph << [entry, bibo[:pageEnd], $2]
-        else
-          graph << [entry, bibo[:pages], get(:pages).to_s]
-        end
-      end
-
-      if has_field?(:author)
-        seq = RDF::Node.new
-
-        graph << [seq, RDF.type, RDF[:Seq]]
-        graph << [entry, bibo[:authorList], seq]
-
-        authors.each do |author|
-          a = RDF::Node.new
-
-          graph << [a, RDF.type, RDF::FOAF[:Person]]
-
-          if author.is_a?(Name)
-            [:given, :family, :prefix, :suffix].each do |part|
-              graph << [a, bibo["#{part}Name"], author.send(part).to_s]
-            end
-          else
-            graph << [a, RDF::FOAF.name, author.to_s]
-          end
-
-          graph << [entry, RDF::DC.creator, a]
-          graph << [seq, RDF.li, a]
-        end
-      end
-
-      if has_field?(:editor)
-        seq = RDF::Node.new
-
-        graph << [seq, RDF.type, RDF[:Seq]]
-        graph << [entry, bibo[:editorList], seq]
-
-        editors.each do |editor|
-          e = RDF::Node.new
-
-          graph << [e, RDF.type, RDF::FOAF[:Person]]
-
-          if editor.is_a?(Name)
-            [:given, :family, :prefix, :suffix].each do |part|
-              graph << [e, bibo["#{part}Name"], editor.send(part).to_s]
-            end
-          else
-            graph << [e, RDF::FOAF.name, editor.to_s]
-          end
-
-          graph << [entry, bibo.editor, a]
-          graph << [seq, RDF.li, e]
-        end
-      end
-
-      graph
-    rescue LoadError
-      BibTeX.log.error "Please gem install rdf for RDF support."
     end
 
     alias to_bibo to_rdf
-
-
-
 
     private
 

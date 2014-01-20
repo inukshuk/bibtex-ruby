@@ -271,7 +271,8 @@ module BibTeX
 
       it 'support literal dates in citeproc export' do
         @entry.year = 'Test'
-        assert_equal({ 'literal' => 'Test' }, @entry.issued)
+        e = @entry.to_citeproc
+        assert_equal({ 'literal' => 'Test' }, e['issued'])
       end
 
       describe 'given a filter object or a filter name' do
