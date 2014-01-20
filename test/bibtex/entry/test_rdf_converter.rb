@@ -20,11 +20,27 @@ module BibTeX
       end
     end
 
+    describe '#annote' do
+      let(:entry) { Entry.new(annote: 'foo') }
+
+      it 'should run successfully' do
+        subject.annote
+      end
+    end
+
     describe '#author' do
       let(:entry) { Entry.new(author: 'Gustav Gans and Donald Duck') }
 
       it 'should run successfully' do
         subject.author
+      end
+    end
+
+    describe '#bdsk_url' do
+      let(:entry) { Entry.new(:'bdsk-url-1' => 'http://www.example.com') }
+
+      it 'should run successfully' do
+        subject.bdsk_url
       end
     end
 
@@ -61,6 +77,14 @@ module BibTeX
 
       it 'should run successfully' do
         subject.date_added
+      end
+    end
+
+    describe '#date_modified' do
+      let(:entry) { Entry.new(:'date-modified' => '2014-01-20') }
+
+      it 'should run successfully' do
+        subject.date_modified
       end
     end
 
