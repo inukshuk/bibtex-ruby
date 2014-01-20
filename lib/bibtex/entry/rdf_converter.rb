@@ -446,7 +446,9 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:title)
     remove_from_fallback(:title)
 
-    title = [bibtex[:title].to_s, bibtex[:subtitle].to_s].join(': ')
+    title = [bibtex[:title].to_s, bibtex[:subtitle].to_s]
+      .reject { |t| t.nil? || t.empty? }
+      .join(': ')
     graph << [entry, RDF::DC.title, title]
     graph << [entry, bibo[:shortTitle], bibtex[:title].to_s] if bibtex.field?(:subtitle)
   end
