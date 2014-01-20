@@ -98,7 +98,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.has_children?
 
     bibtex.children.each do |child|
-      graph << [entry, RDF::DC.hasPart, child.to_rdf]
+      graph << [entry, RDF::DC.hasPart, RDF::URI.new(child.identifier)]
     end
   end
 
@@ -302,7 +302,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.has_parent?
     remove_from_fallback(:crossref)
 
-    graph << [entry, RDF::DC.isPartOf, bibtex.parent.to_rdf]
+    graph << [entry, RDF::DC.isPartOf, RDF::URI.new(bibtex.parent.identifier)]
   end
 
   def publisher
