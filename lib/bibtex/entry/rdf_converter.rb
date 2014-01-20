@@ -31,8 +31,9 @@ class BibTeX::Entry::RDFConverter
   end
 
   # @param [BibTeX::Entry] the entry to convert
-  def initialize(bibtex)
+  def initialize(bibtex, graph = RDF::Graph.new)
     @bibtex = bibtex
+    @graph = graph
   end
 
   # @return [RDF::Graph] the RDF graph of this entry
@@ -445,7 +446,7 @@ class BibTeX::Entry::RDFConverter
 
   private
 
-  attr_reader :bibtex
+  attr_reader :bibtex, :graph
 
   def bibo
     @bibo ||= RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
@@ -457,10 +458,6 @@ class BibTeX::Entry::RDFConverter
 
   def entry
     @entry ||= RDF::URI.new(bibtex.identifier)
-  end
-
-  def graph
-    @graph ||= RDF::Graph.new
   end
 
   def agent(key, &block)
