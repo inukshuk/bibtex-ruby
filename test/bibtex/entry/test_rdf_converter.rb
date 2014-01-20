@@ -56,6 +56,14 @@ module BibTeX
       end
     end
 
+    describe '#date_added' do
+      let(:entry) { Entry.new(:'date-added' => '2014-01-20') }
+
+      it 'should run successfully' do
+        subject.date_added
+      end
+    end
+
     describe '#doi' do
       let(:entry) { Entry.new(doi: '10.1000/182') }
 
@@ -77,6 +85,12 @@ module BibTeX
 
       it 'should run successfully' do
         subject.editor
+      end
+    end
+
+    describe '#fallback_default' do
+      it 'should run successfully' do
+        subject.fallback_default
       end
     end
 
@@ -208,14 +222,6 @@ module BibTeX
       end
     end
 
-    describe '#pagetotal' do
-      let(:entry) { Entry.new(pagetotal: '12') }
-
-      it 'should run successfully' do
-        subject.pagetotal
-      end
-    end
-
     describe '#parent' do
       it 'should run successfully'
     end
@@ -293,10 +299,10 @@ module BibTeX
     end
 
     describe '#volumes' do
-      let(:entry) { Entry.new(volume: '7') }
+      let(:entry) { Entry.new(volumes: '7') }
 
       it 'should run successfully' do
-        subject.volume
+        subject.volumes
       end
     end
 
