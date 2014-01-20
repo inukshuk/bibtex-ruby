@@ -440,7 +440,12 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:year)
     remove_from_fallback(:year, :month)
 
-    date = [bibtex[:year].to_s, bibtex[:month].to_s].join('-')
+    year = bibtex[:year].to_s
+    if bibtex.field?(:month)
+      month = BibTeX::Entry::MONTHS.find_index(bibtex[:month].to_s.intern)
+      month += 1 unless month.nil?
+    end
+    date = [year, month].join('-')
 
     if bibtex.type == :unpublished
       graph << [entry, RDF::DC.created, date]
