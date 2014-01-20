@@ -72,6 +72,14 @@ module BibTeX
       end
     end
 
+    describe '#date_modified' do
+      let(:entry) { Entry.new(:'date-modified' => '2014-01-20') }
+
+      it 'should run successfully' do
+        subject.date_modified
+      end
+    end
+
     describe '#doi' do
       let(:entry) { Entry.new(doi: '10.1000/182') }
 

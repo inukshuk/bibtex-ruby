@@ -2,7 +2,6 @@ require 'uri/common'
 
 class BibTeX::Entry::RDFConverter
   DEFAULT_REMOVE_FROM_FALLBACK = %w(
-    date-modified
     bdsk-file-1
     bdsk-file-2
     bdsk-file-3
@@ -141,6 +140,13 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:'date-added')
 
     graph << [entry, RDF::DC.created, bibtex[:'date-added'].to_s]
+  end
+
+  def date_modified
+    return unless bibtex.field?(:'date-modified')
+    remove_from_fallback(:'date-modified')
+
+    graph << [entry, RDF::DC.modified, bibtex[:'date-modified'].to_s]
   end
 
   def doi
