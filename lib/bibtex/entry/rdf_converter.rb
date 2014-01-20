@@ -300,6 +300,7 @@ class BibTeX::Entry::RDFConverter
 
   def parent
     return unless bibtex.has_parent?
+    remove_from_fallback(:crossref)
 
     graph << [entry, RDF::DC.isPartOf, bibtex.parent.to_rdf]
   end
