@@ -425,7 +425,10 @@ class BibTeX::Entry::RDFConverter
       else degree
       end
 
-    graph << [entry, bibo[:degree], degree] unless degree.nil?
+    unless degree.nil?
+      remove_from_fallback(:type)
+      graph << [entry, bibo[:degree], degree]
+    end
   end
 
   def title
