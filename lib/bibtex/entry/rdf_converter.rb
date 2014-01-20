@@ -155,7 +155,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:institution)
     remove_from_fallback(:institution)
 
-    org = agent(bibtex[:institution]) { create_agent(bibtex[:institution].to_s, :Organization) }
+    org = agent(bibtex[:institution].to_s) { create_agent(bibtex[:institution].to_s, :Organization) }
 
     graph << [entry, RDF::DC.contributor, org]
   end
@@ -274,7 +274,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:organization)
     remove_from_fallback(:organization)
 
-    org = agent(bibtex[:organization]) { create_agent(bibtex[:organization].to_s, :Organization) }
+    org = agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
 
     graph << [entry, RDF::DC.contributor, org]
     graph << [entry, bibo[:organizer], org] if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
@@ -313,11 +313,11 @@ class BibTeX::Entry::RDFConverter
     org =
       case
       when bibtex.field?(:publisher)
-        agent(bibtex[:publisher]) { create_agent(bibtex[:publisher].to_s, :Organization) }
+        agent(bibtex[:publisher].to_s) { create_agent(bibtex[:publisher].to_s, :Organization) }
       when bibtex.field?(:organization)
-        agent(bibtex[:organization]) { create_agent(bibtex[:organization].to_s, :Organization) }
+        agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
       when bibtex.field?(:school)
-        agent(bibtex[:school]) { create_agent(bibtex[:school].to_s, :Organization) }
+        agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
       end
 
     if bibtex.field?(:address)
@@ -333,7 +333,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:school)
     remove_from_fallback(:school)
 
-    org = agent(bibtex[:school]) { create_agent(bibtex[:school].to_s, :Organization) }
+    org = agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
 
     graph << [entry, RDF::DC.contributor, org]
   end
@@ -392,7 +392,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:translator)
     remove_from_fallback(:translator)
 
-    node = agent(bibtex[:translator]) { create_agent(bibtex[:translator].to_s, :Person) }
+    node = agent(bibtex[:translator].to_s) { create_agent(bibtex[:translator].to_s, :Person) }
 
     graph << [entry, RDF::DC.contributor, node]
     graph << [entry, bibo[:translator], node]
