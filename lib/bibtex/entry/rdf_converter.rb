@@ -80,6 +80,7 @@ class BibTeX::Entry::RDFConverter
     return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:booktitle]
     return if bibtex.has_parent? && bibtex.parent[:booktitle] == bibtex[:booktitle]
     return if bibtex.has_parent? && bibtex.parent[:isbn] == bibtex[:isbn]
+    return if bibtex[:title] == bibtex[:booktitle]
 
     series = RDF::Node.new
     graph << [series, RDF.type, bibo[:Document]]
