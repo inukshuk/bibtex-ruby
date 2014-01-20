@@ -273,7 +273,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:keywords)
     remove_from_fallback(:keywords)
 
-    bibtex[:keywords].to_s.split(/\s*,\s*/).each do |keyword|
+    bibtex[:keywords].to_s.split(/\s*[,;]\s*/).each do |keyword|
       graph << [entry, RDF::DC.subject, keyword]
     end
   end
