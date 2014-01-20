@@ -83,6 +83,17 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
+  def bdsk_url
+    count = 1
+    while bibtex.field?("bdsk-url-#{count}".to_sym) do
+      field = "bdsk-url-#{count}".to_sym
+      remove_from_fallback(field)
+      graph << [entry, RDF::DC.URI, bibtex[field].to_s]
+      graph << [entry, bibo[:uri], bibtex[field].to_s]
+      count  += 1
+    end
+  end
+
   def booktitle
     return unless bibtex.field?(:booktitle)
     remove_from_fallback(:booktitle)
