@@ -99,7 +99,9 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.has_children?
 
     bibtex.children.each do |child|
-      graph << [entry, RDF::DC.hasPart, RDF::URI.new(child.identifier)]
+      child_id = RDF::URI.new(child.identifier)
+      BibTeX::Entry::RDFConverter.new(child, graph, agent).convert! unless uri_in_graph?(child_id)
+      graph << [entry, RDF::DC.hasPart, child_id]
     end
   end
 
@@ -303,7 +305,9 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.has_parent?
     remove_from_fallback(:crossref)
 
-    graph << [entry, RDF::DC.isPartOf, RDF::URI.new(bibtex.parent.identifier)]
+    parent_id = RDF::URI.new(bibtex.parent.identifier)
+    BibTeX::Entry::RDFConverter.new(bibtex.parent, graph, agent).convert! unless uri_in_graph?(parent_id)
+    graph << [entry, RDF::DC.isPartOf, parent_id]
   end
 
   def publisher
@@ -484,6 +488,14 @@ class BibTeX::Entry::RDFConverter
     end
 
     node
+  end
+
+  def uri_in_graph?(uri)
+    solutions = RDF::Query.execute(graph) do
+      pattern [uri, nil, nil]
+    end
+
+    solutions.size > 0
   end
 
   def fallback
