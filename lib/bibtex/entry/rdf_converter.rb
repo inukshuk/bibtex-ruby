@@ -1,6 +1,13 @@
 require 'uri/common'
 
 class BibTeX::Entry::RDFConverter
+  DEFAULT_REMOVE_FROM_FALLBACK = %w(
+    date-modified
+    bdsk-file-1
+    bdsk-file-2
+    bdsk-file-3
+  ).map(&:intern).freeze
+
   BIBO_TYPES = Hash[*%w{
     article        Article
     book           Book
@@ -150,6 +157,10 @@ class BibTeX::Entry::RDFConverter
       graph << [entry, bibo.name, node]
       graph << [seq, RDF.li, node]
     end
+  end
+
+  def fallback_default
+     remove_from_fallback *DEFAULT_REMOVE_FROM_FALLBACK
   end
 
   def howpublished
