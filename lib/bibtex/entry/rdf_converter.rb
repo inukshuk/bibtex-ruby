@@ -355,7 +355,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def publisher
-    return unless bibtex.field?(:publisher) || bibtex.field?(:organization) || bibtex.field?(:school)
+    return unless bibtex.field?(:publisher, :organization, :school, :institution)
     remove_from_fallback(:publisher, :address)
 
     org =
@@ -366,6 +366,8 @@ class BibTeX::Entry::RDFConverter
         agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
       when bibtex.field?(:school)
         agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
+      when bibtex.field?(:institution)
+        agent(bibtex[:institution].to_s) { create_agent(bibtex[:institution].to_s, :Organization) }
       end
 
     if bibtex.field?(:address)
