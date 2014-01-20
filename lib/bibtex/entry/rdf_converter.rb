@@ -449,7 +449,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def type
-    graph << [entry, RDF.type, bibo_class]
+    graph << [entry, RDF.type, bibo[bibo_class]]
 
     case bibtex.type
     when :proceedings, :journal
