@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'rdf', '~>0.3'
+gem 'rdf', '~>1.1'
 gem 'json', '~>1.8', :platforms => [:mri_18, :jruby, :rbx]
 
 gem 'rubysl', '~>2.0', :platforms => :rbx
