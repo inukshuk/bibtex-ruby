@@ -490,7 +490,7 @@ class BibTeX::Entry::RDFConverter
       month = BibTeX::Entry::MONTHS.find_index(bibtex[:month].to_s.intern)
       month += 1 unless month.nil?
     end
-    date = [year, month].join('-')
+    date = month.nil? ? year : [year, month].join('-')
 
     graph << [entry, RDF::DC.issued, date]
   end
