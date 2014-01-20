@@ -37,7 +37,7 @@ module BibTeX
     end
 
     describe '#bdsk_url' do
-      let(:entry) { Entry.new(:'bdsk-url-1' 'http://www.example.com') }
+      let(:entry) { Entry.new(:'bdsk-url-1' => 'http://www.example.com') }
 
       it 'should run successfully' do
         subject.bdsk_url
