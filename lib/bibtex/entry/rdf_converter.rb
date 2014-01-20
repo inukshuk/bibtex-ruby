@@ -449,10 +449,8 @@ class BibTeX::Entry::RDFConverter
 
     if bibtex.type == :unpublished
       graph << [entry, RDF::DC.created, date]
-      graph << [entry, bibo[:created], date]
     else
       graph << [entry, RDF::DC.issued, date]
-      graph << [entry, bibo[:issued], date]
     end
   end
 
