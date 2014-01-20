@@ -2,10 +2,10 @@ require 'uri/common'
 
 class BibTeX::Entry::RDFConverter
   DEFAULT_REMOVE_FROM_FALLBACK = %w(
-    date-modified
     bdsk-file-1
     bdsk-file-2
     bdsk-file-3
+    bdsk-file-4
   ).map(&:intern).freeze
 
   BIBO_TYPES = Hash[*%w{
@@ -66,6 +66,17 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:abstract], bibtex[:abstract].to_s]
   end
 
+  def annote
+    return unless bibtex.field?(:annote)
+    remove_from_fallback(:annote)
+
+    pub = RDF::Node.new
+    graph << [pub, RDF.type, bibo[:Note]]
+    graph << [pub, bibo[:content], bibtex[:annote]]
+
+    graph << [entry, bibo[:annotates], pub]
+  end
+
   def author
     return unless bibtex.field?(:author)
     remove_from_fallback(:author)
@@ -80,6 +91,17 @@ class BibTeX::Entry::RDFConverter
 
       graph << [entry, RDF::DC.creator, node]
       graph << [seq, RDF.li, node]
+    end
+  end
+
+  def bdsk_url
+    count = 1
+    while bibtex.field?("bdsk-url-#{count}".to_sym) do
+      field = "bdsk-url-#{count}".to_sym
+      remove_from_fallback(field)
+      graph << [entry, RDF::DC.URI, bibtex[field].to_s]
+      graph << [entry, bibo[:uri], bibtex[field].to_s]
+      count  += 1
     end
   end
 
@@ -130,6 +152,13 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:'date-added')
 
     graph << [entry, RDF::DC.created, bibtex[:'date-added'].to_s]
+  end
+
+  def date_modified
+    return unless bibtex.field?(:'date-modified')
+    remove_from_fallback(:'date-modified')
+
+    graph << [entry, RDF::DC.modified, bibtex[:'date-modified'].to_s]
   end
 
   def doi
@@ -244,7 +273,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:keywords)
     remove_from_fallback(:keywords)
 
-    bibtex[:keywords].to_s.split(/\s*,\s*/).each do |keyword|
+    bibtex[:keywords].to_s.split(/\s*[,;]\s*/).each do |keyword|
       graph << [entry, RDF::DC.subject, keyword]
     end
   end
@@ -338,7 +367,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def publisher
-    return unless bibtex.field?(:publisher) || bibtex.field?(:organization) || bibtex.field?(:school)
+    return unless bibtex.field?(:publisher, :organization, :school, :institution)
     remove_from_fallback(:publisher, :address)
 
     org =
@@ -349,6 +378,8 @@ class BibTeX::Entry::RDFConverter
         agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
       when bibtex.field?(:school)
         agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
+      when bibtex.field?(:institution)
+        agent(bibtex[:institution].to_s) { create_agent(bibtex[:institution].to_s, :Organization) }
       end
 
     if bibtex.field?(:address)
@@ -398,20 +429,26 @@ class BibTeX::Entry::RDFConverter
       case bibtex[:type]
       when 'mathesis' then bibo['degrees/ma']
       when 'phdthesis' then bibo['degrees/phd']
+      when /Dissertation/i then bibo['degrees/phd']
       when /Bachelor['s]{0,2} Thesis/i then "Bachelor's Thesis"
       when /Diplomarbeit/i then bibo['degrees/ms']
       when /Magisterarbeit/i then bibo['degrees/ma']
       else degree
       end
 
-    graph << [entry, bibo[:degree], degree] unless degree.nil?
+    unless degree.nil?
+      remove_from_fallback(:type)
+      graph << [entry, bibo[:degree], degree]
+    end
   end
 
   def title
     return unless bibtex.field?(:title)
     remove_from_fallback(:title)
 
-    title = [bibtex[:title].to_s, bibtex[:subtitle].to_s].join(': ')
+    title = [bibtex[:title].to_s, bibtex[:subtitle].to_s]
+      .reject { |t| t.nil? || t.empty? }
+      .join(': ')
     graph << [entry, RDF::DC.title, title]
     graph << [entry, bibo[:shortTitle], bibtex[:title].to_s] if bibtex.field?(:subtitle)
   end
@@ -429,7 +466,7 @@ class BibTeX::Entry::RDFConverter
   end
 
   def type
-    graph << [entry, RDF.type, bibo_class]
+    graph << [entry, RDF.type, bibo[bibo_class]]
 
     case bibtex.type
     when :proceedings, :journal
@@ -470,7 +507,7 @@ class BibTeX::Entry::RDFConverter
       month = BibTeX::Entry::MONTHS.find_index(bibtex[:month].to_s.intern)
       month += 1 unless month.nil?
     end
-    date = [year, month].join('-')
+    date = month.nil? ? year : [year, month].join('-')
 
     graph << [entry, RDF::DC.issued, date]
   end
