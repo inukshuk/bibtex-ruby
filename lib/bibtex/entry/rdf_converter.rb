@@ -66,6 +66,17 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:abstract], bibtex[:abstract].to_s]
   end
 
+  def annote
+    return unless bibtex.field?(:annote)
+    remove_from_fallback(:annote)
+
+    pub = RDF::Node.new
+    graph << [pub, RDF.type, bibo[:Note]]
+    graph << [pub, bibo[:content], bibtex[:annote]]
+
+    graph << [entry, bibo[:annotates], pub]
+  end
+
   def author
     return unless bibtex.field?(:author)
     remove_from_fallback(:author)

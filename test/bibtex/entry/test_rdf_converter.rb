@@ -20,6 +20,14 @@ module BibTeX
       end
     end
 
+    describe '#annote' do
+      let(:entry) { Entry.new(annote: 'foo') }
+
+      it 'should run successfully' do
+        subject.annote
+      end
+    end
+
     describe '#author' do
       let(:entry) { Entry.new(author: 'Gustav Gans and Donald Duck') }
 
