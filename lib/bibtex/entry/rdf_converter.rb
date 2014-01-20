@@ -113,6 +113,13 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, RDF::DC.rightsHolder, bibtex[:copyright].to_s]
   end
 
+  def date_added
+    return unless bibtex.field?(:'date-added')
+    remove_from_fallback(:'date-added')
+
+    graph << [entry, RDF::DC.created, bibtex[:'date-added'].to_s]
+  end
+
   def doi
     return unless bibtex.field?(:doi)
     remove_from_fallback(:doi)
