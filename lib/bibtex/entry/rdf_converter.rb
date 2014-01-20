@@ -447,11 +447,7 @@ class BibTeX::Entry::RDFConverter
     end
     date = [year, month].join('-')
 
-    if bibtex.type == :unpublished
-      graph << [entry, RDF::DC.created, date]
-    else
-      graph << [entry, RDF::DC.issued, date]
-    end
+    graph << [entry, RDF::DC.issued, date]
   end
 
   private
