@@ -33,8 +33,8 @@ class BibTeX::Entry::RDFConverter
 
   # converts a BibTeX entry to RDF
   # @return [RDF::Graph] the RDF graph of this entry
-  def self.convert(bibtex)
-    new(bibtex).convert!
+  def self.convert(bibtex, graph = RDF::Graph.new, agent = {})
+    new(bibtex, graph, agent).convert!
   end
 
   # @param [BibTeX::Entry] the entry to convert
@@ -49,9 +49,11 @@ class BibTeX::Entry::RDFConverter
     bibtex.parse_names
     bibtex.parse_month
 
-    methods = self.class.instance_methods(false) - [:convert!]
-    methods.each { |m| send(m) }
-    run_fallback
+    unless uri_in_graph?(entry)
+      methods = self.class.instance_methods(false) - [:convert!]
+      methods.each { |m| send(m) }
+      run_fallback
+    end
 
     graph
   end

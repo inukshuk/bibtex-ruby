@@ -78,4 +78,5 @@ end
 require 'bibtex/error'
 require 'bibtex/parser'
 require 'bibtex/bibliography'
+require 'bibtex/bibliography/rdf_converter'
 require 'bibtex/utilities'
