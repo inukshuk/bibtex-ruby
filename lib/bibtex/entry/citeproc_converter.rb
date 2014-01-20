@@ -1,5 +1,5 @@
 class BibTeX::Entry::CiteProcConverter
-  CSL_FILTER = Hash.new {|h,k|k}.merge(Hash[*%w{
+  CSL_FILTER = Hash.new { |h, k| k }.merge(Hash[*%w{
     date      issued
     isbn      ISBN
     booktitle container-title
@@ -14,7 +14,8 @@ class BibTeX::Entry::CiteProcConverter
     type      genre
   }.map(&:intern)]).freeze
 
-  CSL_FIELDS = %w{ abstract annote archive archive_location archive-place
+  CSL_FIELDS = %w{
+    abstract annote archive archive_location archive-place
     authority call-number chapter-number citation-label citation-number
     collection-title container-title DOI edition event event-place
     first-reference-note-number genre ISBN issue jurisdiction keyword locator
@@ -26,7 +27,7 @@ class BibTeX::Entry::CiteProcConverter
     original-publisher original-author container-author collection-editor
   }.map(&:intern).freeze
 
-  CSL_TYPES = Hash.new {|h,k|k}.merge(Hash[*%w{
+  CSL_TYPES = Hash.new { |h, k| k }.merge(Hash[*%w{
     booklet        pamphlet
     conference     paper-conference
     inbook         chapter
@@ -48,7 +49,7 @@ class BibTeX::Entry::CiteProcConverter
 
   def initialize(bibtex, options = {})
     @bibtex = bibtex
-    @options = {:quotes => []}.merge(options)
+    @options = { quotes: [] }.merge(options)
   end
 
   def convert!

@@ -112,11 +112,19 @@ module BibTeX
       end
     end
 
-    describe '#journal' do
+    describe '#journal_dc_source' do
       let(:entry) { Entry.new(journal: 'Lustiges Taschenbuch') }
 
       it 'should run successfully' do
-        subject.journal
+        subject.journal_dc_source
+      end
+    end
+
+    describe '#journal_dc_part_of' do
+      let(:entry) { Entry.new(journal: 'Lustiges Taschenbuch') }
+
+      it 'should run successfully' do
+        subject.journal_dc_part_of
       end
     end
 

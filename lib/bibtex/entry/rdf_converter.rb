@@ -86,9 +86,12 @@ class BibTeX::Entry::RDFConverter
   def booktitle
     return unless bibtex.field?(:booktitle)
     remove_from_fallback(:booktitle)
-    return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:booktitle]
-    return if bibtex.has_parent? && bibtex.parent[:booktitle] == bibtex[:booktitle]
-    return if bibtex.has_parent? && bibtex.parent[:isbn] == bibtex[:isbn]
+    return if bibtex.has_parent? &&
+      bibtex.parent[:title] == bibtex[:booktitle]
+    return if bibtex.has_parent? &&
+      bibtex.parent[:booktitle] == bibtex[:booktitle]
+    return if bibtex.has_parent? &&
+      bibtex.parent[:isbn] == bibtex[:isbn]
     return if bibtex[:title] == bibtex[:booktitle]
 
     series = RDF::Node.new
@@ -162,14 +165,14 @@ class BibTeX::Entry::RDFConverter
   end
 
   def fallback_default
-     remove_from_fallback *DEFAULT_REMOVE_FROM_FALLBACK
+    remove_from_fallback(*DEFAULT_REMOVE_FROM_FALLBACK)
   end
 
   def howpublished
     return unless bibtex.field?(:howpublished)
-    return unless bibtex[:howpublished] =~ /^#{URI::regexp}$/
-
+    return unless bibtex[:howpublished] =~ /^#{URI.regexp}$/
     remove_from_fallback(:howpublished)
+
     graph << [entry, RDF::DC.URI, bibtex[:howpublished].to_s]
     graph << [entry, bibo[:uri], bibtex[:howpublished].to_s]
   end
@@ -208,7 +211,7 @@ class BibTeX::Entry::RDFConverter
     end
   end
 
-  def journal
+  def journal_dc_source
     return unless bibtex.field?(:journal)
     remove_from_fallback(:journal)
 
@@ -219,7 +222,10 @@ class BibTeX::Entry::RDFConverter
     pagination = bibtex[:pagination] || 'pp.'
     source << "#{pagination.to_s} #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
     graph << [entry, RDF::DC.source, source.join(', ')]
+  end
 
+  def journal_dc_part_of
+    return unless bibtex.field?(:journal)
     return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:journal]
     return if bibtex.has_parent? && bibtex.parent[:issn] == bibtex[:issn]
 
@@ -308,8 +314,8 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:pages)
 
     if bibtex[:pages].to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
-      graph << [entry, bibo[:pageStart], $1]
-      graph << [entry, bibo[:pageEnd], $2]
+      graph << [entry, bibo[:pageStart], Regexp.last_match[1]]
+      graph << [entry, bibo[:pageEnd], Regexp.last_match[2]]
     else
       graph << [entry, bibo[:pages], bibtex[:pages].to_s]
     end
@@ -380,26 +386,23 @@ class BibTeX::Entry::RDFConverter
   def thesis_degree
     return unless bibo_class == :Thesis
 
-    case bibtex.type
-    when :mastersthesis
+    degree =
+      case bibtex.type
       # ms = masters degree in science
       # Only ma and ms available. We simply chose one.
-      degree = bibo['degrees/ms']
-    when :phdthesis
-      degree = bibo['degrees/phd']
-    end
-    case bibtex[:type]
-    when 'mathesis'
-      degree = bibo['degrees/ma']
-    when 'phdthesis'
-      degree = bibo['degrees/phd']
-    when /Bachelor['s]{0,2} Thesis/i
-      degree = "Bachelor's Thesis"
-    when /Diplomarbeit/i
-      degree = bibo['degrees/ms']
-    when /Magisterarbeit/i
-      degree = bibo['degrees/ma']
-    end
+      when :mastersthesis then bibo['degrees/ms']
+      when :phdthesis then bibo['degrees/phd']
+      end
+
+    degree =
+      case bibtex[:type]
+      when 'mathesis' then bibo['degrees/ma']
+      when 'phdthesis' then bibo['degrees/phd']
+      when /Bachelor['s]{0,2} Thesis/i then "Bachelor's Thesis"
+      when /Diplomarbeit/i then bibo['degrees/ms']
+      when /Magisterarbeit/i then bibo['degrees/ma']
+      else degree
+      end
 
     graph << [entry, bibo[:degree], degree] unless degree.nil?
   end
@@ -417,7 +420,9 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:translator)
     remove_from_fallback(:translator)
 
-    node = agent(bibtex[:translator].to_s) { create_agent(bibtex[:translator].to_s, :Person) }
+    node = agent(bibtex[:translator].to_s) do
+      create_agent(bibtex[:translator].to_s, :Person)
+    end
 
     graph << [entry, RDF::DC.contributor, node]
     graph << [entry, bibo[:translator], node]
@@ -503,7 +508,8 @@ class BibTeX::Entry::RDFConverter
 
     if name.is_a?(BibTeX::Name)
       [:given, :family, :prefix, :suffix].each do |part|
-        graph << [node, bibo["#{part}Name"], name.send(part).to_s] unless name.send(part).nil?
+        value = name.send(part)
+        graph << [node, bibo["#{part}Name"], value.to_s] unless value.nil?
       end
     end
 
