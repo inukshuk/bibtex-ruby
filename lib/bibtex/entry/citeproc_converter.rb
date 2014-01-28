@@ -37,7 +37,7 @@ class BibTeX::Entry::CiteProcConverter
     mastersthesis  thesis
     misc           article
     phdthesis      thesis
-    proceedings    paper-conference
+    proceedings    book
     techreport     report
     unpublished    manuscript
     article        article-journal
