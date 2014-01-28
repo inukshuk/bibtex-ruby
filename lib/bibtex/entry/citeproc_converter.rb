@@ -15,6 +15,7 @@ class BibTeX::Entry::CiteProcConverter
     school       publisher
     institution  publisher
     organization publisher
+    howpublished publisher
   }.map(&:intern)]).freeze
 
   CSL_FIELDS = %w{
@@ -38,7 +39,6 @@ class BibTeX::Entry::CiteProcConverter
     inproceedings  paper-conference
     manual         book
     mastersthesis  thesis
-    misc           article
     phdthesis      thesis
     proceedings    book
     techreport     report
