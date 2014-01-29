@@ -314,7 +314,7 @@ module BibTeX
             p.address = 'Place'
           }.to_citeproc
 
-          assert_equal 'Place', conference['event-lace']
+          assert_equal 'Place', conference['event-place']
         end
 
         it 'support literal dates in citeproc export' do
