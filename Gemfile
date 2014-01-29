@@ -19,6 +19,9 @@ group :test do
   gem 'minitest-ansi'
   gem 'cucumber', '~>1.3'
   gem 'unicode', '~>0.4', :platforms => [:rbx, :mswin, :mingw, :mri_19, :mri_20, :mri_21]
+	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby_21, :ruby_20]
+  gem 'rubinius-coverage', :require => false, :platforms => :rbx
+  gem 'coveralls', '~>0.7', :require => false
 end
 
 group :extra do
@@ -34,8 +37,6 @@ end
 group :profile do
 	gem 'ruby-prof', '~>0.14', :platforms => [:mri_19, :mri_20, :mri_21]
 	gem 'gnuplot', '~>2.4', :platforms => [:mri_19, :mri_20, :mri_21]
-	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby_21, :ruby_20]
-  gem 'rubinius-coverage', :require => false, :platforms => :rbx
 end
 
 group :development do

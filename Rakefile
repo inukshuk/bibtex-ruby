@@ -38,6 +38,9 @@ rescue LoadError
   end
 end
 
+require 'coveralls/rake/task'
+Coveralls::RakeTask.new
+task :test_with_coveralls => [:spec, :cucumber, 'coveralls:push']
 
 task :default => [:test, :features]
 
@@ -82,6 +85,8 @@ end
 
 
 desc 'Updates the Manifest file'
+  require 'coveralls' if ENV['CI']
+  require 'coveralls' if ENV['CI']
 task :manifest => ['clean', 'racc'] do
   m = File.open('Manifest', 'w')
   m.print FileList['**/*'].reject{ |f|

@@ -1,6 +1,7 @@
 BibTeX-Ruby
 ===========
 [![Build Status](https://secure.travis-ci.org/inukshuk/bibtex-ruby.png?branch=master)](http://travis-ci.org/inukshuk/bibtex-ruby)
+[![Coverage Status](https://coveralls.io/repos/inukshuk/bibtex-ruby/badge.png)](https://coveralls.io/r/inukshuk/bibtex-ruby)
 
 BibTeX-Ruby is the Rubyist's swiss-army-knife for all things BibTeX. It
 includes a parser for all common BibTeX objects (@string, @preamble, @comment
