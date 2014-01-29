@@ -1,17 +1,21 @@
 class BibTeX::Entry::CiteProcConverter
   CSL_FILTER = Hash.new { |h, k| k }.merge(Hash[*%w{
-    date      issued
-    isbn      ISBN
-    booktitle container-title
-    journal   container-title
-    series    collection-title
-    address   publisher-place
-    pages     page
-    number    issue
-    url       URL
-    doi       DOI
-    year      issued
-    type      genre
+    date         issued
+    isbn         ISBN
+    booktitle    container-title
+    journal      container-title
+    series       collection-title
+    address      publisher-place
+    pages        page
+    number       issue
+    url          URL
+    doi          DOI
+    year         issued
+    type         genre
+    school       publisher
+    institution  publisher
+    organization publisher
+    howpublished publisher
   }.map(&:intern)]).freeze
 
   CSL_FIELDS = %w{
@@ -35,9 +39,8 @@ class BibTeX::Entry::CiteProcConverter
     inproceedings  paper-conference
     manual         book
     mastersthesis  thesis
-    misc           article
     phdthesis      thesis
-    proceedings    paper-conference
+    proceedings    book
     techreport     report
     unpublished    manuscript
     article        article-journal
