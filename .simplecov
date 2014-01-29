@@ -1,4 +1,4 @@
 SimpleCov.start do
-  filter 'test/'
-  filter 'features/'
+  add_filter 'test/'
+  add_filter 'features/'
 end
