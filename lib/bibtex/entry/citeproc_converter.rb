@@ -60,13 +60,48 @@ class BibTeX::Entry::CiteProcConverter
     bibtex.parse_month
 
     bibtex.each_pair do |key, value|
-      hash[CSL_FILTER[key].to_s] = value.to_citeproc(options) unless BibTeX::Entry::DATE_FIELDS.include?(key)
+      unless BibTeX::Entry::DATE_FIELDS.include?(key)
+        cp_key = CSL_FILTER[key].to_s
+
+        if hash.key?(cp_key)
+          hash[key] = value.to_citeproc(options)
+        else
+          hash[cp_key] = value.to_citeproc(options)
+        end
+      end
     end
 
     methods = self.class.instance_methods(false) - [:convert!]
     methods.each { |m| send(m) }
 
     hash
+  end
+
+  def proceedings
+    return unless bibtex.type == :inproceedings
+
+    if bibtex.field?(:organization) && bibtex.field?(:publisher)
+      hash['authority'] = bibtex[:organization]
+      hash['publisher'] = bibtex[:publisher]
+    end
+  end
+
+  def conference
+    return unless bibtex.type == :conference
+
+    if bibtex.field? :address
+      hash['event-place'] = bibtex[:address]
+    end
+  end
+
+  def techreport
+    return unless bibtex.type == :techreport
+
+    hash.delete 'number'
+    hash.delete 'issue'
+
+    hash['number'] = bibtex[:number] if bibtex.field? :number
+    hash['issue'] = bibtex[:issue] if bibtex.field? :issue
   end
 
   def date

@@ -259,27 +259,76 @@ module BibTeX
         assert_equal 'Moby Dick', e[:foo]
       end
 
-      it 'supports citeproc export' do
-        e = @entry.to_citeproc
-        assert_equal 'book', e['type']
-        assert_equal 'New York', e['publisher-place']
-        assert_equal [1993,11], e['issued']['date-parts'][0]
-        assert_equal 1, e['author'].length
-        assert_equal 'Herman', e['author'][0]['given']
-        assert_equal 'Melville', e['author'][0]['family']
-      end
+      describe 'citeproc export' do
+        it 'supports citeproc export' do
+          e = @entry.to_citeproc
+          assert_equal 'book', e['type']
+          assert_equal 'New York', e['publisher-place']
+          assert_equal [1993,11], e['issued']['date-parts'][0]
+          assert_equal 1, e['author'].length
+          assert_equal 'Herman', e['author'][0]['given']
+          assert_equal 'Melville', e['author'][0]['family']
+        end
 
-      it 'support literal dates in citeproc export' do
-        @entry.year = 'Test'
-        e = @entry.to_citeproc
-        assert_equal({ 'literal' => 'Test' }, e['issued'])
+        it 'keeps both issue and number in techreports' do
+          report = Entry.new { |r|
+            r.type = :techreport
+            r.number = 1
+            r.issue = 2
+          }.to_citeproc
+
+          assert_equal 1, report['number']
+          assert_equal 2, report['issue']
+        end
+
+        it 'uses authority and publisher for proceedings' do
+          proceedings = Entry.new { |p|
+            p.type = :inproceedings
+            p.publisher = 'Publisher'
+            p.organization = 'Organization'
+          }.to_citeproc
+
+          assert_equal 'Publisher', proceedings['publisher']
+          assert_equal 'Organization', proceedings['authority']
+
+          proceedings = Entry.new { |p|
+            p.type = :inproceedings
+            p.organization = 'Organization'
+          }.to_citeproc
+
+          assert_equal 'Organization', proceedings['publisher']
+          refute proceedings.key?('authority')
+
+          proceedings = Entry.new { |p|
+            p.type = :inproceedings
+            p.publisher = 'Publisher'
+          }.to_citeproc
+
+          assert_equal 'Publisher', proceedings['publisher']
+          refute proceedings.key?('authority')
+        end
+
+        it 'uses event_place for conferences' do
+          conference = Entry.new { |p|
+            p.type = :conference
+            p.address = 'Place'
+          }.to_citeproc
+
+          assert_equal 'Place', conference['event-lace']
+        end
+
+        it 'support literal dates in citeproc export' do
+          @entry.year = 'Test'
+          e = @entry.to_citeproc
+          assert_equal({ 'literal' => 'Test' }, e['issued'])
+        end
       end
 
       describe 'given a filter object or a filter name' do
         before do
           @filter = Object.new
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
-          
+
           class SuffixB < BibTeX::Filter
             def apply(value)
               value.is_a?(::String) ? "#{value}b" : value
