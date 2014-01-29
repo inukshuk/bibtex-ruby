@@ -444,4 +444,4 @@ def _reduce_none(val, _values, result)
 end
 
   end   # class NameParser
-  end   # module BibTeX
+end   # module BibTeX
