@@ -77,17 +77,13 @@ class BibTeX::Entry::CiteProcConverter
     hash
   end
 
-  def proceedings
-    return unless bibtex.type == :inproceedings
+  def conferences
+    return unless [:conference, :proceedings, :inproceedings].include?(bibtex.type)
 
     if bibtex.field?(:organization) && bibtex.field?(:publisher)
       hash['authority'] = bibtex[:organization]
       hash['publisher'] = bibtex[:publisher]
     end
-  end
-
-  def conference
-    return unless bibtex.type == :conference
 
     if bibtex.field? :address
       hash['event-place'] = bibtex[:address]
@@ -96,12 +92,7 @@ class BibTeX::Entry::CiteProcConverter
 
   def techreport
     return unless bibtex.type == :techreport
-
-    hash.delete 'number'
-    hash.delete 'issue'
-
-    hash['number'] = bibtex[:number] if bibtex.field? :number
-    hash['issue'] = bibtex[:issue] if bibtex.field? :issue
+    hash['number'] = bibtex[:number].to_s if bibtex.field? :number
   end
 
   def date

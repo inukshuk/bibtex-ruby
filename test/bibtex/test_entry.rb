@@ -270,15 +270,14 @@ module BibTeX
           assert_equal 'Melville', e['author'][0]['family']
         end
 
-        it 'keeps both issue and number in techreports' do
+        it 'sets both issue and number in techreports' do
           report = Entry.new { |r|
             r.type = :techreport
             r.number = 1
-            r.issue = 2
           }.to_citeproc
 
-          assert_equal 1, report['number']
-          assert_equal 2, report['issue']
+          assert_equal '1', report['number']
+          assert_equal '1', report['issue']
         end
 
         it 'uses authority and publisher for proceedings' do
