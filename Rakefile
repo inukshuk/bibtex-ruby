@@ -71,6 +71,13 @@ task :console, [:script] do |t,args|
   IRB.start
 end
 
+task :check_warnings do
+  $VERBOSE = true
+  require 'bibtex'
+
+  puts BibTeX::Version::STRING
+end
+
 
 desc 'Runs the benchmarks (and plots the results)'
 task :benchmark => ['racc'] do

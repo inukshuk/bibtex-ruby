@@ -109,24 +109,33 @@ module BibTeX
       self
     end
 
-    # Generate Accessors for required fields (#52)
-
+    # Generate accessors for required fields (#52)
     REQUIRED_FIELDS.values.flatten.uniq.each do |name|
-
       define_method(name) do
-        case
-        when fields.has_key?(name)
-          fields[name]
-        when has_parent? && parent.provides?(name)
-          parent.provide(name)
-        else
-          nil
-        end
-      end
+        get name
+      end unless method_defined? name
 
-      define_method("#{name}=") do |value|
+      writer = "#{name}="
+
+      define_method(writer) do |value|
         add name, value
-      end
+      end unless method_defined? writer
+    end
+
+    # Generate author, editor and translator accessors
+    NAME_FIELDS.each do |contributor|
+      define_method(contributor) do
+        get contributor
+      end unless method_defined? contributor
+
+      writer = "#{contributor}="
+
+      define_method(writer) do |value|
+        add contributor, value
+      end unless method_defined? writer
+
+      alias_method "#{contributor}s", contributor
+      alias_method "#{contributor}s=", writer
     end
 
     # call-seq:
@@ -335,16 +344,6 @@ module BibTeX
     def []=(name, value)
       add(name.to_sym, value)
     end
-
-    # Author, Editor and Translator readers
-    NAME_FIELDS.each do |contributor|
-      define_method(contributor) do
-        get(contributor)
-      end
-
-      alias_method "#{contributor}s", contributor
-    end
-
 
     # call-seq:
     #   add(:author, "Edgar A. Poe")

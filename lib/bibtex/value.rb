@@ -22,7 +22,7 @@ require 'forwardable'
 
 module BibTeX
 
-  #
+
   # A BibTeX Value is something very much like a string. In BibTeX files it
   # can appear on the right hand side of @string or @entry field assignments
   # or as @preamble contents. In the example below [VALUE] indicates possible
@@ -52,7 +52,11 @@ module BibTeX
     attr_reader :tokens
     alias to_a tokens
 
-    def_delegators :to_s, :=~, :===, *String.instance_methods(false).reject { |m| m =~ /^\W|^length$|^dup$|!$/ }
+    def_delegators :to_s, :=~, :===,
+      *String.instance_methods(false).reject { |m|
+        m =~ /^\W|^(length|dup|replace|to_s|inspect)$|!$/
+      }
+
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
 
