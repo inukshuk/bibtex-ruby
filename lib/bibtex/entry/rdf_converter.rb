@@ -512,9 +512,11 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, RDF::DC.issued, date]
   end
 
-  private
+  protected
 
   attr_reader :bibtex, :graph
+
+  private
 
   def bibo
     @bibo ||= RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
