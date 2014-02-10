@@ -12,24 +12,24 @@ module BibTeX
   class NameParser < Racc::Parser
 
 module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
-  
+
   @patterns = {
     :and => /,?\s+and\s+/io,
-    :space => /[\t\r\n\s]+/o,
+    :space => /\s+/o,
     :comma => /,/o,
-    :lower => /[[:lower:]][^\t\r\n\s\{\}\d\\,]*/o,
-    :upper => /[[:upper:]][^\t\r\n\s\{\}\d\\,]*/uo,
+    :lower => /[[:lower:]][^\s\{\}\d\\,]*/o,
+    :upper => /[[:upper:]][^\s\{\}\d\\,]*/uo,
     :symbols => /(\d|\\.)+/o,
     :lbrace => /\{/o,
     :rbrace => /\}/o,
     :period => /./o,
     :braces => /[\{\}]/o
   }
-  
+
   class << self
     attr_reader :patterns
   end
-  
+
   def initialize(options = {})
     self.options.merge!(options)
   end
@@ -37,17 +37,17 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
   def options
     @options ||= { :debug => ENV['DEBUG'] == true }
   end
-  
+
   def parse(input)
     @yydebug = options[:debug]
     scan(input)
     do_parse
   end
-  
+
   def next_token
     @stack.shift
   end
-  
+
   def on_error(tid, val, vstack)
     BibTeX.log.error("Failed to parse BibTeX Name on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
   end
@@ -59,7 +59,7 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
     @word = [:PWORD,'']
     do_scan
   end
-  
+
   private
 
   def do_scan
@@ -68,14 +68,14 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
       when @src.scan(NameParser.patterns[:and])
         push_word
         @stack.push([:AND,@src.matched])
-        
+
       when @src.scan(NameParser.patterns[:space])
         push_word
-      
+
       when @src.scan(NameParser.patterns[:comma])
         push_word
         @stack.push([:COMMA,@src.matched])
-        
+
       when @src.scan(NameParser.patterns[:lower])
         is_lowercase
         @word[1] << @src.matched
@@ -83,14 +83,14 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
       when @src.scan(NameParser.patterns[:upper])
         is_uppercase
         @word[1] << @src.matched
-        
+
       when @src.scan(NameParser.patterns[:symbols])
         @word[1] << @src.matched
-        
+
       when @src.scan(NameParser.patterns[:lbrace])
         @word[1] << @src.matched
         scan_literal
-        
+
       when @src.scan(NameParser.patterns[:rbrace])
         error_unbalanced
 
@@ -98,18 +98,18 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
         @word[1] << @src.matched
       end
     end
-    
+
     push_word
     @stack
   end
-  
+
   def push_word
     unless @word[1].empty?
       @stack.push(@word)
       @word = [:PWORD,'']
     end
   end
-  
+
   def is_lowercase
     @word[0] = :LWORD if @word[0] == :PWORD
   end
@@ -117,7 +117,7 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
   def is_uppercase
     @word[0] = :UWORD if @word[0] == :PWORD
   end
-  
+
   def scan_literal
     @brace_level = 1
 
@@ -140,12 +140,12 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 94)
     @stack.push [:ERROR,@src.matched]
     BibTeX.log.warn("NameParser: unexpected token `#{@src.matched}' at position #{@src.pos}; brace level #{@brace_level}.")
   end
-  
+
   def error_unbalanced
     @stack.push [:ERROR,'}']
     BibTeX.log.warn("NameParser: unbalanced braces at position #{@src.pos}; brace level #{@brace_level}.")
   end
-  
+
 # -*- racc -*-
 ...end names.y/module_eval...
 ##### State transition tables begin ###
