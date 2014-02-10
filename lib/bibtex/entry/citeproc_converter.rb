@@ -129,7 +129,7 @@ class BibTeX::Entry::CiteProcConverter
     end
   end
 
-  private
+  protected
 
   attr_reader :bibtex, :options
 

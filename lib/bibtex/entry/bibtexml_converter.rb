@@ -34,7 +34,7 @@ class BibTeX::Entry::BibTeXMLConverter
     end
   end
 
-  private
+  protected
 
   attr_reader :bibtex, :options
 

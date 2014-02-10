@@ -21,7 +21,7 @@ class BibTeX::Bibliography::RDFConverter
     graph
   end
 
-  private
+  protected
 
   attr_reader :bibtex, :graph, :agent
 end
