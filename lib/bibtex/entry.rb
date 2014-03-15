@@ -49,7 +49,7 @@ module BibTeX
     }.freeze
 
 
-    NAME_FIELDS = [:author,:editor,:translator].freeze
+    NAME_FIELDS = [:author,:editor,:translator,:director,:producer,:composer].freeze
     DATE_FIELDS = [:year,:month].freeze
 
     MONTHS = [:jan,:feb,:mar,:apr,:may,:jun,:jul,:aug,:sep,:oct,:nov,:dec].freeze
