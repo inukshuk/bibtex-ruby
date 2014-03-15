@@ -109,6 +109,14 @@ module BibTeX
       self
     end
 
+    def update(fields)
+      fields.each do |name, value|
+        add name, value
+      end
+
+      self
+    end
+
     # Generate accessors for required fields (#52)
     REQUIRED_FIELDS.values.flatten.uniq.each do |name|
       define_method(name) do

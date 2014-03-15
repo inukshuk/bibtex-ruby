@@ -105,6 +105,10 @@ class BibTeX::Entry::CiteProcConverter
       if bibtex.field?(:month)
         parts.push BibTeX::Entry::MONTHS.find_index(bibtex[:month].to_s.intern)
         parts[1] = parts[1] + 1 unless parts[1].nil?
+
+        if bibtex.field?(:day)
+          parts.push bibtex[:day]
+        end
       end
 
       hash['issued'] = { 'date-parts' => [parts.compact.map(&:to_i)] }

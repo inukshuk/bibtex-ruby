@@ -321,6 +321,11 @@ module BibTeX
           e = @entry.to_citeproc
           assert_equal({ 'literal' => 'Test' }, e['issued'])
         end
+
+        it 'combines year, month and day in issued date' do
+          @entry.update :year => 2005, :month => 5, :day => 31
+          assert_equal [[2005, 5, 31]], @entry.to_citeproc['issued']['date-parts']
+        end
       end
 
       describe 'given a filter object or a filter name' do
