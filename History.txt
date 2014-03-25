@@ -1,3 +1,9 @@
+3.1.5 / 2014-03-25
+==================
+
+* Improve Name#extend_initials
+* Add Name#normalize_initials
+
 3.1.4 / 2014-03-15
 ==================
 
