@@ -92,8 +92,6 @@ end
 
 
 desc 'Updates the Manifest file'
-  require 'coveralls' if ENV['CI']
-  require 'coveralls' if ENV['CI']
 task :manifest => ['clean', 'racc'] do
   m = File.open('Manifest', 'w')
   m.print FileList['**/*'].reject{ |f|

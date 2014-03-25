@@ -171,6 +171,7 @@ module BibTeX
       token = token.dup.to_s
       token.gsub!(/([[:upper:]])([[:upper:]])/, '\1 \2')
       token.gsub!(/\b([[:upper:]])\b[^[:alpha:]-]*/, '\1.')
+      token.gsub!(/\b([[:upper:]]\.)([[:upper:]][[:lower:]]+)/, '\1 \2')
       token
     end
     
