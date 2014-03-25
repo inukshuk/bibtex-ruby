@@ -164,7 +164,14 @@ module BibTeX
 
     # Returns the first name (or the passed-in string) as initials.
     def initials(token = first)
-      token.to_s.gsub(/([[:upper:]])[[:lower:]]+\s*/, '\1.')
+      token.to_s.gsub(/([[:upper:]])[^[:upper:]\s-]*\s*/, '\1.')
+    end
+
+    def normalize_initials(token = first)
+      token = token.dup.to_s
+      token.gsub!(/([[:upper:]])([[:upper:]])/, '\1 \2')
+      token.gsub!(/\b([[:upper:]])\b[^[:alpha:]-]*/, '\1.')
+      token
     end
     
     # Returns true if the first name consists solely of initials.
@@ -176,7 +183,12 @@ module BibTeX
     # for_last and the current first name has the same initials as with_first.
     def extend_initials(with_first, for_last)
       rename_if :first => with_first do |name|
-        name.last == for_last && name.initials.gsub(/\s+/, '') == initials(with_first).gsub(/\s+/, '')
+        if name.last == for_last
+          mine = name.initials.split(/\.[^[:alpha:]]*/)
+          other = initials(with_first).split(/\.[^[:alpha:]]*/)
+
+          mine == other || mine.length < other.length && mine == other[0, mine.length]
+        end
       end
     end
     

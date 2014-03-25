@@ -101,13 +101,41 @@ module BibTeX
       end
     end
   
+    describe '#normalize_initials' do
+      it 'returns normalized initials of existing initials only' do
+        Name.new(:first => 'Edgar A.', :last => 'Poe').normalize_initials.must_equal 'Edgar A.'
+        Name.new(:first => 'E.A.', :last => 'Poe').normalize_initials.must_equal 'E.A.'
+        Name.new(:first => 'E. A.', :last => 'Poe').normalize_initials.must_equal 'E.A.'
+        Name.new(:first => 'E. A', :last => 'Poe').normalize_initials.must_equal 'E.A.'
+        Name.new(:first => 'E A', :last => 'Poe').normalize_initials.must_equal 'E.A.'
+        Name.new(:first => 'Edgar A P', :last => 'Poe').normalize_initials.must_equal 'Edgar A.P.'
+      end
+    end
+
     describe '#extend_initials' do
       it 'extends the first name if the last name and initials match' do
         Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
         Name.new(:first => 'Edgar A.', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
         Name.new(:first => 'E. A.', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
+        Name.new(:first => 'E. A', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
+        Name.new(:first => 'E A', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
         Name.new(:first => 'E. Allen', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
         Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar A.', 'Poe').first.must_equal 'Edgar A.'
+
+        Name.new(:first => 'Edgar-A.', :last => 'Poe').extend_initials('Edgar-Allen', 'Poe').first.must_equal 'Edgar-Allen'
+        Name.new(:first => 'E.-Allen', :last => 'Poe').extend_initials('Edgar-Allen', 'Poe').first.must_equal 'Edgar-Allen'
+        Name.new(:first => 'E.-A.', :last => 'Poe').extend_initials('Edgar-Allen', 'Poe').first.must_equal 'Edgar-Allen'
+        Name.new(:first => 'E.-A', :last => 'Poe').extend_initials('Edgar-Allen', 'Poe').first.must_equal 'Edgar-Allen'
+        Name.new(:first => 'E-A', :last => 'Poe').extend_initials('Edgar-Allen', 'Poe').first.must_equal 'Edgar-Allen'
+      end
+
+      it 'extends the first name if the last name and initials name match with extra middle names' do
+        Name.new(:first => 'E.', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
+        Name.new(:first => 'E', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
+        Name.new(:first => 'Edgar', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.must_equal 'Edgar Allen'
+
+        Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar', 'Poe').first.must_equal 'E.A.'
+        Name.new(:first => 'A.', :last => 'Poe').extend_initials('Edgar', 'Poe').first.must_equal 'A.'
       end
       
       it 'does not extend the first name if the last name or initials do not match' do
