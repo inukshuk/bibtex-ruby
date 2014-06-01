@@ -274,7 +274,7 @@ module BibTeX
       end
     end
 
-    def respond_to? (method)
+    def respond_to? (method, include_all=false)
       method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
     end
 

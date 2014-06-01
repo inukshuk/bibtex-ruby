@@ -309,9 +309,10 @@ module BibTeX
       end
     end
 
-    def respond_to?(method)
+    def respond_to?(method, include_all=false)
       provides?(method.to_sym) || method.to_s.match(/=$/) ||
-        method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || (has_parent? && parent.respond_to?(method)) || super
+        method =~ /^(?:convert|from)_([a-z]+)(!)?$/ ||
+        (has_parent? && parent.respond_to?(method, include_all)) || super
     end
 
     # Returns a copy of the Entry with all the field names renamed.
