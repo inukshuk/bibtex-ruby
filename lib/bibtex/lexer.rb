@@ -59,8 +59,8 @@ module BibTeX
       :string       => /string/io,
       :comment      => /comment\b/io,
       :preamble     => /preamble\b/io,
-      :key          => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+&\*-]+,/io,
-      :optional_key => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+&\*-]*,/io
+      :key          => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*-]+,/io,
+      :optional_key => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*-]*,/io
     }.freeze
     
     MODE = Hash.new(:meta).merge({

@@ -55,6 +55,13 @@ module BibTeX
         assert bib[:"foo+bar"]
       end
 
+      it 'allows semicolons in keys' do
+        input = "@Misc{Gomez;,title = {Foobar}}"
+        bib = Parser.new(:debug => false, :strict => false).parse(input)
+        assert_equal "Gomez;", bib.first.key
+        assert bib[:"Gomez;"]
+      end
+
       it 'fails when there is no cite-key' do
         input = "@misc{title = {Crime and Punishment}}"       
         assert_raises ParseError do
