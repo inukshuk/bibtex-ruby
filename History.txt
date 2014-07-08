@@ -1,3 +1,9 @@
+4.0.0 / 2014-07-08
+==================
+
+* BREAKING: Support type/key fields. Rename type -> bibtex_type
+  and key -> bibtex_key in key-value exports.
+
 3.1.6 / 2014-06-17
 ==================
 
