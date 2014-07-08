@@ -16,6 +16,7 @@ class BibTeX::Entry::CiteProcConverter
     institution  publisher
     organization publisher
     howpublished publisher
+    type         genre
   }.map(&:intern)]).freeze
 
   CSL_FIELDS = %w{
@@ -71,7 +72,7 @@ class BibTeX::Entry::CiteProcConverter
       end
     end
 
-    methods = self.class.instance_methods(false) - [:convert!]
+    methods = self.class.instance_methods(false) - [:convert!, :hash]
     methods.each { |m| send(m) }
 
     hash

@@ -59,7 +59,7 @@ module BibTeX
       # file = File.read(Test.fixtures(:roundtrip))
       # bib = BibTeX::Bibliography.new
       # bib << BibTeX::Entry.new({
-      #   :type => :book,
+      #   :bibtex_type => :book,
       #   :key => 'rails',
       #   :address => 'Raleigh, North Carolina',
       #   :author => 'Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David',

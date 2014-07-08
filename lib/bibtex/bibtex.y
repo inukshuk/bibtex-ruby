@@ -67,7 +67,7 @@ rule
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
         | entry_head RBRACE                        { result = val[0] }
 
-  entry_head : NAME LBRACE opt_key                 { result = BibTeX::Entry.new(:type => val[0].downcase.to_sym, :key => val[2]) }
+  entry_head : NAME LBRACE opt_key                 { result = BibTeX::Entry.new(:bibtex_type => val[0].downcase.to_sym, :bibtex_key => val[2]) }
 
   opt_key :                                        { missing_key }
           | KEY

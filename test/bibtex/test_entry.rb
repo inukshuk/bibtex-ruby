@@ -216,12 +216,12 @@ module BibTeX
       end
 
       it 'includes type and all defined fields' do
-        assert_equal 'book', Entry.new(:type => 'book').digest
-        assert_equal 'book|title:foo', Entry.new(:type => 'book', :title => 'foo').digest
+        assert_equal 'book', Entry.new(:bibtex_type => 'book').digest
+        assert_equal 'book|title:foo', Entry.new(:bibtex_type => 'book', :title => 'foo').digest
       end
 
       it 'accepts a filter' do
-        assert_equal 'book|year:2012', Entry.new(:type => 'book', :title => 'foo', :year => 2012).digest([:year])
+        assert_equal 'book|year:2012', Entry.new(:bibtex_type => 'book', :title => 'foo', :year => 2012).digest([:year])
       end
     end
 
@@ -468,8 +468,8 @@ module BibTeX
 
     def test_creation_from_hash
       entry = BibTeX::Entry.new({
-        :type => 'book',
-        :key => :raven,
+        :bibtex_type => 'book',
+        :bibtex_key => :raven,
         :author => 'Poe, Edgar A.',
         :title => 'The Raven'
       })
@@ -496,10 +496,10 @@ module BibTeX
 
     def test_sorting
       entries = []
-      entries << Entry.new({ :type => 'book', :key => 'raven3', :author => 'Poe, Edgar A.', :title => 'The Raven'})
-      entries << Entry.new({ :type => 'book', :key => 'raven2', :author => 'Poe, Edgar A.', :title => 'The Raven'})
-      entries << Entry.new({ :type => 'book', :key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Raven'})
-      entries << Entry.new({ :type => 'book', :key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Aven'})
+      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven3', :author => 'Poe, Edgar A.', :title => 'The Raven'})
+      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven2', :author => 'Poe, Edgar A.', :title => 'The Raven'})
+      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Raven'})
+      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Aven'})
 
       entries.sort!
 
@@ -510,9 +510,9 @@ module BibTeX
 
     describe 'default keys' do
       before {
-        @e1 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
-        @e2 = Entry.new(:type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
-        @e3 = Entry.new(:type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
+        @e1 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
+        @e2 = Entry.new(:bibtex_type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
+        @e3 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
       }
 
       it 'should return "unknown-a" for an empty Entry' do

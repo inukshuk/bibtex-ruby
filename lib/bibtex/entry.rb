@@ -73,8 +73,8 @@ module BibTeX
     def initialize(attributes = {})
       @fields = {}
 
-      self.type = attributes.delete(:type) if attributes.has_key?(:type)
-      self.key = attributes.delete(:key) if attributes.has_key?(:key)
+      self.type = attributes.delete(:bibtex_type) if attributes.has_key?(:bibtex_type)
+      self.key = attributes.delete(:bibtex_key) if attributes.has_key?(:bibtex_key)
 
       add(attributes)
 
@@ -621,7 +621,7 @@ module BibTeX
 
     def to_hash(options = {})
       options[:quotes] ||= %w({ })
-      hash = { :key => key, :type => type }
+      hash = { :bibtex_key => key, :bibtex_type => type }
       each_pair { |k,v| hash[k] = v.to_s(options) }
       hash
     end
