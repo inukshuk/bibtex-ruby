@@ -645,6 +645,13 @@ module BibTeX
 
     alias to_bibo to_rdf
 
+    def year
+      return fields[:year] if has_field?(:year)
+      return unless has_field?(:date)
+
+      fields[:date].to_s[/\d{4}/]
+    end
+
     private
 
     # Returns a default key for this entry.
@@ -653,7 +660,7 @@ module BibTeX
       k = k.respond_to?(:family) ? k.family : k.to_s
       k = BibTeX.transliterate(k).gsub(/["']/, '')
       k = k[/[A-Za-z-]+/] || 'unknown'
-      k << (has_field?(:year) ? year : '-')
+      k << (year || '-')
       k << 'a'
       k.downcase!
       k

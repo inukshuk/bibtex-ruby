@@ -530,6 +530,7 @@ module BibTeX
         @e1 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
         @e2 = Entry.new(:bibtex_type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
         @e3 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
+        @e4 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :date => '2003-09')
       }
 
       it 'should return "unknown-a" for an empty Entry' do
@@ -550,6 +551,10 @@ module BibTeX
 
       it 'skips the year if not present' do
         @e3.key.must_be :==, 'poe-a'
+      end
+
+      it 'extracts the year from the date field if present' do
+        @e4.key.must_be :==, 'poe2003a'
       end
     end
 
