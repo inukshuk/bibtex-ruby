@@ -97,24 +97,35 @@ class BibTeX::Entry::CiteProcConverter
   end
 
   def date
-    return unless bibtex.field?(:year)
+    case
+    when bibtex.field?(:date)
+      hash['issued'] = {
+        'date-parts' => bibtex.date.to_s.split('/').map { |part|
+          part.split('-').map(&:to_i)
+        }
+      }
 
-    case bibtex[:year].to_s
-    when /^\d+$/
-      parts = [bibtex[:year].to_s]
+    when bibtex.field?(:year)
+      case bibtex[:year].to_s
+      when /^\d+$/
+        parts = [bibtex[:year].to_s]
 
-      if bibtex.field?(:month)
-        parts.push BibTeX::Entry::MONTHS.find_index(bibtex[:month].to_s.intern)
-        parts[1] = parts[1] + 1 unless parts[1].nil?
+        if bibtex.field?(:month)
+          parts.push BibTeX::Entry::MONTHS.find_index(bibtex[:month].to_s.intern)
+          parts[1] = parts[1] + 1 unless parts[1].nil?
 
-        if bibtex.field?(:day)
-          parts.push bibtex[:day]
+          if bibtex.field?(:day)
+            parts.push bibtex[:day]
+          end
         end
+
+        hash['issued'] = { 'date-parts' => [parts.compact.map(&:to_i)] }
+      else
+        hash['issued'] = { 'literal' => bibtex[:year].to_s }
       end
 
-      hash['issued'] = { 'date-parts' => [parts.compact.map(&:to_i)] }
     else
-      hash['issued'] = { 'literal' => bibtex[:year].to_s }
+      # no date present
     end
   end
 

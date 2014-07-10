@@ -326,6 +326,23 @@ module BibTeX
           @entry.update :year => 2005, :month => 5, :day => 31
           assert_equal [[2005, 5, 31]], @entry.to_citeproc['issued']['date-parts']
         end
+
+        it 'prefers biblatex syntax' do
+          @entry.date = '2014-07-13'
+          assert_equal [[2014,7,13]], @entry.to_citeproc['issued']['date-parts']
+        end
+
+        it 'supports biblatex date ranges' do
+          @entry.date = '2014-06-12/2014-07-13'
+
+          assert_equal [[2014,6,12],[2014,7,13]],
+            @entry.to_citeproc['issued']['date-parts']
+        end
+
+        it 'supports biblatex partial dates' do
+          @entry.date = '2014-07'
+          assert_equal [[2014,7]], @entry.to_citeproc['issued']['date-parts']
+        end
       end
 
       describe 'given a filter object or a filter name' do
