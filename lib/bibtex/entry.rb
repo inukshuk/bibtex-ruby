@@ -660,7 +660,7 @@ module BibTeX
       k = k.respond_to?(:family) ? k.family : k.to_s
       k = BibTeX.transliterate(k).gsub(/["']/, '')
       k = k[/[A-Za-z-]+/] || 'unknown'
-      k << (year || '-')
+      k << (year.to_s[/\d+/] || '-')
       k << 'a'
       k.downcase!
       k
