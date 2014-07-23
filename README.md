@@ -150,11 +150,11 @@ Instead of parsing strings you can also create BibTeX elements directly in
 Ruby:
 
     > bib = BibTeX::Bibliography.new
-    
+
 Using a Hash:
 
     > bib << BibTeX::Entry.new({
-        :type => :book,
+        :bibtex_type => :book,
         :key => :rails,
         :address => 'Raleigh, North Carolina',
         :author => 'Ruby, Sam and Thomas, Dave, and Hansson, David Heinemeier',
@@ -236,7 +236,7 @@ query functionality with the exception of yielding to a block. For instance:
 
     # note that the above includes entries inheriting the book title
     # from a cross-referenced entry!
-    
+
     bib['@book[keywords=ruby]']
     => Returns all books whose keywords attribute equals 'ruby' or []
     bib['@book[keywords!=ruby]']
@@ -522,7 +522,7 @@ because these tokens will be concatenated using BibTeX's '#' operator).
       Year = {2009}
     }
     END
-    => [{:key=>:pickaxe, :type=>:book,
+    => [{:bibtex_key=>:pickaxe, :bibtex_type=>:book,
       :address=>"{Raleigh, North Carolina}",
       :author=>"{Thomas, Dave, and Fowler, Chad, and Hunt, Andy}",
       :publisher=>"{The Pragmatic Bookshelf}",
@@ -535,7 +535,7 @@ quotes; therefore you can simply add the :quotes option with an empty string:
     >> BibTeX.parse(<<-END).to_a(:quotes => '')
     ...
     END
-    => [{:key=>:pickaxe, :type=>:book,
+    => [{:bibtex_key=>:pickaxe, :bibtex_type=>:book,
       :address=>"Raleigh, North Carolina",
       :author=>"Thomas, Dave, and Fowler, Chad, and Hunt, Andy",
       :publisher=>"The Pragmatic Bookshelf",
