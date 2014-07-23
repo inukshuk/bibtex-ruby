@@ -594,20 +594,20 @@ module BibTeX
 
     describe '#meet?' do
       before { @e = Entry.new }
-      
+
       it 'returns true for an empty condition list' do
         assert @e.meet? []
         assert @e.meet? ['']
       end
-      
+
       it 'it returns true when all conditions hold' do
         refute @e.meet? ['author = Edgar']
-        
+
         @e.author = 'Poe, Edgar A.'
 
         refute @e.meet? ['author = Edgar']
         refute @e.meet? ['author = Poe, Edgar']
-        
+
         assert @e.meet? ['author = Poe, Edgar A.']
 
         assert @e.meet? ['author ^= Poe']
@@ -617,11 +617,46 @@ module BibTeX
 
         assert @e.meet? ['author ~= .']
         assert @e.meet? ['author ~= [a-z]*']
-        
-        assert @e.meet? ['author ^= P\w+']        
 
+        assert @e.meet? ['author ^= P\w+']
       end
-      
+    end
+
+    describe '#valid?' do
+      before {
+        @misc = Entry.new
+        @book = Entry.new({ :bibtex_type => :book })
+        @article = Entry.new({ :bibtex_type => :article })
+      }
+
+      it 'is true by default' do
+        assert @misc.valid?
+      end
+
+      it 'is not true by default for types with mandatory fields' do
+        refute @book.valid?
+        refute @article.valid?
+      end
+
+      it 'is true only if all mandatory fields are present' do
+        @book.update({
+          :author => 'Henry James',
+          :title => 'What Maisie Knew',
+          :year => 1897,
+          :publisher => 'Heineman'
+        })
+
+        assert @book.valid?
+
+        @book.delete :publisher
+        refute @book.valid?
+
+        @book.publisher = 'Heineman'
+        assert @book.valid?
+
+        @book.delete :year
+        refute @book.valid?
+      end
     end
   end
 end

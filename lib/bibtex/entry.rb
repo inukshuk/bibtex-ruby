@@ -382,7 +382,7 @@ module BibTeX
     # Returns false if the entry is one of the standard entry types and does not have
     # definitions of all the required fields for that type.
     def valid?
-      REQUIRED_FIELDS[@type].all? do |f|
+      REQUIRED_FIELDS[type].all? do |f|
         f.is_a?(Array) ? !(f & fields.keys).empty? : !fields[f].nil?
       end
     end
