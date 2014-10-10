@@ -55,11 +55,11 @@ module BibTeX
     def values_at(*arguments)
       []
     end
-    
+
     def digest(*arguments)
       [type, content].join('|')
     end
-  
+
     # Invokes BibTeX string replacement on this element.
     def replace(*arguments); self; end
 
@@ -187,9 +187,9 @@ module BibTeX
     def inspect
       "#<#{self.class} #{content.gsub(/\n/, ' ')}>"
     end
-    
+
     private
-    
+
     def meets_condition?(condition)
       property, operator, value = condition.split(/\s*([!~\/\^<>]?=|!~)\s*/)
 
