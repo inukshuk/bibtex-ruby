@@ -191,7 +191,7 @@ module BibTeX
     private
 
     def meets_condition?(condition)
-      property, operator, value = condition.split(/\s*([!~\/\^<>]?=)\s*/)
+      property, operator, value = condition.split(/\s*([!~\/\^<>]?=|!~)\s*/)
 
       if property.nil?
         true
