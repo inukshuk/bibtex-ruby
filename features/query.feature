@@ -59,6 +59,8 @@ Feature: Searching in BibTeX bibliographies
 		Then there should be exactly 3 matches
 		When I search for "@*[year=2007]"
 		Then there should be exactly 1 match
+		When I search for "@*[keywords!~lex]"
+		Then there should be exactly 2 matches
 		
 	@query
 	Scenario: Find entries using compound queries
