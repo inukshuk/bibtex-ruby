@@ -248,6 +248,8 @@ query functionality with the exception of yielding to a block. For instance:
     => Returns all books whose keywords attribute matches /^ruby/
     bib.q('@book[keywords ~= ruby]')
     => Returns all books whose keywords attribute matches /ruby/
+    bib['@book[keywords!~ruby]']
+    => Returns all books whose keywords attribute does not match /ruby/ or don't have keywords attribute
 
     bib.q('@article[year<=2007]')
     => Returns all articles published in 2007 or earlier
