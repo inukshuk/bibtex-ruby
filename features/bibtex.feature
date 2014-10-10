@@ -5,11 +5,11 @@ Feature: Parse BibTeX files
 	Scenario: A BibTeX file with lots of objects and comments
 		When I parse the following file:
 		"""
-		%%
-		%% This BibTeX file contains all the examples of valid BibTeX objects
-		%% in Xavier Decoret's `A summary of BibTeX' at
-		%% http://artis.imag.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html
-		%%
+    ##
+    ## This BibTeX file contains all the examples of valid BibTeX objects
+    ## in Xavier Decoret's `A summary of BibTeX' at
+    ## http://artis.imag.fr/~Xavier.Decoret/resources/xdkbibtex/bibtex_summary.html
+    ##
 
 		@Article{py03,
 		  author = {Xavier D\'ecoret},
