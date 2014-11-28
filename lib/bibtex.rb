@@ -46,7 +46,7 @@ module BibTeX
 	@log.datetime_format = '%Y-%m-%d %H:%M:%S'
 
   class << self
-    attr_reader :log
+    attr_accessor :log
   end
 
 end

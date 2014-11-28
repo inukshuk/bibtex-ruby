@@ -96,6 +96,12 @@ module BibTeX
       bib.replace_strings
 			assert_equal 'The Pragmatic Bookshelf', bib['rails'].publisher
     end
+
+    def test_logger_can_be_assigned
+      logger = BibTeX.log
+      BibTeX.log = logger
+    end
+
   end
 
 end
