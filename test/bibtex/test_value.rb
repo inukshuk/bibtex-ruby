@@ -98,13 +98,13 @@ module BibTeX
             value.is_a?(::String) ? value.upcase : value
           end
         end
-        
+
         class SuffixA < BibTeX::Filter
           def apply(value)
             value.is_a?(::String) ? "#{value}a" : value
           end
         end
-        
+
         @values = [Value.new('foo'), Value.new('foo', :bar)]
       end
 
@@ -141,7 +141,7 @@ module BibTeX
           @values.each { |v| v.convert_upcase }
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
         end
-        
+
         it "raises argument error when a filter cannot be resolved" do
           assert_raises ArgumentError do
             @values[0].convert(:foo)
@@ -167,7 +167,14 @@ module BibTeX
           @values.each { |v| v.convert_upcase! }
           assert_equal ['FOO', '"FOO" # bar'], @values.map(&:to_s)
         end
+      end
 
+      describe "value" do
+        it 'returns numbers as numbers' do
+          assert Value.new('42').v.is_a?(::Fixnum)
+          assert Value.new('-42').v.is_a?(::Fixnum)
+          assert Value.new('a42').v.is_a?(::String)
+        end
       end
 
       describe "#to_s" do

@@ -191,7 +191,14 @@ module BibTeX
     # joined by a '#', additionally, all string tokens will be turned into
     # string literals (i.e., delimitted by quotes).
     def value
-      atomic? ? @tokens[0] : @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
+      case
+      when numeric?
+        @tokens[0].to_i
+      when atomic?
+        @tokens[0]
+      else
+        @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
+      end
     end
 
     alias :v :value
@@ -231,7 +238,7 @@ module BibTeX
 
     # Returns true if the Value's content is numeric.
     def numeric?
-      to_s =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
+      atomic? && tokens[0] =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
     end
 
     def to_citeproc (options = {})
