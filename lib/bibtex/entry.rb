@@ -482,7 +482,9 @@ module BibTeX
     end
 
     def month=(month)
-      fields[:month] = MONTHS_FILTER[month]
+      fields[:month] = month
+    ensure
+      parse_month
     end
 
     def month_numeric
@@ -493,7 +495,14 @@ module BibTeX
     end
 
     def parse_month
-      fields[:month] = MONTHS_FILTER[fields[:month]] if has_field?(:month)
+      fields.delete(:month_numeric)
+      return unless has_field?(:month)
+
+      fields[:month] = MONTHS_FILTER[fields[:month]]
+
+      numeric = MONTHS.index(fields[:month].to_sym)
+      fields[:month_numeric] = Value.new(numeric.succ) if numeric
+
       self
     end
 
