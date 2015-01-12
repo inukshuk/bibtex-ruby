@@ -485,6 +485,13 @@ module BibTeX
       fields[:month] = MONTHS_FILTER[month]
     end
 
+    def month_numeric
+      return unless has_field?(:month)
+      return unless (num = MONTHS.index fields[:month].to_sym)
+
+      num.succ
+    end
+
     def parse_month
       fields[:month] = MONTHS_FILTER[fields[:month]] if has_field?(:month)
       self

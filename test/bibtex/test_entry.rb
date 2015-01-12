@@ -186,6 +186,7 @@ module BibTeX
         it 'should convert numbers when parsing' do
           @entry = Entry.parse("@misc{id, month = #{m[1]}}")[0]
           assert_equal m[0], @entry.month.v
+          assert_equal m[1], @entry.month_numeric
         end
       end
 
