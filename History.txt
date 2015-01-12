@@ -1,7 +1,8 @@
-4.0.7 / 2015-01-12
+4.0.8 / 2015-01-12
 ==================
 * Ruby 2.2 support
 * Added Entry#month_numeric
+* Added support for numeric values
 
 4.0.4 / 2014-10-10
 ==================
