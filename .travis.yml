@@ -9,10 +9,14 @@ rvm:
   - 2.0.0
   - 1.9.3
   - jruby-19mode
-  - rbx-2.2.7
+  - rbx-2
 notifications:
   email:
     recipients:
       - sylvester@keil.or.at
     on_success: change
     on_failure: always
+matrix:
+  allow_failures:
+    - rvm:
+      - rbx-2
