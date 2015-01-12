@@ -18,8 +18,8 @@ group :test do
   gem 'rubysl-test-unit', '~>2.0', :platforms => :rbx
   gem 'minitest-ansi'
   gem 'cucumber', '~>1.3'
-  gem 'unicode', '~>0.4', :platforms => [:rbx, :mswin, :mingw, :mri_19, :mri_20, :mri_21]
-	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby_21, :ruby_20]
+  gem 'unicode', '~>0.4', :platforms => [:rbx, :mswin, :mingw, :mri_19, :mri_20, :mri_21, :mri_22]
+	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby_21, :ruby_20, :ruby_22]
   gem 'rubinius-coverage', :require => false, :platforms => :rbx
   gem 'coveralls', '~>0.7', :require => false
 end
@@ -42,10 +42,10 @@ end
 group :development do
   gem 'rake'
   gem 'yard'
-  gem 'iconv', :platforms => [:ruby_20, :ruby_21]
+  gem 'iconv', :platforms => [:ruby_20, :ruby_21, :ruby_22]
 end
 
 group :travis do
   # Gem is required at runtime for RBX!
-  gem 'racc', :platforms => [:ruby_21, :ruby_20, :ruby_19]
+  gem 'racc', :platforms => [:ruby_22, :ruby_21, :ruby_20, :ruby_19]
 end
