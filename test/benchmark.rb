@@ -34,7 +34,7 @@ format = Benchmark.const_defined?(:FMTSTR) ? Benchmark::FMTSTR : Benchmark::FORM
 Benchmark.benchmark((" "*15) + CAPTION, 7, format, '%14s:' % 'sum(f)', '%14s:' % 'sum(g)') do |b|
 
   1.step(n,k) do |i|
-  
+
     f << b.report('%14s:' % "f(#{i})") do
       i.times do
         lexer.data = input
@@ -44,41 +44,41 @@ Benchmark.benchmark((" "*15) + CAPTION, 7, format, '%14s:' % 'sum(f)', '%14s:' %
     end
 
     data = input * i
-  
+
     g << b.report('%14s:' % "g(#{i})") do
       lexer.data = data
       lexer.analyse
 			# BibTeX::Parser.new.parse(data)
     end
-    
+
   end
-  
+
   [f.inject(:+), g.inject(:+)]
 end
 
 # require 'gnuplot'
-# 
+#
 # f = f.map(&:total)
 # g = g.map(&:total)
-# 
+#
 # x = 1.step(n,k).to_a
-# 
+#
 # Gnuplot.open do |gp|
 #   Gnuplot::Plot.new(gp) do |plot|
-# 
+#
 #     plot.title  'BibTeX-Ruby Benchmark'
 #     plot.ylabel 't'
 #     plot.xlabel 'n'
-# 
+#
 #     plot.data << Gnuplot::DataSet.new([x,f]) do |ds|
 #       ds.with = 'linespoints'
 #       ds.title = 'f'
 #     end
-# 
+#
 #     plot.data << Gnuplot::DataSet.new([x,g]) do |ds|
 #       ds.with = 'linespoints'
 #       ds.title = 'g'
 #     end
-# 
+#
 #   end
 # end

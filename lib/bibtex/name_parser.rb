@@ -296,7 +296,7 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'names.y', 31)
   def _reduce_1(val, _values, result)
-     result = [] 
+     result = []
     result
   end
 .,.,
@@ -305,14 +305,14 @@ module_eval(<<'.,.,', 'names.y', 31)
 
 module_eval(<<'.,.,', 'names.y', 33)
   def _reduce_3(val, _values, result)
-     result = [val[0]] 
+     result = [val[0]]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'names.y', 34)
   def _reduce_4(val, _values, result)
-     result << val[2] 
+     result << val[2]
     result
   end
 .,.,
@@ -320,7 +320,7 @@ module_eval(<<'.,.,', 'names.y', 34)
 module_eval(<<'.,.,', 'names.y', 38)
   def _reduce_5(val, _values, result)
              result = Name.new(:last => val[0])
-       
+
     result
   end
 .,.,
@@ -328,7 +328,7 @@ module_eval(<<'.,.,', 'names.y', 38)
 module_eval(<<'.,.,', 'names.y', 42)
   def _reduce_6(val, _values, result)
              result = Name.new(:first => val[0], :last => val[1])
-       
+
     result
   end
 .,.,
@@ -336,7 +336,7 @@ module_eval(<<'.,.,', 'names.y', 42)
 module_eval(<<'.,.,', 'names.y', 46)
   def _reduce_7(val, _values, result)
              result = Name.new(:first => val[0], :von => val[1], :last => val[2])
-       
+
     result
   end
 .,.,
@@ -344,7 +344,7 @@ module_eval(<<'.,.,', 'names.y', 46)
 module_eval(<<'.,.,', 'names.y', 50)
   def _reduce_8(val, _values, result)
              result = Name.new(:von => val[0], :last => val[1])
-       
+
     result
   end
 .,.,
@@ -352,7 +352,7 @@ module_eval(<<'.,.,', 'names.y', 50)
 module_eval(<<'.,.,', 'names.y', 54)
   def _reduce_9(val, _values, result)
              result = Name.new(:last => val[0], :jr => val[2][0], :first => val[2][1])
-       
+
     result
   end
 .,.,
@@ -360,7 +360,7 @@ module_eval(<<'.,.,', 'names.y', 54)
 module_eval(<<'.,.,', 'names.y', 58)
   def _reduce_10(val, _values, result)
              result = Name.new(:von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1])
-       
+
     result
   end
 .,.,
@@ -368,7 +368,7 @@ module_eval(<<'.,.,', 'names.y', 58)
 module_eval(<<'.,.,', 'names.y', 62)
   def _reduce_11(val, _values, result)
              result = Name.new(:von => val[0,2].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1])
-       
+
     result
   end
 .,.,
@@ -377,14 +377,14 @@ module_eval(<<'.,.,', 'names.y', 62)
 
 module_eval(<<'.,.,', 'names.y', 67)
   def _reduce_13(val, _values, result)
-     result = val.join(' ') 
+     result = val.join(' ')
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'names.y', 68)
   def _reduce_14(val, _values, result)
-     result = val.join(' ') 
+     result = val.join(' ')
     result
   end
 .,.,
@@ -395,14 +395,14 @@ module_eval(<<'.,.,', 'names.y', 68)
 
 module_eval(<<'.,.,', 'names.y', 72)
   def _reduce_17(val, _values, result)
-     result = [nil,val[0]] 
+     result = [nil,val[0]]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'names.y', 73)
   def _reduce_18(val, _values, result)
-     result = [val[0],val[2]] 
+     result = [val[0],val[2]]
     result
   end
 .,.,
@@ -411,7 +411,7 @@ module_eval(<<'.,.,', 'names.y', 73)
 
 module_eval(<<'.,.,', 'names.y', 76)
   def _reduce_20(val, _values, result)
-     result = val.join(' ') 
+     result = val.join(' ')
     result
   end
 .,.,
@@ -424,7 +424,7 @@ module_eval(<<'.,.,', 'names.y', 76)
 
 module_eval(<<'.,.,', 'names.y', 81)
   def _reduce_24(val, _values, result)
-     result = val.join(' ') 
+     result = val.join(' ')
     result
   end
 .,.,

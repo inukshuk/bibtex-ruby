@@ -14,48 +14,48 @@ module BibTeX
 module_eval(<<'...end bibtex.y/module_eval...', 'bibtex.y', 89)
 
   attr_reader :lexer, :options
-  
+
   @defaults = {
     :include => [:errors],
     :allow_missing_keys => false,
     :debug => false
   }.freeze
-  
+
   class << self
     attr_reader :defaults
   end
-  
+
   def initialize(options = {})
     @options = Parser.defaults.merge(options)
     @lexer = Lexer.new(@options)
   end
 
   def parse(input)
-    @yydebug = debug?   
+    @yydebug = debug?
 
-    lexer.analyse(input)    
+    lexer.analyse(input)
     do_parse
     #yyparse(@lexer,:each)
   end
-  
+
   def next_token
     lexer.next_token
   end
-  
+
   def debug?
     options[:debug] || ENV['DEBUG']
   end
-  
+
   def allow_missing_keys?
     options[:allow_missing_keys]
   end
-  
+
   def missing_key
     unless allow_missing_keys?
       raise ParseError, "Failed to parse BibTeX entry: cite-key missing"
     end
   end
-  
+
   def on_error(tid, val, vstack)
     message =
       "Failed to parse BibTeX on value #{val.inspect} (#{token_to_str(tid) || '?'}) #{ vstack.inspect}"
@@ -242,189 +242,189 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'bibtex.y', 32)
   def _reduce_1(val, _values, result)
-     result = BibTeX::Bibliography.new(@options) 
+     result = BibTeX::Bibliography.new(@options)
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 33)
   def _reduce_2(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 35)
   def _reduce_3(val, _values, result)
-     result = BibTeX::Bibliography.new(@options) << val[0] 
+     result = BibTeX::Bibliography.new(@options) << val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 36)
   def _reduce_4(val, _values, result)
-     result << val[1] 
+     result << val[1]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 38)
   def _reduce_5(val, _values, result)
-     result = val[1] 
+     result = val[1]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 39)
   def _reduce_6(val, _values, result)
-     result = BibTeX::MetaContent.new(val[0]) 
+     result = BibTeX::MetaContent.new(val[0])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 40)
   def _reduce_7(val, _values, result)
-     result = BibTeX::Error.new(val[0]) 
+     result = BibTeX::Error.new(val[0])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 42)
   def _reduce_8(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 43)
   def _reduce_9(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 44)
   def _reduce_10(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 45)
   def _reduce_11(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 47)
   def _reduce_12(val, _values, result)
-     result = BibTeX::Comment.new(val[2]) 
+     result = BibTeX::Comment.new(val[2])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 49)
   def _reduce_13(val, _values, result)
-     result = '' 
+     result = ''
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 50)
   def _reduce_14(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 52)
   def _reduce_15(val, _values, result)
-     result = BibTeX::Preamble.new(val[2]) 
+     result = BibTeX::Preamble.new(val[2])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 54)
   def _reduce_16(val, _values, result)
-     result = BibTeX::String.new(val[2][0],val[2][1]); 
+     result = BibTeX::String.new(val[2][0],val[2][1]);
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 56)
   def _reduce_17(val, _values, result)
-     result = [val[0].downcase.to_sym, val[2]] 
+     result = [val[0].downcase.to_sym, val[2]]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 58)
   def _reduce_18(val, _values, result)
-     result = [val[0]] 
+     result = [val[0]]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 59)
   def _reduce_19(val, _values, result)
-     result << val[2] 
+     result << val[2]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 61)
   def _reduce_20(val, _values, result)
-     result = val[0].downcase.to_sym 
+     result = val[0].downcase.to_sym
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 62)
   def _reduce_21(val, _values, result)
-     result = val[1] 
+     result = val[1]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 63)
   def _reduce_22(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 65)
   def _reduce_23(val, _values, result)
-     result = val[0] << val[1] 
+     result = val[0] << val[1]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 66)
   def _reduce_24(val, _values, result)
-     result = val[0] << val[1] 
+     result = val[0] << val[1]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 67)
   def _reduce_25(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 69)
   def _reduce_26(val, _values, result)
-     result = BibTeX::Entry.new(:bibtex_type => val[0].downcase.to_sym, :bibtex_key => val[2]) 
+     result = BibTeX::Entry.new(:bibtex_type => val[0].downcase.to_sym, :bibtex_key => val[2])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 71)
   def _reduce_27(val, _values, result)
-     missing_key 
+     missing_key
     result
   end
 .,.,
@@ -433,35 +433,35 @@ module_eval(<<'.,.,', 'bibtex.y', 71)
 
 module_eval(<<'.,.,', 'bibtex.y', 74)
   def _reduce_29(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 75)
   def _reduce_30(val, _values, result)
-     result.merge!(val[2]) 
+     result.merge!(val[2])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 77)
   def _reduce_31(val, _values, result)
-     result = { val[0].downcase.to_sym => val[2] } 
+     result = { val[0].downcase.to_sym => val[2] }
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 79)
   def _reduce_32(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'bibtex.y', 80)
   def _reduce_33(val, _values, result)
-     result = val[0] 
+     result = val[0]
     result
   end
 .,.,

@@ -331,7 +331,7 @@ module BibTeX
 
       describe 'sorting' do
 
-        before do 
+        before do
           @small_bib = BibTeX.parse <<-END
         @book{flanagan2008,
           title={{The ruby programming language}},

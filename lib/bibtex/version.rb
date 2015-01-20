@@ -1,6 +1,6 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010-2014	Sylvester Keil <sylvester.keil.or.at>
+# Copyright (C) 2010-2015	Sylvester Keil <sylvester.keil.or.at>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ module BibTeX
   module Version
     MAJOR = 4
     MINOR = 0
-    PATCH = 8
+    PATCH = 9
     BUILD = nil
 
     STRING = [MAJOR, MINOR, PATCH, BUILD].compact.join('.').freeze

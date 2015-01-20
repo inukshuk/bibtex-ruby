@@ -1,17 +1,17 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010-2014 Sylvester Keil <http://sylvester.keil.or.at>
-# 
+# Copyright (C) 2010-2015 Sylvester Keil <http://sylvester.keil.or.at>
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
@@ -19,7 +19,7 @@
 require 'strscan'
 
 module BibTeX
-  
+
   #
   # The BibTeX::Lexer handles the lexical analysis of BibTeX bibliographies.
   #
@@ -28,7 +28,7 @@ module BibTeX
 
     attr_reader :options, :stack, :mode, :scanner
     attr_writer :mode
-    
+
     def_delegator :@scanner, :string, :data
 
     @defaults = {
@@ -37,7 +37,7 @@ module BibTeX
       :allow_missing_keys => false,
       :strip => true
     }.freeze
-    
+
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
       :space        => /[\s]+/o,
@@ -62,18 +62,18 @@ module BibTeX
       :key          => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*-]+,/io,
       :optional_key => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*-]*,/io
     }.freeze
-    
+
     MODE = Hash.new(:meta).merge({
       :bibtex  => :bibtex,  :entry    => :bibtex,
       :string  => :bibtex,  :preamble => :bibtex,
       :comment => :bibtex,  :meta     => :meta,
       :literal => :literal, :content  => :content
     }).freeze
-    
+
     class << self
       attr_reader :defaults, :patterns
     end
-    
+
     #
     # Creates a new instance. Possible options and their respective
     # default values are:
@@ -96,14 +96,14 @@ module BibTeX
     def reset
       @stack, @brace_level, @mode, @active_object = [], 0, :meta, nil
       @scanner.reset if @scanner
-      
+
       # cache options for speed
       @include_meta_content = @options[:include].include?(:meta_content)
       @include_errors = @options[:include].include?(:errors)
-      
+
       self
     end
-    
+
     # Sets the source for the lexical analysis and resets the internal state.
     def data=(data)
       @scanner = StringScanner.new(data)
@@ -111,7 +111,7 @@ module BibTeX
     end
 
     def symbols; @stack.map(&:first); end
-    
+
     # Returns the next token from the parse stack.
     def next_token; @stack.shift; end
 
@@ -119,7 +119,7 @@ module BibTeX
     def bibtex_mode?
       MODE[@mode] == :bibtex
     end
-        
+
     [:meta, :literal, :content].each do |m|
       define_method("#{m}_mode?") { @mode == m }
     end
@@ -128,26 +128,26 @@ module BibTeX
     def active?(object)
       @active_object == object
     end
-    
+
     # Returns true if the lexer is currently in strict mode.
     def strict?
       !!@options[:strict]
     end
-    
+
     def allow_missing_keys?
       !!@options[:allow_missing_keys]
     end
-    
+
     def strip_line_breaks?
       !!options[:strip] && !active?(:comment)
     end
-    
+
     # Pushes a value onto the parse stack. Returns the Lexer.
     def push(value)
       case value[0]
       when :CONTENT, :STRING_LITERAL
         value[1].gsub!(/\n\s*/, ' ') if strip_line_breaks?
-        
+
         if !@stack.empty? && value[0] == @stack[-1][0]
           @stack[-1][1] << value[1]
         else
@@ -156,22 +156,22 @@ module BibTeX
       when :ERROR
         @stack.push(value) if @include_errors
         leave_object
-      when :META_CONTENT        
+      when :META_CONTENT
         @stack.push(value) if @include_meta_content
       else
         @stack.push(value)
       end
-            
+
       self
     end
 
     # Start the lexical analysis.
     def analyse(string = nil)
       raise(ArgumentError, 'Lexer: failed to start analysis: no source given!') unless
-        string || @scanner    
+        string || @scanner
 
       self.data = string || @scanner.string
-      
+
       until @scanner.eos?
         send("parse_#{MODE[@mode]}")
       end
@@ -180,7 +180,7 @@ module BibTeX
     end
 
     private
-    
+
     def parse_bibtex
       case
       when @scanner.scan(Lexer.patterns[:lbrace])
@@ -209,10 +209,10 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:space])
         # skip
       when @scanner.scan(Lexer.patterns[:period])
-        error_unexpected_token        
+        error_unexpected_token
       end
     end
-    
+
     def parse_meta
       match = @scanner.scan_until(Lexer.patterns[strict? ? :strict_next : :next])
       if @scanner.matched
@@ -253,7 +253,7 @@ module BibTeX
         error_unterminated_content
       end
     end
-    
+
     def parse_literal
       match = @scanner.scan_until(Lexer.patterns[:unquote])
       case @scanner.matched
@@ -281,7 +281,7 @@ module BibTeX
         error_unterminated_string
       end
     end
-    
+
     # Called when the lexer encounters a new BibTeX object.
     def enter_object
       @brace_level = 0
@@ -300,7 +300,7 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:entry])
         @mode = @active_object = :entry
         push [:NAME, @scanner.matched]
-        
+
         # TODO: DRY - try to parse key
         if @scanner.scan(Lexer.patterns[:lbrace])
           @brace_level += 1
@@ -311,10 +311,10 @@ module BibTeX
             push [:KEY, @scanner.matched.chop.strip]
           end
         end
-        
+
       else
         error_unexpected_object
-      end      
+      end
     end
 
     # Called when parser leaves a BibTeX object.
@@ -326,7 +326,7 @@ module BibTeX
       BibTeX.log.warn("Lexer: unbalanced braces at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
       backtrace [:E_UNBALANCED, @scanner.matched]
     end
-    
+
     def error_unterminated_string
       BibTeX.log.warn("Lexer: unterminated string at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
       backtrace [:E_UNTERMINATED_STRING, @scanner.matched]
@@ -336,7 +336,7 @@ module BibTeX
       BibTeX.log.warn("Lexer: unterminated content at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
       backtrace [:E_UNTERMINATED_CONTENT, @scanner.matched]
     end
-    
+
     def error_unexpected_token
       BibTeX.log.warn("Lexer: unexpected token `#{@scanner.matched}' at #{@scanner.pos}; brace level #{@brace_level}; mode #{@mode.inspect}.")
       backtrace [:E_UNEXPECTED_TOKEN, @scanner.matched]
@@ -353,7 +353,7 @@ module BibTeX
       bt << error
       push [:ERROR,bt]
     end
-    
+
   end
-  
+
 end
