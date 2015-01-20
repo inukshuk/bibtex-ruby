@@ -94,7 +94,7 @@ module BibTeX
     end
 
     def include_token?(token)
-      tokens.include?(token)
+      @tokens.include?(token)
     end
 
     def add(argument)
@@ -120,7 +120,7 @@ module BibTeX
 
     [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
-        tokens.each do |part|
+        @tokens.each do |part|
           part.send(method_id, *arguments, &block) unless part.nil?
         end
         self
@@ -193,7 +193,7 @@ module BibTeX
     def value
       case
       when numeric?
-        @tokens[0].to_i
+        to_i
       when atomic?
         @tokens[0]
       else
@@ -204,7 +204,7 @@ module BibTeX
     alias :v :value
 
     def inspect
-      "#<#{self.class} #{tokens.map(&:inspect).join(', ')}>"
+      "#<#{self.class} #{@tokens.map(&:inspect).join(', ')}>"
     end
 
     # Returns true if the Value is empty or consists of a single token.
@@ -238,7 +238,11 @@ module BibTeX
 
     # Returns true if the Value's content is numeric.
     def numeric?
-      atomic? && tokens[0] =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
+      atomic? && @tokens[0] =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
+    end
+
+    def to_i
+      @tokens[0].to_i
     end
 
     def to_citeproc (options = {})
@@ -247,14 +251,14 @@ module BibTeX
 
     # Returns true if the Value contains at least one symbol.
     def symbol?
-      tokens.detect { |v| v.is_a?(Symbol) }
+      @tokens.detect { |v| v.is_a?(Symbol) }
     end
 
     alias has_symbol? symbol?
 
     # Returns all symbols contained in the Value.
     def symbols
-      tokens.select { |v| v.is_a?(Symbol) }
+      @tokens.select { |v| v.is_a?(Symbol) }
     end
 
     # Returns a new Value with all string values converted according to the given filter(s).
@@ -266,7 +270,7 @@ module BibTeX
     def convert! (*filters)
       filters.flatten.each do |filter|
         f = Filters.resolve!(filter)
-        tokens.map! { |t| f.apply(t) }
+        @tokens.map! { |t| f.apply(t) }
       end
 
       self
@@ -286,7 +290,11 @@ module BibTeX
     end
 
     def <=> (other)
-      to_s <=> other.to_s
+      if numeric? && other.respond_to?(:numeric?) && other.numeric?
+        to_i <=> other.to_i
+      else
+        to_s <=> other.to_s
+      end
     end
 
   end
