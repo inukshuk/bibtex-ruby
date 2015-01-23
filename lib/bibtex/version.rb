@@ -20,7 +20,7 @@ module BibTeX
   module Version
     MAJOR = 4
     MINOR = 0
-    PATCH = 9
+    PATCH = 10
     BUILD = nil
 
     STRING = [MAJOR, MINOR, PATCH, BUILD].compact.join('.').freeze
