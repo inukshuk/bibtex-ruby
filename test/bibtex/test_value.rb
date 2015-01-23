@@ -170,9 +170,9 @@ module BibTeX
       end
 
       describe "value" do
-        it 'returns numbers as numbers' do
-          assert Value.new('42').v.is_a?(::Fixnum)
-          assert Value.new('-42').v.is_a?(::Fixnum)
+        it 'returns numbers as strings' do
+          assert Value.new(42).v.is_a?(::String)
+          assert Value.new(-42).v.is_a?(::String)
           assert Value.new('a42').v.is_a?(::String)
         end
       end

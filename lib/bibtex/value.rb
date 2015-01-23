@@ -182,7 +182,7 @@ module BibTeX
     def to_s(options = {})
       return convert(options.delete(:filter)).to_s(options) if options.has_key?(:filter)
       return value.to_s unless options.has_key?(:quotes) && atomic?
-      q = [options[:quotes]].flatten
+      q = Array(options[:quotes])
       [q[0], value, q[-1]].compact.join
     end
 
@@ -191,10 +191,7 @@ module BibTeX
     # joined by a '#', additionally, all string tokens will be turned into
     # string literals (i.e., delimitted by quotes).
     def value
-      case
-      when numeric?
-        to_i
-      when atomic?
+      if atomic?
         @tokens[0]
       else
         @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
@@ -238,7 +235,7 @@ module BibTeX
 
     # Returns true if the Value's content is numeric.
     def numeric?
-      atomic? && @tokens[0] =~ /^\s*[+-]?\d+[\/\.]?\d*\s*$/
+      atomic? && @tokens[0] =~ /^\s*[+-]?\d+\s*$/
     end
 
     def to_i
