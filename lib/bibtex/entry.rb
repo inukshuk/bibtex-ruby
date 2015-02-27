@@ -456,6 +456,19 @@ module BibTeX
       !!(bibliography && bibliography.entries[key].equal?(self))
     end
 
+    module EmptySucc #:nodoc:
+      SUCC = '0'
+
+      # Avoid infinite loop in Entry#register for an empty string
+      def succ!
+        if empty?
+          concat SUCC
+        else
+          super
+        end
+      end
+    end
+
     # Registers this Entry in the associated Bibliographies entries hash.
     # This method may change the Entry's key, if another entry is already
     # registered with the current key.
@@ -464,7 +477,7 @@ module BibTeX
     def register(key)
       return nil if bibliography.nil?
 
-      k = key.dup
+      k = key.dup.extend(EmptySucc)
       k.succ! while bibliography.has_key?(k)
       bibliography.entries[k] = self
       k
