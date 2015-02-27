@@ -1,4 +1,5 @@
 require 'helper.rb'
+require 'timeout'
 
 module BibTeX
   class TestBibtex < Minitest::Unit::TestCase
@@ -113,6 +114,12 @@ EOF
         @article{}
 EOF
       )
+      timeout(2) do
+        BibTeX.parse(<<EOF, allow_missing_keys: true)
+        @article{},
+        @article{}
+EOF
+      end
     end
 
   end
