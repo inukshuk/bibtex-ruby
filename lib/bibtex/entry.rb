@@ -193,7 +193,11 @@ module BibTeX
     end
 
     def key
-      @key ||= default_key
+      if @key.nil? || @key.empty?
+        @key = default_key
+      else
+        @key
+      end
     end
 
     alias id key
