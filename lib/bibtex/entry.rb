@@ -345,7 +345,7 @@ module BibTeX
     alias get []
 
     def fetch(name, default = nil)
-      get(name) || block_given? ? yield(name) : default
+      get(name) || (block_given? ? yield(name) : default)
     end
 
     # Adds a new field (name-value pair) to the entry.
