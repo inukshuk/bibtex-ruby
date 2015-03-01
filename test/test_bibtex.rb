@@ -1,4 +1,5 @@
 require 'helper.rb'
+require 'timeout'
 
 module BibTeX
   class TestBibtex < Minitest::Unit::TestCase
@@ -100,6 +101,25 @@ module BibTeX
     def test_logger_can_be_assigned
       logger = BibTeX.log
       BibTeX.log = logger
+    end
+
+    def test_missing_key
+      assert_raises(BibTeX::ParseError) do
+        BibTeX.parse(<<EOF)
+        @article{}
+EOF
+      end
+      assert(
+        BibTeX.parse(<<EOF, allow_missing_keys: true)
+        @article{}
+EOF
+      )
+      timeout(2) do
+        BibTeX.parse(<<EOF, allow_missing_keys: true)
+        @article{},
+        @article{}
+EOF
+      end
     end
 
   end
