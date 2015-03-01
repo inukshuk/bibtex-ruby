@@ -659,5 +659,19 @@ module BibTeX
         refute @book.valid?
       end
     end
+
+    describe '#fetch' do
+      let(:pages){ '1--2' }
+      let(:entry){
+        e = Entry.new
+        e.add(:pages, pages)
+      }
+
+      describe '(:pages)' do
+        it 'should fetch pages' do
+          assert_equal(entry.fetch(:pages), pages)
+        end
+      end
+    end
   end
 end
