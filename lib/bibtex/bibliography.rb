@@ -118,7 +118,7 @@ module BibTeX
     # Adds a new element, or a list of new elements to the bibliography.
     # Returns the Bibliography for chainability.
     def add(*arguments)
-      Element.parse(arguments.flatten).each do |element|
+      Element.parse(arguments.flatten, @options).each do |element|
         data << element.added_to_bibliography(self)
       end
       self
