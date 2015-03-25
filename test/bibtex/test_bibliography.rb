@@ -417,6 +417,15 @@ module BibTeX
       end
     end
 
+    describe '#add' do
+      before do
+        @bib = Bibliography.new(allow_missing_keys: true)
+      end
 
+      it 'should respect options provided to initializer' do
+        assert_equal(@bib.add('@article{, title = test}'), @bib)
+        assert(! @bib.entries.keys.any?(&:empty?))
+      end
+    end
   end
 end
