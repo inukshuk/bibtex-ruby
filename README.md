@@ -592,7 +592,7 @@ To execute the test suite continuously while you're working run:
 Credits
 -------
 
-Copyright 2011-2014 [Sylvester Keil](http://sylvester.keil.or.at/).
+Copyright 2011-2015 [Sylvester Keil](http://sylvester.keil.or.at/).
 
 Kudos to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
 who have made BibTeX-Ruby possible.
