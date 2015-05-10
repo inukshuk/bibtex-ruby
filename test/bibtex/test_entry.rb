@@ -178,6 +178,12 @@ module BibTeX
         end
       end
 
+      it 'prints parsed months as symbols' do
+        @entry.month = :aug
+        assert_match(/month = aug/, @entry.content)
+        assert_match(/month = aug/, @entry.to_s)
+      end
+
       [[:jan,1], [:feb,2], [:sep,9]].each do |m|
         it 'should convert numbers' do
           @entry.month = m[1]

@@ -166,14 +166,14 @@ module BibTeX
     #   Value.new('foo').to_s                       #=> "foo"
     #   Value.new(:foo).to_s                        #=> "foo"
     #   Value.new('foo').to_s(:quotes => '"')       #=> "\"foo\""
+    #   Value.new(:foo).to_s(:quotes => '"')       #=> "foo"
     #   Value.new('foo').to_s(:quotes => ['"','"']) #=> "\"foo\""
     #   Value.new('foo').to_s(:quotes => ['{','}']) #=> "{foo}"
     #   Value.new(:foo, 'bar').to_s                 #=> "foo # \"bar\""
     #   Value.new('foo', 'bar').to_s                #=> "\"foo\" # \"bar\""
     #   Value.new('\"u').to_s(:filter => :latex)    #=> "ü"
     #
-    # Returns a the Value as a string. @see #value; the only difference is
-    # that single symbols are returned as String, too.
+    # Returns a the Value as a string. @see #value;
     # If the Value is atomic and the option :quotes is given, the string
     # will be quoted using the quote symbols specified.
     #
@@ -181,7 +181,7 @@ module BibTeX
     # the filter(s) specified.
     def to_s(options = {})
       return convert(options.delete(:filter)).to_s(options) if options.has_key?(:filter)
-      return value.to_s unless options.has_key?(:quotes) && atomic?
+      return value.to_s unless options.has_key?(:quotes) && atomic? && !symbol?
       q = Array(options[:quotes])
       [q[0], value, q[-1]].compact.join
     end
