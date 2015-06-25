@@ -4,6 +4,7 @@ class BibTeX::Entry::CiteProcConverter
     isbn         ISBN
     booktitle    container-title
     journal      container-title
+    journaltitle container-title
     series       collection-title
     address      publisher-place
     pages        page
@@ -92,7 +93,7 @@ class BibTeX::Entry::CiteProcConverter
   end
 
   def techreport
-    return unless bibtex.type == :techreport
+    return unless [:techreport, :report].include?(bibtex.type)
     hash['number'] = bibtex[:number].to_s if bibtex.field? :number
   end
 
