@@ -1,17 +1,17 @@
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2011  Sylvester Keil <http://sylvester.keil.or.at>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
@@ -46,10 +46,10 @@ rule
             | entry                                { result = val[0] }
 
   comment : COMMENT LBRACE content RBRACE          { result = BibTeX::Comment.new(val[2]) }
-  
+
   content : /* empty */                            { result = '' }
           | CONTENT                                { result = val[0] }
-  
+
   preamble : PREAMBLE LBRACE string_value RBRACE   { result = BibTeX::Preamble.new(val[2]) }
 
   string : STRING LBRACE string_assignment RBRACE  { result = BibTeX::String.new(val[2][0],val[2][1]); }
@@ -71,7 +71,7 @@ rule
 
   opt_key :                                        { missing_key }
           | KEY
-  
+
   assignments : assignment                         { result = val[0] }
               | assignments COMMA assignment       { result.merge!(val[2]) }
 
@@ -88,48 +88,48 @@ require 'bibtex/lexer'
 ---- inner
 
   attr_reader :lexer, :options
-  
+
   @defaults = {
     :include => [:errors],
     :allow_missing_keys => false,
     :debug => false
   }.freeze
-  
+
   class << self
     attr_reader :defaults
   end
-  
+
   def initialize(options = {})
     @options = Parser.defaults.merge(options)
     @lexer = Lexer.new(@options)
   end
 
   def parse(input)
-    @yydebug = debug?   
+    @yydebug = debug?
 
-    lexer.analyse(input)    
+    lexer.analyse(input)
     do_parse
     #yyparse(@lexer,:each)
   end
-  
+
   def next_token
     lexer.next_token
   end
-  
+
   def debug?
     options[:debug] || ENV['DEBUG']
   end
-  
+
   def allow_missing_keys?
     options[:allow_missing_keys]
   end
-  
+
   def missing_key
     unless allow_missing_keys?
       raise ParseError, "Failed to parse BibTeX entry: cite-key missing"
     end
   end
-  
+
   def on_error(tid, val, vstack)
     message =
       "Failed to parse BibTeX on value #{val.inspect} (#{token_to_str(tid) || '?'}) #{ vstack.inspect}"
