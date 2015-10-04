@@ -199,7 +199,15 @@ module BibTeX
         if operator.nil? && value.nil?
           respond_to?(:provides?) && provides?(property)
         else
-          actual = respond_to?(property) ? send(property) : nil
+
+          # Hack: we need to get rid of #type returning the bibtex_type,
+          # because type is a valid BibTeX property. This mitigates the
+          # issue but is no fix!
+          if property == 'type'
+            actual = respond_to?(:fields) ? fields[:type] : nil
+          else
+            actual = respond_to?(property) ? send(property) : nil
+          end
 
           case operator
           when '!=', '/='

@@ -65,7 +65,8 @@ module BibTeX
           title={{Programming collective intelligence}},
           author={Segaran, T.},
           year={2007},
-          publisher={O'Reilly}
+          publisher={O'Reilly},
+          type={interview}
         }
         @string{ foo = "foobar" }
         @misc{flanagan-1,
@@ -199,6 +200,7 @@ module BibTeX
 
       it 'supports queries by type string and conditions' do
         assert_equal 1, @bib['@book[keywords=ruby]'].length
+        assert_equal 1, @bib['@*[type=interview]'].length
       end
 
       it 'supports queries with negative conditions' do
@@ -232,7 +234,8 @@ module BibTeX
           title = {{Programming collective intelligence}},
           author = {Segaran, T.},
           year = {2007},
-          publisher = {O'Reilly}
+          publisher = {O'Reilly},
+          type={interview}
         }
         END
         assert_equal 1, @bib[entry].length
