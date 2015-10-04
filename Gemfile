@@ -7,8 +7,14 @@ gem 'json', '~>1.8', :platforms => [:mri_18, :jruby, :rbx]
 gem 'rubysl', '~>2.0', :platforms => :rbx
 
 group :debug do
-	gem 'debugger', :require => false, :platforms => [:mri_19, :mri_20]
-	gem 'ruby-debug', :require => false, :platforms => [:mri_18]
+  if RUBY_VERSION >= '2.0'
+    gem 'byebug', :require => false, :platforms => :mri
+  else
+    gem 'debugger', :require => false, :platforms => :mri
+  end
+
+  gem 'ruby-debug', :require => false, :platforms => :jruby
+
   gem 'rubinius-debugger', :require => false, :platforms => :rbx
   gem 'rubinius-compiler', :require => false, :platforms => :rbx
 end
