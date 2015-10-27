@@ -288,17 +288,21 @@ module BibTeX
             @book{b1,
               title = {FOO},
               year = {2013},
-              author = {Doe, John}}
+              author = {Doe, John},
+              pages = {1-2}}
             @book{b2,
               title = {BAR},
               year = {2013},
-              author = {Doe, John}}
+              author = {Doe, John},
+              pages = {1-3},
+              }
           END
           @b = BibTeX.parse <<-END
             @book{b3,
               title = {FOO},
               year = {2013},
-              author = {Doe, Jane}}
+              author = {Doe, John},
+              pages = {1-2}}
           END
         end
 
@@ -311,6 +315,11 @@ module BibTeX
           assert @a.length > @a.uniq!(:author).length
         end
 
+        describe 'with block' do
+          it 'removes duplicate entries and returns the bibliography' do
+            assert @a.length > @a.uniq!(:author){|d,e| d+'|'+e.pages_from}.length
+          end
+        end
       end
 
       describe 'given a filter' do
