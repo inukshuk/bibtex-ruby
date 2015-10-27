@@ -527,7 +527,7 @@ module BibTeX
         # digest = digest[0] if digest.is_a?(Array)
 
         digest.gsub(/\s+/, '').downcase
-        digest = block.call(disgest, entry) unless block.nil?
+        digest = block.call(digest, entry) unless block.nil?
         digest
 
       }.values.select { |d| d.length > 1 }
