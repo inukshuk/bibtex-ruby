@@ -85,3 +85,32 @@ Feature: BibTeX Names
     | {Barnes} {and} {Noble,} {Inc.}    | {Barnes} {and} {Noble,} |                | {Inc.}                         |     |
     | Charles Louis Xavier Joseph de la Vallee Poussin | Charles Louis Xavier Joseph | de la | Vallee Poussin       |     |
 
+	@names @display
+	Scenarios: Some Japanese names (ordinal names to weird cases)
+		| name                              | first                   | von            | last                           | jr  |
+		| 田中 花子                         | 花子                    |                | 田中                           |     |
+		| たなか はなこ                     | はなこ                  |                | たなか                         |     |
+		| タナカ ハナコ                     | ハナコ                  |                | タナカ                         |     |
+		| {山田} 太郎                       | 太郎                    |                | {山田}                         |     |
+		| {山}田 {太郎}                     | {太郎}                  |                | {山}田                         |     |
+		| {アリス} {鈴木}                   | {アリス}                |                | {鈴木}                         |     |
+		| Alice {鈴木}                      | Alice                   |                | {鈴木}                         |     |
+		| 大君 ズム 慈恩                    | ズム 慈恩               |                | 大君                           |     |
+		| {大君 ズム} 慈恩                  | 慈恩                    |                | {大君 ズム}                    |     |
+		| 大君{ }ズム 慈恩                  | 慈恩                    |                | 大君{ }ズム                    |     |
+		| 佐藤 B作                          | B作                     |                | 佐藤                           |     |
+		| 佐藤 b作                          | b作                     |                | 佐藤                           |     |
+		| 佐藤 b作 俊夫                     |                         | 佐藤 b作       | 俊夫                           |     |
+		| 佐藤 {b}作 俊夫                   | {b}作 俊夫              |                | 佐藤                           |     |
+		| 聖in斗 天草 四郎                  | 四郎                    | 聖in斗         | 天草                           |     |
+		| 聖In斗 天草 四郎                  | 天草 四郎               |                | 聖In斗                         |     |
+		| 聖{I}n斗 天草 四郎                | 四郎                    | 聖{I}n斗       | 天草                           |     |
+		| Micro soft デベロップメント K. K. | K. K.                   | Micro soft     | デベロップメント               |     |
+
+	@names @sort
+	Scenarios: In sorted name, Japanese letter has no effect
+		| name                              | first                   | von            | last                           | jr  |
+		| 山崎, 渉                          | 渉                      |                | 山崎                           |     |
+		| 山崎, 2世, 渉                     | 渉                      |                | 山崎                           | 2世 |
+		| びb C詩,x掛, エA                  | エA                     | びb            | C詩                            | x掛 |
+		| ビB c氏 出d シC, A絵              | A絵                     | ビB c氏 出d    | シC                            |     |
