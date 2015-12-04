@@ -40,7 +40,7 @@ module BibTeX
     if RUBY_VERSION < '1.9'
        Patterns[:sur_given] = / /o # never matches, since spaces is eliminated
     else
-       Patterns[:sur_given] = /[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]/o
+       Patterns[:sur_given] = /[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]/uo
     end
 
     def initialize(options = {})
