@@ -96,13 +96,13 @@ require 'strscan'
     :and => /,?\s+and\s+/io,
     :space => /\s+/o,
     :comma => /,/o,
-    :lower => /[[:lower:]][^\s\{\}\d\\,]*/o,
-    :upper => /[[:upper:]][^\s\{\}\d\\,]*/uo,
-    :symbols => /(\d|\\.)+/o,
+    :lower => /[[:lower:]][[:lower:][:upper:]]*/uo,
+    :upper => /[[:upper:]][[:lower:][:upper:].]*/uo,
+    :other => /[^\s,\{\}\\[:upper:][:lower:]]+/uo,
     :lbrace => /\{/o,
     :rbrace => /\}/o,
-    :period => /./o,
-    :braces => /[\{\}]/o
+    :braces => /[\{\}]/o,
+    :escape => /\\./o
   }
 
   class << self
@@ -163,7 +163,7 @@ require 'strscan'
         is_uppercase
         @word[1] << @src.matched
 
-      when @src.scan(NameParser.patterns[:symbols])
+      when @src.scan(NameParser.patterns[:other])
         @word[1] << @src.matched
 
       when @src.scan(NameParser.patterns[:lbrace])
@@ -173,7 +173,7 @@ require 'strscan'
       when @src.scan(NameParser.patterns[:rbrace])
         error_unbalanced
 
-      when @src.scan(NameParser.patterns[:period])
+      when @src.scan(NameParser.patterns[:escape])
         @word[1] << @src.matched
       end
     end
