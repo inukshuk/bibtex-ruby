@@ -217,6 +217,9 @@ require 'strscan'
 
       when @src.scan(NameParser.patterns[:escape])
         @word[1] << @src.matched
+
+      else
+        error_invalid
       end
     end
 
@@ -270,6 +273,11 @@ require 'strscan'
   def error_unbalanced
     @stack.push [:ERROR,'}']
     BibTeX.log.warn("NameParser: unbalanced braces at position #{@src.pos}; brace level #{@brace_level}.")
+  end
+
+  def error_invalid
+    @stack.push [:ERROR,@src.getch]
+    BibTeX.log.warn("NameParser: invalid character at position #{@src.pos}; brace level #{@brace_level}.")
   end
 
 # -*- racc -*-

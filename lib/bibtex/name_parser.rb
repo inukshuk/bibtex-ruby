@@ -100,6 +100,9 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 132)
 
       when @src.scan(NameParser.patterns[:escape])
         @word[1] << @src.matched
+
+      else
+        error_invalid
       end
     end
 
@@ -153,6 +156,11 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 132)
   def error_unbalanced
     @stack.push [:ERROR,'}']
     BibTeX.log.warn("NameParser: unbalanced braces at position #{@src.pos}; brace level #{@brace_level}.")
+  end
+
+  def error_invalid
+    @stack.push [:ERROR,@src.getch]
+    BibTeX.log.warn("NameParser: invalid character at position #{@src.pos}; brace level #{@brace_level}.")
   end
 
 # -*- racc -*-
