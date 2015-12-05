@@ -35,11 +35,7 @@ rule
         | names name { result << val[1] }
 
   name : ANDFL flname { result = Name.new(val[1]) }
-       | ANDLF lfname
-       {
-         val[1][:first] = nil if val[1][:first] && val[1][:first].empty?
-         result = Name.new(val[1])
-       }
+       | ANDLF lfname { result = Name.new(val[1]) }
 
   flname : word
          {
@@ -59,33 +55,17 @@ rule
          }
          | comma
 
-  lfname : LWORD
+  lfname : lastfirst
          {
-           result = { :last => val[0] }
+           result = { :last => val[0][0], :first => val[0][1] }
          }
-         | u_words
+         | von lastfirst
          {
-           result = { :last => val[0][0], :first => val[0][1..-1].join(' ') }
+           result = { :von => val[0], :last => val[1][0], :first => val[1][1] }
          }
-         | u_words LWORD
+         | u_words von lastfirst
          {
-           result = { :last => val[0][0], :first => (val[0][1..-1] << val[1]).join(' ') }
-         }
-         | von LWORD
-         {
-           result = { :von => val[0], :last => val[1] }
-         }
-         | von u_words
-         {
-           result = { :von => val[0], :last => val[1][0], :first => val[1][1..-1].join(' ') }
-         }
-         | u_words von LWORD
-         {
-           result = { :von => val[0..1].join(' '), :last => val[2] }
-         }
-         | u_words von u_words
-         {
-           result = { :von => val[0..1].join(' '), :last => val[2][0], :first => val[2][1..-1].join(' ') }
+           result = { :von => val[0..1].join(' '), :last => val[2][0], :first => val[2][1] }
          }
          | comma
 
@@ -105,6 +85,10 @@ rule
   von : LWORD
       | von LWORD         { result = val.join(' ') }
       | von u_words LWORD { result = val.join(' ') }
+
+  lastfirst : LWORD         { result = [val[0], nil] }
+            | u_words       { result = [val[0][0], val[0][1] ? val[0][1..-1].join(' ') : nil] }
+            | u_words LWORD { result = [val[0][0], (val[0][1..-1] << val[1]).join(' ')] }
 
   last : LWORD | u_words { result = val[0].join(' ') }
 

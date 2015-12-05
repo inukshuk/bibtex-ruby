@@ -88,6 +88,7 @@ Feature: BibTeX Names
 	@names @display
 	Scenarios: Some Japanese names (ordinal names to weird cases)
 		| name                              | first                   | von            | last                           | jr  |
+		| 田中                              |                         |                | 田中                           |     |
 		| 田中 花子                         | 花子                    |                | 田中                           |     |
 		| たなか はなこ                     | はなこ                  |                | たなか                         |     |
 		| タナカ ハナコ                     | ハナコ                  |                | タナカ                         |     |
@@ -104,8 +105,10 @@ Feature: BibTeX Names
 		| 佐藤 {b}作 俊夫                   | {b}作 俊夫              |                | 佐藤                           |     |
 		| 聖in斗 天草 四郎                  | 四郎                    | 聖in斗         | 天草                           |     |
 		| 聖In斗 天草 四郎                  | 天草 四郎               |                | 聖In斗                         |     |
-		| 聖{I}n斗 天草 四郎                | 四郎                    | 聖{I}n斗       | 天草                           |     |
+		| 聖in斗 天草 shi郎                 | shi郎                   | 聖in斗         | 天草                           |     |
+		| Micro soft デベロップメント       |                         | Micro soft     | デベロップメント               |     |
 		| Micro soft デベロップメント K. K. | K. K.                   | Micro soft     | デベロップメント               |     |
+		| Micro soft デベロップメント K. k. | K. k.                   | Micro soft     | デベロップメント               |     |
 
 	@names @sort
 	Scenarios: In sorted name, Japanese letter has no effect
