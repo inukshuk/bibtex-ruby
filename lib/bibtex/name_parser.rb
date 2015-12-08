@@ -57,7 +57,7 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 116)
     @src = StringScanner.new(input)
     @brace_level = 0
     @last_and = 0
-    @stack = [[:ANDFL,'#dummy']]
+    @stack = [[:ANDFL,'(^start)']]
     @word = [:PWORD,'']
     do_scan
   end
