@@ -23,7 +23,7 @@
 
 class BibTeX::NameParser
 
-token COMMA UWORD LWORD PWORD AND ERROR
+token COMMA UWORD LWORD PWORD ANDFL ANDLF ERROR
 
 expect 0
 
@@ -31,50 +31,72 @@ rule
 
   result : { result = [] } | names
 
-  names : name           { result = [val[0]] }
-        | names AND name { result << val[2] }
+  names : name       { result = [val[0]] }
+        | names name { result << val[1] }
 
-  name : word
-       {
-         result = Name.new(:last => val[0])
-       }
-       | u_words word
-       {
-         result = Name.new(:first => val[0], :last => val[1])
-       }
-       | u_words von last
-       {
-         result = Name.new(:first => val[0], :von => val[1], :last => val[2])
-       }
-       | von last
-       {
-         result = Name.new(:von => val[0], :last => val[1])
-       }
-       | last COMMA first
-       {
-         result = Name.new(:last => val[0], :jr => val[2][0], :first => val[2][1])
-       }
-       | von last COMMA first
-       {
-         result = Name.new(:von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1])
-       }
-       | u_words von last COMMA first
-       {
-         result = Name.new(:von => val[0,2].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1])
-       }
-       ;
+  name : ANDFL flname { result = Name.new(val[1]) }
+       | ANDLF lfname { result = Name.new(val[1]) }
+
+  flname : word
+         {
+           result = { :last => val[0] }
+         }
+         | u_words word
+         {
+           result = { :first => val[0].join(' '), :last => val[1] }
+         }
+         | u_words von last
+         {
+           result = { :first => val[0].join(' '), :von => val[1], :last => val[2] }
+         }
+         | von last
+         {
+           result = { :von => val[0], :last => val[1] }
+         }
+         | comma
+
+  lfname : lastfirst
+         {
+           result = { :last => val[0][0], :first => val[0][1] }
+         }
+         | von lastfirst
+         {
+           result = { :von => val[0], :last => val[1][0], :first => val[1][1] }
+         }
+         | u_words von lastfirst
+         {
+           result = { :von => val[0..1].join(' '), :last => val[2][0], :first => val[2][1] }
+         }
+         | comma
+
+  comma : last COMMA first
+        {
+          result = { :last => val[0], :jr => val[2][0], :first => val[2][1] }
+        }
+        | von last COMMA first
+        {
+          result = { :von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1] }
+        }
+        | u_words von last COMMA first
+        {
+          result = { :von => val[0..1].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1] }
+        }
 
   von : LWORD
       | von LWORD         { result = val.join(' ') }
       | von u_words LWORD { result = val.join(' ') }
 
-  last : LWORD | u_words
+  lastfirst : LWORD         { result = [val[0], nil] }
+            | u_words       { result = [val[0][0], val[0][1] ? val[0][1..-1].join(' ') : nil] }
+            | u_words LWORD { result = [val[0][0], (val[0][1..-1] << val[1]).join(' ')] }
+
+  last : LWORD | u_words { result = val[0].join(' ') }
 
   first : opt_words                 { result = [nil,val[0]] }
         | opt_words COMMA opt_words { result = [val[0],val[2]] }
 
-  u_words : u_word
-          | u_words u_word { result = val.join(' ') }
+  u_words : u_word         { result = [val[0]] }
+          | u_words u_word { result << val[1] }
 
   u_word : UWORD | PWORD
 
@@ -96,13 +118,14 @@ require 'strscan'
     :and => /,?\s+and\s+/io,
     :space => /\s+/o,
     :comma => /,/o,
-    :lower => /[[:lower:]][^\s\{\}\d\\,]*/o,
-    :upper => /[[:upper:]][^\s\{\}\d\\,]*/uo,
-    :symbols => /(\d|\\.)+/o,
+    :lower => /[[:lower:]][[:lower:][:upper:]]*/uo,
+    :upper => /[[:upper:]][[:lower:][:upper:].]*/uo,
+    :other => /[^\s,\{\}\\[:upper:][:lower:]]+/uo,
     :lbrace => /\{/o,
     :rbrace => /\}/o,
-    :period => /./o,
-    :braces => /[\{\}]/o
+    :braces => /[\{\}]/o,
+    :escape => /\\./o,
+    :last_first => /[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]/uo
   }
 
   class << self
@@ -134,7 +157,8 @@ require 'strscan'
   def scan(input)
     @src = StringScanner.new(input)
     @brace_level = 0
-    @stack = []
+    @last_and = 0
+    @stack = [[:ANDFL,'(^start)']]
     @word = [:PWORD,'']
     do_scan
   end
@@ -146,9 +170,10 @@ require 'strscan'
       case
       when @src.scan(NameParser.patterns[:and])
         push_word
-        @stack.push([:AND,@src.matched])
+        @last_and = @stack.length
+        @stack.push([:ANDFL,@src.matched])
 
-      when @src.scan(NameParser.patterns[:space])
+      when @src.skip(NameParser.patterns[:space])
         push_word
 
       when @src.scan(NameParser.patterns[:comma])
@@ -163,7 +188,8 @@ require 'strscan'
         is_uppercase
         @word[1] << @src.matched
 
-      when @src.scan(NameParser.patterns[:symbols])
+      when @src.scan(NameParser.patterns[:other])
+        check_name_order
         @word[1] << @src.matched
 
       when @src.scan(NameParser.patterns[:lbrace])
@@ -173,8 +199,11 @@ require 'strscan'
       when @src.scan(NameParser.patterns[:rbrace])
         error_unbalanced
 
-      when @src.scan(NameParser.patterns[:period])
+      when @src.scan(NameParser.patterns[:escape])
         @word[1] << @src.matched
+
+      else
+        error_invalid
       end
     end
 
@@ -195,6 +224,11 @@ require 'strscan'
 
   def is_uppercase
     @word[0] = :UWORD if @word[0] == :PWORD
+  end
+
+  def check_name_order
+    return if RUBY_VERSION < '1.9'
+    @stack[@last_and][0] = :ANDLF if @stack[@last_and][0] != :ANDLF && @src.matched =~ NameParser.patterns[:last_first]
   end
 
   def scan_literal
@@ -223,6 +257,11 @@ require 'strscan'
   def error_unbalanced
     @stack.push [:ERROR,'}']
     BibTeX.log.warn("NameParser: unbalanced braces at position #{@src.pos}; brace level #{@brace_level}.")
+  end
+
+  def error_invalid
+    @stack.push [:ERROR,@src.getch]
+    BibTeX.log.warn("NameParser: invalid character at position #{@src.pos}; brace level #{@brace_level}.")
   end
 
 # -*- racc -*-
