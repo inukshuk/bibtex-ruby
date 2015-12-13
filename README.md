@@ -397,6 +397,19 @@ The duplicate methods above, for example, do something like this:
 You can use this method, for example, to match entries only by their author's
 last name and so on and so forth.
 
+Since version 4.1.0, BibTeX-ruby supports parsing of names spelled in the East Asian order (last name, then first name). Names contain a Chinese, Japanese or Korean letter are currently assumed to be such names. If the name is written in comma-separated manner, it is parsed in the normal way.
+
+    b = BibTeX.parse(<<-END)
+    @book{key,
+     title = "プログラミング言語 Ruby",
+     author = "David Flanagan and まつもと ゆきひろ",
+     translator = "卜部, 昌平 and 長尾, 高弘",
+     year = "2009",
+     publisher = "O'Reilly Japan"
+    }
+    END
+    [*b[0].author, *b[0].translator].map(&:last) #=> [Flanagan, まつもと, 卜部, 長尾]
+
 ### Filters
 
 Since version 1.3.8 BibTeX-Ruby comes with a plugin framework for input
