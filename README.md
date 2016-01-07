@@ -490,19 +490,20 @@ and writes the following XML to standard out:
   <bibtex:entry id='pickaxe'>
     <bibtex:book>
       <bibtex:address>Raleigh, North Carolina</bibtex:address>
-      <bibtex:person>
-        <bibtex:first>Dave</bibtex:first>
-        <bibtex:last>Thomas</bibtex:last>
-      </bibtex:person>
-      <bibtex:person>
-        <bibtex:first>Chad</bibtex:first>
-        <bibtex:last>Fowler</bibtex:last>
-      </bibtex:person>
-      <bibtex:person>
-        <bibtex:first>Andy</bibtex:first>
-        <bibtex:last>Hunt</bibtex:last>
-      </bibtex:person>
-      <bibtex:author/>
+      <bibtex:author>
+        <bibtex:person>
+          <bibtex:first>Dave</bibtex:first>
+          <bibtex:last>Thomas</bibtex:last>
+        </bibtex:person>
+        <bibtex:person>
+          <bibtex:first>Chad</bibtex:first>
+          <bibtex:last>Fowler</bibtex:last>
+        </bibtex:person>
+        <bibtex:person>
+          <bibtex:first>Andy</bibtex:first>
+          <bibtex:last>Hunt</bibtex:last>
+        </bibtex:person>
+      </bibtex:author>
       <bibtex:publisher>The Pragmatic Bookshelf</bibtex:publisher>
       <bibtex:title>
         Programming Ruby 1.9: The Pragmatic Programmer&apos;s Guide
