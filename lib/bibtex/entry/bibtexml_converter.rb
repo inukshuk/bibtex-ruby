@@ -25,7 +25,7 @@ class BibTeX::Entry::BibTeXMLConverter
       field = REXML::Element.new("bibtex:#{key}")
 
       if options[:extended] && value.name?
-        value.each { |n| entry.add_element(n.to_xml) }
+        value.each { |n| field.add_element(n.to_xml) }
       else
         field.text = value.to_s(options)
       end
