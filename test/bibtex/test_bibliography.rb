@@ -200,6 +200,9 @@ module BibTeX
 
       it 'supports queries by type string and conditions' do
         assert_equal 1, @bib['@book[keywords=ruby]'].length
+        assert_equal 1, @bib['@book[keywords = ruby]'].length
+        assert_equal 1, @bib['@book[ keywords = ruby]'].length
+        assert_equal 1, @bib['@book[keywords=ruby ]'].length
         assert_equal 1, @bib['@*[type=interview]'].length
       end
 

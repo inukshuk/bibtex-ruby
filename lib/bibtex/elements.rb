@@ -196,6 +196,9 @@ module BibTeX
       if property.nil?
         true
       else
+        property.strip!
+        value.strip! unless value.nil?
+
         if operator.nil? && value.nil?
           respond_to?(:provides?) && provides?(property)
         else
