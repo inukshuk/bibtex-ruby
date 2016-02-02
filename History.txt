@@ -1,3 +1,7 @@
+4.2.0 / 2015-02-02
+==================
+* Fixed queries being whitespace sensitive
+
 4.0.9 / 2015-01-20
 ==================
 * Improve BibTeX::Value comparison
