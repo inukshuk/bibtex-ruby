@@ -10,6 +10,7 @@ lib/bibtex/parser.output
 lib/bibtex/name_parser.output
 Gemfile.lock
 coverage
+.byebug_history
 
 .DS_Store
 .ruby-version
