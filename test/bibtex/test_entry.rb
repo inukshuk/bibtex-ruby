@@ -123,6 +123,12 @@ module BibTeX
             end
           end
 
+          describe '#to_citeproc' do
+            it 'includes inherited values' do
+              @bib['a1'].to_citeproc['container-title'].must_be :==, @bib['a'].title.to_s
+            end
+          end
+
           describe '#save_inherited_fields' do
             it 'copies referenced values to the entry' do
               @bib['a1'].title = 'a1'

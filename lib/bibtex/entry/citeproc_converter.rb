@@ -62,15 +62,11 @@ class BibTeX::Entry::CiteProcConverter
     bibtex.parse_month
 
     bibtex.each_pair do |key, value|
-      unless BibTeX::Entry::DATE_FIELDS.include?(key)
-        cp_key = CSL_FILTER[key].to_s
+      convert key, value
+    end
 
-        if hash.key?(cp_key)
-          hash[key] = value.to_citeproc(options)
-        else
-          hash[cp_key] = value.to_citeproc(options)
-        end
-      end
+    bibtex.inherited_fields.each do |key|
+      convert key, bibtex.parent.provide(key)
     end
 
     methods = self.class.instance_methods(false) - [:convert!, :hash]
@@ -146,9 +142,21 @@ class BibTeX::Entry::CiteProcConverter
     end
   end
 
-  protected
+  private
 
   attr_reader :bibtex, :options
+
+  def convert(key, value)
+    return if BibTeX::Entry::DATE_FIELDS.include?(key)
+
+    cp_key = CSL_FILTER[key].to_s
+
+    if hash.key?(cp_key)
+      hash[key] = value.to_citeproc(options)
+    else
+      hash[cp_key] = value.to_citeproc(options)
+    end
+  end
 
   def hash
     @hash ||= {}
