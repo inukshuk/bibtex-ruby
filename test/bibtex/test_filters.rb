@@ -2,12 +2,12 @@ require 'helper.rb'
 
 module BibTeX
   class FiltersTest < Minitest::Spec
-    
+
     it "should Filters should be singleton classes" do
       assert_equal false, Filter.respond_to?(:new)
       assert_equal Filter.instance.object_id, Filter.instance.object_id
     end
-    
+
     describe 'Filters.resolve' do
       it "should return the filter if a filter is given" do
         assert_equal Filter.instance.object_id, Filters.resolve(Filter.instance).object_id
@@ -25,14 +25,12 @@ module BibTeX
         assert_equal FooBar.instance.object_id, Filters.resolve('foobar').object_id
         Filter.subclasses.delete(FooBar)
       end
-      
+
       it "should return nil if there is no filter by that name" do
         assert_equal nil, Filters.resolve(:foobar)
-        assert_equal nil, Filters.resolve(:upcase)
         assert_equal nil, Filters.resolve('foobar')
         assert_equal nil, Filters.resolve(nil)
       end
     end
-    
   end
 end

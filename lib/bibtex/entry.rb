@@ -72,6 +72,7 @@ module BibTeX
     # Creates a new instance. If a hash is given, the entry is populated accordingly.
     def initialize(attributes = {})
       @fields = {}
+      @key = nil
 
       self.type = attributes.delete(:bibtex_type) if attributes.has_key?(:bibtex_type)
       self.key = attributes.delete(:bibtex_key) if attributes.has_key?(:bibtex_key)

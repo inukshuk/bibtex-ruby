@@ -95,7 +95,6 @@ module BibTeX
 
     def reset
       @stack, @brace_level, @mode, @active_object = [], 0, :meta, nil
-      @scanner.reset if @scanner
 
       # cache options for speed
       @include_meta_content = @options[:include].include?(:meta_content)

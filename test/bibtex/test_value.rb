@@ -1,5 +1,17 @@
 require 'helper.rb'
 
+class Upcase < BibTeX::Filter
+  def apply(value)
+    value.is_a?(::String) ? value.upcase : value
+  end
+end
+
+class SuffixA < BibTeX::Filter
+  def apply(value)
+    value.is_a?(::String) ? "#{value}a" : value
+  end
+end
+
 module BibTeX
   class ValueTest < Minitest::Spec
 
@@ -93,18 +105,6 @@ module BibTeX
 
     describe "conversions" do
       before do
-        class Upcase < BibTeX::Filter
-          def apply(value)
-            value.is_a?(::String) ? value.upcase : value
-          end
-        end
-
-        class SuffixA < BibTeX::Filter
-          def apply(value)
-            value.is_a?(::String) ? "#{value}a" : value
-          end
-        end
-
         @values = [Value.new('foo'), Value.new('foo', :bar)]
       end
 

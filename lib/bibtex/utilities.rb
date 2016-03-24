@@ -31,7 +31,7 @@ module BibTeX
     # Delegates to BibTeX.open if the string is a filename or URI.
     def parse(string, options = {}, &block)
       case
-      when string.length < 260 && File.exists?(string)
+      when string.length < 260 && File.exist?(string)
         Bibliography.open(string, options, &block)
       when string =~ /^[a-z]+:\/\//i
         Bibliography.open(string, options)

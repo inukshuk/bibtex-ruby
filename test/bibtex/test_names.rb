@@ -4,11 +4,11 @@ require 'helper'
 
 module BibTeX
   class NamesTest < Minitest::Spec
-    
+
     before do
       @poe = Name.new(:first => 'Edgar Allen', :last => 'Poe')
     end
-    
+
     describe 'string behaviour' do
       before do
         @name = Name.new(:first => 'Charles Louis Xavier Joseph', :prefix => 'de la', :last => 'Vallee Poussin', :suffix => 'Jr.')
@@ -20,15 +20,15 @@ module BibTeX
         assert_equal 'de la vallee poussin, jr., charles louis xavier joseph', @name.downcase!.to_s
       end
       it 'should implement gsub!' do
-        assert_equal 'dX la VallXX PoussXn, Jr., CharlXs LouXs XavXXr JosXph', @name.gsub!(/[ei]/, 'X').to_s        
+        assert_equal 'dX la VallXX PoussXn, Jr., CharlXs LouXs XavXXr JosXph', @name.gsub!(/[ei]/, 'X').to_s
       end
     end
-    
+
     describe '#display_order' do
       it 'returns the name as "first last"' do
         @poe.display_order.must_be :==, 'Edgar Allen Poe'
       end
-      
+
       it 'accepts the :initials option' do
         @poe.display_order(:initials => true).must_be :==, 'E.A. Poe'
       end
@@ -38,16 +38,16 @@ module BibTeX
       it 'returns the name as "last, first"' do
         @poe.sort_order.must_be :==, 'Poe, Edgar Allen'
       end
-      
+
       it 'accepts the :initials option' do
         @poe.sort_order(:initials => true).must_be :==, 'Poe, E.A.'
       end
     end
-    
+
     describe '#initials?' do
       it 'returns true if the name contains a solely initials as a first name' do
         @poe.initials?.must_equal false
-        
+
         @poe.first = 'Edgar A.'
         @poe.initials?.must_equal false
 
@@ -61,7 +61,7 @@ module BibTeX
         @poe.initials?.must_equal false
       end
     end
-    
+
     describe '#rename_if' do
       it 'renames the name to the given attributes if no condition is given' do
         @poe.rename_if({ :first => 'E.A.' }).first.must_equal 'E.A.'
@@ -86,21 +86,21 @@ module BibTeX
         @poe.rename_if({ :first => 'E.A.' }) {|n| false}.first.wont_equal 'E.A.'
       end
     end
-    
+
     describe '#merge!' do
       it 'does not merge duplicates' do
         n1 = Names.new(@poe)
         n2 = Names.new(@poe)
         assert_equal @poe.to_s, n1.merge!(n2).to_s
       end
-      
+
       it 'merges different names' do
         n1 = Names.new(@poe)
         n2 = Names.new(Name.new(:last => 'Plato'))
         assert_equal "#{@poe.to_s} and Plato", n1.merge!(n2).to_s
       end
     end
-  
+
     describe '#normalize_initials' do
       it 'returns normalized initials of existing initials only' do
         Name.new(:first => 'Edgar A.', :last => 'Poe').normalize_initials.must_equal 'Edgar A.'
@@ -137,23 +137,21 @@ module BibTeX
         Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar', 'Poe').first.must_equal 'E.A.'
         Name.new(:first => 'A.', :last => 'Poe').extend_initials('Edgar', 'Poe').first.must_equal 'A.'
       end
-      
+
       it 'does not extend the first name if the last name or initials do not match' do
         Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar Allen', 'Poser').first.wont_equal 'Edgar Allen'
         Name.new(:first => 'E.A.', :last => 'Poe').extend_initials('Edgar Ellen', 'Poe').first.wont_equal 'Edgar Ellen'
         Name.new(:first => 'E.R.', :last => 'Poe').extend_initials('Edgar Allen', 'Poe').first.wont_equal 'Edgar Allen'
       end
     end
-    
+
 		describe "conversions" do
-      before do
-        class UpcaseAll < BibTeX::Filter
-          def apply (value)
-            value.upcase
-          end
+      class UpcaseAll < BibTeX::Filter
+        def apply (value)
+          value.upcase
         end
       end
-      
+
       describe "#convert" do
         it "converts the value when given a filter instance" do
 					Names.parse('Poe and Hawthorne').convert(UpcaseAll.instance).to_s.must_be :==, 'POE and HAWTHORNE'
@@ -164,7 +162,7 @@ module BibTeX
 				end
 			end
 		end
-    
+
   end
-  
+
 end

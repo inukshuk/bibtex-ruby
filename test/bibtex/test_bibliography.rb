@@ -327,7 +327,7 @@ module BibTeX
 
       describe 'given a filter' do
         before do
-          @filter = Object
+          @filter = Object.new
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
         end
 

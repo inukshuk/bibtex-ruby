@@ -3,7 +3,7 @@ require 'timeout'
 
 module BibTeX
   class TestBibtex < Minitest::Unit::TestCase
-  
+
     def setup
     end
 
@@ -37,25 +37,25 @@ module BibTeX
       assert_equal('A {bunch {of} braces {in}} title', bib[:key03][:title])
       #TODO missing assertions
     end
-  
+
     # def test_errors
     #   bib = BibTeX.open(Test.fixtures(:errors), :debug => false)
     #   #refute_nil(bib)
     # end
-  
+
     def test_bibdesk
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), :debug => false)
       assert_equal 3, bib.length
       assert_equal 'rails', bib[0].key
       assert_equal '2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified']
     end
-  
+
     def test_roundtrip
       # file = File.read(Test.fixtures(:roundtrip))
       # bib = BibTeX.parse(file, :debug => false)
       # assert_equal file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, '')
     end
-  
+
     def test_construct
       # file = File.read(Test.fixtures(:roundtrip))
       # bib = BibTeX::Bibliography.new
@@ -72,9 +72,9 @@ module BibTeX
       #   :title => 'Agile Web Development with Rails',
       #   :year => '2009'
       # })
-      # assert_equal(file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, ''))    
+      # assert_equal(file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, ''))
     end
-  
+
     def test_parse
       bib = BibTeX::Bibliography.new
       bib.add(BibTeX::Element.parse(%q( @string{ pragprog = "The Pragmatic Bookshelf" } )))
@@ -89,9 +89,9 @@ module BibTeX
         series = {The Facets of Ruby},
         title = {Agile Web Development with Rails},
         year = {2009}
-      }    
+      }
       END
-    
+
       assert_equal(2, bib.length)
       refute_nil(bib[:rails])
       bib.replace_strings
@@ -114,7 +114,7 @@ EOF
         @article{}
 EOF
       )
-      timeout(2) do
+      Timeout.timeout(2) do
         BibTeX.parse(<<EOF, allow_missing_keys: true)
         @article{},
         @article{}

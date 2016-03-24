@@ -359,15 +359,16 @@ module BibTeX
       end
 
       describe 'given a filter object or a filter name' do
+
+        class SuffixB < BibTeX::Filter
+          def apply(value)
+            value.is_a?(::String) ? "#{value}b" : value
+          end
+        end
+
         before do
           @filter = Object.new
           def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
-
-          class SuffixB < BibTeX::Filter
-            def apply(value)
-              value.is_a?(::String) ? "#{value}b" : value
-            end
-          end
         end
 
         it 'supports arbitrary conversion' do
