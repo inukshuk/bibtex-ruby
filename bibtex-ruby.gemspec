@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Sylvester Keil']
   s.email       = ['sylvester@keil.or.at']
   s.homepage    = 'http://inukshuk.github.com/bibtex-ruby'
-  s.license     = 'GPL-3'
+  s.license     = 'GPL-3.0'
 
   s.summary     = 'A BibTeX parser, converter and API for Ruby.'
   s.description = <<-END_DESCRIPTION.gsub(/^\s+/, '')
