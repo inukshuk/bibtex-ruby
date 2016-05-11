@@ -62,7 +62,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:abstract)
     remove_from_fallback(:abstract)
 
-    graph << [entry, RDF::DC.abstract, bibtex[:abstract].to_s]
+    graph << [entry, RDF::Vocab::DC.abstract, bibtex[:abstract].to_s]
     graph << [entry, bibo[:abstract], bibtex[:abstract].to_s]
   end
 
@@ -89,7 +89,7 @@ class BibTeX::Entry::RDFConverter
     bibtex[:author].each do |name|
       node = agent(name) { create_agent(name, :Person) }
 
-      graph << [entry, RDF::DC.creator, node]
+      graph << [entry, RDF::Vocab::DC.creator, node]
       graph << [seq, RDF.li, node]
     end
   end
@@ -99,7 +99,7 @@ class BibTeX::Entry::RDFConverter
     while bibtex.field?("bdsk-url-#{count}".to_sym) do
       field = "bdsk-url-#{count}".to_sym
       remove_from_fallback(field)
-      graph << [entry, RDF::DC.URI, bibtex[field].to_s]
+      graph << [entry, RDF::Vocab::DC.URI, bibtex[field].to_s]
       graph << [entry, bibo[:uri], bibtex[field].to_s]
       count  += 1
     end
@@ -118,9 +118,9 @@ class BibTeX::Entry::RDFConverter
 
     series = RDF::Node.new
     graph << [series, RDF.type, bibo[:Document]]
-    graph << [series, RDF::DC.title, bibtex[:booktitle].to_s]
+    graph << [series, RDF::Vocab::DC.title, bibtex[:booktitle].to_s]
 
-    graph << [entry, RDF::DC.isPartOf, series]
+    graph << [entry, RDF::Vocab::DC.isPartOf, series]
   end
 
   def chapter
@@ -136,7 +136,7 @@ class BibTeX::Entry::RDFConverter
     bibtex.children.each do |child|
       child_id = RDF::URI.new(child.identifier)
       BibTeX::Entry::RDFConverter.new(child, graph, agent).convert! unless uri_in_graph?(child_id)
-      graph << [entry, RDF::DC.hasPart, child_id]
+      graph << [entry, RDF::Vocab::DC.hasPart, child_id]
     end
   end
 
@@ -144,21 +144,21 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:copyright)
     remove_from_fallback(:copyright)
 
-    graph << [entry, RDF::DC.rightsHolder, bibtex[:copyright].to_s]
+    graph << [entry, RDF::Vocab::DC.rightsHolder, bibtex[:copyright].to_s]
   end
 
   def date_added
     return unless bibtex.field?(:'date-added')
     remove_from_fallback(:'date-added')
 
-    graph << [entry, RDF::DC.created, bibtex[:'date-added'].to_s]
+    graph << [entry, RDF::Vocab::DC.created, bibtex[:'date-added'].to_s]
   end
 
   def date_modified
     return unless bibtex.field?(:'date-modified')
     remove_from_fallback(:'date-modified')
 
-    graph << [entry, RDF::DC.modified, bibtex[:'date-modified'].to_s]
+    graph << [entry, RDF::Vocab::DC.modified, bibtex[:'date-modified'].to_s]
   end
 
   def doi
@@ -166,7 +166,7 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:doi)
 
     graph << [entry, bibo[:doi], bibtex[:doi].to_s]
-    graph << [entry, RDF::DC.identifier, "doi:#{bibtex[:doi].to_s}"]
+    graph << [entry, RDF::Vocab::DC.identifier, "doi:#{bibtex[:doi].to_s}"]
   end
 
   def edition
@@ -202,7 +202,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex[:howpublished] =~ /^#{URI.regexp}$/
     remove_from_fallback(:howpublished)
 
-    graph << [entry, RDF::DC.URI, bibtex[:howpublished].to_s]
+    graph << [entry, RDF::Vocab::DC.URI, bibtex[:howpublished].to_s]
     graph << [entry, bibo[:uri], bibtex[:howpublished].to_s]
   end
 
@@ -212,7 +212,7 @@ class BibTeX::Entry::RDFConverter
 
     org = agent(bibtex[:institution].to_s) { create_agent(bibtex[:institution].to_s, :Organization) }
 
-    graph << [entry, RDF::DC.contributor, org]
+    graph << [entry, RDF::Vocab::DC.contributor, org]
   end
 
   def isbn
@@ -222,9 +222,9 @@ class BibTeX::Entry::RDFConverter
     graph << [entry, bibo[:isbn], bibtex[:isbn].to_s]
 
     if bibtex.contained?
-      graph << [entry, RDF::DC.isPartOf, "urn:isbn:#{bibtex[:isbn].to_s}"]
+      graph << [entry, RDF::Vocab::DC.isPartOf, "urn:isbn:#{bibtex[:isbn].to_s}"]
     else
-      graph << [entry, RDF::DC.identifier, "urn:isbn:#{bibtex[:isbn].to_s}"]
+      graph << [entry, RDF::Vocab::DC.identifier, "urn:isbn:#{bibtex[:isbn].to_s}"]
     end
   end
 
@@ -234,9 +234,9 @@ class BibTeX::Entry::RDFConverter
 
     graph << [entry, bibo[:issn], bibtex[:issn].to_s]
     if bibtex.contained?
-      graph << [entry, RDF::DC.isPartOf, "urn:issn:#{bibtex[:issn].to_s}"]
+      graph << [entry, RDF::Vocab::DC.isPartOf, "urn:issn:#{bibtex[:issn].to_s}"]
     else
-      graph << [entry, RDF::DC.identifier, "urn:issn:#{bibtex[:issn].to_s}"]
+      graph << [entry, RDF::Vocab::DC.identifier, "urn:issn:#{bibtex[:issn].to_s}"]
     end
   end
 
@@ -250,7 +250,7 @@ class BibTeX::Entry::RDFConverter
     source << "No. #{bibtex[:number].to_s}" if bibtex.field?(:number)
     pagination = bibtex[:pagination] || 'pp.'
     source << "#{pagination.to_s} #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
-    graph << [entry, RDF::DC.source, source.join(', ')]
+    graph << [entry, RDF::Vocab::DC.source, source.join(', ')]
   end
 
   def journal_dc_part_of
@@ -260,13 +260,13 @@ class BibTeX::Entry::RDFConverter
 
     journal = RDF::Node.new
     graph << [journal, RDF.type, bibo[:Journal]]
-    graph << [journal, RDF::DC.title, bibtex[:journal].to_s]
+    graph << [journal, RDF::Vocab::DC.title, bibtex[:journal].to_s]
 
-    graph << [entry, RDF::DC.isPartOf, journal]
+    graph << [entry, RDF::Vocab::DC.isPartOf, journal]
   end
 
   def key
-    graph << [entry, RDF::DC.identifier, "urn:bibtex:#{bibtex.key}"]
+    graph << [entry, RDF::Vocab::DC.identifier, "urn:bibtex:#{bibtex.key}"]
   end
 
   def keywords
@@ -274,7 +274,7 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:keywords)
 
     bibtex[:keywords].to_s.split(/\s*[,;]\s*/).each do |keyword|
-      graph << [entry, RDF::DC.subject, keyword]
+      graph << [entry, RDF::Vocab::DC.subject, keyword]
     end
   end
 
@@ -284,14 +284,14 @@ class BibTeX::Entry::RDFConverter
 
     bibtex[:language] = 'german' if bibtex[:language] == 'ngerman'
 
-    graph << [entry, RDF::DC.language, bibtex[:language].to_s]
+    graph << [entry, RDF::Vocab::DC.language, bibtex[:language].to_s]
   end
 
   def location
     return unless bibtex.field?(:location)
     remove_from_fallback(:location)
 
-    graph << [entry, RDF::DC.Location, bibtex[:location].to_s]
+    graph << [entry, RDF::Vocab::DC.Location, bibtex[:location].to_s]
     if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
       event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
       graph << [entry, event[:place], org]
@@ -334,7 +334,7 @@ class BibTeX::Entry::RDFConverter
 
     org = agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
 
-    graph << [entry, RDF::DC.contributor, org]
+    graph << [entry, RDF::Vocab::DC.contributor, org]
     graph << [entry, bibo[:organizer], org] if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
   end
 
@@ -363,7 +363,7 @@ class BibTeX::Entry::RDFConverter
 
     parent_id = RDF::URI.new(bibtex.parent.identifier)
     BibTeX::Entry::RDFConverter.new(bibtex.parent, graph, agent).convert! unless uri_in_graph?(parent_id)
-    graph << [entry, RDF::DC.isPartOf, parent_id]
+    graph << [entry, RDF::Vocab::DC.isPartOf, parent_id]
   end
 
   def publisher
@@ -387,7 +387,7 @@ class BibTeX::Entry::RDFConverter
       graph << [org, address[:localityName], bibtex[:address]]
     end
 
-    graph << [entry, RDF::DC.publisher, org]
+    graph << [entry, RDF::Vocab::DC.publisher, org]
     graph << [entry, bibo[:publisher], org]
   end
 
@@ -397,7 +397,7 @@ class BibTeX::Entry::RDFConverter
 
     org = agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
 
-    graph << [entry, RDF::DC.contributor, org]
+    graph << [entry, RDF::Vocab::DC.contributor, org]
   end
 
   def series
@@ -409,9 +409,9 @@ class BibTeX::Entry::RDFConverter
 
     series = RDF::Node.new
     graph << [series, RDF.type, bibo[:MultiVolumeBook]]
-    graph << [series, RDF::DC.title, bibtex[:series].to_s]
+    graph << [series, RDF::Vocab::DC.title, bibtex[:series].to_s]
 
-    graph << [entry, RDF::DC.isPartOf, series]
+    graph << [entry, RDF::Vocab::DC.isPartOf, series]
   end
 
   def thesis_degree
@@ -449,7 +449,7 @@ class BibTeX::Entry::RDFConverter
     title = [bibtex[:title].to_s, bibtex[:subtitle].to_s]
       .reject { |t| t.nil? || t.empty? }
       .join(': ')
-    graph << [entry, RDF::DC.title, title]
+    graph << [entry, RDF::Vocab::DC.title, title]
     graph << [entry, bibo[:shortTitle], bibtex[:title].to_s] if bibtex.field?(:subtitle)
   end
 
@@ -461,7 +461,7 @@ class BibTeX::Entry::RDFConverter
       create_agent(bibtex[:translator].to_s, :Person)
     end
 
-    graph << [entry, RDF::DC.contributor, node]
+    graph << [entry, RDF::Vocab::DC.contributor, node]
     graph << [entry, bibo[:translator], node]
   end
 
@@ -470,9 +470,9 @@ class BibTeX::Entry::RDFConverter
 
     case bibtex.type
     when :proceedings, :journal
-      graph << [entry, RDF::DC.type, 'Collection']
+      graph << [entry, RDF::Vocab::DC.type, 'Collection']
     else
-      graph << [entry, RDF::DC.type, 'Text']
+      graph << [entry, RDF::Vocab::DC.type, 'Text']
     end
   end
 
@@ -480,7 +480,7 @@ class BibTeX::Entry::RDFConverter
     return unless bibtex.field?(:url)
     remove_from_fallback(:url)
 
-    graph << [entry, RDF::DC.URI, bibtex[:url].to_s]
+    graph << [entry, RDF::Vocab::DC.URI, bibtex[:url].to_s]
     graph << [entry, bibo[:uri], bibtex[:url].to_s]
   end
 
@@ -509,7 +509,7 @@ class BibTeX::Entry::RDFConverter
     end
     date = month.nil? ? year : [year, month].join('-')
 
-    graph << [entry, RDF::DC.issued, date]
+    graph << [entry, RDF::Vocab::DC.issued, date]
   end
 
   protected
@@ -542,8 +542,8 @@ class BibTeX::Entry::RDFConverter
   def create_agent(name, type)
     node = RDF::Node.new
 
-    graph << [node, RDF.type, RDF::FOAF[type]]
-    graph << [node, RDF::FOAF.name, name.to_s]
+    graph << [node, RDF.type, RDF::Vocab::FOAF[type]]
+    graph << [node, RDF::Vocab::FOAF.name, name.to_s]
 
     if name.is_a?(BibTeX::Name)
       [:given, :family, :prefix, :suffix].each do |part|
