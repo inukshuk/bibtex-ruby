@@ -76,6 +76,7 @@ require 'bibtex/utilities'
 
 begin
   require 'rdf'
+  require 'rdf/vocab'
   require 'bibtex/entry/rdf_converter'
   require 'bibtex/bibliography/rdf_converter'
 rescue LoadError
