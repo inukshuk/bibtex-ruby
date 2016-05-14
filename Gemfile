@@ -15,11 +15,8 @@ gem 'rubysl', '~>2.0', :platforms => :rbx
 group :debug do
   if RUBY_VERSION >= '2.0'
     gem 'byebug', :require => false, :platforms => :mri
-    gem 'rdf', '~>2.0'
-    gem 'rdf-vocab', '~>2.0'
   else
     gem 'debugger', :require => false, :platforms => :mri
-    gem 'rdf', '~>1.1'
   end
 
   gem 'ruby-debug', :require => false, :platforms => :jruby
