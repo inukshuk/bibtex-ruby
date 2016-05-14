@@ -1,9 +1,6 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'rdf', '~>2.0'
-gem 'rdf-vocab', '~>2.0
-'
 gem 'json', '~>1.8', :platforms => [:mri_18, :jruby, :rbx]
 
 gem 'rubysl', '~>2.0', :platforms => :rbx
@@ -11,8 +8,11 @@ gem 'rubysl', '~>2.0', :platforms => :rbx
 group :debug do
   if RUBY_VERSION >= '2.0'
     gem 'byebug', :require => false, :platforms => :mri
+    gem 'rdf', '~>2.0'
+    gem 'rdf-vocab', '~>2.0'
   else
     gem 'debugger', :require => false, :platforms => :mri
+    gem 'rdf', '~>1.1'
   end
 
   gem 'ruby-debug', :require => false, :platforms => :jruby
