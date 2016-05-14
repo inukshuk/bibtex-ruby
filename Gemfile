@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rdf', '~>2.0'
+gem 'rdf-vocab', '~>2.0
+'
 gem 'json', '~>1.8', :platforms => [:mri_18, :jruby, :rbx]
 
 gem 'rubysl', '~>2.0', :platforms => :rbx
