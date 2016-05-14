@@ -1,10 +1,6 @@
 require 'uri/common'
 
-if Gem.loaded_specs["rdf"].version < Gem::Version.create('2.0')
-  RDFVocab = RDF
-else
-  RDFVovab = RDF::Vocab
-end
+RDFVocab = defined?(RDF::Vocab) ? RDF::Vocab : RDF
 
 class BibTeX::Entry::RDFConverter
   DEFAULT_REMOVE_FROM_FALLBACK = %w(
@@ -299,7 +295,7 @@ class BibTeX::Entry::RDFConverter
 
     graph << [entry, RDFVocab::DC.Location, bibtex[:location].to_s]
     if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
-      event = RDFVocabulary.new('http://purl.org/NET/c4dm/event.owl')
+      event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
       graph << [entry, event[:place], org]
     end
   end
@@ -389,7 +385,7 @@ class BibTeX::Entry::RDFConverter
       end
 
     if bibtex.field?(:address)
-      address = RDFVocabulary.new('http://schemas.talis.com/2005/address/schema#')
+      address = RDF::Vocabulary.new('http://schemas.talis.com/2005/address/schema#')
       graph << [org, address[:localityName], bibtex[:address]]
     end
 
@@ -525,7 +521,7 @@ class BibTeX::Entry::RDFConverter
   private
 
   def bibo
-    @bibo ||= RDFVocabulary.new('http://purl.org/ontology/bibo/')
+    @bibo ||= RDF::Vocabulary.new('http://purl.org/ontology/bibo/')
   end
 
   def bibo_class
@@ -580,7 +576,7 @@ class BibTeX::Entry::RDFConverter
   def run_fallback
     return if fallback.empty?
 
-    ml = RDFVocabulary.new('http://bibtexml.sf.net/')
+    ml = RDF::Vocabulary.new('http://bibtexml.sf.net/')
     fallback.each do |field|
       graph << [entry, ml[field], bibtex[field]]
     end
