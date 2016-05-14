@@ -76,9 +76,6 @@ require 'bibtex/utilities'
 
 begin
   require 'rdf'
-  if Gem.loaded_specs["rdf"].version >= Gem::Version.create('2.0')
-    require 'rdf/vocab'
-  end
   require 'bibtex/entry/rdf_converter'
   require 'bibtex/bibliography/rdf_converter'
 rescue LoadError
