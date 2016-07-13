@@ -413,7 +413,15 @@ module BibTeX
           it 'does not change the original entry' do
             e = @entry.convert(:latex)
             e.wont_be :==, @entry
+            e.title.to_s.wont_be :==, @entry.title.to_s
             e.title.to_s.length.must_be :<, @entry.title.to_s.length
+          end
+
+          it 'does not change the author of a parsed entry' do
+            entry = BibTeX.parse('@book{o, author = {M\\"{o}by Dick}}')[0]
+            e = entry.convert(:latex)
+            e.wont_be :==, entry
+            e.author.to_s.length.must_be :<, entry.author.to_s.length
           end
         end
 

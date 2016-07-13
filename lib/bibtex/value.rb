@@ -78,7 +78,13 @@ module BibTeX
     end
 
     def initialize_copy(other)
-      @tokens = other.tokens.dup
+      @tokens = other.tokens.map do |token|
+        case
+        when token.nil? then nil
+        when token.is_a?(Symbol) then token
+        else token.dup
+        end
+      end
     end
 
     def merge(other)

@@ -145,8 +145,10 @@ module BibTeX
       set(attributes)
     end
 
-    def initalize_copy(other)
-      each_pair { |k,v| self[k] = v.dup }
+    def initialize_copy(other)
+      other.each_pair do |k,v|
+        self[k] = v.dup unless v.nil?
+      end
     end
 
     # Set the name tokens to the values defined in the passed-in hash.
