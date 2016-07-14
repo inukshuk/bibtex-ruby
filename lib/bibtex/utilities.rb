@@ -33,7 +33,7 @@ module BibTeX
       case
       when string.length < 260 && File.exist?(string)
         Bibliography.open(string, options, &block)
-      when string =~ /^[a-z]+:\/\//i
+      when string =~ /\A[a-z]+:\/\//i
         Bibliography.open(string, options)
       else
         Bibliography.parse(string, options)
