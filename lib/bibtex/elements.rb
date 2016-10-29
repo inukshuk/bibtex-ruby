@@ -294,7 +294,7 @@ module BibTeX
 
     # Returns a string representation of the @string object.
     def to_s(options = {})
-      "@string{ #{content} }"
+      "@string{ #{content} }\n"
     end
 
     def to_hash(options = {})
@@ -338,7 +338,7 @@ module BibTeX
 
     # Returns a string representation of the @preamble object
     def to_s(options = {})
-      "@preamble{ #{content} }"
+      "@preamble{ #{content} }\n"
     end
   end
 
@@ -351,7 +351,7 @@ module BibTeX
     end
 
     def to_s(options = {})
-      "@comment{ #@content }"
+      "@comment{ #@content }\n"
     end
   end
 
