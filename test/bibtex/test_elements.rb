@@ -45,9 +45,9 @@ module BibTeX
       end
 
       it 'should support round-trips of all parsed preambles' do
-        assert_equal %q[@preamble{ "This bibliography was created \today" }], @preambles[0].to_s
-        assert_equal %q[@preamble{ "Bib\TeX" }], @preambles[1].to_s
-        assert_equal %q[@preamble{ "Maintained by " # maintainer }], @preambles[2].to_s
+        assert_equal %[@preamble{ "This bibliography was created \\today" }\n], @preambles[0].to_s
+        assert_equal %[@preamble{ "Bib\\TeX" }\n], @preambles[1].to_s
+        assert_equal %[@preamble{ "Maintained by " # maintainer }\n], @preambles[2].to_s
       end
 
       it 'should support string replacement of preamble contents' do
