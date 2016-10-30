@@ -38,9 +38,13 @@ rescue LoadError
   end
 end
 
-require 'coveralls/rake/task'
-Coveralls::RakeTask.new
-task :test_with_coveralls => [:test, :features, 'coveralls:push']
+begin
+  require 'coveralls/rake/task'
+  Coveralls::RakeTask.new
+  task :test_with_coveralls => [:test, :features, 'coveralls:push']
+rescue LoadError
+  # ignore
+end
 
 task :default => [:test, :features]
 

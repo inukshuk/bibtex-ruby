@@ -31,9 +31,6 @@ group :test do
   gem 'minitest-ansi'
   gem 'cucumber', '~>1.3'
   gem 'unicode', '~>0.4', :platforms => [:rbx, :mswin, :mingw, :mri]
-	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby]
-  gem 'rubinius-coverage', :require => false, :platforms => :rbx
-  gem 'coveralls', '~>0.7', :require => false
 end
 
 group :extra do
@@ -51,6 +48,12 @@ group :profile do
 	gem 'gnuplot', '~>2.4', :platforms => [:mri]
 end
 
+group :coverage do
+	gem 'simplecov', '~>0.8', :require => false, :platforms => [:ruby]
+  gem 'rubinius-coverage', :require => false, :platforms => :rbx
+  gem 'coveralls', '~>0.7', :require => false
+end
+
 group :development do
   gem 'rake'
   gem 'yard'
@@ -59,5 +62,5 @@ end
 
 group :travis do
   # Gem is required at runtime for RBX!
-  gem 'racc', :platforms => [:ruby]
+  gem 'racc', :platforms => [:rbx]
 end
