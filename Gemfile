@@ -62,5 +62,5 @@ end
 
 group :travis do
   # Gem is required at runtime for RBX!
-  gem 'racc', :platforms => [:rbx]
+  gem 'racc', :platforms => [:ruby]
 end
