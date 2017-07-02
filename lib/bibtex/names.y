@@ -151,7 +151,7 @@ require 'strscan'
   end
 
   def on_error(tid, val, vstack)
-    BibTeX.log.error("Failed to parse BibTeX Name on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
+    BibTeX.log.debug("Failed to parse BibTeX Name on value %s (%s) %s" % [val.inspect, token_to_str(tid) || '?', vstack.inspect])
   end
 
   def scan(input)
