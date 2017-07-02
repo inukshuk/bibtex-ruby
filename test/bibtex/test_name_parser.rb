@@ -19,6 +19,10 @@ module BibTeX
         assert_equal(@b[0].prefix, "Van den")
       end
 
+      it "should accept empty strings" do
+        assert_equal '', Names.parse("").to_s
+      end
+
     end
 
   end

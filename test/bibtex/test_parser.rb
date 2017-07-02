@@ -190,5 +190,21 @@ module BibTeX
         }.must_raise(ParseError)
       end
     end
+
+    describe 'given an entry with empty values' do
+      it 'does not raise an error' do
+        bib = BibTeX.parse <<-END
+          @Incollection{test,
+            author = {author},
+            title = {title},
+            editor = {},
+          }
+        END
+
+        assert_equal 'author', bib[:test][:author]
+        assert_equal 'title', bib[:test][:title]
+        assert_equal '', bib[:test][:editor]
+      end
+    end
   end
 end
