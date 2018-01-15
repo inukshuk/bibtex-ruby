@@ -62,6 +62,13 @@ module BibTeX
         assert bib[:"Gomez;"]
       end
 
+      it 'allows quotes in keys' do
+        input = %|@Misc{Gomez'1",title = {Foobar}}|
+        bib = Parser.new(:debug => false, :strict => false).parse(input)
+        assert_equal %{Gomez'1"}, bib.first.key
+        assert bib[:"Gomez'1\""]
+      end
+
       it 'fails when there is no cite-key' do
         input = "@misc{title = {Crime and Punishment}}"
         assert_raises ParseError do
