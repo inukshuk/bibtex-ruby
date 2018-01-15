@@ -36,7 +36,7 @@ module BibTeX
       :strict => true,
       :allow_missing_keys => false,
       :strip => true
-    }.freeze
+    }
 
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
@@ -61,7 +61,7 @@ module BibTeX
       :preamble     => /preamble\b/io,
       :key          => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*-]+,/io,
       :optional_key => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*-]*,/io
-    }.freeze
+    }
 
     MODE = Hash.new(:meta).merge({
       :bibtex  => :bibtex,  :entry    => :bibtex,
