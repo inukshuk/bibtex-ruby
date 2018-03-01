@@ -213,5 +213,18 @@ module BibTeX
         assert_equal '', bib[:test][:editor]
       end
     end
+
+    describe 'anotations' do
+      it 'handles annotation in fields' do
+        bib = BibTeX.parse <<-END
+          @article{foo,
+            title={Some Title},
+            author={SureName1, GivenName 1 and SureName2, GivenName 2},
+            author+an={1=highlight}
+          }
+        END
+        assert_equal '1=highlight', bib[:foo][:'author+an']
+      end
+    end
   end
 end

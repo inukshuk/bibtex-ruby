@@ -47,7 +47,7 @@ module BibTeX
       :eq           => /\s*=\s*/o,
       :comma        => /\s*,\s*/o,
       :number       => /[[:digit:]]+/o,
-      :name         => /[[:alpha:][:digit:]\/:_!$\?\.%&\*-]+/io,
+      :name         => /[[:alpha:][:digit:]\/:_!$\?\.%+&\*-]+/io,
       :quote        => /\s*"/o,
       :unquote      => /[\{\}"]/o,
       :sharp        => /\s*#\s*/o,
