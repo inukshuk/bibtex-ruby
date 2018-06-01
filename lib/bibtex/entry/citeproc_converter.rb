@@ -11,6 +11,8 @@ class BibTeX::Entry::CiteProcConverter
     number       issue
     url          URL
     doi          DOI
+    pmid         PMID
+    pmcid        PMCID
     year         issued
     type         genre
     school       publisher
