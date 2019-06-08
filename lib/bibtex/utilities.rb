@@ -17,9 +17,7 @@
 #++
 
 module BibTeX
-
   class << self
-
     # Opens a BibTeX file or URI and returns a corresponding +Bibliography+
     # object or, if a block is given, yields the Bibliography to the block,
     # ensuring that the file is saved.
@@ -30,10 +28,9 @@ module BibTeX
     # Parses the given string and returns a corresponding +Bibliography+ object.
     # Delegates to BibTeX.open if the string is a filename or URI.
     def parse(string, options = {}, &block)
-      case
-      when string.length < 260 && File.exist?(string)
+      if string.length < 260 && File.exist?(string)
         Bibliography.open(string, options, &block)
-      when string =~ /\A[a-z]+:\/\//i
+      elsif string =~ %r{\A[a-z]+://}i
         Bibliography.open(string, options)
       else
         Bibliography.parse(string, options)
@@ -50,10 +47,8 @@ module BibTeX
       Names.parse(string)
     end
 
-    alias :name :names
-    alias :parse_name :names
-    alias :parse_names :names
-
+    alias name names
+    alias parse_name names
+    alias parse_names names
   end
-
 end

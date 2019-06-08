@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015  Sylvester Keil <sylvester.keil.or.at>
@@ -21,8 +19,6 @@
 require 'forwardable'
 
 module BibTeX
-
-
   # A BibTeX Value is something very much like a string. In BibTeX files it
   # can appear on the right hand side of @string or @entry field assignments
   # or as @preamble contents. In the example below [VALUE] indicates possible
@@ -53,9 +49,9 @@ module BibTeX
     alias to_a tokens
 
     def_delegators :to_s, :=~, :===,
-      *String.instance_methods(false).reject { |m|
-        m =~ /^\W|^(length|dup|replace|to_s|inspect)$|!$/
-      }
+                   *String.instance_methods(false).reject do |m|
+                     m =~ /^\W|^(length|dup|replace|to_s|inspect)$|!$/
+                   end
 
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
@@ -79,9 +75,8 @@ module BibTeX
 
     def initialize_copy(other)
       @tokens = other.tokens.map do |token|
-        case
-        when token.nil? then nil
-        when token.is_a?(Symbol) then token
+        if token.nil? then nil
+        elsif token.is_a?(Symbol) then token
         else token.dup
         end
       end
@@ -115,7 +110,7 @@ module BibTeX
         if argument.respond_to?(:to_s)
           @tokens << argument.to_s
         else
-          raise(ArgumentError, "Failed to create Value from argument #{ argument.inspect }; expected String, Symbol or Value instance.")
+          raise(ArgumentError, "Failed to create Value from argument #{argument.inspect}; expected String, Symbol or Value instance.")
         end
       end
       self
@@ -124,10 +119,10 @@ module BibTeX
     alias << add
     alias push add
 
-    [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
+    %i[strip! upcase! downcase! sub! gsub! chop! chomp! rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
         @tokens.each do |part|
-          part.send(method_id, *arguments, &block) unless part.nil?
+          part&.send(method_id, *arguments, &block)
         end
         self
       end
@@ -135,6 +130,7 @@ module BibTeX
 
     def replace(*arguments)
       return self unless has_symbol?
+
       arguments.flatten.each do |argument|
         case argument
         when ::String # simulates Ruby's String#replace
@@ -148,7 +144,6 @@ module BibTeX
       self
     end
 
-
     # call-seq:
     #   Value.new('foo', 'bar').join #=> <'foobar'>
     #   Value.new(:foo, 'bar').join  #=> <:foo, 'bar'>
@@ -157,13 +152,12 @@ module BibTeX
     #
     # @return {Value} the instance with all consecutive String tokens joined
     def join(separator = '')
-      @tokens = @tokens.inject([]) do |a,b|
+      @tokens = @tokens.each_with_object([]) do |b, a|
         if a[-1].is_a?(::String) && b.is_a?(::String)
           a[-1] = [a[-1], b].join(separator)
         else
           a << b
         end
-        a
       end
       self
     end
@@ -186,8 +180,9 @@ module BibTeX
     # If the option :filter is given, the Value will be converted using
     # the filter(s) specified.
     def to_s(options = {})
-      return convert(options.delete(:filter)).to_s(options) if options.has_key?(:filter)
-      return value.to_s unless options.has_key?(:quotes) && atomic? && !symbol?
+      return convert(options.delete(:filter)).to_s(options) if options.key?(:filter)
+      return value.to_s unless options.key?(:quotes) && atomic? && !symbol?
+
       q = Array(options[:quotes])
       [q[0], value, q[-1]].compact.join
     end
@@ -200,11 +195,11 @@ module BibTeX
       if atomic?
         @tokens[0]
       else
-        @tokens.map { |v|  v.is_a?(::String) ? v.inspect : v }.join(' # ')
+        @tokens.map { |v| v.is_a?(::String) ? v.inspect : v }.join(' # ')
       end
     end
 
-    alias :v :value
+    alias v value
 
     def inspect
       "#<#{self.class} #{@tokens.map(&:inspect).join(', ')}>"
@@ -216,9 +211,11 @@ module BibTeX
     end
 
     # Returns true if the value is a BibTeX name value.
-    def name?; false; end
+    def name?
+      false
+    end
 
-    alias :names? :name?
+    alias names? name?
 
     def to_name
       Names.parse(to_s)
@@ -235,7 +232,7 @@ module BibTeX
     def to_date
       require 'date'
       Date.parse(to_s)
-    rescue
+    rescue StandardError
       nil
     end
 
@@ -248,7 +245,7 @@ module BibTeX
       @tokens[0].to_i
     end
 
-    def to_citeproc (options = {})
+    def to_citeproc(options = {})
       to_s(options)
     end
 
@@ -265,12 +262,12 @@ module BibTeX
     end
 
     # Returns a new Value with all string values converted according to the given filter(s).
-    def convert (*filters)
+    def convert(*filters)
       dup.convert!(*filters)
     end
 
     # Converts all string values according to the given filter(s).
-    def convert! (*filters)
+    def convert!(*filters)
       filters.flatten.each do |filter|
         f = Filters.resolve!(filter)
         @tokens.map! { |t| f.apply(t) }
@@ -279,27 +276,24 @@ module BibTeX
       self
     end
 
-    def method_missing (name, *args)
-      case
-      when name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
-        $2 ? convert!($1) : convert($1)
+    def method_missing(name, *args)
+      if name.to_s =~ /^(?:convert|from)_([a-z]+)(!)?$/
+        Regexp.last_match(2) ? convert!(Regexp.last_match(1)) : convert(Regexp.last_match(1))
       else
         super
       end
     end
 
-    def respond_to? (method, include_all=false)
+    def respond_to?(method, include_all = false)
       method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
     end
 
-    def <=> (other)
+    def <=>(other)
       if numeric? && other.respond_to?(:numeric?) && other.numeric?
         to_i <=> other.to_i
       else
         to_s <=> other.to_s
       end
     end
-
   end
-
 end

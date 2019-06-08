@@ -1,8 +1,7 @@
-# coding: utf-8
-
 module BibTeX
   begin
-    original_verbosity, $VERBOSE = $VERBOSE, nil
+    original_verbosity = $VERBOSE
+    $VERBOSE = nil
 
     require 'iconv'
 
@@ -12,8 +11,7 @@ module BibTeX
       @iconv.iconv(str)
     end
   rescue LoadError
-
-    @iconv_replacements = Hash[*%w(ä ae ö oe ü ue Ä Ae Ö Oe Ü Ue ß ss)]
+    @iconv_replacements = Hash['ä', 'ae', 'ö', 'oe', 'ü', 'ue', 'Ä', 'Ae', 'Ö', 'Oe', 'Ü', 'Ue', 'ß', 'ss']
 
     # Returns +str+ transliterated containing only ASCII characters.
     def self.transliterate(str)

@@ -7,35 +7,35 @@ rescue LoadError
 end
 
 class BibTeX::Entry::RDFConverter
-  DEFAULT_REMOVE_FROM_FALLBACK = %w(
+  DEFAULT_REMOVE_FROM_FALLBACK = %w[
     bdsk-file-1
     bdsk-file-2
     bdsk-file-3
     bdsk-file-4
-  ).map(&:intern).freeze
+  ].map(&:intern).freeze
 
-  BIBO_TYPES = Hash[*%w{
-    article        Article
-    book           Book
-    booklet        Book
-    collection     Collection
-    conference     AcademicArticle
-    inbook         BookSection
-    incollection   BookSection
-    inproceedings  AcademicArticle
-    journal        Journal
-    manual         Manual
-    mastersthesis  Thesis
-    online         Website
-    patent         Patent
-    periodical     Periodical
-    phdthesis      Thesis
-    proceedings    Proceedings
-    standard       Standard
-    techreport     Report
-    thesis         Thesis
-    unpublished    Manuscript
-  }.map(&:intern)].freeze
+  BIBO_TYPES = Hash[*%w[
+    article Article
+    book Book
+    booklet Book
+    collection Collection
+    conference AcademicArticle
+    inbook BookSection
+    incollection BookSection
+    inproceedings AcademicArticle
+    journal Journal
+    manual Manual
+    mastersthesis Thesis
+    online Website
+    patent Patent
+    periodical Periodical
+    phdthesis Thesis
+    proceedings Proceedings
+    standard Standard
+    techreport Report
+    thesis Thesis
+    unpublished Manuscript
+  ].map(&:intern)].freeze
 
   # converts a BibTeX entry to RDF
   # @return [RDF::Graph] the RDF graph of this entry
@@ -66,6 +66,7 @@ class BibTeX::Entry::RDFConverter
 
   def abstract
     return unless bibtex.field?(:abstract)
+
     remove_from_fallback(:abstract)
 
     graph << [entry, RDF::Vocab::DC.abstract, bibtex[:abstract].to_s]
@@ -74,6 +75,7 @@ class BibTeX::Entry::RDFConverter
 
   def annote
     return unless bibtex.field?(:annote)
+
     remove_from_fallback(:annote)
 
     pub = RDF::Node.new
@@ -85,6 +87,7 @@ class BibTeX::Entry::RDFConverter
 
   def author
     return unless bibtex.field?(:author)
+
     remove_from_fallback(:author)
 
     seq = RDF::Node.new
@@ -102,24 +105,25 @@ class BibTeX::Entry::RDFConverter
 
   def bdsk_url
     count = 1
-    while bibtex.field?("bdsk-url-#{count}".to_sym) do
+    while bibtex.field?("bdsk-url-#{count}".to_sym)
       field = "bdsk-url-#{count}".to_sym
       remove_from_fallback(field)
       graph << [entry, RDF::Vocab::DC.URI, bibtex[field].to_s]
       graph << [entry, bibo[:uri], bibtex[field].to_s]
-      count  += 1
+      count += 1
     end
   end
 
   def booktitle
     return unless bibtex.field?(:booktitle)
+
     remove_from_fallback(:booktitle)
     return if bibtex.has_parent? &&
-      bibtex.parent[:title] == bibtex[:booktitle]
+              bibtex.parent[:title] == bibtex[:booktitle]
     return if bibtex.has_parent? &&
-      bibtex.parent[:booktitle] == bibtex[:booktitle]
+              bibtex.parent[:booktitle] == bibtex[:booktitle]
     return if bibtex.has_parent? &&
-      bibtex.parent[:isbn] == bibtex[:isbn]
+              bibtex.parent[:isbn] == bibtex[:isbn]
     return if bibtex[:title] == bibtex[:booktitle]
 
     series = RDF::Node.new
@@ -131,6 +135,7 @@ class BibTeX::Entry::RDFConverter
 
   def chapter
     return unless bibtex.field?(:chapter)
+
     remove_from_fallback(:chapter)
 
     graph << [entry, bibo[:chapter], bibtex[:chapter].to_s]
@@ -148,6 +153,7 @@ class BibTeX::Entry::RDFConverter
 
   def copyright
     return unless bibtex.field?(:copyright)
+
     remove_from_fallback(:copyright)
 
     graph << [entry, RDF::Vocab::DC.rightsHolder, bibtex[:copyright].to_s]
@@ -155,6 +161,7 @@ class BibTeX::Entry::RDFConverter
 
   def date_added
     return unless bibtex.field?(:'date-added')
+
     remove_from_fallback(:'date-added')
 
     graph << [entry, RDF::Vocab::DC.created, bibtex[:'date-added'].to_s]
@@ -162,6 +169,7 @@ class BibTeX::Entry::RDFConverter
 
   def date_modified
     return unless bibtex.field?(:'date-modified')
+
     remove_from_fallback(:'date-modified')
 
     graph << [entry, RDF::Vocab::DC.modified, bibtex[:'date-modified'].to_s]
@@ -169,14 +177,16 @@ class BibTeX::Entry::RDFConverter
 
   def doi
     return unless bibtex.field?(:doi)
+
     remove_from_fallback(:doi)
 
     graph << [entry, bibo[:doi], bibtex[:doi].to_s]
-    graph << [entry, RDF::Vocab::DC.identifier, "doi:#{bibtex[:doi].to_s}"]
+    graph << [entry, RDF::Vocab::DC.identifier, "doi:#{bibtex[:doi]}"]
   end
 
   def edition
     return unless bibtex.field?(:edition)
+
     remove_from_fallback(:edition)
 
     graph << [entry, bibo[:edition], bibtex[:edition].to_s]
@@ -184,6 +194,7 @@ class BibTeX::Entry::RDFConverter
 
   def editor
     return unless bibtex.field?(:editor)
+
     remove_from_fallback(:editor)
 
     seq = RDF::Node.new
@@ -205,7 +216,8 @@ class BibTeX::Entry::RDFConverter
 
   def howpublished
     return unless bibtex.field?(:howpublished)
-    return unless bibtex[:howpublished] =~ /^#{URI.regexp}$/
+    return unless bibtex[:howpublished] =~ /^#{URI::DEFAULT_PARSER.make_regexp}$/
+
     remove_from_fallback(:howpublished)
 
     graph << [entry, RDF::Vocab::DC.URI, bibtex[:howpublished].to_s]
@@ -214,6 +226,7 @@ class BibTeX::Entry::RDFConverter
 
   def institution
     return unless bibtex.field?(:institution)
+
     remove_from_fallback(:institution)
 
     org = agent(bibtex[:institution].to_s) { create_agent(bibtex[:institution].to_s, :Organization) }
@@ -223,39 +236,42 @@ class BibTeX::Entry::RDFConverter
 
   def isbn
     return unless bibtex.field?(:isbn)
+
     remove_from_fallback(:isbn)
 
     graph << [entry, bibo[:isbn], bibtex[:isbn].to_s]
 
-    if bibtex.contained?
-      graph << [entry, RDF::Vocab::DC.isPartOf, "urn:isbn:#{bibtex[:isbn].to_s}"]
-    else
-      graph << [entry, RDF::Vocab::DC.identifier, "urn:isbn:#{bibtex[:isbn].to_s}"]
-    end
+    graph << if bibtex.contained?
+               [entry, RDF::Vocab::DC.isPartOf, "urn:isbn:#{bibtex[:isbn]}"]
+             else
+               [entry, RDF::Vocab::DC.identifier, "urn:isbn:#{bibtex[:isbn]}"]
+             end
   end
 
   def issn
     return unless bibtex.field?(:issn)
+
     remove_from_fallback(:issn)
 
     graph << [entry, bibo[:issn], bibtex[:issn].to_s]
-    if bibtex.contained?
-      graph << [entry, RDF::Vocab::DC.isPartOf, "urn:issn:#{bibtex[:issn].to_s}"]
-    else
-      graph << [entry, RDF::Vocab::DC.identifier, "urn:issn:#{bibtex[:issn].to_s}"]
-    end
+    graph << if bibtex.contained?
+               [entry, RDF::Vocab::DC.isPartOf, "urn:issn:#{bibtex[:issn]}"]
+             else
+               [entry, RDF::Vocab::DC.identifier, "urn:issn:#{bibtex[:issn]}"]
+             end
   end
 
   def journal_dc_source
     return unless bibtex.field?(:journal)
+
     remove_from_fallback(:journal)
 
     source = []
     source << bibtex[:journal].to_s
-    source << "Vol. #{bibtex[:volume].to_s}" if bibtex.field?(:volume)
-    source << "No. #{bibtex[:number].to_s}" if bibtex.field?(:number)
+    source << "Vol. #{bibtex[:volume]}" if bibtex.field?(:volume)
+    source << "No. #{bibtex[:number]}" if bibtex.field?(:number)
     pagination = bibtex[:pagination] || 'pp.'
-    source << "#{pagination.to_s} #{bibtex[:pages].to_s}" if bibtex.field?(:pages)
+    source << "#{pagination} #{bibtex[:pages]}" if bibtex.field?(:pages)
     graph << [entry, RDF::Vocab::DC.source, source.join(', ')]
   end
 
@@ -277,6 +293,7 @@ class BibTeX::Entry::RDFConverter
 
   def keywords
     return unless bibtex.field?(:keywords)
+
     remove_from_fallback(:keywords)
 
     bibtex[:keywords].to_s.split(/\s*[,;]\s*/).each do |keyword|
@@ -286,6 +303,7 @@ class BibTeX::Entry::RDFConverter
 
   def language
     return unless bibtex.field?(:language)
+
     remove_from_fallback(:language)
 
     bibtex[:language] = 'german' if bibtex[:language] == 'ngerman'
@@ -295,10 +313,11 @@ class BibTeX::Entry::RDFConverter
 
   def location
     return unless bibtex.field?(:location)
+
     remove_from_fallback(:location)
 
     graph << [entry, RDF::Vocab::DC.Location, bibtex[:location].to_s]
-    if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
+    if %i[proceedings inproceedings conference].include?(bibtex.type)
       event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
       graph << [entry, event[:place], org]
     end
@@ -306,6 +325,7 @@ class BibTeX::Entry::RDFConverter
 
   def lccn
     return unless bibtex.field?(:lccn)
+
     remove_from_fallback(:lccn)
 
     graph << [entry, bibo[:lccn], bibtex[:lccn].to_s]
@@ -313,6 +333,7 @@ class BibTeX::Entry::RDFConverter
 
   def note
     return unless bibtex.field?(:note)
+
     remove_from_fallback(:note)
 
     pub = RDF::Node.new
@@ -324,28 +345,31 @@ class BibTeX::Entry::RDFConverter
 
   def number
     return unless bibtex.field?(:number)
+
     remove_from_fallback(:number)
 
-    case bibtex.type
-    when :techreport || :manual || :unpublished
-      graph << [entry, bibo[:number], bibtex[:number].to_s]
-    else
-      graph << [entry, bibo[:issue], bibtex[:number].to_s]
-    end
+    graph << case bibtex.type
+             when :techreport || :manual || :unpublished
+               [entry, bibo[:number], bibtex[:number].to_s]
+             else
+               [entry, bibo[:issue], bibtex[:number].to_s]
+             end
   end
 
   def organization
     return unless bibtex.field?(:organization)
+
     remove_from_fallback(:organization)
 
     org = agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
 
     graph << [entry, RDF::Vocab::DC.contributor, org]
-    graph << [entry, bibo[:organizer], org] if [:proceedings, :inproceedings, :conference].include?(bibtex.type)
+    graph << [entry, bibo[:organizer], org] if %i[proceedings inproceedings conference].include?(bibtex.type)
   end
 
   def pages
     return unless bibtex.field?(:pages)
+
     remove_from_fallback(:pages)
 
     if bibtex[:pages].to_s =~ /^\s*(\d+)\s*-+\s*(\d+)\s*$/
@@ -358,6 +382,7 @@ class BibTeX::Entry::RDFConverter
 
   def pagetotal
     return unless bibtex.field?(:pagetotal)
+
     remove_from_fallback(:pagetotal)
 
     graph << [entry, bibo[:numPages], bibtex[:pagetotal].to_s]
@@ -365,6 +390,7 @@ class BibTeX::Entry::RDFConverter
 
   def parent
     return unless bibtex.has_parent?
+
     remove_from_fallback(:crossref)
 
     parent_id = RDF::URI.new(bibtex.parent.identifier)
@@ -374,17 +400,17 @@ class BibTeX::Entry::RDFConverter
 
   def publisher
     return unless bibtex.field?(:publisher, :organization, :school, :institution)
+
     remove_from_fallback(:publisher, :address)
 
     org =
-      case
-      when bibtex.field?(:publisher)
+      if bibtex.field?(:publisher)
         agent(bibtex[:publisher].to_s) { create_agent(bibtex[:publisher].to_s, :Organization) }
-      when bibtex.field?(:organization)
+      elsif bibtex.field?(:organization)
         agent(bibtex[:organization].to_s) { create_agent(bibtex[:organization].to_s, :Organization) }
-      when bibtex.field?(:school)
+      elsif bibtex.field?(:school)
         agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
-      when bibtex.field?(:institution)
+      elsif bibtex.field?(:institution)
         agent(bibtex[:institution].to_s) { create_agent(bibtex[:institution].to_s, :Organization) }
       end
 
@@ -399,6 +425,7 @@ class BibTeX::Entry::RDFConverter
 
   def school
     return unless bibtex.field?(:school)
+
     remove_from_fallback(:school)
 
     org = agent(bibtex[:school].to_s) { create_agent(bibtex[:school].to_s, :Organization) }
@@ -408,6 +435,7 @@ class BibTeX::Entry::RDFConverter
 
   def series
     return unless bibtex.field?(:series)
+
     remove_from_fallback(:series)
     return if bibtex.has_parent? && bibtex.parent[:title] == bibtex[:series]
     return if bibtex.has_parent? && bibtex.parent[:series] == bibtex[:series]
@@ -450,17 +478,19 @@ class BibTeX::Entry::RDFConverter
 
   def title
     return unless bibtex.field?(:title)
+
     remove_from_fallback(:title)
 
     title = [bibtex[:title].to_s, bibtex[:subtitle].to_s]
-      .reject { |t| t.nil? || t.empty? }
-      .join(': ')
+            .reject { |t| t.nil? || t.empty? }
+            .join(': ')
     graph << [entry, RDF::Vocab::DC.title, title]
     graph << [entry, bibo[:shortTitle], bibtex[:title].to_s] if bibtex.field?(:subtitle)
   end
 
   def translator
     return unless bibtex.field?(:translator)
+
     remove_from_fallback(:translator)
 
     node = agent(bibtex[:translator].to_s) do
@@ -484,6 +514,7 @@ class BibTeX::Entry::RDFConverter
 
   def url
     return unless bibtex.field?(:url)
+
     remove_from_fallback(:url)
 
     graph << [entry, RDF::Vocab::DC.URI, bibtex[:url].to_s]
@@ -492,6 +523,7 @@ class BibTeX::Entry::RDFConverter
 
   def volume
     return unless bibtex.field?(:volume)
+
     remove_from_fallback(:volume)
 
     graph << [entry, bibo[:volume], bibtex[:volume].to_s]
@@ -499,6 +531,7 @@ class BibTeX::Entry::RDFConverter
 
   def volumes
     return unless bibtex.field?(:volumes)
+
     remove_from_fallback(:volumes)
 
     graph << [entry, bibo[:numVolumes], bibtex[:volumes].to_s]
@@ -506,6 +539,7 @@ class BibTeX::Entry::RDFConverter
 
   def year
     return unless bibtex.field?(:year)
+
     remove_from_fallback(:year, :month)
 
     year = bibtex[:year].to_s
@@ -536,7 +570,7 @@ class BibTeX::Entry::RDFConverter
     @entry ||= RDF::URI.new(bibtex.identifier)
   end
 
-  def agent(key = nil, &block)
+  def agent(key = nil)
     if key.nil?
       @agent
     else
@@ -552,7 +586,7 @@ class BibTeX::Entry::RDFConverter
     graph << [node, RDF::Vocab::FOAF.name, name.to_s]
 
     if name.is_a?(BibTeX::Name)
-      [:given, :family, :prefix, :suffix].each do |part|
+      %i[given family prefix suffix].each do |part|
         value = name.send(part)
         graph << [node, bibo["#{part}Name"], value.to_s] unless value.nil?
       end
@@ -566,7 +600,7 @@ class BibTeX::Entry::RDFConverter
       pattern [uri, nil, nil]
     end
 
-    solutions.size > 0
+    !solutions.empty?
   end
 
   def fallback

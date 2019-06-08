@@ -10,27 +10,26 @@ rescue LoadError
 end
 
 # Open a bibliography file
-bib = BibTeX.open File.expand_path('../markdown.bib',__FILE__),
-  :include => [:meta_content]
+bib = BibTeX.open File.expand_path('markdown.bib', __dir__),
+                  include: [:meta_content]
 
 # Replaces all strings in the Bibliography and then
 # converts each BibTeX entries to a string using Chicago style
 # (all other elements are mapped to simple strings)
 bib.replace
 
-cp = CiteProc::Processor.new :style => 'apa',
-  :format => 'html', :locale => 'en'
+cp = CiteProc::Processor.new style: 'apa',
+                             format: 'html', locale: 'en'
 
 cp.import bib.to_citeproc
 
 content = bib['@entry, @meta_content'].map do |e|
   if e.entry?
-    cp.render :bibliography, :id => e.key
+    cp.render :bibliography, id: e.key
   else
     e.to_s
   end
 end
-
 
 begin
   require 'redcarpet'

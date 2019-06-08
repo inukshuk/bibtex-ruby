@@ -2,11 +2,10 @@ require 'helper.rb'
 
 module BibTeX
   class StringTest < Minitest::Spec
-
     describe 'when parsing a simple string' do
       before do
         @bib = BibTeX.parse('@string{ foo = "bar" }')
-      end        
+      end
       it 'should should not be empty' do
         assert_equal 1, @bib.length
       end
@@ -21,14 +20,14 @@ module BibTeX
       end
     end
 
-    # 
+    #
     # def test_replacement
     #   bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => false)
     #   refute_nil(bib)
     #   assert(bib.kind_of?(BibTeX::Bibliography))
     #   refute(bib.empty?)
     #   assert_equal(7,bib.length)
-    #   assert_equal([BibTeX::String,BibTeX::Preamble,BibTeX::Entry], bib.data.map(&:class).uniq) 
+    #   assert_equal([BibTeX::String,BibTeX::Preamble,BibTeX::Entry], bib.data.map(&:class).uniq)
     #   assert_equal(["foo"], bib.strings[:foo])
     #   assert_equal(["bar"], bib.strings[:bar])
     #   assert_equal([:foo, "bar"], bib.strings[:foobar])
@@ -36,7 +35,7 @@ module BibTeX
     #   assert_equal([:bar, "foo", :bar], bib.strings[:barfoobar])
     #   assert_equal('"foo" # foo # foobarfoo # "bar"', bib.preambles[0].content)
     #   assert_equal('"foo" # barfoobar', bib[:'manual:1'].title)
-    # 
+    #
     #   bib.replace_strings({ :filter => [:preamble]})
     #   assert_equal(["foo"], bib.strings[:foo])
     #   assert_equal(["bar"], bib.strings[:bar])
@@ -45,19 +44,19 @@ module BibTeX
     #   assert_equal([:bar, "foo", :bar], bib.strings[:barfoobar])
     #   assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preambles[0].content)
     #   assert_equal('"foo" # barfoobar', bib[:'manual:1'].title)
-    # 
+    #
     #   bib.replace_strings({ :filter => [:string]})
     #   assert_equal(['foo','bar'], bib.strings[:foobar])
     #   assert_equal(['foo', 'bar','foo'], bib.strings[:foobarfoo])
     #   assert_equal(['bar','foo','bar'], bib.strings[:barfoobar])
     #   assert_equal('"foo" # "foo" # foobar # foo # "bar"', bib.preambles[0].content)
     #   assert_equal('"foo" # barfoobar', bib[:'manual:1'].title)
-    # 
+    #
     #   bib.replace_strings({ :filter => [:preamble,:entry]})
     #   assert_equal('"foo" # "foo" # "foo" # "bar" # "foo" # "bar"', bib.preambles[0].content)
     #   assert_equal('"foo" # "bar" # "foo" # "bar"', bib[:'manual:1'].title)
     # end
-    #   
+    #
     # def test_roundtrip
     #   bib = BibTeX::Bibliography.open(Test.fixtures(:string_replacement), :debug => false)
     #   refute_nil(bib)

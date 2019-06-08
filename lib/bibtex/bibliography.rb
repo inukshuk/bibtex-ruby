@@ -17,7 +17,6 @@
 #++
 
 module BibTeX
-
   #
   # The Bibliography class models a BibTeX bibliography;
   # typically, it corresponds to a `.bib' file.
@@ -28,10 +27,9 @@ module BibTeX
     include Enumerable
     include Comparable
 
-    @defaults = { :parse_names => true, :parse_months => true }.freeze
+    @defaults = { parse_names: true, parse_months: true }.freeze
 
     class << self
-
       attr_reader :defaults
 
       # Opens and parses the `.bib' file at the given +path+. Returns
@@ -86,7 +84,7 @@ module BibTeX
     attr_reader :data, :strings, :entries, :errors, :options
 
     attr_by_type :article, :book, :journal, :collection, :preamble,
-      :comment, :meta_content
+                 :comment, :meta_content
 
     def_delegators :@data, :length, :size, :empty?
     def_delegators :@entries, :key?, :has_key?, :values_at
@@ -96,8 +94,10 @@ module BibTeX
     # Creates a new bibliography.
     def initialize(options = {})
       @options = Bibliography.defaults.merge(options)
-      @data, @strings, @errors = [], {}, []
-      @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
+      @data = []
+      @strings = {}
+      @errors = []
+      @entries = Hash.new { |h, k| h.fetch(k.to_s, nil) }
 
       yield self if block_given?
     end
@@ -105,8 +105,9 @@ module BibTeX
     def initialize_copy(other)
       @options = other.options.dup
       @errors = other.errors.dup
-      @data, @strings = [], {}
-      @entries = Hash.new { |h,k| h.fetch(k.to_s, nil) }
+      @data = []
+      @strings = {}
+      @entries = Hash.new { |h, k| h.fetch(k.to_s, nil) }
 
       other.each do |element|
         add element.dup
@@ -127,7 +128,6 @@ module BibTeX
     alias << add
     alias push add
 
-
     # Saves the bibliography to the current path.
     def save(options = {})
       save_to(@path, options)
@@ -135,7 +135,7 @@ module BibTeX
 
     # Saves the bibliography to a file at the given path. Returns the bibliography.
     def save_to(path, options = {})
-      options[:quotes] ||= %w({ })
+      options[:quotes] ||= %w[{ }]
 
       File.open(path, 'w:UTF-8') do |f|
         f.write(to_s(options))
@@ -143,7 +143,6 @@ module BibTeX
 
       self
     end
-
 
     def each
       if block_given?
@@ -154,17 +153,15 @@ module BibTeX
       end
     end
 
-
     def parse_names
-      entries.each_value { |e| e.parse_names }
+      entries.each_value(&:parse_names)
       self
     end
 
     def parse_months
-      entries.each_value { |e| e.parse_month }
+      entries.each_value(&:parse_month)
       self
     end
-
 
     # Converts all enties using the given filter(s). If an optional block is given
     # the block is used as a condition (the block will be called with each
@@ -179,7 +176,6 @@ module BibTeX
       self
     end
 
-
     # Deletes an object, or a list of objects from the bibliography.
     # If a list of objects is to be deleted, you can either supply the list
     # of objects or use a query or block to define the list.
@@ -188,13 +184,12 @@ module BibTeX
     # if the object was not part of the bibliography.
     def delete(*arguments, &block)
       objects = q(*arguments, &block).map { |o| o.removed_from_bibliography(self) }
-      @data = @data - objects
+      @data -= objects
       objects.length == 1 ? objects[0] : objects
     end
 
     alias remove delete
     alias rm delete
-
 
     # call-seq:
     # >> bib[-1]
@@ -221,20 +216,18 @@ module BibTeX
     # not yield to a block for additional refinement of the query.
     #
     def [](*arguments)
-      raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1,2)
+      raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1, 2)
 
-      case
-      when arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
+      if arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
         data[*arguments]
-      when arguments.length == 1
-        case
-        when arguments[0].nil?
+      elsif arguments.length == 1
+        if arguments[0].nil?
           nil
-        when arguments[0].respond_to?(:empty?) && arguments[0].empty?
+        elsif arguments[0].respond_to?(:empty?) && arguments[0].empty?
           nil
-        when arguments[0].is_a?(Symbol)
+        elsif arguments[0].is_a?(Symbol)
           entries[arguments[0]]
-        when arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@', '!@')
+        elsif arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@', '!@')
           entries[arguments[0]]
         else
           query(*arguments)
@@ -243,7 +236,6 @@ module BibTeX
         query(*arguments)
       end
     end
-
 
     # Returns true if there are object which could not be parsed.
     def errors?
@@ -279,7 +271,7 @@ module BibTeX
       self
     end
 
-    alias :replace_strings :replace
+    alias replace_strings replace
 
     def join(filter = '')
       q(filter, &:join)
@@ -318,18 +310,16 @@ module BibTeX
     # and 'Poe, E. A.' calling this method would convert all three names to
     # 'Poe, Edgar A.'.
     def extend_initials!
-      groups = Hash.new do |h,k|
-        h[k] = { :prototype => nil, :names => [] }
+      groups = Hash.new do |h, k|
+        h[k] = { prototype: nil, names: [] }
       end
 
       # group names together
       names.each do |name|
-        group = groups[name.sort_order(:initials => true).downcase]
+        group = groups[name.sort_order(initials: true).downcase]
         group[:names] << name
 
-        if group[:prototype].nil? || group[:prototype].first.to_s.length < name.first.to_s.length
-          group[:prototype] = name
-        end
+        group[:prototype] = name if group[:prototype].nil? || group[:prototype].first.to_s.length < name.first.to_s.length
       end
 
       # extend all names in group to prototype
@@ -353,22 +343,20 @@ module BibTeX
       pattern = Regexp.new(pattern) unless pattern.is_a?(Regexp)
 
       block = if block_given?
-        Proc.new
-      else
-        Proc.new { |e| e[field] = value }
-      end
+                Proc.new
+              else
+                proc { |e| e[field] = value }
+              end
 
       each_entry do |entry|
-        if entry.field?(field) && entry[field].to_s =~ pattern
-          block.call(entry)
-        end
+        block.call(entry) if entry.field?(field) && entry[field].to_s =~ pattern
       end
 
       self
     end
 
     def group_by(*arguments, &block)
-      groups = Hash.new { |h,k| h[k] = [] }
+      groups = Hash.new { |h, k| h[k] = [] }
 
       entries.values.each do |e|
         groups[e.digest(arguments, &block)] << e
@@ -406,7 +394,7 @@ module BibTeX
 
     # Returns a Ruby hash representation of the bibliography.
     def to_hash(options = {})
-      { :bibliography => map { |o| o.to_hash(options) } }
+      { bibliography: map { |o| o.to_hash(options) } }
     end
 
     # Returns a YAML representation of the bibliography.
@@ -430,7 +418,7 @@ module BibTeX
       require 'rexml/document'
 
       xml =  REXML::Document.new
-      xml << REXML::XMLDecl.new('1.0','UTF-8')
+      xml << REXML::XMLDecl.new('1.0', 'UTF-8')
 
       root = REXML::Element.new('bibtex:file')
       root.add_namespace('bibtex', 'http://bibtexml.sf.net/')
@@ -443,7 +431,7 @@ module BibTeX
 
     # Returns an RDF::Graph representation of the bibliography. The graph
     # can be serialized using any of the RDF serializer plugins.
-    def to_rdf(options = {})
+    def to_rdf(_options = {})
       if defined?(::RDF)
         RDFConverter.convert(self)
       else
@@ -482,17 +470,19 @@ module BibTeX
     def query(*arguments, &block)
       case arguments.length
       when 0
-        selector, q = :all, nil
+        selector = :all
+        q = nil
       when 1
-        selector, q = :all, arguments[0]
+        selector = :all
+        q = arguments[0]
       when 2
         selector, q = arguments
       else
         raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)"
       end
 
-      filter = block ? Proc.new { |e| e.match?(q) && block.call(e) } :
-        Proc.new { |e| e.match?(q) }
+      filter = block ? proc { |e| e.match?(q) && block.call(e) } :
+        proc { |e| e.match?(q) }
 
       send(query_handler(selector), &filter)
     end
@@ -518,19 +508,17 @@ module BibTeX
     end
 
     def select_duplicates_by(*arguments)
-      arguments = [:year, :title] if arguments.empty?
+      arguments = %i[year title] if arguments.empty?
       block = Proc.new if block_given?
 
-      group_by(*arguments) { |digest, entry|
-
+      group_by(*arguments) do |digest, entry|
         # 1.8 compatibility
         # digest = digest[0] if digest.is_a?(Array)
 
         digest.gsub(/\s+/, '').downcase
         digest = block.call(digest, entry) unless block.nil?
         digest
-
-      }.values.select { |d| d.length > 1 }
+      end.values.select { |d| d.length > 1 }
     end
 
     alias duplicates select_duplicates_by
@@ -564,7 +552,7 @@ module BibTeX
       select_duplicates_by(*arguments, &block).each do |dupes|
         dupes.shift
         dupes.each do |dupe|
-          self.remove dupe
+          remove dupe
         end
       end
 
@@ -573,7 +561,7 @@ module BibTeX
 
     # Experimental!
     # Returns a new Bibliography with all duplicates removed.
-    def uniq(*arguments, &block)
+    def uniq(*_arguments)
       dup.uniq!
     end
 
@@ -589,6 +577,5 @@ module BibTeX
         :select
       end
     end
-
   end
 end

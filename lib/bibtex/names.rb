@@ -19,7 +19,6 @@
 require 'forwardable'
 
 module BibTeX
-
   # A BibTeX Names value is an ordered list of name values.
   class Names < Value
     include Enumerable
@@ -28,7 +27,7 @@ module BibTeX
 
     def self.parse(string)
       new(NameParser.new.parse(string))
-    rescue => e
+    rescue StandardError => e
       BibTeX.log.info(e.message)
       nil
     end
@@ -40,7 +39,7 @@ module BibTeX
       end
     end
 
-    def replace(*arguments)
+    def replace(*_arguments)
       self
     end
 
@@ -53,7 +52,8 @@ module BibTeX
     end
 
     def to_s(options = {})
-      return value unless options.has_key?(:quotes)
+      return value unless options.key?(:quotes)
+
       q = [options[:quotes]].flatten
       [q[0], value, q[-1]].compact.join
     end
@@ -82,14 +82,13 @@ module BibTeX
     end
 
     def strip_braces
-      gsub!(/\{|\}/,'')
+      gsub!(/\{|\}/, '')
     end
 
     def add(name)
-      case
-      when name.is_a?(Name)
+      if name.is_a?(Name)
         @tokens << name
-      when name.respond_to?(:to_s)
+      elsif name.respond_to?(:to_s)
         @tokens += Names.parse(name.to_s)
       else
         raise ArgumentError, "failed to add #{name.inspect}: not a name."
@@ -100,7 +99,7 @@ module BibTeX
     alias << add
     alias push add
 
-    [:convert!, :rename_if, :rename_unless, :extend_initials].each do |method_id|
+    %i[convert! rename_if rename_unless extend_initials].each do |method_id|
       define_method(method_id) do |*arguments|
         tokens.each { |t| t.send(method_id, *arguments) }
         self
@@ -108,9 +107,8 @@ module BibTeX
     end
 
     def <=>(other)
-      other.respond_to?(:to_a) ? to_a <=> other.to_a  : super
+      other.respond_to?(:to_a) ? to_a <=> other.to_a : super
     end
-
   end
 
   # A Name comprises individual name parts (first, last, prefix and suffix),
@@ -120,14 +118,14 @@ module BibTeX
     include Comparable
 
     BibTeXML = {
-      :first  => :first,
-      :last   => :last,
-      :prefix => :prelast,
-      :suffix => :lineage
+      first: :first,
+      last: :last,
+      prefix: :prelast,
+      suffix: :lineage
     }.freeze
 
     def_delegators :to_s, :=~, :===,
-      *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|replace|each|first|last|!$/ }
+                   *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|replace|each|first|last|!$/ }
 
     class << self
       def parse(string)
@@ -146,7 +144,7 @@ module BibTeX
     end
 
     def initialize_copy(other)
-      other.each_pair do |k,v|
+      other.each_pair do |k, v|
         self[k] = v.dup unless v.nil?
       end
     end
@@ -185,7 +183,7 @@ module BibTeX
     # Sets the name's first name to the passed-in name if the last name equals
     # for_last and the current first name has the same initials as with_first.
     def extend_initials(with_first, for_last)
-      rename_if :first => with_first do |name|
+      rename_if first: with_first do |name|
         if name.last == for_last
           mine = name.initials.split(/\.[^[:alpha:]]*/)
           other = initials(with_first).split(/\.[^[:alpha:]]*/)
@@ -256,20 +254,20 @@ module BibTeX
       xml = REXML::Element.new('bibtex:person')
 
       each_pair do |part, text|
-        unless text.nil?
-          element = REXML::Element.new("bibtex:#{BibTeXML[part]}")
-          element.text = text
-          xml.add_element(element)
-        end
+        next if text.nil?
+
+        element = REXML::Element.new("bibtex:#{BibTeXML[part]}")
+        element.text = text
+        xml.add_element(element)
       end
 
       xml
     end
 
-    [:strip!, :upcase!, :downcase!, :sub!, :gsub!, :chop!, :chomp!, :rstrip!].each do |method_id|
+    %i[strip! upcase! downcase! sub! gsub! chop! chomp! rstrip!].each do |method_id|
       define_method(method_id) do |*arguments, &block|
         each do |part|
-          part.send(method_id, *arguments, &block) unless part.nil?
+          part&.send(method_id, *arguments, &block)
         end
         self
       end
@@ -281,9 +279,8 @@ module BibTeX
 
     def convert!(*filters)
       filters.flatten.each do |filter|
-
         f = Filters.resolve(filter) ||
-          raise(ArgumentError, "Failed to load filter #{filter.inspect}")
+            raise(ArgumentError, "Failed to load filter #{filter.inspect}")
 
         each_pair do |k, v|
           self[k] = f.apply(v) unless v.nil?
@@ -310,6 +307,5 @@ module BibTeX
     alias jr= suffix=
     alias von prefix
     alias von= prefix=
-
   end
 end

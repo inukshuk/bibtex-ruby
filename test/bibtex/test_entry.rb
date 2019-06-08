@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
 require 'helper.rb'
 
 module BibTeX
   class EntryTest < Minitest::Spec
-
     describe 'a new entry' do
       it "won't be nil" do
         Entry.new.wont_be_nil
@@ -14,7 +11,7 @@ module BibTeX
     describe '#add' do
       it 'preserves BibTeX::Names (and other subclasses of BibTeX::Value)' do
         e = Entry.new
-        e.add(:author, Names.new(Name.new(:first => 'first_name')))
+        e.add(:author, Names.new(Name.new(first: 'first_name')))
         assert_equal e[:author].class, Names
       end
     end
@@ -88,7 +85,7 @@ module BibTeX
           end
 
           describe 'when "booktitle" is undefined for the entry but defined in the reference' do
-            before { @bib['a'].booktitle = "A Booktitle" }
+            before { @bib['a'].booktitle = 'A Booktitle' }
             it 'returns the referenced booktitle' do
               @bib['a1'].booktitle.must_be :==, @bib['a'].booktitle
             end
@@ -119,7 +116,7 @@ module BibTeX
             end
 
             it 'returns a list of all fields not set in the field but in the reference' do
-              @bib['a1'].inherited_fields.must_be :==, [:booktitle, :editor, :title]
+              @bib['a1'].inherited_fields.must_be :==, %i[booktitle editor title]
             end
           end
 
@@ -138,7 +135,6 @@ module BibTeX
             end
           end
         end
-
       end
     end
 
@@ -148,21 +144,20 @@ module BibTeX
       end
 
       it 'returns the author (if set)' do
-        Entry.new(:author => 'A').names.must_be :==, %w{ A }
+        Entry.new(author: 'A').names.must_be :==, %w[A]
       end
 
       it 'returns all authors (if set)' do
-        Entry.new(:author => 'A B and C D').parse_names.names.length.must_be :==, 2
+        Entry.new(author: 'A B and C D').parse_names.names.length.must_be :==, 2
       end
 
       it 'returns the editor (if set)' do
-        Entry.new(:editor => 'A').names.must_be :==, %w{ A }
+        Entry.new(editor: 'A').names.must_be :==, %w[A]
       end
 
       it 'returns the translator (if set)' do
-        Entry.new(:translator => 'A').names.must_be :==, %w{ A }
+        Entry.new(translator: 'A').names.must_be :==, %w[A]
       end
-
     end
 
     describe 'month conversion' do
@@ -170,14 +165,14 @@ module BibTeX
         @entry = Entry.new
       end
 
-      [[:jan,'January'], [:feb,'February'], [:sep,'September']].each do |m|
+      [[:jan, 'January'], [:feb, 'February'], [:sep, 'September']].each do |m|
         it 'should convert english months' do
           @entry.month = m[1]
           assert_equal m[0], @entry.month.v
         end
       end
 
-      [[:jan,:jan], [:feb,:feb], [:sep,:sep]].each do |m|
+      [%i[jan jan], %i[feb feb], %i[sep sep]].each do |m|
         it 'should convert bibtex abbreviations' do
           @entry.month = m[1]
           assert_equal m[0], @entry.month.v
@@ -190,7 +185,7 @@ module BibTeX
         assert_match(/month = aug/, @entry.to_s)
       end
 
-      [[:jan,1], [:feb,2], [:sep,9]].each do |m|
+      [[:jan, 1], [:feb, 2], [:sep, 9]].each do |m|
         it 'should convert numbers' do
           @entry.month = m[1]
           assert_equal m[0], @entry.month.v
@@ -201,7 +196,6 @@ module BibTeX
           assert_equal m[1], @entry.month_numeric
         end
       end
-
     end
 
     describe '#values_at' do
@@ -210,7 +204,7 @@ module BibTeX
       end
 
       it 'returns an empty array when given no arguments' do
-        assert_equal [], Entry.new(:title => 'foo').values_at
+        assert_equal [], Entry.new(title: 'foo').values_at
       end
 
       it 'returns a nil array if the passed in key is not set' do
@@ -218,8 +212,8 @@ module BibTeX
       end
 
       it 'returns an array with the value of the passed in key' do
-        assert_equal ['x'], Entry.new(:title => 'x').values_at(:title)
-        assert_equal ['a', 'b'], Entry.new(:title => 'b', :year => 'a').values_at(:year, :title)
+        assert_equal ['x'], Entry.new(title: 'x').values_at(:title)
+        assert_equal %w[a b], Entry.new(title: 'b', year: 'a').values_at(:year, :title)
       end
     end
 
@@ -229,12 +223,12 @@ module BibTeX
       end
 
       it 'includes type and all defined fields' do
-        assert_equal 'book', Entry.new(:bibtex_type => 'book').digest
-        assert_equal 'book|title:foo', Entry.new(:bibtex_type => 'book', :title => 'foo').digest
+        assert_equal 'book', Entry.new(bibtex_type: 'book').digest
+        assert_equal 'book|title:foo', Entry.new(bibtex_type: 'book', title: 'foo').digest
       end
 
       it 'accepts a filter' do
-        assert_equal 'book|year:2012', Entry.new(:bibtex_type => 'book', :title => 'foo', :year => 2012).digest([:year])
+        assert_equal 'book|year:2012', Entry.new(bibtex_type: 'book', title: 'foo', year: 2012).digest([:year])
       end
     end
 
@@ -254,13 +248,13 @@ module BibTeX
       end
 
       it 'supports renaming! of field attributes' do
-        @entry.rename!(:title => :foo)
+        @entry.rename!(title: :foo)
         refute @entry.has_field?(:title)
         assert_equal 'Moby Dick', @entry[:foo]
       end
 
       it 'supports renaming of field attributes' do
-        e = @entry.rename(:title => :foo)
+        e = @entry.rename(title: :foo)
 
         assert @entry.has_field?(:title)
         refute @entry.has_field?(:foo)
@@ -277,54 +271,54 @@ module BibTeX
           e = @entry.to_citeproc
           assert_equal 'book', e['type']
           assert_equal 'New York', e['publisher-place']
-          assert_equal [1993,11], e['issued']['date-parts'][0]
+          assert_equal [1993, 11], e['issued']['date-parts'][0]
           assert_equal 1, e['author'].length
           assert_equal 'Herman', e['author'][0]['given']
           assert_equal 'Melville', e['author'][0]['family']
         end
 
         it 'sets both issue and number in techreports' do
-          report = Entry.new { |r|
+          report = Entry.new do |r|
             r.type = :techreport
             r.number = 1
-          }.to_citeproc
+          end.to_citeproc
 
           assert_equal '1', report['number']
           assert_equal '1', report['issue']
         end
 
         it 'uses authority and publisher for proceedings' do
-          proceedings = Entry.new { |p|
+          proceedings = Entry.new do |p|
             p.type = :inproceedings
             p.publisher = 'Publisher'
             p.organization = 'Organization'
-          }.to_citeproc
+          end.to_citeproc
 
           assert_equal 'Publisher', proceedings['publisher']
           assert_equal 'Organization', proceedings['authority']
 
-          proceedings = Entry.new { |p|
+          proceedings = Entry.new do |p|
             p.type = :inproceedings
             p.organization = 'Organization'
-          }.to_citeproc
+          end.to_citeproc
 
           assert_equal 'Organization', proceedings['publisher']
           refute proceedings.key?('authority')
 
-          proceedings = Entry.new { |p|
+          proceedings = Entry.new do |p|
             p.type = :inproceedings
             p.publisher = 'Publisher'
-          }.to_citeproc
+          end.to_citeproc
 
           assert_equal 'Publisher', proceedings['publisher']
           refute proceedings.key?('authority')
         end
 
         it 'uses event_place for conferences' do
-          conference = Entry.new { |p|
+          conference = Entry.new do |p|
             p.type = :conference
             p.address = 'Place'
-          }.to_citeproc
+          end.to_citeproc
 
           assert_equal 'Place', conference['event-place']
         end
@@ -336,30 +330,29 @@ module BibTeX
         end
 
         it 'combines year, month and day in issued date' do
-          @entry.update :year => 2005, :month => 5, :day => 31
+          @entry.update year: 2005, month: 5, day: 31
           assert_equal [[2005, 5, 31]], @entry.to_citeproc['issued']['date-parts']
         end
 
         it 'prefers biblatex syntax' do
           @entry.date = '2014-07-13'
-          assert_equal [[2014,7,13]], @entry.to_citeproc['issued']['date-parts']
+          assert_equal [[2014, 7, 13]], @entry.to_citeproc['issued']['date-parts']
         end
 
         it 'supports biblatex date ranges' do
           @entry.date = '2014-06-12/2014-07-13'
 
-          assert_equal [[2014,6,12],[2014,7,13]],
-            @entry.to_citeproc['issued']['date-parts']
+          assert_equal [[2014, 6, 12], [2014, 7, 13]],
+                       @entry.to_citeproc['issued']['date-parts']
         end
 
         it 'supports biblatex partial dates' do
           @entry.date = '2014-07'
-          assert_equal [[2014,7]], @entry.to_citeproc['issued']['date-parts']
+          assert_equal [[2014, 7]], @entry.to_citeproc['issued']['date-parts']
         end
       end
 
       describe 'given a filter object or a filter name' do
-
         class SuffixB < BibTeX::Filter
           def apply(value)
             value.is_a?(::String) ? "#{value}b" : value
@@ -368,7 +361,9 @@ module BibTeX
 
         before do
           @filter = Object.new
-          def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
+          def @filter.apply(value)
+            value.is_a?(::String) ? value.upcase : value
+          end
         end
 
         it 'supports arbitrary conversion' do
@@ -386,18 +381,17 @@ module BibTeX
         end
 
         it 'supports conditional arbitrary in-place conversion' do
-          @entry.convert!(@filter) { |k,v| k.to_s =~ /publisher/i  }
+          @entry.convert!(@filter) { |k, _v| k.to_s =~ /publisher/i }
           assert_equal 'Moby Dick', @entry.title
           assert_equal 'PENGUIN', @entry.publisher
         end
 
         it 'supports conditional arbitrary conversion' do
-          e = @entry.convert(@filter) { |k,v| k.to_s =~ /publisher/i  }
+          e = @entry.convert(@filter) { |k, _v| k.to_s =~ /publisher/i }
           assert_equal 'Moby Dick', e.title
           assert_equal 'PENGUIN', e.publisher
           assert_equal 'Penguin', @entry.publisher
         end
-
       end
 
       describe 'LaTeX filter' do
@@ -436,7 +430,6 @@ module BibTeX
             e.title.to_s.length.must_be :==, @entry.title.to_s.length
           end
         end
-
       end
     end
 
@@ -455,12 +448,12 @@ module BibTeX
       end
 
       it 'should accept option to use non-dropping-particle' do
-        assert_equal 'van', @entry.to_citeproc(:particle => 'non-dropping-particle')['author'][0]['non-dropping-particle']
+        assert_equal 'van', @entry.to_citeproc(particle: 'non-dropping-particle')['author'][0]['non-dropping-particle']
       end
     end
 
     def test_simple
-      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
       refute_nil(bib)
       assert_equal(BibTeX::Bibliography, bib.class)
       assert_equal(4, bib.data.length)
@@ -482,7 +475,7 @@ module BibTeX
     end
 
     def test_ghost_methods
-      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), :debug => false)
+      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
 
       assert_equal 'Poe, Edgar A.', bib[0].author.to_s
 
@@ -506,12 +499,12 @@ module BibTeX
     end
 
     def test_creation_from_hash
-      entry = BibTeX::Entry.new({
-        :bibtex_type => 'book',
-        :bibtex_key => :raven,
-        :author => 'Poe, Edgar A.',
-        :title => 'The Raven'
-      })
+      entry = BibTeX::Entry.new(
+        bibtex_type: 'book',
+        bibtex_key: :raven,
+        author: 'Poe, Edgar A.',
+        title: 'The Raven'
+      )
 
       assert_equal :book, entry.type
       assert_equal 'raven', entry.key
@@ -535,27 +528,26 @@ module BibTeX
 
     def test_sorting
       entries = []
-      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven3', :author => 'Poe, Edgar A.', :title => 'The Raven'})
-      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven2', :author => 'Poe, Edgar A.', :title => 'The Raven'})
-      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Raven'})
-      entries << Entry.new({ :bibtex_type => 'book', :bibtex_key => 'raven1', :author => 'Poe, Edgar A.', :title => 'The Aven'})
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven3', author: 'Poe, Edgar A.', title: 'The Raven')
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven2', author: 'Poe, Edgar A.', title: 'The Raven')
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven1', author: 'Poe, Edgar A.', title: 'The Raven')
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven1', author: 'Poe, Edgar A.', title: 'The Aven')
 
       entries.sort!
 
-      assert_equal ['raven1', 'raven1', 'raven2', 'raven3'], entries.map(&:key)
-      assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0,2]
-
+      assert_equal %w[raven1 raven1 raven2 raven3], entries.map(&:key)
+      assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0, 2]
     end
 
     describe 'default keys' do
-      before {
-        @e1 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
-        @e2 = Entry.new(:bibtex_type => 'book', :title => 'The Raven', :editor => 'John Hopkins', :year => 1996)
-        @e3 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins')
-        @e4 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :date => '2003-09')
-        @e5 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => 'n.d.')
-        @e6 = Entry.new(:bibtex_type => 'book', :author => 'Poe, Edgar A.', :title => 'The Raven', :editor => 'John Hopkins', :year => '[2009]')
-      }
+      before do
+        @e1 = Entry.new(bibtex_type: 'book', author: 'Poe, Edgar A.', title: 'The Raven', editor: 'John Hopkins', year: 1996)
+        @e2 = Entry.new(bibtex_type: 'book', title: 'The Raven', editor: 'John Hopkins', year: 1996)
+        @e3 = Entry.new(bibtex_type: 'book', author: 'Poe, Edgar A.', title: 'The Raven', editor: 'John Hopkins')
+        @e4 = Entry.new(bibtex_type: 'book', author: 'Poe, Edgar A.', title: 'The Raven', editor: 'John Hopkins', date: '2003-09')
+        @e5 = Entry.new(bibtex_type: 'book', author: 'Poe, Edgar A.', title: 'The Raven', editor: 'John Hopkins', year: 'n.d.')
+        @e6 = Entry.new(bibtex_type: 'book', author: 'Poe, Edgar A.', title: 'The Raven', editor: 'John Hopkins', year: '[2009]')
+      end
 
       it 'should return "unknown-a" for an empty Entry' do
         Entry.new.key.must_be :==, 'unknown-a'
@@ -591,10 +583,10 @@ module BibTeX
     end
 
     describe 'when the entry is added to a Bibliography' do
-      before {
+      before do
         @e = Entry.new
         @bib = Bibliography.new
-      }
+      end
 
       it 'should register itself with its key' do
         @bib << @e
@@ -604,13 +596,12 @@ module BibTeX
       describe "when there is already an element registered with the entry's key" do
         before { @bib << Entry.new }
 
-        it "should find a suitable key" do
+        it 'should find a suitable key' do
           k = @e.key
           @bib << @e
           @bib.entries.keys.must_include @e.key
           k.wont_be :==, @e.key
         end
-
       end
     end
 
@@ -645,11 +636,11 @@ module BibTeX
     end
 
     describe '#valid?' do
-      before {
+      before do
         @misc = Entry.new
-        @book = Entry.new({ :bibtex_type => :book })
-        @article = Entry.new({ :bibtex_type => :article })
-      }
+        @book = Entry.new(bibtex_type: :book)
+        @article = Entry.new(bibtex_type: :article)
+      end
 
       it 'is true by default' do
         assert @misc.valid?
@@ -661,12 +652,12 @@ module BibTeX
       end
 
       it 'is true only if all mandatory fields are present' do
-        @book.update({
-          :author => 'Henry James',
-          :title => 'What Maisie Knew',
-          :year => 1897,
-          :publisher => 'Heineman'
-        })
+        @book.update(
+          author: 'Henry James',
+          title: 'What Maisie Knew',
+          year: 1897,
+          publisher: 'Heineman'
+        )
 
         assert @book.valid?
 
@@ -682,11 +673,11 @@ module BibTeX
     end
 
     describe '#fetch' do
-      let(:pages){ '1--2' }
-      let(:entry){
+      let(:pages) { '1--2' }
+      let(:entry) do
         e = Entry.new
         e.add(:pages, pages)
-      }
+      end
 
       describe '(:pages)' do
         it 'should fetch pages' do
