@@ -1,3 +1,7 @@
+5.0.0 / 2019-06-12
+==================
+* Dropped support for Ruby < 2.3
+
 4.2.0 / 2015-02-02
 ==================
 * Fixed queries being whitespace sensitive
