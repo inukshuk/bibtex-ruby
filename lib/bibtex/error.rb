@@ -1,13 +1,12 @@
 module BibTeX
+  class BibTeXError < StandardError
+    attr_reader :original
 
-	class BibTeXError < StandardError
-		attr_reader :original
-
-		def initialize(message = nil, original = $!)
-			super(message)
-			@original = original
-		end
-	end
+    def initialize(message = nil, original = $ERROR_INFO)
+      super(message)
+      @original = original
+    end
+  end
 
   class ParseError < BibTeXError; end
   class ArgumentError < BibTeXError; end
@@ -16,15 +15,15 @@ module BibTeX
   # Represents a lexical or syntactical error.
   #
   class Error < Element
-
     attr_reader :trace
 
-    def initialize(trace=[])
+    def initialize(trace = [])
       @trace = trace
     end
 
     def trace=(trace)
-      raise(ArgumentError, "BibTeX::Error trace must be of type Array; was: #{trace.class.name}.") unless trace.kind_of?(Array)
+      raise(ArgumentError, "BibTeX::Error trace must be of type Array; was: #{trace.class.name}.") unless trace.is_a?(Array)
+
       @trace = trace
     end
 

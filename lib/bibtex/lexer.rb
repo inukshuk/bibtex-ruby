@@ -19,7 +19,6 @@
 require 'strscan'
 
 module BibTeX
-
   #
   # The BibTeX::Lexer handles the lexical analysis of BibTeX bibliographies.
   #
@@ -32,43 +31,43 @@ module BibTeX
     def_delegator :@scanner, :string, :data
 
     @defaults = {
-      :include => [:errors],
-      :strict => true,
-      :allow_missing_keys => false,
-      :strip => true
+      include: [:errors],
+      strict: true,
+      allow_missing_keys: false,
+      strip: true
     }
 
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
-      :space        => /[\s]+/o,
-      :lbrace       => /\s*\{/o,
-      :rbrace       => /\s*\}\s*/o,
-      :braces       => /\{|\}/o,
-      :eq           => /\s*=\s*/o,
-      :comma        => /\s*,\s*/o,
-      :number       => /[[:digit:]]+/o,
-      :name         => /[[:alpha:][:digit:]\/:_!$\?\.%+&\*-]+/io,
-      :quote        => /\s*"/o,
-      :unquote      => /[\{\}"]/o,
-      :sharp        => /\s*#\s*/o,
-      :object       => /@/o,
-      :period       => /./o,
-      :strict_next  => /@[\t ]*/o,
-      :next         => /(^|\n)[\t ]*@[\t ]*/o,
-      :entry        => /[a-z\d:_!\.$%&*-]+/io,
-      :string       => /string/io,
-      :comment      => /comment\b/io,
-      :preamble     => /preamble\b/io,
-      :key          => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*'"-]+,/io,
-      :optional_key => /\s*[[:alpha:][:digit:] \/:_!$\?\.%+;&\*'"-]*,/io
+      space: /[\s]+/o,
+      lbrace: /\s*\{/o,
+      rbrace: /\s*\}\s*/o,
+      braces: /\{|\}/o,
+      eq: /\s*=\s*/o,
+      comma: /\s*,\s*/o,
+      number: /[[:digit:]]+/o,
+      name: %r{[[:alpha:][:digit:]/:_!$\?\.%+&\*-]+}io,
+      quote: /\s*"/o,
+      unquote: /[\{\}"]/o,
+      sharp: /\s*#\s*/o,
+      object: /@/o,
+      period: /./o,
+      strict_next: /@[\t ]*/o,
+      next: /(^|\n)[\t ]*@[\t ]*/o,
+      entry: /[a-z\d:_!\.$%&*-]+/io,
+      string: /string/io,
+      comment: /comment\b/io,
+      preamble: /preamble\b/io,
+      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]+,}io,
+      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]*,}io
     }
 
-    MODE = Hash.new(:meta).merge({
-      :bibtex  => :bibtex,  :entry    => :bibtex,
-      :string  => :bibtex,  :preamble => :bibtex,
-      :comment => :bibtex,  :meta     => :meta,
-      :literal => :literal, :content  => :content
-    }).freeze
+    MODE = Hash.new(:meta).merge(
+      bibtex: :bibtex, entry: :bibtex,
+      string: :bibtex, preamble: :bibtex,
+      comment: :bibtex,  meta: :meta,
+      literal: :literal, content: :content
+    ).freeze
 
     class << self
       attr_reader :defaults, :patterns
@@ -94,7 +93,10 @@ module BibTeX
     end
 
     def reset
-      @stack, @brace_level, @mode, @active_object = [], 0, :meta, nil
+      @stack = []
+      @brace_level = 0
+      @mode = :meta
+      @active_object = nil
 
       # cache options for speed
       @include_meta_content = @options[:include].include?(:meta_content)
@@ -109,17 +111,21 @@ module BibTeX
       reset
     end
 
-    def symbols; @stack.map(&:first); end
+    def symbols
+      @stack.map(&:first)
+    end
 
     # Returns the next token from the parse stack.
-    def next_token; @stack.shift; end
+    def next_token
+      @stack.shift
+    end
 
     # Returns true if the lexer is currenty parsing a BibTeX object.
     def bibtex_mode?
       MODE[@mode] == :bibtex
     end
 
-    [:meta, :literal, :content].each do |m|
+    %i[meta literal content].each do |m|
       define_method("#{m}_mode?") { @mode == m }
     end
 
@@ -171,9 +177,7 @@ module BibTeX
 
       self.data = string || @scanner.string
 
-      until @scanner.eos?
-        send("parse_#{MODE[@mode]}")
-      end
+      send("parse_#{MODE[@mode]}") until @scanner.eos?
 
       push([false, '$end'])
     end
@@ -184,25 +188,25 @@ module BibTeX
       case
       when @scanner.scan(Lexer.patterns[:lbrace])
         @brace_level += 1
-        push([:LBRACE,'{'])
+        push([:LBRACE, '{'])
         @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
       when @scanner.scan(Lexer.patterns[:rbrace])
         @brace_level -= 1
-        push([:RBRACE,'}'])
+        push([:RBRACE, '}'])
         return leave_object if @brace_level == 0
         return error_unbalanced_braces if @brace_level < 0
       when @scanner.scan(Lexer.patterns[:eq])
-        push([:EQ,'='])
+        push([:EQ, '='])
       when @scanner.scan(Lexer.patterns[:comma])
-        push([:COMMA,','])
+        push([:COMMA, ','])
       when @scanner.scan(Lexer.patterns[:number])
-        push([:NUMBER,@scanner.matched])
+        push([:NUMBER, @scanner.matched])
       when @scanner.scan(Lexer.patterns[:name])
-        push([:NAME,@scanner.matched.rstrip])
+        push([:NAME, @scanner.matched.rstrip])
       when @scanner.scan(Lexer.patterns[:quote])
         @mode = :literal
       when @scanner.scan(Lexer.patterns[:sharp])
-        push([:SHARP,'#'])
+        push([:SHARP, '#'])
       when @scanner.scan(Lexer.patterns[:object])
         enter_object
       when @scanner.scan(Lexer.patterns[:space])
@@ -215,10 +219,10 @@ module BibTeX
     def parse_meta
       match = @scanner.scan_until(Lexer.patterns[strict? ? :strict_next : :next])
       if @scanner.matched
-        push([:META_CONTENT,match.chop])
+        push([:META_CONTENT, match.chop])
         enter_object
       else
-        push([:META_CONTENT,@scanner.rest])
+        push([:META_CONTENT, @scanner.rest])
         @scanner.terminate
       end
     end
@@ -228,26 +232,25 @@ module BibTeX
       case @scanner.matched
       when '{'
         @brace_level += 1
-        push([:CONTENT,match])
+        push([:CONTENT, match])
       when '}'
         @brace_level -= 1
-        case
-        when @brace_level == 0
-          push([:CONTENT,match.chop])
-          push([:RBRACE,'}'])
+        if @brace_level == 0
+          push([:CONTENT, match.chop])
+          push([:RBRACE, '}'])
           leave_object
-        when @brace_level == 1 && !active?(:comment)
-          push([:CONTENT,match.chop])
-          push([:RBRACE,'}'])
+        elsif @brace_level == 1 && !active?(:comment)
+          push([:CONTENT, match.chop])
+          push([:RBRACE, '}'])
           @mode = :bibtex
-        when @brace_level < 0
-          push([:CONTENT,match.chop])
+        elsif @brace_level < 0
+          push([:CONTENT, match.chop])
           error_unbalanced_braces
         else
-          push([:CONTENT,match])
+          push([:CONTENT, match])
         end
       else
-        push([:CONTENT,@scanner.rest])
+        push([:CONTENT, @scanner.rest])
         @scanner.terminate
         error_unterminated_content
       end
@@ -258,24 +261,24 @@ module BibTeX
       case @scanner.matched
       when '{'
         @brace_level += 1
-        push([:STRING_LITERAL,match])
+        push([:STRING_LITERAL, match])
       when '}'
         @brace_level -= 1
         if @brace_level < 1
-          push([:STRING_LITERAL,match.chop])
+          push([:STRING_LITERAL, match.chop])
           error_unbalanced_braces
         else
-          push([:STRING_LITERAL,match])
+          push([:STRING_LITERAL, match])
         end
       when '"'
         if @brace_level == 1
-          push([:STRING_LITERAL,match.chop])
+          push([:STRING_LITERAL, match.chop])
           @mode = :bibtex
         else
-          push([:STRING_LITERAL,match])
+          push([:STRING_LITERAL, match])
         end
       else
-        push([:STRING_LITERAL,@scanner.rest])
+        push([:STRING_LITERAL, @scanner.rest])
         @scanner.terminate
         error_unterminated_string
       end
@@ -284,31 +287,28 @@ module BibTeX
     # Called when the lexer encounters a new BibTeX object.
     def enter_object
       @brace_level = 0
-      push [:AT,'@']
+      push [:AT, '@']
 
-      case
-      when @scanner.scan(Lexer.patterns[:string])
+      if @scanner.scan(Lexer.patterns[:string])
         @mode = @active_object = :string
         push [:STRING, @scanner.matched]
-      when @scanner.scan(Lexer.patterns[:preamble])
+      elsif @scanner.scan(Lexer.patterns[:preamble])
         @mode = @active_object = :preamble
         push [:PREAMBLE, @scanner.matched]
-      when @scanner.scan(Lexer.patterns[:comment])
+      elsif @scanner.scan(Lexer.patterns[:comment])
         @mode = @active_object = :comment
         push [:COMMENT, @scanner.matched]
-      when @scanner.scan(Lexer.patterns[:entry])
+      elsif @scanner.scan(Lexer.patterns[:entry])
         @mode = @active_object = :entry
         push [:NAME, @scanner.matched]
 
         # TODO: DRY - try to parse key
         if @scanner.scan(Lexer.patterns[:lbrace])
           @brace_level += 1
-          push([:LBRACE,'{'])
+          push([:LBRACE, '{'])
           @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
 
-          if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
-            push [:KEY, @scanner.matched.chop.strip]
-          end
+          push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
         end
 
       else
@@ -318,7 +318,9 @@ module BibTeX
 
     # Called when parser leaves a BibTeX object.
     def leave_object
-      @mode, @active_object, @brace_level = :meta, nil, 0
+      @mode = :meta
+      @active_object = nil
+      @brace_level = 0
     end
 
     def error_unbalanced_braces
@@ -348,11 +350,9 @@ module BibTeX
 
     def backtrace(error)
       bt = []
-      bt.unshift(@stack.pop) until @stack.empty? || (!bt.empty? && [:AT,:META_CONTENT].include?(bt[0][0]))
+      bt.unshift(@stack.pop) until @stack.empty? || (!bt.empty? && %i[AT META_CONTENT].include?(bt[0][0]))
       bt << error
-      push [:ERROR,bt]
+      push [:ERROR, bt]
     end
-
   end
-
 end

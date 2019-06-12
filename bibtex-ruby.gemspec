@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
@@ -8,6 +7,7 @@ Gem::Specification.new do |s|
   s.name        = 'bibtex-ruby'
   s.version     = BibTeX::Version::STRING.dup
   s.platform    = Gem::Platform::RUBY
+  s.required_ruby_version = '>= 2.3.0'
   s.authors     = ['Sylvester Keil']
   s.email       = ['sylvester@keil.or.at']
   s.homepage    = 'http://inukshuk.github.com/bibtex-ruby'

@@ -2,10 +2,9 @@ require 'helper.rb'
 
 module BibTeX
   class ParserTest < Minitest::Spec
-
     describe 'given a set of valid @entries' do
       before do
-        @bib = Parser.new(:debug => false).parse(File.read(Test.fixtures(:entry)))
+        @bib = Parser.new(debug: false).parse(File.read(Test.fixtures(:entry)))
       end
 
       it 'returns a Bibliography instance' do
@@ -18,11 +17,11 @@ module BibTeX
       end
 
       it 'parses the key values' do
-        assert_equal %w{ key:0 key:1 foo staudinger }, @bib.map(&:key)
+        assert_equal %w[key:0 key:1 foo staudinger], @bib.map(&:key)
       end
 
       it 'should parse the entry types' do
-        assert_equal [:book, :article, :article, :commentary], @bib.map(&:type)
+        assert_equal %i[book article article commentary], @bib.map(&:type)
       end
 
       it 'should parse all values correctly' do
@@ -35,63 +34,62 @@ module BibTeX
         assert_equal 'American Library', @bib[:'key:0'].publisher
         assert_equal 'American Library', @bib[:'key:1'].publisher
 
-        assert_equal %q[Selected \emph{Poetry} and `Tales'], @bib[:'key:0'].title
+        assert_equal %q(Selected \emph{Poetry} and `Tales'), @bib[:'key:0'].title
         assert_equal 'Tales and Sketches', @bib[:'key:1'].title
       end
     end
 
     describe 'key parsing' do
       it 'handles whitespace in keys' do
-        input = "@Misc{George Martin06,title = {FEAST FOR CROWS}}"
-        bib = Parser.new(:debug => false, :strict => false).parse(input)
-        assert_equal "George Martin06", bib.first.key
+        input = '@Misc{George Martin06,title = {FEAST FOR CROWS}}'
+        bib = Parser.new(debug: false, strict: false).parse(input)
+        assert_equal 'George Martin06', bib.first.key
         assert bib[:"George Martin06"]
       end
 
       it 'handles plus symbols in keys' do
-        input = "@Misc{foo+bar,title = {Foobar}}"
-        bib = Parser.new(:debug => false, :strict => false).parse(input)
-        assert_equal "foo+bar", bib.first.key
+        input = '@Misc{foo+bar,title = {Foobar}}'
+        bib = Parser.new(debug: false, strict: false).parse(input)
+        assert_equal 'foo+bar', bib.first.key
         assert bib[:"foo+bar"]
       end
 
       it 'allows semicolons in keys' do
-        input = "@Misc{Gomez;,title = {Foobar}}"
-        bib = Parser.new(:debug => false, :strict => false).parse(input)
-        assert_equal "Gomez;", bib.first.key
+        input = '@Misc{Gomez;,title = {Foobar}}'
+        bib = Parser.new(debug: false, strict: false).parse(input)
+        assert_equal 'Gomez;', bib.first.key
         assert bib[:"Gomez;"]
       end
 
       it 'allows quotes in keys' do
-        input = %|@Misc{Gomez'1",title = {Foobar}}|
-        bib = Parser.new(:debug => false, :strict => false).parse(input)
-        assert_equal %{Gomez'1"}, bib.first.key
+        input = %(@Misc{Gomez'1",title = {Foobar}})
+        bib = Parser.new(debug: false, strict: false).parse(input)
+        assert_equal %(Gomez'1"), bib.first.key
         assert bib[:"Gomez'1\""]
       end
 
       it 'fails when there is no cite-key' do
-        input = "@misc{title = {Crime and Punishment}}"
+        input = '@misc{title = {Crime and Punishment}}'
         assert_raises ParseError do
-          Parser.new(:debug => false, :strict => false).parse(input)
+          Parser.new(debug: false, strict: false).parse(input)
         end
       end
 
       it 'tolerates missing key with :allow_missing_keys set' do
-        input = "@misc{title = {Crime and Punishment}}"
-        assert_equal :misc, Parser.new({
-          :debug => false, :strict => false, :allow_missing_keys => true
-        }).parse(input)[0].type
+        input = '@misc{title = {Crime and Punishment}}'
+        assert_equal :misc, Parser.new(
+          debug: false, strict: false, allow_missing_keys: true
+        ).parse(input)[0].type
       end
     end
 
     describe 'backslashes and escape sequences' do
-
       it 'leaves backslashes intact' do
         Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title.must_be :==, 'a backslash: \\'
       end
 
       it 'parses LaTeX escaped quotes {"}' do
-        Parser.new.parse(%q(@misc{key, title = "{"}"}))[0].title.must_be :==, '{"}'
+        Parser.new.parse('@misc{key, title = "{"}"}')[0].title.must_be :==, '{"}'
       end
 
       it 'parses complex LaTeX markup' do
@@ -110,12 +108,11 @@ module BibTeX
         b.booktitle.must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
         b.editor.to_s.must_be :==, 'Proust, Jo\"{e}lle'
       end
-
     end
 
     describe 'given a set of explicit and implicit comments' do
       before do
-        @bib = Parser.new(:debug => false, :include => [:meta_content]).parse(File.read(Test.fixtures(:comment)))
+        @bib = Parser.new(debug: false, include: [:meta_content]).parse(File.read(Test.fixtures(:comment)))
       end
 
       it 'should parses all @comments' do
@@ -128,13 +125,13 @@ module BibTeX
 
       it 'should parse @comment content as string' do
         assert_equal ' A comment can contain pretty much anything ', @bib.comments[0].content
-        assert_equal %Q[\n@string{ foo = "bar" }\n\n@string{ bar = "foo" }\n], @bib.comments[1].content
+        assert_equal %(\n@string{ foo = "bar" }\n\n@string{ bar = "foo" }\n), @bib.comments[1].content
       end
     end
 
     describe 'given a set of @preambles' do
       before do
-        @bib = Parser.new(:debug => false).parse(File.read(Test.fixtures(:preamble)))
+        @bib = Parser.new(debug: false).parse(File.read(Test.fixtures(:preamble)))
       end
 
       it 'should parse all @preambles' do
@@ -150,8 +147,8 @@ module BibTeX
 
     describe 'given an entry containing a multi-line literals' do
       before do
-        @braces = %Q[@TechReport{key,\n  author = {Donald,\n     Duck}\n}]
-        @string = %Q[@TechReport{key,\n  author = "Donald,\n     Duck"\n}]
+        @braces = %(@TechReport{key,\n  author = {Donald,\n     Duck}\n})
+        @string = %(@TechReport{key,\n  author = "Donald,\n     Duck"\n})
       end
 
       it 'should parse string literals' do
@@ -161,18 +158,17 @@ module BibTeX
       it 'should parse braced literals' do
         refute_nil Parser.new.parse(@braces)[:key]
       end
-
     end
 
     describe 'year values' do
       it 'parses non-numeric year literals' do
         assert_equal 'to appear',
-          Parser.new.parse("@article{x,  year = {to appear}}")['x'].year.to_s
+                     Parser.new.parse('@article{x,  year = {to appear}}')['x'].year.to_s
       end
 
       it 'parses numeric year literals' do
         assert_equal 1993,
-          Parser.new.parse("@article{x,  year = { 1993 }}")['x'].year.to_i
+                     Parser.new.parse('@article{x,  year = { 1993 }}')['x'].year.to_i
       end
     end
 

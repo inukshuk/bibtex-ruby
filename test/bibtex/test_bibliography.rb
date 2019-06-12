@@ -1,11 +1,7 @@
-# -*- encoding: utf-8 -*-
-
 require 'helper'
 
 module BibTeX
-
   class BibliographyTest < Minitest::Spec
-
     describe 'when newly created' do
       it 'should not be nil' do
         assert Bibliography.new
@@ -27,16 +23,15 @@ module BibTeX
 
         assert_equal b.length - 1, BibTeX.open(tmp.path).length
       end
-
     end
 
     describe '.parse' do
       it 'accepts filters' do
-        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => 'latex')[0].title.must_be :==, 'ü'
+        Bibliography.parse("@misc{k, title = {\\''u}}", filter: 'latex')[0].title.must_be :==, 'ü'
       end
 
       it 'accepts filters in an array' do
-        Bibliography.parse("@misc{k, title = {\\''u}}", :filter => ['latex'])[0].title.must_be :==, 'ü'
+        Bibliography.parse("@misc{k, title = {\\''u}}", filter: ['latex'])[0].title.must_be :==, 'ü'
       end
     end
 
@@ -89,15 +84,15 @@ module BibTeX
       describe '#extend_initials' do
         it 'extends the initials in matching names' do
           @bib.names.map(&:to_s).wont_include 'Flanagan, Dave'
-          @bib.extend_initials(['Dave', 'Flanagan'])
+          @bib.extend_initials(%w[Dave Flanagan])
           @bib.names.map(&:to_s).must_include 'Flanagan, Dave'
         end
       end
 
       describe '#extend_initials!' do
         it 'extends the initials of all names to the longest prototype' do
-          assert_equal "Ruby, Sam Thomas, Dave Hansson Heinemeier, David Flanagan, David Matsumoto, Yukihiro Segaran, Thomas",
-            @bib.extend_initials!.names.map(&:sort_order).uniq.join(' ')
+          assert_equal 'Ruby, Sam Thomas, Dave Hansson Heinemeier, David Flanagan, David Matsumoto, Yukihiro Segaran, Thomas',
+                       @bib.extend_initials!.names.map(&:sort_order).uniq.join(' ')
         end
       end
 
@@ -116,7 +111,7 @@ module BibTeX
         it 'passes each entry with matching fields to the block if given' do
           years = []
           @bib.unify(:publisher, /reilly/i) { |e| years << e.year.to_s }
-          assert_equal ['2007','2008'], years.sort
+          assert_equal %w[2007 2008], years.sort
         end
 
         it 'returns the bibliography' do
@@ -144,11 +139,11 @@ module BibTeX
       end
 
       it 'supports access by range' do
-        assert_equal %w{2008 2007}, @bib[1..2].map(&:year)
+        assert_equal %w[2008 2007], @bib[1..2].map(&:year)
       end
 
       it 'supports access by index and offset' do
-        assert_equal %w{2008 2007}, @bib[1,2].map(&:year)
+        assert_equal %w[2008 2007], @bib[1, 2].map(&:year)
       end
 
       it 'supports queries by symbol key' do
@@ -192,7 +187,6 @@ module BibTeX
         assert_nil @bib.q(:first, '@collection')
       end
 
-
       it 'supports queries by pattern' do
         assert_equal 0, @bib[/reilly/].length
         assert_equal 2, @bib[/reilly/i].length
@@ -230,7 +224,6 @@ module BibTeX
         assert_equal 0, @bib['@*[year>=2010]'].length
       end
 
-
       it 'supports queries by bibtex element' do
         entry = Entry.parse(<<-END).first
         @article{segaran2007,
@@ -258,7 +251,6 @@ module BibTeX
       end
 
       describe '#query' do
-
         it 'returns all elements when passed no arguments' do
           @bib.query.length.must_be :==, 6
         end
@@ -270,11 +262,9 @@ module BibTeX
         it 'returns all entries when passed a * wildcard' do
           @bib.query('@*').length.must_be :==, 5
         end
-
       end
 
       describe 'duplicates' do
-
         it 'understands select_duplicates_by' do
           assert_equal 1, @bib.select_duplicates_by.length
         end
@@ -282,7 +272,6 @@ module BibTeX
         it 'understands duplicates?' do
           assert @bib.duplicates?
         end
-
       end
 
       describe '#uniq!' do
@@ -320,7 +309,7 @@ module BibTeX
 
         describe 'with block' do
           it 'removes duplicate entries and returns the bibliography' do
-            assert @a.length > @a.uniq!(:author){|d,e| d+'|'+e.pages_from}.length
+            assert @a.length > @a.uniq!(:author) { |d, e| d + '|' + e.pages_from }.length
           end
         end
       end
@@ -328,7 +317,9 @@ module BibTeX
       describe 'given a filter' do
         before do
           @filter = Object.new
-          def @filter.apply (value); value.is_a?(::String) ? value.upcase : value; end
+          def @filter.apply(value)
+            value.is_a?(::String) ? value.upcase : value
+          end
         end
 
         it 'supports arbitrary conversions' do
@@ -341,11 +332,9 @@ module BibTeX
           assert_equal 'ruby, rails', @bib[:rails].keywords
           assert_equal 'RUBY', @bib[:flanagan2008].keywords
         end
-
       end
 
       describe 'sorting' do
-
         before do
           @small_bib = BibTeX.parse <<-END
         @book{flanagan2008,
@@ -372,29 +361,29 @@ module BibTeX
           year={2007},
           publisher={O'Reilly}
         }
-        END
-      end
+          END
+        end
 
         it 'can be sorted destructively' do
           @small_bib.sort!
-          @small_bib.map(&:key).must_equal [ 'segaran2007', 'flanagan2008', 'rails']
+          @small_bib.map(&:key).must_equal %w[segaran2007 flanagan2008 rails]
         end
 
         it 'can be sorted by field destructively' do
           @small_bib.sort_by! { |e| -e[:year].to_i }
-          @small_bib.map(&:key).must_equal [  'rails', 'flanagan2008', 'segaran2007' ]
+          @small_bib.map(&:key).must_equal %w[rails flanagan2008 segaran2007]
         end
 
         it 'can be sorted non-destructively' do
           sorted_entries = @small_bib.sort
-          sorted_entries.map(&:key).must_equal [ 'segaran2007', 'flanagan2008', 'rails']
-          @small_bib.map(&:key).must_equal [  'flanagan2008', 'rails', 'segaran2007']
+          sorted_entries.map(&:key).must_equal %w[segaran2007 flanagan2008 rails]
+          @small_bib.map(&:key).must_equal %w[flanagan2008 rails segaran2007]
         end
 
         it 'can be sorted by field non-destructively' do
           sorted_entries = @small_bib.sort_by { |e| -e[:year].to_i }
-          sorted_entries.map(&:key).must_equal [  'rails', 'flanagan2008', 'segaran2007' ]
-          @small_bib.map(&:key).must_equal [  'flanagan2008', 'rails', 'segaran2007']
+          sorted_entries.map(&:key).must_equal %w[rails flanagan2008 segaran2007]
+          @small_bib.map(&:key).must_equal %w[flanagan2008 rails segaran2007]
         end
       end
 
@@ -406,7 +395,6 @@ module BibTeX
         it 'converts LaTeX umlauts' do
           @bib.convert(:latex)['rails'].keywords.must_be :==, 'rüby'
         end
-
       end
 
       describe 'BibTeXML export' do
@@ -422,13 +410,12 @@ module BibTeX
         end
 
         it 'supports exporting to extended BibTeXML' do
-          @bib.to_xml(:extended => true).write(@bibtexml, 2)
+          @bib.to_xml(extended: true).write(@bibtexml, 2)
           @bibtexml.rewind
           xml = REXML::Document.new(@bibtexml)
           xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
           xml.root.get_elements('//bibtex:person').wont_be_empty
         end
-
       end
     end
 
@@ -439,7 +426,7 @@ module BibTeX
 
       it 'should respect options provided to initializer' do
         assert_equal(@bib.add('@article{, title = test}'), @bib)
-        assert(! @bib.entries.keys.any?(&:empty?))
+        assert(@bib.entries.keys.none?(&:empty?))
       end
     end
   end

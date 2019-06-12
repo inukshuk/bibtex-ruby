@@ -14,7 +14,7 @@ When /^I search for :(.+)$/ do |query|
   @result = @bibliography.query(query.to_sym)
 end
 
-When /^I search for \/(.+)\/$/ do |query|
+When %r{^I search for /(.+)/$} do |query|
   @result = @bibliography.query(Regexp.new(query))
 end
 
@@ -50,7 +50,6 @@ When /^I create entries with these elements:$/ do |table|
   end
 end
 
-
 Then /^my bibliography should contain the following objects:$/ do |table|
   @bibliography.each_with_index do |object, index|
     table.hashes[index].each_pair do |key, value|
@@ -69,7 +68,7 @@ end
 
 Then /^my bibliography should contain the following numbers of elements:$/ do |table|
   counts = table.hashes.first
-  counts[[]] = counts.delete('total') if counts.has_key?('total')
+  counts[[]] = counts.delete('total') if counts.key?('total')
   counts.each_pair do |type, length|
     assert_equal length.to_i, @bibliography.find_by_type(type).length
   end
@@ -83,11 +82,10 @@ Then /^my bibliography should contain an entry with an? (?:key|id) like "([^"]*)
   pattern = Regexp.compile key
   refute_nil @bibliography.detect { |e| e.key.to_s =~ pattern }
 end
-Then /^my bibliography should contain an entry with (?:key|id) "([^"]*)" and a?n? (\w+) value of "([^"]*)"$/ do |key,field,value|
+Then /^my bibliography should contain an entry with (?:key|id) "([^"]*)" and a?n? (\w+) value of "([^"]*)"$/ do |key, field, value|
   refute_nil @bibliography[key.to_s]
   assert_equal value, @bibliography[key.to_s][field.downcase.to_sym].to_s
 end
-
 
 Then /^my bibliography should not contain an entry with (?:key|id) "([^"]*)"$/ do |key|
   assert_nil @bibliography[key.to_sym]
@@ -96,7 +94,6 @@ end
 Then /^there should be exactly (\d+) match(?:es)?$/ do |matches|
   assert_equal matches.to_i, @result.length
 end
-
 
 Then /^my bibliography should contain (\d+) (\w+)$/ do |count, type|
   assert_equal count.to_i, @bibliography.q("@#{type.chomp('s')}").length

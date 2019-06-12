@@ -25,44 +25,43 @@ module BibTeX
     include Enumerable
 
     # Defines the required fields of the standard entry types
-    REQUIRED_FIELDS = Hash.new([]).merge({
-      :article       => [:author,:title,:journal,:year],
-      :book          => [[:author,:editor],:title,:publisher,:year],
-      :booklet       => [:title],
-      :conference    => [:author,:title,:booktitle,:year],
-      :inbook        => [[:author,:editor],:title,[:chapter,:pages],:publisher,:year],
-      :incollection  => [:author,:title,:booktitle,:publisher,:year],
-      :inproceedings => [:author,:title,:booktitle,:year],
-      :manual        => [:title],
-      :mastersthesis => [:author,:title,:school,:year],
-      :misc          => [],
-      :phdthesis     => [:author,:title,:school,:year],
-      :proceedings   => [:title,:year],
-      :techreport    => [:author,:title,:institution,:year],
-      :unpublished   => [:author,:title,:note]
-    }).freeze
+    REQUIRED_FIELDS = Hash.new([]).merge(
+      article: %i[author title journal year],
+      book: [%i[author editor], :title, :publisher, :year],
+      booklet: [:title],
+      conference: %i[author title booktitle year],
+      inbook: [%i[author editor], :title, %i[chapter pages], :publisher, :year],
+      incollection: %i[author title booktitle publisher year],
+      inproceedings: %i[author title booktitle year],
+      manual: [:title],
+      mastersthesis: %i[author title school year],
+      misc: [],
+      phdthesis: %i[author title school year],
+      proceedings: %i[title year],
+      techreport: %i[author title institution year],
+      unpublished: %i[author title note]
+    ).freeze
 
     # Defines the default fallbacks for values defined in cross-references
     FIELD_ALIASES = {
-      :booktitle => :title,
+      booktitle: :title
       # :editor => :author
     }.freeze
 
+    NAME_FIELDS = %i[author editor translator director producer composer].freeze
+    DATE_FIELDS = %i[year month day date].freeze
 
-    NAME_FIELDS = [:author,:editor,:translator,:director,:producer,:composer].freeze
-    DATE_FIELDS = [:year,:month,:day,:date].freeze
+    MONTHS = %i[jan feb mar apr may jun jul aug sep oct nov dec].freeze
 
-    MONTHS = [:jan,:feb,:mar,:apr,:may,:jun,:jul,:aug,:sep,:oct,:nov,:dec].freeze
-
-    MONTHS_FILTER = Hash.new do |h,k|
-      case k.to_s.strip
-      when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
-        h[k] = Value.new(k.to_s[0,3].downcase.to_sym)
-      when /^\d\d?$/
-        h[k] = Value.new(MONTHS[k.to_i - 1] || k)
-      else
-        h[k] = Value.new(k)
-      end
+    MONTHS_FILTER = Hash.new do |h, k|
+      h[k] = case k.to_s.strip
+             when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
+               Value.new(k.to_s[0, 3].downcase.to_sym)
+             when /^\d\d?$/
+               Value.new(MONTHS[k.to_i - 1] || k)
+             else
+               Value.new(k)
+             end
     end
 
     attr_reader :fields, :type
@@ -74,8 +73,8 @@ module BibTeX
       @fields = {}
       @key = nil
 
-      self.type = attributes.delete(:bibtex_type) if attributes.has_key?(:bibtex_type)
-      self.key = attributes.delete(:bibtex_key) if attributes.has_key?(:bibtex_key)
+      self.type = attributes.delete(:bibtex_type) if attributes.key?(:bibtex_type)
+      self.key = attributes.delete(:bibtex_key) if attributes.key?(:bibtex_key)
 
       add(attributes)
 
@@ -120,28 +119,36 @@ module BibTeX
 
     # Generate accessors for required fields (#52)
     REQUIRED_FIELDS.values.flatten.uniq.each do |name|
-      define_method(name) do
-        get name
-      end unless method_defined? name
+      unless method_defined? name
+        define_method(name) do
+          get name
+        end
+      end
 
       writer = "#{name}="
 
+      next if method_defined? writer
+
       define_method(writer) do |value|
         add name, value
-      end unless method_defined? writer
+      end
     end
 
     # Generate author, editor and translator accessors
     NAME_FIELDS.each do |contributor|
-      define_method(contributor) do
-        get contributor
-      end unless method_defined? contributor
+      unless method_defined? contributor
+        define_method(contributor) do
+          get contributor
+        end
+      end
 
       writer = "#{contributor}="
 
-      define_method(writer) do |value|
-        add contributor, value
-      end unless method_defined? writer
+      unless method_defined? writer
+        define_method(writer) do |value|
+          add contributor, value
+        end
+      end
 
       alias_method "#{contributor}s", contributor
       alias_method "#{contributor}s=", writer
@@ -168,7 +175,6 @@ module BibTeX
 
     alias each_pair each
 
-
     # Returns the Entry's field name aliases.
     def aliases
       @aliases ||= FIELD_ALIASES.dup
@@ -189,7 +195,7 @@ module BibTeX
       end
 
       @key = key
-    rescue => e
+    rescue StandardError => e
       raise BibTeXError, "failed to set key to #{key.inspect}: #{e.message}"
     end
 
@@ -215,10 +221,9 @@ module BibTeX
 
     alias type? has_type?
 
-
     def has_field?(*names)
       names.flatten.any? do |name|
-        name.respond_to?(:to_sym) ? fields.has_key?(name.to_sym) : false
+        name.respond_to?(:to_sym) ? fields.key?(name.to_sym) : false
       end
     end
 
@@ -250,6 +255,7 @@ module BibTeX
     # corresponding alias is defined.
     def provide(name)
       return nil unless name.respond_to?(:to_sym)
+
       name = name.to_sym
       fields[name] || fields[aliases[name]]
     end
@@ -275,13 +281,9 @@ module BibTeX
     def field_names(filter = [], include_inherited = true)
       names = fields.keys
 
-      if include_inherited && has_parent?
-        names.concat(inherited_fields)
-      end
+      names.concat(inherited_fields) if include_inherited && has_parent?
 
-      unless filter.empty?
-        names = names & filter.map(&:to_sym)
-      end
+      names &= filter.map(&:to_sym) unless filter.empty?
 
       names.sort!
       names
@@ -292,29 +294,27 @@ module BibTeX
       return [] unless has_parent?
 
       names = parent.fields.keys - fields.keys
-      names.concat(parent.aliases.reject { |k,v| !parent.has_field?(v) }.keys)
+      names.concat(parent.aliases.select { |_k, v| parent.has_field?(v) }.keys)
       names.sort!
 
       names
     end
 
-
     def method_missing(name, *args, &block)
-      case
-      when fields.has_key?(name)
+      if fields.key?(name)
         fields[name]
-      when name.to_s =~ /^(.+)=$/
-        send(:add, $1.to_sym, args[0])
-      when name =~ /^(?:convert|from)_([a-z]+)(!)?$/
-        $2 ? convert!($1, &block) : convert($1, &block)
-      when has_parent? && parent.provides?(name)
+      elsif name.to_s =~ /^(.+)=$/
+        send(:add, Regexp.last_match(1).to_sym, args[0])
+      elsif name =~ /^(?:convert|from)_([a-z]+)(!)?$/
+        Regexp.last_match(2) ? convert!(Regexp.last_match(1), &block) : convert(Regexp.last_match(1), &block)
+      elsif has_parent? && parent.provides?(name)
         parent.provide(name)
       else
         super
       end
     end
 
-    def respond_to?(method, include_all=false)
+    def respond_to?(method, include_all = false)
       provides?(method.to_sym) || method.to_s.match(/=$/) ||
         method =~ /^(?:convert|from)_([a-z]+)(!)?$/ ||
         (has_parent? && parent.respond_to?(method, include_all)) || super
@@ -328,8 +328,8 @@ module BibTeX
     # Renames the given field names unless a field with the new name already
     # exists.
     def rename!(*arguments)
-      Hash[*arguments.flatten].each_pair do |from,to|
-        if fields.has_key?(from) && !fields.has_key?(to)
+      Hash[*arguments.flatten].each_pair do |from, to|
+        if fields.key?(from) && !fields.key?(to)
           fields[to] = fields[from]
           fields.delete(from)
         end
@@ -344,7 +344,7 @@ module BibTeX
     # defined and the entry has cross-reference, returns the cross-referenced
     # value instead.
     def [](name)
-      fields[name.to_sym] || parent && parent.provide(name)
+      fields[name.to_sym] || parent&.provide(name)
     end
 
     alias get []
@@ -418,12 +418,11 @@ module BibTeX
     end
 
     def identifier
-      case
-      when provides?(:doi)
+      if provides?(:doi)
         "info:doi/#{get(:doi)}"
-      when provides?(:isbn)
+      elsif provides?(:isbn)
         "urn:isbn:#{get(:isbn)}"
-      when provides?(:issn)
+      elsif provides?(:issn)
         "urn:issn:#{get(:issn)}"
       else
         "urn:bibtex:#{key}"
@@ -436,11 +435,11 @@ module BibTeX
 
       @key = register(key)
 
-      [:parse_names, :parse_months].each do |parser|
+      %i[parse_names parse_months].each do |parser|
         send(parser) if bibliography.options[parser]
       end
 
-      if bibliography.options.has_key?(:filter)
+      if bibliography.options.key?(:filter)
         [*bibliography.options[:filter]].each do |filter|
           convert!(filter)
         end
@@ -470,7 +469,7 @@ module BibTeX
       return nil if bibliography.nil?
 
       k = key.dup
-      k.succ! while bibliography.has_key?(k)
+      k.succ! while bibliography.key?(k)
       bibliography.entries[k] = self
       k
     end
@@ -537,7 +536,6 @@ module BibTeX
       NAME_FIELDS.map { |k| has_field?(k) ? @fields[k].tokens : nil }.flatten.compact
     end
 
-
     # Returns true if the Entry has a valid cross-reference in the Bibliography.
     def has_parent?
       !parent.nil?
@@ -561,7 +559,6 @@ module BibTeX
 
     alias cross_reference parent
 
-
     # Returns true if the entry is cross-referenced by another entry in the
     # Bibliography.
     def has_children?
@@ -574,7 +571,7 @@ module BibTeX
     # cross-reference to this entry or [] if there are no references to this
     # entry.
     def children
-      bibliography && bibliography.q("@entry[crossref=#{key}]") or []
+      bibliography&.q("@entry[crossref=#{key}]") || []
     end
 
     alias cross_referenced_by children
@@ -618,7 +615,7 @@ module BibTeX
       filters = filters.flatten.map { |f| Filters.resolve!(f) }
 
       fields.each_pair do |k, v|
-        (!block_given? || yield(k, v)) ? v.convert!(*filters) : v
+        !block_given? || yield(k, v) ? v.convert!(*filters) : v
       end
 
       self
@@ -628,22 +625,21 @@ module BibTeX
       type != other.type ? type <=> other.type : key != other.key ? key <=> other.key : to_s <=> other.to_s
     end
 
-
     # Returns a string of all the entry's fields.
     def content(options = {})
-      fields.map { |k,v| "#{k} = #{ fields[k].to_s(options) }" }.join(",\n")
+      fields.map { |k, _v| "#{k} = #{fields[k].to_s(options)}" }.join(",\n")
     end
 
     # Returns a string representation of the entry.
     def to_s(options = {})
-      options[:quotes] ||= %w({ })
-      ["@#{type}{#{key},", content(options).gsub(/^/,'  '), "}\n"].join("\n")
+      options[:quotes] ||= %w[{ }]
+      ["@#{type}{#{key},", content(options).gsub(/^/, '  '), "}\n"].join("\n")
     end
 
     def to_hash(options = {})
-      options[:quotes] ||= %w({ })
-      hash = { :bibtex_key => key, :bibtex_type => type }
-      each_pair { |k,v| hash[k] = v.to_s(options) }
+      options[:quotes] ||= %w[{ }]
+      hash = { bibtex_key: key, bibtex_type: type }
+      each_pair { |k, v| hash[k] = v.to_s(options) }
       hash
     end
 
@@ -656,7 +652,7 @@ module BibTeX
     end
 
     # Returns a RDF::Graph representation of the entry using the BIBO ontology.
-    def to_rdf(options = {})
+    def to_rdf(_options = {})
       if defined?(::RDF)
         RDFConverter.convert(self)
       else

@@ -1,19 +1,17 @@
-# encoding: utf-8
-
 require 'bundler'
 begin
   Bundler.setup
 rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
+  warn e.message
+  warn 'Run `bundle install` to install missing gems'
   exit e.status_code
 end
 
-$:.unshift(File.join(File.dirname(__FILE__), './lib'))
-
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), './lib'))
 
 require 'rake/clean'
 require 'rake/testtask'
+require 'rubocop/rake_task'
 
 require 'bibtex/version'
 
@@ -29,7 +27,7 @@ end
 begin
   require 'cucumber/rake/task'
   Cucumber::Rake::Task.new(:features) do |t|
-    t.cucumber_opts = "--format progress"
+    t.cucumber_opts = '--format progress'
   end
 rescue LoadError
   desc 'Cucumber rake task not available'
@@ -41,17 +39,19 @@ end
 begin
   require 'coveralls/rake/task'
   Coveralls::RakeTask.new
-  task :test_with_coveralls => [:test, :features, 'coveralls:push']
+  task test_with_coveralls: [:test, :features, 'coveralls:push']
 rescue LoadError
   # ignore
 end
 
-task :default => [:test, :features]
+RuboCop::RakeTask.new
+
+task default: %i[test features rubocop]
 
 desc 'Generates the BibTeX parser'
-task :racc => ['lib/bibtex/parser.rb','lib/bibtex/name_parser.rb']
+task racc: ['lib/bibtex/parser.rb', 'lib/bibtex/name_parser.rb']
 
-task :test => ['racc','test_task']
+task test: %w[racc test_task]
 
 file 'lib/bibtex/parser.output' => ['lib/bibtex/parser.rb']
 file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
@@ -65,7 +65,7 @@ file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
 end
 
 desc 'Run an IRB session with BibTeX-Ruby loaded'
-task :console, [:script] do |t,args|
+task :console, [:script] do |_t, args|
   ARGV.clear
 
   require 'irb'
@@ -82,37 +82,35 @@ task :check_warnings do
   puts BibTeX::Version::STRING
 end
 
-
 desc 'Runs the benchmarks (and plots the results)'
-task :benchmark => ['racc'] do
-  require File.expand_path('../test/benchmark.rb', __FILE__)
+task benchmark: ['racc'] do
+  require File.expand_path('test/benchmark.rb', __dir__)
 end
-task :bm => ['benchmark']
+task bm: ['benchmark']
 
 desc 'Runs the profiler'
-task :profile => ['racc'] do
-  require File.expand_path('../test/profile.rb', __FILE__)
+task profile: ['racc'] do
+  require File.expand_path('test/profile.rb', __dir__)
 end
 
-
 desc 'Updates the Manifest file'
-task :manifest => ['clean', 'racc'] do
+task manifest: %w[clean racc] do
   m = File.open('Manifest', 'w')
-  m.print FileList['**/*'].reject{ |f|
+  m.print FileList['**/*'].reject { |f|
     f.start_with?('coverage') || f =~ /(rbc|swp|~|lock)$/
   }.join("\n")
   m.close
 end
 
 desc 'Builds the gem file'
-task :build => ['manifest'] do
+task build: ['manifest'] do
   system 'gem build bibtex-ruby.gemspec'
 end
 
 desc 'Pushes the gem file to rubygems.org'
-task :release => ['build'] do
-  system %Q{git tag "#{BibTeX::Version::STRING}"}
-  system "git push --tags"
+task release: ['build'] do
+  system %(git tag "#{BibTeX::Version::STRING}")
+  system 'git push --tags'
   system "gem push bibtex-ruby-#{BibTeX::Version::STRING}.gem"
 end
 

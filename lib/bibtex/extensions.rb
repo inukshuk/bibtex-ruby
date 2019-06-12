@@ -17,9 +17,6 @@
 #++
 
 module BibTeX
-
-	module Extensions
-
-	end
-
+  module Extensions
+  end
 end

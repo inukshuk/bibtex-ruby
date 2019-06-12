@@ -17,7 +17,6 @@
 #++
 
 module BibTeX
-
   #
   # The base class for BibTeX objects.
   #
@@ -35,7 +34,7 @@ module BibTeX
       when Hash
         [Entry.new(input)]
       when Array
-        input.inject([]) { |s,a| s.concat(parse(a, options)) }
+        input.inject([]) { |s, a| s.concat(parse(a, options)) }
       when ::String
         Parser.new(options).parse(input).data.each do |e|
           e.parse_names unless !e.respond_to?(:parse_names) || options[:parse_names] == false
@@ -47,31 +46,37 @@ module BibTeX
     end
 
     # Returns a string containing the object's content.
-    def content(options = {})
+    def content(_options = {})
       ''
     end
 
     # Returns a string containing the object's content.
-    def values_at(*arguments)
+    def values_at(*_arguments)
       []
     end
 
-    def digest(*arguments)
+    def digest(*_arguments)
       [type, content].join('|')
     end
 
     # Invokes BibTeX string replacement on this element.
-    def replace(*arguments); self; end
+    def replace(*_arguments)
+      self
+    end
 
     # Invokes BibTeX string joining on this element.
-    def join; self; end
+    def join
+      self
+    end
 
     # Returns the element's id.
-    def id; @id ||= object_id.to_s; end
+    def id
+      @id ||= object_id.to_s
+    end
 
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
-      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{$1}_#{$2}" }.downcase.intern
+      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{Regexp.last_match(1)}_#{Regexp.last_match(2)}" }.downcase.intern
     end
 
     # Returns a list of names for that Element. All Elements except Entries return an empty list.
@@ -83,7 +88,7 @@ module BibTeX
       self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
     end
 
-    [:entry, :book, :article, :collection, :string, :preamble, :comment].each do |type|
+    %i[entry book article collection string preamble comment].each do |type|
       method_id = "#{type}?"
       define_method(method_id) { has_type?(type) } unless method_defined?(method_id)
     end
@@ -99,11 +104,11 @@ module BibTeX
         query == self
       when Regexp
         to_s.match(query)
-      when /^\/(.+)\/$/
-        to_s.match(Regexp.new($1))
+      when %r{^/(.+)/$}
+        to_s.match(Regexp.new(Regexp.last_match(1)))
       when /@(\*|\w+)(?:\[([^\]]*)\])?/
         query.scan(/(!)?@(\*|\w+)(?:\[([^\]]*)\])?/).any? do |non, type, condition|
-          if (non ? !has_type?(type) : has_type?(type))
+          if non ? !has_type?(type) : has_type?(type)
             if condition.nil? || condition.empty?
               true
             else
@@ -141,11 +146,11 @@ module BibTeX
 
     alias to_s content
 
-    def to_hash(options = {})
+    def to_hash(_options = {})
       { type => content }
     end
 
-    def to_yaml(options = {})
+    def to_yaml(_options = {})
       require 'yaml'
       to_hash.to_yaml
     end
@@ -158,7 +163,7 @@ module BibTeX
       ::JSON.dump(to_hash(options))
     end
 
-    def to_xml(options = {})
+    def to_xml(_options = {})
       require 'rexml/document'
       xml = REXML::Element.new(type)
       xml.text = content
@@ -173,13 +178,14 @@ module BibTeX
     end
 
     # Called when the element was removed from a bibliography.
-    def removed_from_bibliography(bibliography)
+    def removed_from_bibliography(_bibliography)
       @bibliography = nil
       self
     end
 
     def <=>(other)
-      return nil unless other.respond_to? :type and other.respond_to? :to_s
+      return nil unless other.respond_to?(:type) && other.respond_to?(:to_s)
+
       [type, to_s] <=> [other.type, other.to_s]
     end
 
@@ -191,26 +197,26 @@ module BibTeX
     private
 
     def meets_condition?(condition)
-      property, operator, value = condition.split(/\s*([!~\/\^<>]?=|!~)\s*/)
+      property, operator, value = condition.split(%r{\s*([!~/\^<>]?=|!~)\s*})
 
       if property.nil?
         true
       else
         property.strip!
-        value.strip! unless value.nil?
+        value&.strip!
 
         if operator.nil? && value.nil?
           respond_to?(:provides?) && provides?(property)
         else
 
-          # Hack: we need to get rid of #type returning the bibtex_type,
+          # HACK: we need to get rid of #type returning the bibtex_type,
           # because type is a valid BibTeX property. This mitigates the
           # issue but is no fix!
-          if property == 'type'
-            actual = respond_to?(:fields) ? fields[:type] : nil
-          else
-            actual = respond_to?(property) ? send(property) : nil
-          end
+          actual = if property == 'type'
+                     respond_to?(:fields) ? fields[:type] : nil
+                   else
+                     respond_to?(property) ? send(property) : nil
+                   end
 
           case operator
           when '!=', '/='
@@ -233,7 +239,6 @@ module BibTeX
     end
   end
 
-
   #
   # Represents a @string object.
   #
@@ -251,7 +256,8 @@ module BibTeX
 
     # Creates a new instance.
     def initialize(key = nil, value = nil)
-      @key, @value = key.to_sym, Value.new(value)
+      @key = key.to_sym
+      @value = Value.new(value)
       yield self if block_given?
     end
 
@@ -272,7 +278,6 @@ module BibTeX
       @key == key ? @value : nil
     end
 
-
     # Called when the element was added to a bibliography.
     def added_to_bibliography(bibliography)
       super
@@ -289,26 +294,27 @@ module BibTeX
 
     # Returns a string representation of the @string's content.
     def content
-      "#@key = #{@value.to_s(:quotes => '"')}"
+      "#{@key} = #{@value.to_s(quotes: '"')}"
     end
 
     # Returns a string representation of the @string object.
-    def to_s(options = {})
+    def to_s(_options = {})
       "@string{ #{content} }\n"
     end
 
-    def to_hash(options = {})
-      { :string => { @key => @value.to_s(:quotes => '"') } }
+    def to_hash(_options = {})
+      { string: { @key => @value.to_s(quotes: '"') } }
     end
 
-    def to_xml(options = {})
+    def to_xml(_options = {})
       require 'rexml/document'
 
       xml = REXML::Element.new(:string)
 
-      k, v = REXML::Element.new(:key), REXML::Element.new(:value)
+      k = REXML::Element.new(:key)
+      v = REXML::Element.new(:value)
       k.text = key.to_s
-      v.text = value.to_s(:quotes => '"')
+      v.text = value.to_s(quotes: '"')
 
       xml.add_elements(k)
       xml.add_elements(v)
@@ -333,11 +339,11 @@ module BibTeX
 
     # Returns a string representation of the @preamble's content.
     def content
-      @value.to_s(:quotes => '"')
+      @value.to_s(quotes: '"')
     end
 
     # Returns a string representation of the @preamble object
-    def to_s(options = {})
+    def to_s(_options = {})
       "@preamble{ #{content} }\n"
     end
   end
@@ -350,8 +356,8 @@ module BibTeX
       @content = content
     end
 
-    def to_s(options = {})
-      "@comment{ #@content }\n"
+    def to_s(_options = {})
+      "@comment{ #{@content} }\n"
     end
   end
 
@@ -370,7 +376,8 @@ module BibTeX
       @content = content
     end
 
-    def to_s(options = {}); @content; end
+    def to_s(_options = {})
+      @content
+    end
   end
-
 end

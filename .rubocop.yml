@@ -1,0 +1,18 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  TargetRubyVersion: 2.3
+  DisplayCopNames: true
+  Include:
+    - '**/Rakefile'
+    - 'Gemfile'
+    - '**/*.rb'
+  Exclude:
+    - 'lib/bibtex/parser.rb'
+    - 'lib/bibtex/name_parser.rb'
+
+Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false

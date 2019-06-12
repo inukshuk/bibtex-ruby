@@ -23,11 +23,10 @@ module BibTeX
 
     alias convert apply
     alias << apply
-
   end
 
   module Filters
-    LOAD_PATH = [File.expand_path('..', __FILE__), 'filters'].join('/').freeze
+    LOAD_PATH = [File.expand_path(__dir__), 'filters'].join('/').freeze
 
     Dir.glob("#{LOAD_PATH}/*.rb").each do |filter|
       require filter
@@ -38,18 +37,14 @@ module BibTeX
     end
 
     def self.resolve(filter)
-      case
-      when filter.respond_to?(:apply)
+      if filter.respond_to?(:apply)
         filter
-      when filter.respond_to?(:to_s)
+      elsif filter.respond_to?(:to_s)
         klass = Filter.subclasses.detect do |c|
           c.name == filter.to_s || c.name.split(/::/)[-1] =~ /^#{filter}$/i
         end
-        klass && klass.instance
-      else
-        nil
+        klass&.instance
       end
     end
   end
 end
-

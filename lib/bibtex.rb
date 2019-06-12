@@ -1,6 +1,6 @@
 #--
 # BibTeX-Ruby
-# Copyright (C) 2010-2015	Sylvester Keil <sylvester.keil.or.at>
+# Copyright (C) 2010-2015  Sylvester Keil <sylvester.keil.or.at>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.	If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
 require 'digest/md5'
@@ -36,19 +36,17 @@ require 'bibtex/version'
 # License:: GNU GPL 3.0
 #
 module BibTeX
-
-	#
-	# An instance of the Ruby core class +Logger+.
-	# Used for logging by BibTeX-Ruby.
-	#
-	@log = Logger.new(STDERR)
-	@log.level = ENV.has_key?('DEBUG') ? Logger::DEBUG : Logger::WARN
-	@log.datetime_format = '%Y-%m-%d %H:%M:%S'
+  #
+  # An instance of the Ruby core class +Logger+.
+  # Used for logging by BibTeX-Ruby.
+  #
+  @log = Logger.new(STDERR)
+  @log.level = ENV.key?('DEBUG') ? Logger::DEBUG : Logger::WARN
+  @log.datetime_format = '%Y-%m-%d %H:%M:%S'
 
   class << self
     attr_accessor :log
   end
-
 end
 
 # Load debugger
@@ -79,5 +77,5 @@ begin
   require 'bibtex/entry/rdf_converter'
   require 'bibtex/bibliography/rdf_converter'
 rescue LoadError
-# ignored
+  # ignored
 end
