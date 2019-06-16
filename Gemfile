@@ -3,21 +3,13 @@ gemspec
 
 gem 'json', '~>1.8', platforms: %i[mri_18 jruby rbx]
 
-if RUBY_VERSION >= '2.0'
-  gem 'rdf', '~>2.0.0'
-  gem 'rdf-vocab', '~>2.0.0'
-else
-  gem 'rdf', '~>1.1'
-end
+gem 'rdf', '~>2.0.0'
+gem 'rdf-vocab', '~>2.0.0'
 
 gem 'rubysl', '~>2.0', platforms: :rbx
 
 group :debug do
-  if RUBY_VERSION >= '2.0'
-    gem 'byebug', require: false, platforms: :mri
-  else
-    gem 'debugger', require: false, platforms: :mri
-  end
+  gem 'byebug', require: false, platforms: :mri
 
   gem 'ruby-debug', require: false, platforms: :jruby
 

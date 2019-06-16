@@ -31,8 +31,6 @@ Gem::Specification.new do |s|
   s.test_files   = Dir.glob('test/**/test*.rb')
   s.executables  = []
   s.require_path = 'lib'
-
-  s.has_rdoc  = 'yard'
 end
 
 # vim: syntax=ruby
