@@ -6,11 +6,7 @@ rescue LoadError
 end
 
 begin
-  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
-    require 'rubinius-debugger'
-  else
-    require 'debugger'
-  end
+  require 'debugger'
 rescue LoadError
   # ignore
 end
