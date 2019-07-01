@@ -16,7 +16,7 @@ matrix:
     env: WITH_COVERALLS=false
 
 before_install:
-  - bundle update --bundler
+  - gem install bundler:2.0.2
 
 install:
   - if [[ $WITH_COVERALLS = "true" ]]; then
