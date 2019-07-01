@@ -1,28 +1,21 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'json', '~>1.8', platforms: %i[mri_18 jruby rbx]
+gem 'json', '~>1.8', platforms: %i[mri_18 jruby]
 
 gem 'rdf', '~>2.0.0'
 gem 'rdf-vocab', '~>2.0.0'
 
-gem 'rubysl', '~>2.0', platforms: :rbx
-
 group :debug do
   gem 'byebug', require: false, platforms: :mri
-
   gem 'ruby-debug', require: false, platforms: :jruby
-
-  gem 'rubinius-compiler', require: false, platforms: :rbx
-  gem 'rubinius-debugger', require: false, platforms: :rbx
 end
 
 group :test do
   gem 'cucumber', '~>1.3'
   gem 'minitest', '~>4.7', require: false
   gem 'minitest-ansi'
-  gem 'rubysl-test-unit', '~>2.0', platforms: :rbx
-  gem 'unicode', '~>0.4', platforms: %i[rbx mswin mingw mri]
+  gem 'unicode', '~>0.4', platforms: %i[mswin mingw mri]
 end
 
 group :extra do
@@ -40,7 +33,6 @@ end
 
 group :coverage do
   gem 'coveralls', '~>0.7', require: false
-  gem 'rubinius-coverage', require: false, platforms: :rbx
   gem 'simplecov', '~>0.8', require: false, platforms: [:ruby]
 end
 
@@ -49,9 +41,4 @@ group :development do
   gem 'rake'
   gem 'rubocop', '~> 0.71.0', require: false
   gem 'yard'
-end
-
-group :travis do
-  # Gem is required at runtime for RBX!
-  gem 'racc', platforms: [:ruby]
 end

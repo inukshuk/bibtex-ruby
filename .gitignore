@@ -2,7 +2,6 @@
 *.tmproj
 **/*~
 *.rbc
-.rbx
 doc/**/*
 .yardoc
 .bundle

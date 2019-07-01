@@ -9,8 +9,6 @@ begin
   if RUBY_PLATFORM < 'java'
     require 'debug'
     Debugger.start
-  elsif defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
-    require 'rubinius/debugger'
   else
     require 'byebug'
   end
