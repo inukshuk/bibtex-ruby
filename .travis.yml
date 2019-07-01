@@ -15,6 +15,9 @@ matrix:
   - rvm: jruby-19mode
     env: WITH_COVERALLS=false
 
+before_install:
+  - bundle update --bundler
+
 install:
   - if [[ $WITH_COVERALLS = "true" ]]; then
       bundle install --without debug profile extra;
