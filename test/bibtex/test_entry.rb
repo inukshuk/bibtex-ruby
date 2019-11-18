@@ -638,9 +638,20 @@ module BibTeX
         assert @e.meet? ['date = 2019-11-18']
         assert @e.meet? ['date >= 2019-10-18']
         assert @e.meet? ['date <= 2019-12-18']
+        assert @e.meet? ['date > 2019-10-18']
+        assert @e.meet? ['date < 2019-12-18']
 
         refute @e.meet? ['date >= 2019-12-18']
         refute @e.meet? ['date <= 2019-10-18']
+        refute @e.meet? ['date > 2019-12-18']
+        refute @e.meet? ['date < 2019-10-18']
+        refute @e.meet? ['date > 2019-11-18']
+        refute @e.meet? ['date < 2019-11-18']
+
+        @e['x'] = '019'
+
+        assert @e.meet? ['x < 20']
+        assert @e.meet? ['x >= 19']
       end
     end
 

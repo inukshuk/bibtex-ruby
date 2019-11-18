@@ -197,7 +197,7 @@ module BibTeX
     private
 
     def meets_condition?(condition)
-      property, operator, value = condition.split(%r{\s*([!~/\^<>]?=|!~)\s*})
+      property, operator, value = condition.split(%r{\s*([!~/^<>]?=|!~|=~|<|>)\s*})
 
       if property.nil?
         true
@@ -223,14 +223,18 @@ module BibTeX
             actual.nil? || actual.to_s != value
           when '^='
             !actual.nil? && actual.to_s.match("^#{value}")
-          when '~='
+          when '~=', '=~'
             !actual.nil? && actual.to_s.match(value)
           when '!~'
             actual.nil? || !actual.to_s.match(value)
-          when '<='
-            !actual.nil? && actual.to_i <= value.to_i
-          when '>='
-            !actual.nil? && actual.to_i >= value.to_i
+          when '<=', '>=', '<', '>'
+            if actual.nil?
+              false
+            elsif actual =~ /^\d+$/ && value.to_s =~ /^\d+$/
+              actual.to_i.send operator, value.to_i
+            else
+              actual.send operator, value.to_s
+            end
           else
             !actual.nil? && actual.to_s == value
           end
