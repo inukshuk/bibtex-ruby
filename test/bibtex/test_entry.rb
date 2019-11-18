@@ -632,6 +632,15 @@ module BibTeX
         assert @e.meet? ['author ~= [a-z]*']
 
         assert @e.meet? ['author ^= P\w+']
+
+        @e.date = '2019-11-18'
+
+        assert @e.meet? ['date = 2019-11-18']
+        assert @e.meet? ['date >= 2019-10-18']
+        assert @e.meet? ['date <= 2019-12-18']
+
+        refute @e.meet? ['date >= 2019-12-18']
+        refute @e.meet? ['date <= 2019-10-18']
       end
     end
 
