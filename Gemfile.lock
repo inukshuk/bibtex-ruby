@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bibtex-ruby (5.1.0)
+    bibtex-ruby (5.1.1)
       latex-decode (~> 0.0)
 
 GEM
@@ -51,6 +51,7 @@ GEM
     parallel (1.19.1)
     parser (2.7.0.2)
       ast (~> 2.4.0)
+    racc (1.4.16)
     rainbow (3.0.0)
     rake (13.0.1)
     rdf (3.1.1)
@@ -95,6 +96,7 @@ DEPENDENCIES
   iconv
   json (~> 2.0)
   minitest
+  racc
   rake
   rdf (~> 3.0)
   rdf-vocab (~> 3.0)
