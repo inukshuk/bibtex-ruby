@@ -36,7 +36,7 @@ Lint/EmptyWhen:
 
 # Offense count: 6
 # Configuration parameters: AllowComments.
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Exclude:
     - 'Rakefile'
     - 'features/support/env.rb'
@@ -71,7 +71,7 @@ Metrics/CyclomaticComplexity:
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
 # URISchemes: http, https
-Metrics/LineLength:
+Layout/LineLength:
   Max: 145
 
 # Offense count: 23
@@ -116,7 +116,7 @@ Naming/PredicateName:
 # Offense count: 1
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
 # AllowedNames: io, id, to, by, on, in, at, ip, db
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Exclude:
     - 'lib/bibtex/elements.rb'
 

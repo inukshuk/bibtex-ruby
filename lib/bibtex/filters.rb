@@ -28,7 +28,7 @@ module BibTeX
   module Filters
     LOAD_PATH = [File.expand_path(__dir__), 'filters'].join('/').freeze
 
-    Dir.glob("#{LOAD_PATH}/*.rb").each do |filter|
+    Dir.glob("#{LOAD_PATH}/*.rb").sort.each do |filter|
       require filter
     end
 

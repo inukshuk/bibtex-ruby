@@ -17,9 +17,6 @@ rescue LoadError
 end
 
 require 'minitest/autorun'
-require 'minitest/ansi'
-
-Minitest::ANSI.use!
 
 require 'tempfile'
 

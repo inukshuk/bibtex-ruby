@@ -11,7 +11,7 @@ rescue LoadError
   # ignore
 end
 
-require 'minitest/unit'
+require 'minitest'
 require 'bibtex'
 
 World(MiniTest::Assertions)

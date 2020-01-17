@@ -1,7 +1,7 @@
 inherit_from: .rubocop_todo.yml
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.4
   DisplayCopNames: true
   Include:
     - '**/Rakefile'
@@ -11,8 +11,11 @@ AllCops:
     - 'lib/bibtex/parser.rb'
     - 'lib/bibtex/name_parser.rb'
 
-Documentation:
+Style/Documentation:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/FormatStringToken:
   Enabled: false
