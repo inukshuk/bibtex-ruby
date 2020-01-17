@@ -47,7 +47,7 @@ module BibTeX
       # -:filter: convert all entries using the sepcified filter (not set by default)
       #
       def open(path, options = {})
-        b = parse(File.read(path), options)
+        b = parse(File.read(path, encoding: 'utf-8'), options)
         b.path = path
         return b unless block_given?
 
