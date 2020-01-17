@@ -4,19 +4,19 @@ cache: bundler
 
 matrix:
   include:
-  - rvm: 2.6
+  - rvm: 2.7
     env: WITH_COVERALLS=true
+  - rvm: 2.6
+    env: WITH_COVERALLS=false
   - rvm: 2.5
     env: WITH_COVERALLS=false
   - rvm: 2.4
-    env: WITH_COVERALLS=false
-  - rvm: 2.3
     env: WITH_COVERALLS=false
   - rvm: jruby-19mode
     env: WITH_COVERALLS=false
 
 before_install:
-  - gem install bundler:2.0.2
+  - gem install bundler:2.1.4
 
 install:
   - if [[ $WITH_COVERALLS = "true" ]]; then
