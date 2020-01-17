@@ -27,7 +27,7 @@ group :profile do
 end
 
 group :coverage do
-  gem 'coveralls', require: false
+  gem 'coveralls', '~>0.8', require: false
   gem 'simplecov', require: false, platforms: [:ruby]
 end
 
