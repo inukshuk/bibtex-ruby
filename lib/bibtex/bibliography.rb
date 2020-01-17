@@ -144,9 +144,9 @@ module BibTeX
       self
     end
 
-    def each
+    def each(&block)
       if block_given?
-        data.each(&Proc.new)
+        data.each(&block)
         self
       else
         to_enum
@@ -339,14 +339,9 @@ module BibTeX
     # Sets all fields matching the passed-in pattern to the supplied value.
     # If a block is given, each matching entry will be passed to the block
     # instead. Returns the bibliography.
-    def unify(field, pattern, value = nil)
+    def unify(field, pattern, value = nil, &block)
       pattern = Regexp.new(pattern) unless pattern.is_a?(Regexp)
-
-      block = if block_given?
-                Proc.new
-              else
-                proc { |e| e[field] = value }
-              end
+      block = proc { |e| e[field] = value } unless block_given?
 
       each_entry do |entry|
         block.call(entry) if entry.field?(field) && entry[field].to_s =~ pattern
@@ -489,9 +484,9 @@ module BibTeX
 
     alias q query
 
-    def each_entry
+    def each_entry(&block)
       if block_given?
-        q('@entry').each(&Proc.new)
+        q('@entry').each(&block)
       else
         q('@entry').to_enum
       end
@@ -507,9 +502,8 @@ module BibTeX
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
 
-    def select_duplicates_by(*arguments)
+    def select_duplicates_by(*arguments, &block)
       arguments = %i[year title] if arguments.empty?
-      block = Proc.new if block_given?
 
       group_by(*arguments) do |digest, entry|
         # 1.8 compatibility

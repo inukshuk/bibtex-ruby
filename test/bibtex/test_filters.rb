@@ -28,9 +28,9 @@ module BibTeX
       end
 
       it 'should return nil if there is no filter by that name' do
-        assert_equal nil, Filters.resolve(:foobar)
-        assert_equal nil, Filters.resolve('foobar')
-        assert_equal nil, Filters.resolve(nil)
+        assert_nil Filters.resolve(:foobar)
+        assert_nil Filters.resolve('foobar')
+        assert_nil Filters.resolve(nil)
       end
     end
   end

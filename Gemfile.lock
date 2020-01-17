@@ -56,11 +56,11 @@ GEM
       ast (~> 2.4.0)
     rainbow (3.0.0)
     rake (13.0.1)
-    rdf (2.0.2)
+    rdf (3.1.1)
       hamster (~> 3.0)
       link_header (~> 0.0, >= 0.0.8)
-    rdf-vocab (2.0.2)
-      rdf (~> 2.0)
+    rdf-vocab (3.1.1)
+      rdf (~> 3.1)
     redcarpet (3.5.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
@@ -99,8 +99,8 @@ DEPENDENCIES
   json (~> 2.0)
   minitest
   rake
-  rdf (~> 2.0.0)
-  rdf-vocab (~> 2.0.0)
+  rdf (~> 3.0)
+  rdf-vocab (~> 3.0)
   redcarpet
   rubocop
   ruby-debug

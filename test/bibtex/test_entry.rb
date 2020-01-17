@@ -4,7 +4,7 @@ module BibTeX
   class EntryTest < Minitest::Spec
     describe 'a new entry' do
       it "won't be nil" do
-        Entry.new.wont_be_nil
+        _(Entry.new).wont_be_nil
       end
     end
 
@@ -23,7 +23,7 @@ module BibTeX
 
       it 'is not cross-referenced by default' do
         assert_equal false, Entry.new.cross_referenced?
-        Entry.new.cross_referenced_by.must_be_empty
+        _(Entry.new.cross_referenced_by).must_be_empty
       end
 
       describe 'given a bibliography with cross referenced entries' do
@@ -74,26 +74,26 @@ module BibTeX
           describe 'when a "title" is set in the entry itself' do
             before { @bib['a1'].title = 'A1' }
             it 'returns the title' do
-              @bib['a1'].title.must_be :==, 'A1'
+              _(@bib['a1'].title).must_be :==, 'A1'
             end
           end
 
           describe 'when "title" is undefined for the entry but defined in the reference' do
             it 'returns the referenced title' do
-              @bib['a1'].title.must_be :==, @bib['a'].title
+              _(@bib['a1'].title).must_be :==, @bib['a'].title
             end
           end
 
           describe 'when "booktitle" is undefined for the entry but defined in the reference' do
             before { @bib['a'].booktitle = 'A Booktitle' }
             it 'returns the referenced booktitle' do
-              @bib['a1'].booktitle.must_be :==, @bib['a'].booktitle
+              _(@bib['a1'].booktitle).must_be :==, @bib['a'].booktitle
             end
           end
 
           describe 'when "booktitle" is undefined for the entry and the reference but the reference has a "title"' do
             it "returns the reference's title" do
-              @bib['a1'].booktitle.must_be :==, @bib['a'].title
+              _(@bib['a1'].booktitle).must_be :==, @bib['a'].title
             end
           end
 

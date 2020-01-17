@@ -27,11 +27,11 @@ module BibTeX
 
     describe '.parse' do
       it 'accepts filters' do
-        Bibliography.parse("@misc{k, title = {\\''u}}", filter: 'latex')[0].title.must_be :==, 'ü'
+        _(Bibliography.parse("@misc{k, title = {\\''u}}", filter: 'latex')[0].title).must_be :==, 'ü'
       end
 
       it 'accepts filters in an array' do
-        Bibliography.parse("@misc{k, title = {\\''u}}", filter: ['latex'])[0].title.must_be :==, 'ü'
+        _(Bibliography.parse("@misc{k, title = {\\''u}}", filter: ['latex'])[0].title).must_be :==, 'ü'
       end
     end
 
@@ -252,15 +252,15 @@ module BibTeX
 
       describe '#query' do
         it 'returns all elements when passed no arguments' do
-          @bib.query.length.must_be :==, 6
+          assert_equal 6, @bib.query.length
         end
 
         it 'returns all elements when passed :all and an empty condition' do
-          @bib.query(:all, '').length.must_be :==, 6
+          assert_equal 6, @bib.query(:all, '').length
         end
 
         it 'returns all entries when passed a * wildcard' do
-          @bib.query('@*').length.must_be :==, 5
+          assert_equal 5, @bib.query('@*').length
         end
       end
 
@@ -393,7 +393,7 @@ module BibTeX
         end
 
         it 'converts LaTeX umlauts' do
-          @bib.convert(:latex)['rails'].keywords.must_be :==, 'rüby'
+          assert_equal 'rüby', @bib.convert(:latex)['rails'].keywords
         end
       end
 
@@ -405,16 +405,16 @@ module BibTeX
           @bib.to_xml.write(@bibtexml, 2)
           @bibtexml.rewind
           xml = REXML::Document.new(@bibtexml)
-          xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
-          xml.root.get_elements('//bibtex:entry').wont_be_empty
+          _(xml.root.namespace).must_be :==, 'http://bibtexml.sf.net/'
+          _(xml.root.get_elements('//bibtex:entry')).wont_be_empty
         end
 
         it 'supports exporting to extended BibTeXML' do
           @bib.to_xml(extended: true).write(@bibtexml, 2)
           @bibtexml.rewind
           xml = REXML::Document.new(@bibtexml)
-          xml.root.namespace.must_be :==, 'http://bibtexml.sf.net/'
-          xml.root.get_elements('//bibtex:person').wont_be_empty
+          _(xml.root.namespace).must_be :==, 'http://bibtexml.sf.net/'
+          _(xml.root.get_elements('//bibtex:person')).wont_be_empty
         end
       end
     end
