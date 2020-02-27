@@ -433,7 +433,7 @@ module BibTeX
       end
     end
 
-    describe 'citeproc export' do
+    describe '#to_citeproc' do
       before do
         @entry = Entry.new do |e|
           e.type = :book
@@ -449,6 +449,37 @@ module BibTeX
 
       it 'should accept option to use non-dropping-particle' do
         assert_equal 'van', @entry.to_citeproc(particle: 'non-dropping-particle')['author'][0]['non-dropping-particle']
+      end
+
+      describe 'howpublished' do
+        it 'converts to "URL" when there is a url (without filters)' do
+          bibtex = <<-END
+            @book{noauthor_2017-xx,
+              title = "Google",
+              howpublished = "\\url{http://www.google.com/}"
+            }
+          END
+          bibliography = Bibliography.parse(bibtex)
+
+          citeproc = bibliography.to_citeproc
+
+          assert_equal('http://www.google.com/', citeproc[0]['URL'])
+          assert_nil(citeproc[0]['publisher'])
+        end
+
+        it 'converts to "URL" when there is a url (with latex)' do
+          bibtex = <<-END
+            @book{noauthor_2017-xx,
+              title = "Google",
+              howpublished = "\\url{http://www.google.com/}"
+            }
+          END
+          bibliography = Bibliography.parse(bibtex, filter: :latex)
+
+          citeproc = bibliography.to_citeproc
+
+          assert_equal('http://www.google.com/', citeproc[0]['URL'])
+        end
       end
     end
 

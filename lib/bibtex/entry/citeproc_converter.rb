@@ -56,6 +56,7 @@ class BibTeX::Entry::CiteProcConverter
 
   def initialize(bibtex, options = {})
     @bibtex = bibtex
+    @hash = {}
     @options = { quotes: [] }.merge(options)
   end
 
@@ -141,21 +142,26 @@ class BibTeX::Entry::CiteProcConverter
 
   private
 
-  attr_reader :bibtex, :options
+  attr_reader :bibtex, :options, :hash
 
   def convert(key, value)
     return if BibTeX::Entry::DATE_FIELDS.include?(key)
+    return include_url(value) if howpublished_with_url?(key, value)
 
-    cp_key = CSL_FILTER[key].to_s
+    citeproc_key = CSL_FILTER[key].to_s
 
-    if hash.key?(cp_key)
+    if hash.key?(citeproc_key)
       hash[key] = value.to_citeproc(options)
     else
-      hash[cp_key] = value.to_citeproc(options)
+      hash[citeproc_key] = value.to_citeproc(options)
     end
   end
 
-  def hash
-    @hash ||= {}
+  def howpublished_with_url?(key, value)
+    key == :howpublished && value.include?('url')
+  end
+
+  def include_url(value)
+    hash['URL'] = value.to_s[/url{?([^}]*)/, 1]
   end
 end
