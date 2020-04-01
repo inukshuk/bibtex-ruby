@@ -181,7 +181,12 @@ module BibTeX
     # the filter(s) specified.
     def to_s(options = {})
       opts = options.clone
-      return convert(opts.delete(:filter)).to_s(opts) if opts.key?(:filter)
+      if opts.key?(:filter) and opts.key?(:quotes)
+        if !atomic? || symbol?
+          opts.delete(:quotes)
+        end
+        return convert(opts.delete(:filter)).to_s(opts)
+      end
       return value.to_s unless opts.key?(:quotes) && atomic? && !symbol?
 
       q = Array(opts[:quotes])
