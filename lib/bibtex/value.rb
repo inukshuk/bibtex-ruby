@@ -180,10 +180,11 @@ module BibTeX
     # If the option :filter is given, the Value will be converted using
     # the filter(s) specified.
     def to_s(options = {})
-      return convert(options.delete(:filter)).to_s(options) if options.key?(:filter)
-      return value.to_s unless options.key?(:quotes) && atomic? && !symbol?
+      opts = options.clone
+      return convert(opts.delete(:filter)).to_s(opts) if opts.key?(:filter)
+      return value.to_s unless opts.key?(:quotes) && atomic? && !symbol?
 
-      q = Array(options[:quotes])
+      q = Array(opts[:quotes])
       [q[0], value, q[-1]].compact.join
     end
 
