@@ -485,7 +485,7 @@ module BibTeX
 
     describe '#to_s' do
       before do
-        @bib = Bibliography.parse(<<-BIBINPUT, { :parse_months => false })
+        @bib = Bibliography.parse(<<-BIBINPUT, parse_months: false)
           @misc{foo,
             title  = {A
                        title},
@@ -493,14 +493,14 @@ module BibTeX
                        series},
             month  = dec
           }
-          BIBINPUT
+        BIBINPUT
       end
       it 'applies filters when converting to strings' do
         assert_equal "@misc{foo,\n"\
                      "  title = {A title},\n"\
                      "  series = {A series},\n"\
                      "  month = dec\n"\
-                     "}\n", @bib['foo'].to_s({ filter: :linebreaks })
+                     "}\n", @bib['foo'].to_s(filter: :linebreaks)
       end
     end
 
