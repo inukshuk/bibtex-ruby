@@ -20,6 +20,7 @@ class BibTeX::Entry::CiteProcConverter
     organization publisher
     howpublished publisher
     type genre
+    urldate accessed
   ].map(&:intern)]).freeze
 
   CSL_FIELDS = %w[
@@ -121,6 +122,21 @@ class BibTeX::Entry::CiteProcConverter
       end
 
     end
+  end
+
+  def accessed
+    return unless hash.key? 'accessed'
+
+    hash['accessed'] =
+      case hash['accessed']
+      when %r{^[\d/\s-]+$}
+        {
+          'date-parts' =>
+            hash['accessed'].split('/').map { |pt| pt.split('-').map(&:to_i) }
+        }
+      else
+        { 'literal' => hash['accessed'] }
+      end
   end
 
   def key

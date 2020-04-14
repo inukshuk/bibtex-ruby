@@ -31,7 +31,8 @@ module BibTeX
           @bib = Bibliography.parse <<-END
             @book{a, editor = "A", title = "A"}
             @incollection{a1, crossref = "a"}
-            @incollection{b1, crossref = "b"}
+            @incollection{b1, crossref = "b2"}
+            @book{b, author = "B", title = "B", date = "2020", urldate = "2020"}
           END
         end
 
@@ -123,6 +124,10 @@ module BibTeX
           describe '#to_citeproc' do
             it 'includes inherited values' do
               @bib['a1'].to_citeproc['container-title'].must_be :==, @bib['a'].title.to_s
+            end
+
+            it 'converts urldate' do
+              @bib['b'].to_citeproc['accessed'].must_be :==, 'date-parts' => [[2020]]
             end
           end
 
