@@ -662,6 +662,7 @@ module BibTeX
 
     alias to_bibo to_rdf
 
+    undef_method :year
     def year
       return fields[:year] if has_field?(:year)
       return unless has_field?(:date)

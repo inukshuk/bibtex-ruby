@@ -116,10 +116,12 @@ module BibTeX
       self
     end
 
+    undef_method :<<
     alias << add
     alias push add
 
     %i[strip! upcase! downcase! sub! gsub! chop! chomp! rstrip!].each do |method_id|
+      undef_method method_id
       define_method(method_id) do |*arguments, &block|
         @tokens.each do |part|
           part&.send(method_id, *arguments, &block)
@@ -128,6 +130,7 @@ module BibTeX
       end
     end
 
+    undef_method :replace
     def replace(*arguments)
       return self unless has_symbol?
 
@@ -162,6 +165,7 @@ module BibTeX
       self
     end
 
+    undef_method :to_s
     # call-seq:
     #   Value.new('foo').to_s                       #=> "foo"
     #   Value.new(:foo).to_s                        #=> "foo"
@@ -206,6 +210,7 @@ module BibTeX
 
     alias v value
 
+    undef_method :inspect
     def inspect
       "#<#{self.class} #{@tokens.map(&:inspect).join(', ')}>"
     end
@@ -246,6 +251,7 @@ module BibTeX
       atomic? && @tokens[0] =~ /^\s*[+-]?\d+\s*$/
     end
 
+    undef_method :to_i
     def to_i
       @tokens[0].to_i
     end
@@ -293,6 +299,7 @@ module BibTeX
       method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
     end
 
+    undef_method :<=>
     def <=>(other)
       if numeric? && other.respond_to?(:numeric?) && other.numeric?
         to_i <=> other.to_i
