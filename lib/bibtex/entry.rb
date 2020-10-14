@@ -117,43 +117,6 @@ module BibTeX
       self
     end
 
-    # Generate accessors for required fields (#52)
-    REQUIRED_FIELDS.values.flatten.uniq.each do |name|
-      unless method_defined? name
-        define_method(name) do
-          get name
-        end
-      end
-
-      writer = "#{name}="
-
-      next if method_defined? writer
-
-      define_method(writer) do |value|
-        add name, value
-      end
-    end
-
-    # Generate author, editor and translator accessors
-    NAME_FIELDS.each do |contributor|
-      unless method_defined? contributor
-        define_method(contributor) do
-          get contributor
-        end
-      end
-
-      writer = "#{contributor}="
-
-      unless method_defined? writer
-        define_method(writer) do |value|
-          add contributor, value
-        end
-      end
-
-      alias_method "#{contributor}s", contributor
-      alias_method "#{contributor}s=", writer
-    end
-
     # call-seq:
     #   entry.each      { |key, value| block } -> entry
     #   entry.each_pair { |key, value| block } -> entry
@@ -668,6 +631,44 @@ module BibTeX
 
       fields[:date].to_s[/\d{4}/]
     end
+
+    # Generate accessors for required fields (#52)
+    REQUIRED_FIELDS.values.flatten.uniq.each do |name|
+      unless method_defined? name
+        define_method(name) do
+          get name
+        end
+      end
+
+      writer = "#{name}="
+
+      next if method_defined? writer
+
+      define_method(writer) do |value|
+        add name, value
+      end
+    end
+
+    # Generate author, editor and translator accessors
+    NAME_FIELDS.each do |contributor|
+      unless method_defined? contributor
+        define_method(contributor) do
+          get contributor
+        end
+      end
+
+      writer = "#{contributor}="
+
+      unless method_defined? writer
+        define_method(writer) do |value|
+          add contributor, value
+        end
+      end
+
+      alias_method "#{contributor}s", contributor
+      alias_method "#{contributor}s=", writer
+    end
+
 
     private
 
