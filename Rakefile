@@ -11,7 +11,6 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), './lib'))
 
 require 'rake/clean'
 require 'rake/testtask'
-require 'rubocop/rake_task'
 
 require 'bibtex/version'
 
@@ -44,9 +43,7 @@ rescue LoadError
   # ignore
 end
 
-RuboCop::RakeTask.new
-
-task default: %i[test features rubocop]
+task default: %i[test features]
 
 desc 'Generates the BibTeX parser'
 task racc: ['lib/bibtex/parser.rb', 'lib/bibtex/name_parser.rb']

@@ -35,6 +35,5 @@ group :development do
   gem 'iconv', platforms: [:ruby]
   gem 'racc'
   gem 'rake'
-  gem 'rubocop', require: false
   gem 'yard'
 end
