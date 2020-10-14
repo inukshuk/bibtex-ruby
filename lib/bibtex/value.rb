@@ -49,9 +49,9 @@ module BibTeX
     alias to_a tokens
 
     def_delegators :to_s, :=~, :===,
-                   *String.instance_methods(false).reject do |m|
-                     m =~ /^\W|^(length|dup|replace|to_s|inspect)$|!$/
-                   end
+                   *String.instance_methods(false).reject { |m|
+                     m =~ /^\W|^(length|dup|replace|to_s|to_i|inspect)$|!$/
+                   }
 
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
