@@ -4,8 +4,10 @@ cache: bundler
 
 matrix:
   include:
-  - rvm: 2.7
+  - rvm: 3.0
     env: WITH_COVERALLS=true
+  - rvm: 2.7
+    env: WITH_COVERALLS=false
   - rvm: 2.6
     env: WITH_COVERALLS=false
   - rvm: 2.5
