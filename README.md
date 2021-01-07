@@ -8,7 +8,7 @@ formatted names; BibTeX-Ruby recognizes BibTeX string replacements, joins
 values containing multiple strings or variables, supports cross-references,
 and decodes common LaTeX formatting instructions to unicode; if you are in a
 hurry, it also allows for easy export/conversion to formats such as YAML,
-JSON, CiteProc/CSL, XML (BibTeXML), and RDF (experimental).
+JSON, CiteProc/CSL, XML (BibTeXML, requires `rexml`), and RDF (experimental).
 
 For a list of projects using BibTeX-Ruby, take a look at the
 [project wiki](https://github.com/inukshuk/bibtex-ruby/wiki/Projects-Using-BibTeX-Ruby).
@@ -464,7 +464,7 @@ constitutes a simple BibTeX to YAML converter:
     >> BibTeX.open('example.bib').to_yaml
 
 Starting with version 2.0, BibTeX-Ruby's `#to_xml` exports your bibliography
-to the [BibTeXML](http://bibtexml.sf.net/) format. By passing the option
+to the [BibTeXML](http://bibtexml.sf.net/) format via `rexml`. By passing the option
 `:extended => true` you can make use of the BibTeXML's extended format which
 will return individual person elements and name tokens (provided you have
 successfully parsed the names of your bibliography).
