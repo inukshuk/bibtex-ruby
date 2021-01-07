@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bibtex-ruby (5.1.6)
+    bibtex-ruby (5.1.7)
       latex-decode (~> 0.0)
 
 GEM
@@ -16,12 +16,6 @@ GEM
     builder (3.2.4)
     byebug (11.1.3)
     concurrent-ruby (1.1.7)
-    coveralls (0.7.2)
-      multi_json (~> 1.3)
-      rest-client (= 1.6.7)
-      simplecov (>= 0.7)
-      term-ansicolor (= 1.2.2)
-      thor (= 0.18.1)
     cucumber (5.1.3)
       builder (~> 3.2, >= 3.2.4)
       cucumber-core (~> 8.0, >= 8.0.1)
@@ -66,11 +60,7 @@ GEM
     latex-decode (0.3.2)
     link_header (0.0.8)
     middleware (0.1.0)
-    mime-types (3.3.1)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2020.0512)
     minitest (5.14.2)
-    multi_json (1.15.0)
     multi_test (0.1.2)
     protobuf-cucumber (3.10.8)
       activesupport (>= 3.2)
@@ -85,8 +75,6 @@ GEM
     rdf-vocab (3.1.8)
       rdf (~> 3.1, >= 3.1.2)
     redcarpet (3.5.0)
-    rest-client (1.6.7)
-      mime-types (>= 1.16)
     rexml (3.2.4)
     ruby-prof (1.4.1)
     simplecov (0.19.0)
@@ -95,11 +83,8 @@ GEM
     simplecov-html (0.12.3)
     sys-uname (1.2.1)
       ffi (>= 1.0.0)
-    term-ansicolor (1.2.2)
-      tins (~> 0.8)
     thor (0.18.1)
     thread_safe (0.3.6)
-    tins (0.13.2)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode (0.4.4.4)
@@ -112,7 +97,6 @@ PLATFORMS
 DEPENDENCIES
   bibtex-ruby!
   byebug
-  coveralls
   cucumber
   gnuplot
   iconv

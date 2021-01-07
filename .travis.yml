@@ -5,32 +5,19 @@ cache: bundler
 matrix:
   include:
   - rvm: 3.0
-    env: WITH_COVERALLS=true
   - rvm: 2.7
-    env: WITH_COVERALLS=false
   - rvm: 2.6
-    env: WITH_COVERALLS=false
   - rvm: 2.5
-    env: WITH_COVERALLS=false
   - rvm: jruby-19mode
-    env: WITH_COVERALLS=false
 
 before_install:
-  - gem install bundler:2.1.4
+  - gem install bundler
 
 install:
-  - if [[ $WITH_COVERALLS = "true" ]]; then
-      bundle install --without debug profile extra;
-    else
-      bundle install --without debug profile extra coverage;
-    fi
+    bundle install --without debug profile extra;
 
 script:
-  - if [[ $WITH_COVERALLS = "true" ]]; then
-      bundle exec rake test_with_coveralls;
-    else
-      bundle exec rake;
-    fi
+    bundle exec rake;
 
 notifications:
   email:

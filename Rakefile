@@ -35,14 +35,6 @@ rescue LoadError
   end
 end
 
-begin
-  require 'coveralls/rake/task'
-  Coveralls::RakeTask.new
-  task test_with_coveralls: [:test, :features, 'coveralls:push']
-rescue LoadError
-  # ignore
-end
-
 task default: %i[test features]
 
 desc 'Generates the BibTeX parser'
