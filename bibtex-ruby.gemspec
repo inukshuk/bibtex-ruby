@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   END_DESCRIPTION
 
   s.add_runtime_dependency('latex-decode', ['~>0.0'])
+  s.add_runtime_dependency('rexml', ['~>3.0'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)
   s.test_files   = Dir.glob('test/**/test*.rb')
