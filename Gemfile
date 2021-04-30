@@ -6,7 +6,7 @@ gem 'json', '~>2.0', platforms: %i[mri_18 jruby]
 gem 'rdf', '~>3.0'
 gem 'rdf-vocab', '~>3.0'
 
-gem 'rexml', '~>3.0'
+gem 'rexml', '~>3.2'
 
 group :debug do
   gem 'byebug', require: false, platforms: :mri
