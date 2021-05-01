@@ -75,7 +75,7 @@ GEM
     rdf-vocab (3.1.8)
       rdf (~> 3.1, >= 3.1.2)
     redcarpet (3.5.1)
-    rexml (3.2.4)
+    rexml (3.2.5)
     ruby-prof (1.4.1)
     simplecov (0.19.0)
       docile (~> 1.1)
@@ -107,7 +107,7 @@ DEPENDENCIES
   rdf (~> 3.0)
   rdf-vocab (~> 3.0)
   redcarpet
-  rexml (~> 3.0)
+  rexml (~> 3.2)
   ruby-debug
   ruby-prof
   simplecov
