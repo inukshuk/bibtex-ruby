@@ -58,8 +58,8 @@ module BibTeX
       string: /string/io,
       comment: /comment\b/io,
       preamble: /preamble\b/io,
-      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]+,}io,
-      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]*,}io
+      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-\{\}]+,}io,
+      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-\{\}]*,}io
     }
 
     MODE = Hash.new(:meta).merge(
@@ -120,7 +120,7 @@ module BibTeX
       @stack.shift
     end
 
-    # Returns true if the lexer is currenty parsing a BibTeX object.
+    # Returns true if the lexer is currently parsing a BibTeX object.
     def bibtex_mode?
       MODE[@mode] == :bibtex
     end
@@ -308,7 +308,10 @@ module BibTeX
           push([:LBRACE, '{'])
           @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
 
-          push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
+          if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
+            key = @scanner.matched.chop.strip.tr('{}', '')
+            push [:KEY, key]
+          end
         end
 
       else
