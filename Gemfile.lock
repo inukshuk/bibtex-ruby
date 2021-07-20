@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bibtex-ruby (5.1.7)
+    bibtex-ruby (6.0.0)
       latex-decode (~> 0.0)
 
 GEM
