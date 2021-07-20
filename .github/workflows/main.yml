@@ -1,0 +1,19 @@
+name: CI main
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  minitest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: [2.5, 2.6, 2.7, 3.0, jruby]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # runs `bundle install` and caches installed gems automatically
+      - run: bundle exec rake
