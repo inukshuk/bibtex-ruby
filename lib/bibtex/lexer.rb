@@ -302,21 +302,24 @@ module BibTeX
         @mode = @active_object = :entry
         push [:NAME, @scanner.matched]
 
-        # TODO: DRY - try to parse key
         if @scanner.scan(Lexer.patterns[:lbrace])
           @brace_level += 1
           push([:LBRACE, '{'])
           @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
 
-          if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
-            key = @scanner.matched.chop.strip.tr('{}', '')
-            push [:KEY, key]
-          end
+          parse_key
         end
 
       else
         error_unexpected_object
       end
+    end
+
+    def parse_key
+      return unless @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
+
+      key = @scanner.matched.chop.strip
+      push [:KEY, key]
     end
 
     # Called when parser leaves a BibTeX object.
