@@ -734,9 +734,6 @@ non-zero status if a workload fails.
 
 Credits
 -------
-
-Copyright 2011-2015 [Sylvester Keil](https://github.com/inukshuk).
-
 Kudos to all [contributors](https://github.com/inukshuk/bibtex-ruby/graphs/contributors)
 who have made BibTeX-Ruby possible.
 
