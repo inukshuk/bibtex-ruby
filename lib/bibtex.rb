@@ -1,21 +1,3 @@
-#--
-# BibTeX-Ruby
-# Copyright (C) 2010-2015  Sylvester Keil <sylvester.keil.or.at>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#++
-
 require 'digest/md5'
 require 'forwardable'
 require 'logger'
@@ -31,9 +13,8 @@ require 'bibtex/version'
 # an API to the individual BibTeX objects: +String+,
 # +Preamble+, +Comment+, and +Entry+.
 #
-# Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
-# Copyright:: Copyright (c) 2010-2014 Sylvester Keil
-# License:: GNU GPL 3.0
+# Copyright:: Copyright (c) 2010-2022 The BibTeX-Ruby Contributors
+# License:: GNU GPL 3.0 and BSD-2-Clause
 #
 module BibTeX
   #

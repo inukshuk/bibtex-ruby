@@ -1,3 +1,4 @@
+* Dual-license bibtex-ruby under GPL-3.0 and BSD-2-Clause
 * Add official support for Ruby 3.1
 * Remove official support for Ruby < 2.7, as they reached their End-of-Life
 

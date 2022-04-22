@@ -660,11 +660,8 @@ To execute the test suite continuously while you're working run:
 
 Credits
 -------
-
-Copyright 2011-2015 [Sylvester Keil](http://sylvester.keil.or.at/).
-
 Kudos to all [contributors](https://github.com/inukshuk/bibtex-ruby/contributors)
 who have made BibTeX-Ruby possible.
 
-This software is distributed under the terms and conditions of the GNU GPL.
+This software is dual-licensed under GPL-3.0 and BSD-2-Clause.
 See LICENSE for details.
