@@ -31,5 +31,7 @@ end
 group :development do
   gem 'rake'
   gem 'rubocop', '~>1.28.1'
+  gem 'rubocop-minitest', '~>0.19.1'
+  gem 'rubocop-rake', '~>0.6.0'
   gem 'yard'
 end
