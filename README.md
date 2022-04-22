@@ -740,5 +740,5 @@ Copyright 2011-2015 [Sylvester Keil](https://github.com/inukshuk).
 Kudos to all [contributors](https://github.com/inukshuk/bibtex-ruby/graphs/contributors)
 who have made BibTeX-Ruby possible.
 
-This software is distributed under the terms and conditions of the GNU GPL,
-version 3 or later. See LICENSE for details.
+This software is dual-licensed under GPL-3.0 and BSD-2-Clause.
+See LICENSE for details.
