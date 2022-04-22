@@ -32,8 +32,8 @@ require 'bibtex/version'
 # +Preamble+, +Comment+, and +Entry+.
 #
 # Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
-# Copyright:: Copyright (c) 2010-2014 Sylvester Keil
-# License:: GNU GPL 3.0
+# Copyright:: Copyright (c) 2010-2022 Sylvester Keil
+# License: GNU GPL 3.0 and BSD-2-Clause
 #
 module BibTeX
   #

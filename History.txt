@@ -1,3 +1,5 @@
+* Dual-license bibtex-ruby under GPL-3.0 and BSD-2-Clause
+
 6.0.0 / 2021-01-07
 ==================
 
