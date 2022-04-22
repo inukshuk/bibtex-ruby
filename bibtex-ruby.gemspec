@@ -8,9 +8,8 @@ Gem::Specification.new do |s|
   s.version     = BibTeX::Version::STRING.dup
   s.platform    = Gem::Platform::RUBY
   s.required_ruby_version = '>= 2.4.0'
-  s.authors     = ['Sylvester Keil']
-  s.email       = ['sylvester@keil.or.at']
-  s.homepage    = 'http://inukshuk.github.com/bibtex-ruby'
+  s.authors     = ['The BibTeX-Ruby Contributors']
+  s.homepage    = 'https://github.com/inukshuk/bibtex-ruby'
   s.licenses     = ['GPL-3.0', 'BSD-2-Clause']
 
   s.summary     = 'A BibTeX parser, converter and API for Ruby.'
