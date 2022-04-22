@@ -5,7 +5,6 @@
 doc/**/*
 .yardoc
 .bundle
-Gemfile.lock
 lib/bibtex/parser.output
 lib/bibtex/name_parser.output
 coverage
@@ -13,3 +12,4 @@ coverage
 
 .DS_Store
 .ruby-version
+
