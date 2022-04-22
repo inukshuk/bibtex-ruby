@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 gemspec
 
@@ -36,5 +38,6 @@ group :development do
   gem 'iconv', platforms: [:ruby]
   gem 'racc'
   gem 'rake'
+  gem 'rubocop', '~>1.28.1'
   gem 'yard'
 end
