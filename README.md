@@ -106,6 +106,8 @@ Starting with BibTeX-Ruby version 3.0, support for Ruby versions 1.9.2 and
 earlier has been dropped; most features will likely continue to work, but
 compliance with old Rubies is not a priority going forward.
 
+Starting with BibTex-Ruby version 7.0, only ruby versions still in "security maintenance phase" will be supported.
+This is, as of writing Ruby 2.7 and up.
 
 Documentation
 -------------
