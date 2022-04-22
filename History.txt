@@ -1,3 +1,5 @@
+* Remove official support for Ruby < 2.7, as they reached their End-of-Life
+
 6.0.0 / 2021-01-07
 ==================
 
