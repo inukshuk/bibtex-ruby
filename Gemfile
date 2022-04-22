@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 gemspec
 
@@ -28,5 +30,6 @@ end
 
 group :development do
   gem 'rake'
+  gem 'rubocop', '~>1.28.1'
   gem 'yard'
 end
