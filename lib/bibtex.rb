@@ -33,7 +33,7 @@ require 'bibtex/version'
 #
 # Author:: {Sylvester Keil}[http://sylvester.keil.or.at]
 # Copyright:: Copyright (c) 2010-2022 Sylvester Keil
-# License: GNU GPL 3.0 and BSD-2-Clause
+# License:: GNU GPL 3.0 and BSD-2-Clause
 #
 module BibTeX
   #
