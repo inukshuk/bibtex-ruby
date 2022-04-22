@@ -24,7 +24,9 @@ Install and load BibTeX-Ruby in an IRB session:
 
 Open a BibTeX bibliography:
 
-    b = BibTeX.open('./ruby.bib')
+```ruby
+b = BibTeX.open('./ruby.bib')
+```
 
 Select a BibTeX entry and access individual fields:
 
