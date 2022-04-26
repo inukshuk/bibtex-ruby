@@ -5,7 +5,7 @@ rescue LoadError
 end
 
 begin
-  if RUBY_PLATFORM < 'java'
+  if RUBY_PLATFORM == 'java'
     require 'debug'
     Debugger.start
   else
