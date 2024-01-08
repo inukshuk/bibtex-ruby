@@ -5,7 +5,7 @@ rescue LoadError
 end
 
 begin
-  require 'debug'
+  require 'debug' unless RUBY_PLATFORM == 'java'
 rescue LoadError
   # ignore
 end
