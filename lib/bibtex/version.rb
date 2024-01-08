@@ -19,7 +19,7 @@
 module BibTeX
   module Version
     MAJOR = 6
-    MINOR = 0
+    MINOR = 1
     PATCH = 0
     BUILD = nil
 
