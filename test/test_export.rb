@@ -3,7 +3,7 @@ require 'helper.rb'
 require 'yaml'
 
 module BibTeX
-  class TestString < Minitest::Unit::TestCase
+  class TestString < Minitest::Test
     def test_yaml
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), debug: false)
       yaml = YAML.load(bib.to_yaml) # rubocop:disable Security/YAMLLoad

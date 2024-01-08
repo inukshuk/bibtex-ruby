@@ -14,4 +14,4 @@ end
 require 'minitest'
 require 'bibtex'
 
-World(MiniTest::Assertions)
+World(Minitest::Assertions)

@@ -2,7 +2,7 @@ require 'helper.rb'
 require 'timeout'
 
 module BibTeX
-  class TestBibtex < Minitest::Unit::TestCase
+  class TestBibtex < Minitest::Test
     def setup; end
 
     def teardown; end
