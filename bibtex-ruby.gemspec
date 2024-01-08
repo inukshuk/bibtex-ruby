@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
     export/conversion to formats such as YAML, JSON, CSL, and XML (BibTeXML).
   END_DESCRIPTION
 
-  s.add_runtime_dependency('racc')
+  s.add_runtime_dependency('racc', ['~>1.7'])
   s.add_runtime_dependency('latex-decode', ['~>0.0'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)

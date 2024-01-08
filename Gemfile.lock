@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    bibtex-ruby (6.0.0)
+    bibtex-ruby (6.1.0)
       latex-decode (~> 0.0)
-      racc
+      racc (~> 1.7)
 
 GEM
   remote: https://rubygems.org/
