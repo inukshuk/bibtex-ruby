@@ -9,8 +9,7 @@ gem 'rdf-vocab', '~>3.0'
 gem 'rexml', '~>3.2'
 
 group :debug do
-  gem 'byebug', require: false, platforms: :mri
-  gem 'ruby-debug', require: false, platforms: :jruby
+  gem 'debug', '>= 1.0', require: false, platforms: :mri
 end
 
 group :test do
