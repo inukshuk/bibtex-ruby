@@ -125,7 +125,7 @@ module BibTeX
     }.freeze
 
     def_delegators :to_s, :=~, :===,
-                   *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|replace|each|first|last|!$/ }
+                   *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|dup|replace|each|first|last|!$/ }
 
     class << self
       def parse(string)
