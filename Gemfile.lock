@@ -86,7 +86,7 @@ GEM
       ffi (~> 1.1)
     unicode (0.4.4.4)
     unicode (0.4.4.4-java)
-    yard (0.9.34)
+    yard (0.9.35)
 
 PLATFORMS
   java
