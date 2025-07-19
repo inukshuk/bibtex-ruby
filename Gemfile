@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'json', '~>2.0', platforms: %i[mri_18 jruby]
+gem 'logger'
 
 gem 'rdf', '~>3.0'
 gem 'rdf-vocab', '~>3.0'
