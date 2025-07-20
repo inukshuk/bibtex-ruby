@@ -1,7 +1,7 @@
 require 'helper.rb'
 
 module BibTeX
-  class TestBibtex < Minitest::Test
+  class TestUtilities < Minitest::Test
     def test_empty?
       assert BibTeX.open(Test.fixtures(:empty)).empty?
       refute BibTeX.open(Test.fixtures(:bibdesk)).empty?
