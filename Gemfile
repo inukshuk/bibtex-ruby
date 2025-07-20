@@ -15,7 +15,6 @@ end
 group :test do
   gem 'cucumber'
   gem 'minitest', require: false
-  gem 'unicode', '~>0.4', platforms: %i[mswin mingw mri]
 end
 
 group :extra do
