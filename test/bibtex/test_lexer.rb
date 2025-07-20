@@ -31,6 +31,15 @@ module BibTeX
         [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
     end
 
+    it 'matches KEY token with braces' do
+      assert_equal Lexer.new.analyse('@misc{fo{o, }').symbols,
+        [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
+      assert_equal Lexer.new.analyse('@misc{fo}o, }').symbols,
+        [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
+      assert_equal Lexer.new.analyse('@misc{foo:{bar}, }').symbols,
+        [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]
+    end
+
     it "doesn't start a comment for types starting with but not equal @comment" do
       assert_equal Lexer.new.analyse('@commentary{staudinger, }').symbols,
         [:AT, :NAME, :LBRACE, :KEY, :RBRACE, false]

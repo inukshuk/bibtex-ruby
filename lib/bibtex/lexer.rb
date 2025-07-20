@@ -58,7 +58,7 @@ module BibTeX
       string: /string/io,
       comment: /comment\b/io,
       preamble: /preamble\b/io,
-      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]+,}io,
+      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"{}-]+,}io,
       optional_key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]*,}io
     }
 
