@@ -92,7 +92,6 @@ GEM
       psych (>= 4.0.0)
     readline (0.0.4)
       reline
-    redcarpet (3.6.1)
     reline (0.6.1)
       io-console (~> 0.5)
     rexml (3.4.1)
@@ -123,7 +122,6 @@ DEPENDENCIES
   rake
   rdf (~> 3.0)
   rdf-vocab (~> 3.0)
-  redcarpet
   rexml (~> 3.2)
   ruby-prof
   simplecov

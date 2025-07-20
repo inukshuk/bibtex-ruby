@@ -17,10 +17,6 @@ group :test do
   gem 'minitest', require: false
 end
 
-group :extra do
-  gem 'redcarpet', platforms: [:ruby]
-end
-
 group :profile do
   gem 'gnuplot', platforms: [:mri]
   gem 'ruby-prof', platforms: [:mri]
