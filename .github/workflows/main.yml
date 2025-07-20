@@ -6,11 +6,12 @@ on:
     branches: [ master ]
 jobs:
   minitest:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os:
           - ubuntu-latest
-          - window-latest
+          - windows-latest
           - macos-latest
         ruby-version:
           - "3.2"
