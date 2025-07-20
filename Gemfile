@@ -32,7 +32,6 @@ group :coverage do
 end
 
 group :development do
-  gem 'iconv', platforms: [:ruby]
   gem 'rake'
   gem 'yard'
 end
