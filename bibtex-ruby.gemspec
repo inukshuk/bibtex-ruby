@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency('racc', ['~>1.7'])
   s.add_runtime_dependency('latex-decode', ['~>0.0'])
+  s.add_runtime_dependency('logger', ['~>1.7'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)
   s.test_files   = Dir.glob('test/**/test*.rb')

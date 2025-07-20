@@ -3,6 +3,7 @@ PATH
   specs:
     bibtex-ruby (6.1.0)
       latex-decode (~> 0.0)
+      logger (~> 1.7)
       racc (~> 1.7)
 
 GEM
@@ -53,6 +54,7 @@ GEM
     json (2.7.1-java)
     latex-decode (0.4.0)
     link_header (0.0.8)
+    logger (1.7.0)
     mini_mime (1.1.5)
     minitest (5.20.0)
     multi_test (1.1.0)
