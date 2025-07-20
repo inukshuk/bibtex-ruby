@@ -2,6 +2,7 @@ module BibTeX
   def self.transliterate(str)
     str.unicode_normalize(:nfkd).encode('ASCII', replace: '')
   rescue
-    str.encode('ASCII', replace: '')
+    puts "DEBUG: #{str.inspect}"
+    'key'
   end
 end
