@@ -1,10 +1,9 @@
 module BibTeX
   def self.transliterate(str)
-    str.unicode_normalize(:nfkd).encode('ASCII', replace: '')
+    str
+      .unicode_normalize(:nfkd)
+      .encode(Encoding::ASCII, invalid: :replace, undef: :replace, replace: '')
   rescue
-    puts "DEBUG: #{str.inspect}"
-    puts "DEBUG: #{str.unicode_normalize(:nfkd).inspect}"
-    puts "DEBUG: #{str.unicode_normalize(:nfkd).encode('ASCII', replace: '').inspect}"
-    'key'
+    str.gsub(/[^\x20-\x7E]/, '')
   end
 end
