@@ -102,21 +102,17 @@ module BibTeX
 
     def test_missing_key
       assert_raises(BibTeX::ParseError) do
-        BibTeX.parse(<<EOF)
-        @article{}
-EOF
+        BibTeX.parse(<<-EOF)
+          @article{}
+        EOF
       end
-      assert(
-        BibTeX.parse(<<EOF, allow_missing_keys: true)
+      refute_empty BibTeX.parse(<<-EOF, allow_missing_keys: true)
         @article{}
-EOF
-      )
-      Timeout.timeout(2) do
-        BibTeX.parse(<<EOF, allow_missing_keys: true)
+      EOF
+      refute_empty BibTeX.parse(<<-EOF, allow_missing_keys: true)
         @article{},
         @article{}
-EOF
-      end
+      EOF
     end
   end
 end
