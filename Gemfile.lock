@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bibtex-ruby (6.1.0)
+    bibtex-ruby (6.2.0)
       latex-decode (~> 0.0)
       logger (~> 1.7)
       racc (~> 1.7)
