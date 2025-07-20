@@ -676,12 +676,11 @@ module BibTeX
     def default_key
       k = names[0]
       k = k.respond_to?(:family) ? k.family : k.to_s
-      k = BibTeX.transliterate(k).gsub(/["']/, '')
+      k = BibTeX.transliterate(k).tr('"\'', '')
       k = k[/[A-Za-z-]+/] || 'unknown'
       k << (year.to_s[/\d+/] || '-')
       k << 'a'
-      k.downcase!
-      k
+      k.downcase
     end
   end
 end
