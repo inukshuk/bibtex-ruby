@@ -1,11 +1,3 @@
-require 'uri/common'
-
-begin
-  require 'rdf/vocab'
-rescue LoadError
-  ::RDF::Vocab = RDF # support RDF on Ruby 1.9
-end
-
 class BibTeX::Entry::RDFConverter
   DEFAULT_REMOVE_FROM_FALLBACK = %w[
     bdsk-file-1
