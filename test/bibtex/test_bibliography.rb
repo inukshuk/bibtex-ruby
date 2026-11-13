@@ -83,9 +83,9 @@ module BibTeX
 
       describe '#extend_initials' do
         it 'extends the initials in matching names' do
-          @bib.names.map(&:to_s).wont_include 'Flanagan, Dave'
+          _(@bib.names.map(&:to_s)).wont_include 'Flanagan, Dave'
           @bib.extend_initials(%w[Dave Flanagan])
-          @bib.names.map(&:to_s).must_include 'Flanagan, Dave'
+          _(@bib.names.map(&:to_s)).must_include 'Flanagan, Dave'
         end
       end
 
@@ -366,24 +366,24 @@ module BibTeX
 
         it 'can be sorted destructively' do
           @small_bib.sort!
-          @small_bib.map(&:key).must_equal %w[segaran2007 flanagan2008 rails]
+          _(@small_bib.map(&:key)).must_equal %w[segaran2007 flanagan2008 rails]
         end
 
         it 'can be sorted by field destructively' do
           @small_bib.sort_by! { |e| -e[:year].to_i }
-          @small_bib.map(&:key).must_equal %w[rails flanagan2008 segaran2007]
+          _(@small_bib.map(&:key)).must_equal %w[rails flanagan2008 segaran2007]
         end
 
         it 'can be sorted non-destructively' do
           sorted_entries = @small_bib.sort
-          sorted_entries.map(&:key).must_equal %w[segaran2007 flanagan2008 rails]
-          @small_bib.map(&:key).must_equal %w[flanagan2008 rails segaran2007]
+          _(sorted_entries.map(&:key)).must_equal %w[segaran2007 flanagan2008 rails]
+          _(@small_bib.map(&:key)).must_equal %w[flanagan2008 rails segaran2007]
         end
 
         it 'can be sorted by field non-destructively' do
           sorted_entries = @small_bib.sort_by { |e| -e[:year].to_i }
-          sorted_entries.map(&:key).must_equal %w[rails flanagan2008 segaran2007]
-          @small_bib.map(&:key).must_equal %w[flanagan2008 rails segaran2007]
+          _(sorted_entries.map(&:key)).must_equal %w[rails flanagan2008 segaran2007]
+          _(@small_bib.map(&:key)).must_equal %w[flanagan2008 rails segaran2007]
         end
       end
 

@@ -1,3 +1,10 @@
+Unreleased
+==========
+
+* Make test suite compatible with minitest 6
+* Add official support for Ruby 4.0
+* Remove official support for Ruby < 3.3, as they reached their End-of-Life
+
 6.2.0 / 2025-07-20
 ==================
 

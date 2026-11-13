@@ -85,11 +85,11 @@ module BibTeX
 
     describe 'backslashes and escape sequences' do
       it 'leaves backslashes intact' do
-        Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title.must_be :==, 'a backslash: \\'
+        _(Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title).must_be :==, 'a backslash: \\'
       end
 
       it 'parses LaTeX escaped quotes {"}' do
-        Parser.new.parse('@misc{key, title = "{"}"}')[0].title.must_be :==, '{"}'
+        _(Parser.new.parse('@misc{key, title = "{"}"}')[0].title).must_be :==, '{"}'
       end
 
       it 'parses complex LaTeX markup' do
@@ -105,8 +105,8 @@ module BibTeX
             year = {1996}
           }
         END
-        b.booktitle.must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
-        b.editor.to_s.must_be :==, 'Proust, Jo\"{e}lle'
+        _(b.booktitle).must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
+        _(b.editor.to_s).must_be :==, 'Proust, Jo\"{e}lle'
       end
     end
 
@@ -183,7 +183,7 @@ module BibTeX
       end
 
       it 'raises a parser error' do
-        lambda {
+        _ {
           Parser.new.parse <<-END
             @book{book1,
              title = "Parse error because"

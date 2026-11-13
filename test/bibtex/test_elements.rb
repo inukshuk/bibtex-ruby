@@ -4,19 +4,19 @@ module BibTeX
   class ElementTest < Minitest::Spec
     describe '.parse' do
       it 'accepts a BibTeX string' do
-        Element.parse('@misc{x,},@misc{y,}').length.must_be :==, 2
+        _(Element.parse('@misc{x,},@misc{y,}').length).must_be :==, 2
       end
 
       it 'accepts an Element' do
-        Element.parse(Comment.new('blah')).length.must_be :==, 1
+        _(Element.parse(Comment.new('blah')).length).must_be :==, 1
       end
 
       it 'accepts a Hash and returns an Entry' do
-        Element.parse(bibtex_type: :book)[0].type.must_be :==, :book
+        _(Element.parse(bibtex_type: :book)[0].type).must_be :==, :book
       end
 
       it 'accepts an array of hashes' do
-        Element.parse([{ bibtex_type: :book }, { bibtex_type: :misc }])[1].type.must_be :==, :misc
+        _(Element.parse([{ bibtex_type: :book }, { bibtex_type: :misc }])[1].type).must_be :==, :misc
       end
     end
   end
