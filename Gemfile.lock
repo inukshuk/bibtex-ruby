@@ -119,7 +119,7 @@ GEM
       memoist3 (~> 1.0.0)
       win32ole
     win32ole (1.9.3)
-    yard (0.9.37)
+    yard (0.9.44)
 
 PLATFORMS
   java
