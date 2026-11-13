@@ -101,7 +101,7 @@ GEM
       reline
     reline (0.6.1)
       io-console (~> 0.5)
-    rexml (3.4.1)
+    rexml (3.4.2)
     ruby-prof (1.7.2)
       base64
     simplecov (0.22.0)
@@ -136,7 +136,7 @@ DEPENDENCIES
   rake
   rdf (~> 3.0)
   rdf-vocab (~> 3.0)
-  rexml (~> 3.2)
+  rexml (~> 3.4)
   ruby-prof
   simplecov
   yard
