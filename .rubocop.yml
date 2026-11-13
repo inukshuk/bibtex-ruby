@@ -4,6 +4,7 @@ inherit_from: .rubocop_todo.yml
 
 plugins:
   - rubocop-minitest
+  - rubocop-performance
   - rubocop-rake
 
 AllCops:

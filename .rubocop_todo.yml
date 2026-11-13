@@ -438,6 +438,46 @@ Naming/VariableNumber:
     - 'Gemfile'
 
 # Offense count: 1
+# Configuration parameters: MinSize.
+Performance/CollectionLiteralInLoop:
+  Exclude:
+    - 'lib/bibtex/lexer.rb'
+
+# Offense count: 2
+# This cop supports safe autocorrection (--autocorrect).
+Performance/RedundantBlockCall:
+  Exclude:
+    - 'lib/bibtex/bibliography.rb'
+
+# Offense count: 3
+# This cop supports safe autocorrection (--autocorrect).
+Performance/RedundantSplitRegexpArgument:
+  Exclude:
+    - 'lib/bibtex/elements.rb'
+    - 'lib/bibtex/filters.rb'
+    - 'test/bibtex/test_bibliography.rb'
+
+# Offense count: 2
+# This cop supports safe autocorrection (--autocorrect).
+Performance/RegexpMatch:
+  Exclude:
+    - 'lib/bibtex/entry/rdf_converter.rb'
+    - 'lib/bibtex/utilities.rb'
+
+# Offense count: 1
+# This cop supports safe autocorrection (--autocorrect).
+Performance/StringReplacement:
+  Exclude:
+    - 'lib/bibtex/elements.rb'
+
+# Offense count: 2
+# This cop supports unsafe autocorrection (--autocorrect-all).
+# Configuration parameters: OnlySumOrWithInitialValue.
+Performance/Sum:
+  Exclude:
+    - 'test/benchmark.rb'
+
+# Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 Rake/Desc:
   Exclude:

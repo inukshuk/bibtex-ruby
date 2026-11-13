@@ -136,6 +136,10 @@ GEM
       lint_roller (~> 1.1)
       rubocop (>= 1.89.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
+    rubocop-performance (1.27.0)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.89.0, < 2.0)
+      rubocop-ast (>= 1.47.1, < 2.0)
     rubocop-rake (0.7.1)
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1)
@@ -176,6 +180,7 @@ DEPENDENCIES
   rexml (~> 3.2)
   rubocop (~> 1.92)
   rubocop-minitest (~> 0.41)
+  rubocop-performance (~> 1.27)
   rubocop-rake (~> 0.7)
   ruby-prof
   simplecov

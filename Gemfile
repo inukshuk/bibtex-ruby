@@ -32,6 +32,7 @@ group :development do
   gem 'rake'
   gem 'rubocop', '~> 1.92', require: false
   gem 'rubocop-minitest', '~> 0.41', require: false
+  gem 'rubocop-performance', '~> 1.27', require: false
   gem 'rubocop-rake', '~> 0.7', require: false
   gem 'yard'
 end
