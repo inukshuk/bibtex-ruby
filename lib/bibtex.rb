@@ -13,8 +13,8 @@ require 'bibtex/version'
 # an API to the individual BibTeX objects: +String+,
 # +Preamble+, +Comment+, and +Entry+.
 #
-# Copyright:: Copyright (c) 2010-2022 The BibTeX-Ruby Contributors
-# License:: GNU GPL 3.0 and BSD-2-Clause
+# Copyright:: Copyright (c) 2010-2026 The BibTeX-Ruby Contributors
+# License:: GPL-3.0-or-later OR BSD-2-Clause
 #
 module BibTeX
   #
