@@ -10,7 +10,7 @@ Feature: Parse BibTeX preambles
 		%% http://bibdesk.sourceforge.net/
 
 
-		%% Created for Sylvester Keil at 2010-08-05 10:07:07 +0200 
+		%% Created at 2010-08-05 10:07:07 +0200 
 
 
 		%% Saved with string encoding Unicode (UTF-8) 
