@@ -14,9 +14,9 @@ jobs:
           - windows-latest
           - macos-latest
         ruby-version:
-          - "3.2"
           - "3.3"
           - "3.4"
+          - "4.0"
         include:
           - os: ubuntu-latest
             ruby-version: jruby
