@@ -123,8 +123,8 @@ module BibTeX
         end
 
         it 'applies multiple filters in the order passed' do
-          @values.map { |v| v.convert(:upcase, :suffixa).to_s }.must_equal ['FOOa', '"FOOa" # bar']
-          @values.map { |v| v.convert(:suffixa, :upcase).to_s }.must_equal ['FOOA', '"FOOA" # bar']
+          _(@values.map { |v| v.convert(:upcase, :suffixa).to_s }).must_equal ['FOOa', '"FOOa" # bar']
+          _(@values.map { |v| v.convert(:suffixa, :upcase).to_s }).must_equal ['FOOA', '"FOOA" # bar']
         end
 
         it 'converts the value when using a ghost method' do

@@ -57,11 +57,11 @@ module BibTeX
 
         describe '#cross_referenced_by' do
           it 'returns a list of all entries that cross-reference this entry' do
-            @bib['a'].cross_referenced_by.must_include(@bib['a1'])
+            _(@bib['a'].cross_referenced_by).must_include(@bib['a1'])
           end
 
           it 'returns an empty list if there are no cross-references to this entry' do
-            @bib['a1'].cross_referenced_by.must_be_empty
+            _(@bib['a1'].cross_referenced_by).must_be_empty
           end
         end
 
@@ -105,29 +105,29 @@ module BibTeX
 
           describe '#inherited_fields' do
             it 'returns an empty list by default' do
-              Entry.new.inherited_fields.must_be_empty
+              _(Entry.new.inherited_fields).must_be_empty
             end
 
             it 'returns an empty list if this entry has no cross-reference' do
-              @bib['a'].inherited_fields.must_be_empty
+              _(@bib['a'].inherited_fields).must_be_empty
             end
 
             it 'returns an empty list if this entry has a cross-reference but the reference does not exist in the bibliography' do
-              @bib['b1'].inherited_fields.must_be_empty
+              _(@bib['b1'].inherited_fields).must_be_empty
             end
 
             it 'returns a list of all fields not set in the field but in the reference' do
-              @bib['a1'].inherited_fields.must_be :==, %i[booktitle editor title]
+              _(@bib['a1'].inherited_fields).must_be :==, %i[booktitle editor title]
             end
           end
 
           describe '#to_citeproc' do
             it 'includes inherited values' do
-              @bib['a1'].to_citeproc['container-title'].must_be :==, @bib['a'].title.to_s
+              _(@bib['a1'].to_citeproc['container-title']).must_be :==, @bib['a'].title.to_s
             end
 
             it 'converts urldate' do
-              @bib['b'].to_citeproc['accessed'].must_be :==, 'date-parts' => [[2020]]
+              _(@bib['b'].to_citeproc['accessed']).must_be :==, 'date-parts' => [[2020]]
             end
           end
 
@@ -135,8 +135,8 @@ module BibTeX
             it 'copies referenced values to the entry' do
               @bib['a1'].title = 'a1'
               @bib['a1'].save_inherited_fields
-              @bib['a1'].fields[:booktitle].must_be :==, @bib['a'].title
-              @bib['a1'].fields[:title].wont_be :==, @bib['a'].title
+              _(@bib['a1'].fields[:booktitle]).must_be :==, @bib['a'].title
+              _(@bib['a1'].fields[:title]).wont_be :==, @bib['a'].title
             end
           end
         end
@@ -145,23 +145,23 @@ module BibTeX
 
     describe '#names' do
       it 'returns an empty list by default' do
-        Entry.new.names.must_be :==, []
+        _(Entry.new.names).must_be :==, []
       end
 
       it 'returns the author (if set)' do
-        Entry.new(author: 'A').names.must_be :==, %w[A]
+        _(Entry.new(author: 'A').names).must_be :==, %w[A]
       end
 
       it 'returns all authors (if set)' do
-        Entry.new(author: 'A B and C D').parse_names.names.length.must_be :==, 2
+        _(Entry.new(author: 'A B and C D').parse_names.names.length).must_be :==, 2
       end
 
       it 'returns the editor (if set)' do
-        Entry.new(editor: 'A').names.must_be :==, %w[A]
+        _(Entry.new(editor: 'A').names).must_be :==, %w[A]
       end
 
       it 'returns the translator (if set)' do
-        Entry.new(translator: 'A').names.must_be :==, %w[A]
+        _(Entry.new(translator: 'A').names).must_be :==, %w[A]
       end
     end
 
@@ -372,17 +372,17 @@ module BibTeX
         end
 
         it 'supports arbitrary conversion' do
-          @entry.convert(@filter).title.must_equal 'MOBY DICK'
-          @entry.convert(:suffixb).title.must_equal 'Moby Dickb'
+          _(@entry.convert(@filter).title).must_equal 'MOBY DICK'
+          _(@entry.convert(:suffixb).title).must_equal 'Moby Dickb'
         end
 
         it 'supports multiple filters' do
-          @entry.convert(@filter, :suffixb).title.must_equal 'MOBY DICKb'
-          @entry.convert(:suffixb, @filter).title.must_equal 'MOBY DICKB'
+          _(@entry.convert(@filter, :suffixb).title).must_equal 'MOBY DICKb'
+          _(@entry.convert(:suffixb, @filter).title).must_equal 'MOBY DICKB'
         end
 
         it 'supports arbitrary in-place conversion' do
-          @entry.convert!(@filter).title.must_equal 'MOBY DICK'
+          _(@entry.convert!(@filter).title).must_equal 'MOBY DICK'
         end
 
         it 'supports conditional arbitrary in-place conversion' do
@@ -406,33 +406,33 @@ module BibTeX
 
         describe '#convert' do
           it 'converts LaTeX umlauts' do
-            @entry.convert(:latex).title.must_be :==, 'Möby Dick'
+            _(@entry.convert(:latex).title).must_be :==, 'Möby Dick'
           end
 
           it 'does not change the original entry' do
             e = @entry.convert(:latex)
-            e.wont_be :==, @entry
-            e.title.to_s.wont_be :==, @entry.title.to_s
-            e.title.to_s.length.must_be :<, @entry.title.to_s.length
+            _(e).wont_be :==, @entry
+            _(e.title.to_s).wont_be :==, @entry.title.to_s
+            _(e.title.to_s.length).must_be :<, @entry.title.to_s.length
           end
 
           it 'does not change the author of a parsed entry' do
             entry = BibTeX.parse('@book{o, author = {M\\"{o}by Dick}}')[0]
             e = entry.convert(:latex)
-            e.wont_be :==, entry
-            e.author.to_s.length.must_be :<, entry.author.to_s.length
+            _(e).wont_be :==, entry
+            _(e.author.to_s.length).must_be :<, entry.author.to_s.length
           end
         end
 
         describe '#convert!' do
           it 'converts LaTeX umlauts' do
-            @entry.convert!(:latex).title.must_be :==, 'Möby Dick'
+            _(@entry.convert!(:latex).title).must_be :==, 'Möby Dick'
           end
 
           it 'changes the original entry in-place' do
             e = @entry.convert!(:latex)
-            e.must_be :equal?, @entry
-            e.title.to_s.length.must_be :==, @entry.title.to_s.length
+            _(e).must_be :equal?, @entry
+            _(e.title.to_s.length).must_be :==, @entry.title.to_s.length
           end
         end
       end
@@ -607,35 +607,35 @@ module BibTeX
       end
 
       it 'should return "unknown-a" for an empty Entry' do
-        Entry.new.key.must_be :==, 'unknown-a'
+        _(Entry.new.key).must_be :==, 'unknown-a'
       end
 
       it 'should return a key made up of author-year-a if all fields are present' do
-        @e1.key.must_be :==, 'poe1996a'
+        _(@e1.key).must_be :==, 'poe1996a'
       end
 
       it 'should return a key made up of editor-year-a if there is no author' do
-        @e2.key.must_be :==, 'john1996a'
+        _(@e2.key).must_be :==, 'john1996a'
       end
 
       it 'should return use the last name if the author/editor names have been parsed' do
-        @e2.parse_names.key.must_be :==, 'hopkins1996a'
+        _(@e2.parse_names.key).must_be :==, 'hopkins1996a'
       end
 
       it 'skips the year if not present' do
-        @e3.key.must_be :==, 'poe-a'
+        _(@e3.key).must_be :==, 'poe-a'
       end
 
       it 'skips the year if not numeric' do
-        @e5.key.must_be :==, 'poe-a'
+        _(@e5.key).must_be :==, 'poe-a'
       end
 
       it 'extracts the year from the date field if present' do
-        @e4.key.must_be :==, 'poe2003a'
+        _(@e4.key).must_be :==, 'poe2003a'
       end
 
       it 'extracts the year from as a number' do
-        @e6.key.must_be :==, 'poe2009a'
+        _(@e6.key).must_be :==, 'poe2009a'
       end
     end
 
@@ -647,7 +647,7 @@ module BibTeX
 
       it 'should register itself with its key' do
         @bib << @e
-        @bib.entries.keys.must_include @e.key
+        _(@bib.entries.keys).must_include @e.key
       end
 
       describe "when there is already an element registered with the entry's key" do
@@ -656,8 +656,8 @@ module BibTeX
         it 'should find a suitable key' do
           k = @e.key
           @bib << @e
-          @bib.entries.keys.must_include @e.key
-          k.wont_be :==, @e.key
+          _(@bib.entries.keys).must_include @e.key
+          _(k).wont_be :==, @e.key
         end
       end
     end
