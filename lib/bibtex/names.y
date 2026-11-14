@@ -90,7 +90,9 @@ rule
             | u_words       { result = [val[0][0], val[0][1] ? val[0][1..-1].join(' ') : nil] }
             | u_words LWORD { result = [val[0][0], (val[0][1..-1] << val[1]).join(' ')] }
 
-  last : LWORD | u_words { result = val[0].join(' ') }
+  last : LWORD
+       | u_words       { result = val[0].join(' ') }
+       | u_words LWORD { result = (val[0] << val[1]).join(' ') }
 
   first : opt_words                 { result = [nil,val[0]] }
         | opt_words COMMA opt_words { result = [val[0],val[2]] }

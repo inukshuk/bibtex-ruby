@@ -22,5 +22,25 @@ module BibTeX
         assert_equal '', Names.parse('').to_s
       end
     end
+
+    describe 'parse a last name ending in a lowercase word before the comma (#149)' do
+      it 'treats uppercase words followed by a lowercase word as the last name' do
+        name = Name.parse("Rongiéras d'Usseau, Emmanuel")
+
+        assert_equal [nil, "Rongiéras d'Usseau", 'Emmanuel'], [name.von, name.last, name.first]
+      end
+
+      it 'treats a single lowercase word before the comma as the last name' do
+        name = Name.parse("d'Usseau, Emmanuel")
+
+        assert_equal [nil, "d'Usseau", 'Emmanuel'], [name.von, name.last, name.first]
+      end
+
+      it 'still splits the von part off uppercase last names' do
+        name = Name.parse('Meyer zu Selhausen, Karsten')
+
+        assert_equal ['Meyer zu', 'Selhausen', 'Karsten'], [name.von, name.last, name.first]
+      end
+    end
   end
 end
