@@ -59,6 +59,16 @@ module BibTeX
           assert_equal %w[{ }], [*calls[0][:quotes]]
         end
 
+        it 'uses { } when :quotes is nil, without changing the caller\'s options' do
+          calls = spy_on_to_s(@bib)
+          options = { quotes: nil }
+          @bib.save_to(@path, options)
+
+          assert_equal %w[{ }], [*calls[0][:quotes]]
+          assert_equal({ quotes: nil }, options)
+          assert_includes File.read(@path, encoding: 'utf-8'), 'title = {Moby-Dick; or, The Whale}'
+        end
+
         it 'passes its options on to to_s' do
           calls = spy_on_to_s(@bib)
           @bib.save_to(@path, quotes: '"', custom: :option)
@@ -137,6 +147,167 @@ module BibTeX
           Bibliography.new.save_to(@path)
 
           assert_equal '', File.read(@path)
+        end
+
+        describe 'atomic replacement' do
+          # Makes every file Tempfile.create returns raise error in #fsync
+          # (by default as a full disk would) for the duration of the block.
+          def with_failing_fsync(error = IOError.new('disk full'))
+            original = Tempfile.method(:create)
+            Tempfile.define_singleton_method(:create) do |*args, **kwargs|
+              original.call(*args, **kwargs).tap do |file|
+                file.define_singleton_method(:fsync) { raise error }
+              end
+            end
+            yield
+          ensure
+            Tempfile.define_singleton_method(:create, original)
+          end
+
+          def skip_unless_posix_permissions
+            skip 'needs POSIX permissions' if Gem.win_platform?
+            skip 'root ignores permission bits' if Process.uid.zero?
+          end
+
+          it 'skips fsync where the platform does not implement it' do
+            with_failing_fsync(NotImplementedError.new('fsync')) { @bib.save_to(@path) }
+
+            assert_equal @bib.to_s, File.read(@path, encoding: 'utf-8')
+            assert_equal %w[out.bib], Dir.children(@dir)
+          end
+
+          it 'raises EACCES for a read-only file and leaves it as it was' do
+            skip_unless_posix_permissions
+            File.write(@path, 'old')
+            File.chmod(0o444, @path)
+
+            assert_raises(Errno::EACCES) { @bib.save_to(@path) }
+            assert_equal 'old', File.read(@path)
+            assert_equal 0o444, File.stat(@path).mode & 0o7777
+          end
+
+          it 'writes a writable file in a read-only directory directly' do
+            skip_unless_posix_permissions
+            File.write(@path, 'old')
+            File.chmod(0o555, @dir)
+            begin
+              @bib.save_to(@path)
+            ensure
+              File.chmod(0o755, @dir)
+            end
+
+            assert_equal @bib.to_s, File.read(@path, encoding: 'utf-8')
+          end
+
+          it 'writes to a FIFO without replacing it' do
+            skip 'needs File.mkfifo' if Gem.win_platform? || !File.respond_to?(:mkfifo)
+            fifo = File.join(@dir, 'pipe.bib')
+            File.mkfifo(fifo)
+            reader = Thread.new { File.read(fifo, encoding: 'utf-8') }
+            begin
+              @bib.save_to(fifo)
+
+              assert reader.join(5), 'the FIFO was not written to'
+              assert_equal @bib.to_s, reader.value
+              assert_equal 'fifo', File.ftype(fifo)
+              assert_equal %w[pipe.bib], Dir.children(@dir)
+            ensure
+              reader.kill
+            end
+          end
+
+          it 'creates the file a dangling symlink points to' do
+            skip 'needs symlinks' if Gem.win_platform?
+            link = File.join(@dir, 'link.bib')
+            File.symlink('out.bib', link)
+            @bib.save_to(link)
+
+            assert File.symlink?(link)
+            assert_equal @bib.to_s, File.read(@path, encoding: 'utf-8')
+          end
+
+          it 'handles a target with a 254-byte name' do
+            name = "#{'a' * 250}.bib"
+            path = File.join(@dir, name)
+            File.write(path, 'old')
+            @bib.save_to(path)
+
+            assert_equal @bib.to_s, File.read(path, encoding: 'utf-8')
+            assert_equal [name], Dir.children(@dir)
+          end
+
+          it 'writes the same bytes as a text-mode File.write' do
+            reference = File.join(@dir, 'reference.bib')
+            File.write(reference, @bib.to_s, encoding: Encoding::UTF_8)
+            @bib.save_to(@path)
+
+            assert_equal File.binread(reference), File.binread(@path)
+            @bib.save_to(@path)
+
+            assert_equal File.binread(reference), File.binread(@path)
+          end
+
+          it 'does not copy setuid, setgid or sticky bits' do
+            skip 'needs POSIX permissions' if Gem.win_platform?
+            File.write(@path, 'old')
+            File.chmod(0o4755, @path)
+            skip 'the file system dropped the setuid bit' unless File.stat(@path).mode & 0o7777 == 0o4755
+            @bib.save_to(@path)
+
+            assert_equal 0o755, File.stat(@path).mode & 0o7777
+          end
+
+          it 'leaves the original file and no temp file behind when the write fails' do
+            original = "@misc{keep, title = {Keep me}}\n"
+            File.write(@path, original)
+
+            error = assert_raises(IOError) { with_failing_fsync { @bib.save_to(@path) } }
+
+            assert_equal 'disk full', error.message
+            assert_equal original, File.read(@path)
+            assert_equal %w[out.bib], Dir.children(@dir)
+          end
+
+          it 'does not create the file when the write fails' do
+            assert_raises(IOError) { with_failing_fsync { @bib.save_to(@path) } }
+
+            assert_empty Dir.children(@dir)
+          end
+
+          it 'leaves no temp file behind after a successful save' do
+            @bib.save_to(@path)
+
+            assert_equal %w[out.bib], Dir.children(@dir)
+          end
+
+          it 'creates a missing file with 0666 minus the umask' do
+            skip 'POSIX permissions' if Gem.win_platform?
+            @bib.save_to(@path)
+
+            assert_equal 0o666 & ~File.umask, File.stat(@path).mode & 0o7777
+            assert_equal @bib.to_s, File.read(@path, encoding: 'utf-8')
+          end
+
+          it 'keeps the permission bits of an existing file' do
+            skip 'POSIX permissions' if Gem.win_platform?
+            File.write(@path, 'old')
+            File.chmod(0o640, @path)
+            @bib.save_to(Pathname.new(@path))
+
+            assert_equal 0o640, File.stat(@path).mode & 0o7777
+          end
+
+          it 'replaces the file a symlink points to, not the link' do
+            skip 'symlinks' if Gem.win_platform?
+            File.write(@path, 'old')
+            link = File.join(@dir, 'link.bib')
+            File.symlink('out.bib', link)
+            @bib.save_to(link)
+
+            assert File.symlink?(link)
+            assert_equal @bib.to_s, File.read(@path, encoding: 'utf-8')
+            assert_equal %w[link.bib out.bib], Dir.children(@dir).sort
+          end
         end
 
         describe 'when serialisation raises' do

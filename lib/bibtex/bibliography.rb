@@ -18,6 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'fileutils'
+require 'tempfile'
+
 module BibTeX
   #
   # The Bibliography class models a BibTeX bibliography;
@@ -137,9 +140,25 @@ module BibTeX
       save_to(@path, options)
     end
 
-    # Saves the bibliography to a file at the given path. Returns the bibliography.
+    # Saves the bibliography to a file at the given path (a String or a
+    # Pathname), replacing a regular file atomically where it can and
+    # writing directly otherwise. The options are passed on to #to_s;
+    # values are enclosed in braces unless :quotes says otherwise.
+    # Returns the bibliography.
     def save_to(path, options = {})
-      raise NotImplementedError, 'Bibliography#save_to is being reimplemented (#154)'
+      # Serialise before touching the file system, so an error in #to_s
+      # leaves no trace. A nil :quotes means the default, as an absent key
+      # does. Always UTF-8, whatever Encoding.default_external is, so the
+      # file reads back through BibTeX.open.
+      content = to_s(options.merge(quotes: options[:quotes] || %w[{ }])).encode(Encoding::UTF_8)
+      # Replace the file a symlink points to, not the link.
+      target = File.exist?(path) ? File.realpath(path) : path
+      if replace_atomically?(target)
+        write_atomically(target, content)
+      else
+        File.write(target, content, encoding: Encoding::UTF_8)
+      end
+      self
     end
 
     def each(&)
@@ -561,6 +580,65 @@ module BibTeX
     end
 
     private
+
+    # A short, fixed prefix: a name derived from the target's could exceed
+    # the file system's limit for long target names.
+    TEMP_NAME = ['.bibtex-save', '.tmp'].freeze
+    private_constant :TEMP_NAME
+
+    # Whether #save_to may replace target atomically: only a regular file
+    # (or a missing one) that may be written, in a directory where the
+    # temporary file can be created. Anything else -- a read-only file,
+    # a read-only directory, a device, FIFO or socket, a dangling symlink --
+    # is written directly, so the OS behaves and fails as for File.write.
+    def replace_atomically?(target)
+      return false unless File.writable?(File.dirname(target))
+
+      stat = File.lstat(target)
+      stat.file? && stat.writable?
+    rescue Errno::ENOENT
+      true
+    end
+
+    # Writes content to a temporary file in the target's directory (so the
+    # rename stays on one file system), syncs it and renames it over the
+    # target: a failed write never leaves a partial file. Renaming over an
+    # existing file is atomic on POSIX; on Windows File.rename replaces the
+    # target but is not guaranteed to be atomic. The directory is not
+    # fsynced, so the rename itself may not survive a crash; IO#fsync can
+    # raise NotImplementedError on some platforms, and is skipped there.
+    #
+    # The file keeps its permission bits (without setuid, setgid and sticky)
+    # and a new one gets 0666 minus the umask rather than the temporary
+    # file's 0600. Hard links are out of scope: the target gets a new inode,
+    # so other links to the old file keep the old content (as do its owner,
+    # ACLs and xattrs). Text mode, as for File.write, keeps the platform's
+    # newline conversion.
+    def write_atomically(target, content)
+      mode = File.exist?(target) ? File.stat(target).mode & 0o777 : 0o666 & ~File.umask
+      temp = Tempfile.create(TEMP_NAME, File.dirname(target), encoding: Encoding::UTF_8)
+      begin
+        temp.write(content)
+        temp.flush
+        fsync(temp)
+        temp.chmod(mode)
+        temp.close
+        File.rename(temp.path, target)
+        temp = nil
+      ensure
+        if temp
+          temp.close
+          FileUtils.rm_f(temp.path)
+        end
+      end
+    end
+
+    def fsync(file)
+      file.fsync
+    rescue NotImplementedError
+      # No fsync on this platform; the data has still been flushed.
+      nil
+    end
 
     def query_handler(selector)
       case selector.to_s
