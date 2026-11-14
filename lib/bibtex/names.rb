@@ -125,7 +125,7 @@ module BibTeX
     }.freeze
 
     def_delegators :to_s, :=~, :===,
-                   *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|dup|replace|each|first|last|!$/ }
+                   *String.instance_methods(false).grep_v(/^\W|to_s|dup|replace|each|first|last|!$/)
 
     class << self
       def parse(string)
@@ -246,7 +246,7 @@ module BibTeX
     end
 
     def to_hash
-      Hash[each_pair.to_a]
+      each_pair.to_h
     end
 
     def to_xml

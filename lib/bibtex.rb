@@ -40,7 +40,7 @@ module BibTeX
   # An instance of the Ruby core class +Logger+.
   # Used for logging by BibTeX-Ruby.
   #
-  @log = Logger.new(STDERR)
+  @log = Logger.new($stderr)
   @log.level = ENV.key?('DEBUG') ? Logger::DEBUG : Logger::WARN
   @log.datetime_format = '%Y-%m-%d %H:%M:%S'
 

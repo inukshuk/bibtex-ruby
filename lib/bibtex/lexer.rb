@@ -213,9 +213,9 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:rbrace])
         @brace_level -= 1
         push([:RBRACE, '}'])
-        return leave_object if @brace_level == 0
+        return leave_object if @brace_level.zero?
 
-        error_unbalanced_braces if @brace_level < 0
+        error_unbalanced_braces if @brace_level.negative?
       when @scanner.scan(Lexer.patterns[:eq])
         push([:EQ, '='])
       when @scanner.scan(Lexer.patterns[:comma])
@@ -262,7 +262,7 @@ module BibTeX
         push([:CONTENT, match])
       when '}'
         @brace_level -= 1
-        if @brace_level == 0
+        if @brace_level.zero?
           push([:CONTENT, match.chop])
           push([:RBRACE, '}'])
           leave_object
@@ -270,7 +270,7 @@ module BibTeX
           push([:CONTENT, match.chop])
           push([:RBRACE, '}'])
           @mode = :bibtex
-        elsif @brace_level < 0
+        elsif @brace_level.negative?
           push([:CONTENT, match.chop])
           error_unbalanced_braces
         else

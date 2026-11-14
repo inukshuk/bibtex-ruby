@@ -6,7 +6,7 @@ module BibTeX
   class TestString < Minitest::Test
     def test_yaml
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), debug: false)
-      yaml = YAML.load(bib.to_yaml) # rubocop:disable Security/YAMLLoad
+      yaml = YAML.load(bib.to_yaml)
 
       refute_nil(yaml)
       assert_equal(3, yaml.length)

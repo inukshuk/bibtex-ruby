@@ -49,9 +49,7 @@ module BibTeX
     alias to_a tokens
 
     def_delegators :to_s, :=~, :===,
-                   *String.instance_methods(false).reject { |m|
-                     m =~ /^\W|^(length|dup|replace|to_s|to_i|inspect)$|!$/
-                   }
+                   *String.instance_methods(false).grep_v(/^\W|^(length|dup|replace|to_s|to_i|inspect)$|!$/)
 
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
@@ -264,7 +262,7 @@ module BibTeX
 
     # Returns all symbols contained in the Value.
     def symbols
-      @tokens.select { |v| v.is_a?(Symbol) }
+      @tokens.grep(Symbol)
     end
 
     # Returns a new Value with all string values converted according to the given filter(s).
