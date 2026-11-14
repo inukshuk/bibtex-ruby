@@ -1,4 +1,6 @@
 module BibTeX
+  # Base class for all errors raised by BibTeX-Ruby. Keeps a reference
+  # to the original exception (if any) that caused it.
   class BibTeXError < StandardError
     attr_reader :original
 

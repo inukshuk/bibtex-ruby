@@ -224,37 +224,6 @@ Rake/Desc:
   Exclude:
     - 'Rakefile'
 
-# Offense count: 4
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle, EnforcedStyleForClasses, EnforcedStyleForModules.
-# SupportedStyles: nested, compact
-# SupportedStylesForClasses: ~, nested, compact
-# SupportedStylesForModules: ~, nested, compact
-Style/ClassAndModuleChildren:
-  Exclude:
-    - 'lib/bibtex/bibliography/rdf_converter.rb'
-    - 'lib/bibtex/entry/bibtexml_converter.rb'
-    - 'lib/bibtex/entry/citeproc_converter.rb'
-    - 'lib/bibtex/entry/rdf_converter.rb'
-
-# Offense count: 12
-# Configuration parameters: AllowedConstants.
-Style/Documentation:
-  Exclude:
-    - 'spec/**/*'
-    - 'test/**/*'
-    - 'lib/bibtex/bibliography/rdf_converter.rb'
-    - 'lib/bibtex/compatibility.rb'
-    - 'lib/bibtex/entry/bibtexml_converter.rb'
-    - 'lib/bibtex/entry/citeproc_converter.rb'
-    - 'lib/bibtex/entry/rdf_converter.rb'
-    - 'lib/bibtex/error.rb'
-    - 'lib/bibtex/extensions.rb'
-    - 'lib/bibtex/filters.rb'
-    - 'lib/bibtex/filters/latex.rb'
-    - 'lib/bibtex/filters/linebreaks.rb'
-    - 'lib/bibtex/utilities.rb'
-
 # Offense count: 2
 Style/FileOpen:
   Exclude:

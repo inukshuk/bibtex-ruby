@@ -1,3 +1,4 @@
+# Compatibility helpers, such as transliterating Unicode text to ASCII.
 module BibTeX
   def self.transliterate(str)
     str

@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+# Top-level convenience methods for opening and parsing bibliographies
+# and names.
 module BibTeX
   class << self
     # Opens a BibTeX file or URI and returns a corresponding +Bibliography+
