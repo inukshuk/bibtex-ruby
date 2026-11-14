@@ -109,17 +109,17 @@ module BibTeX
 
       describe '#convert' do
         it 'converts the value when given a filter instance' do
-          assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase.instance).to_s }
+          assert_equal(['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase.instance).to_s })
         end
 
         it 'converts the value when given a filter class' do
-          assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase).to_s }
+          assert_equal(['FOO', '"FOO" # bar'], @values.map { |v| v.convert(Upcase).to_s })
         end
 
         it 'converts the value when given the name of a filter' do
-          assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert(:upcase).to_s }
-          assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert('upcase').to_s }
-          assert_equal ['fooa', '"fooa" # bar'], @values.map { |v| v.convert('suffixa').to_s }
+          assert_equal(['FOO', '"FOO" # bar'], @values.map { |v| v.convert(:upcase).to_s })
+          assert_equal(['FOO', '"FOO" # bar'], @values.map { |v| v.convert('upcase').to_s })
+          assert_equal(['fooa', '"fooa" # bar'], @values.map { |v| v.convert('suffixa').to_s })
         end
 
         it 'applies multiple filters in the order passed' do
@@ -128,7 +128,7 @@ module BibTeX
         end
 
         it 'converts the value when using a ghost method' do
-          assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert_upcase.to_s }
+          assert_equal(['FOO', '"FOO" # bar'], @values.map { |v| v.convert_upcase.to_s })
         end
 
         it 'does not alter the value when using a filter name' do
@@ -154,7 +154,7 @@ module BibTeX
 
       describe '#convert!' do
         it 'converts the value when given the name of a filter' do
-          assert_equal ['FOO', '"FOO" # bar'], @values.map { |v| v.convert!(:upcase).to_s }
+          assert_equal(['FOO', '"FOO" # bar'], @values.map { |v| v.convert!(:upcase).to_s })
         end
 
         it 'alters the value when given the name of a filter' do

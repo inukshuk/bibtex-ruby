@@ -80,7 +80,7 @@ end
 
 Then /^my bibliography should contain an entry with an? (?:key|id) like "([^"]*)"$/ do |key|
   pattern = Regexp.compile key
-  refute_nil @bibliography.detect { |e| e.key.to_s =~ pattern }
+  refute_nil(@bibliography.detect { |e| e.key.to_s =~ pattern })
 end
 Then /^my bibliography should contain an entry with (?:key|id) "([^"]*)" and a?n? (\w+) value of "([^"]*)"$/ do |key, field, value|
   refute_nil @bibliography[key.to_s]
