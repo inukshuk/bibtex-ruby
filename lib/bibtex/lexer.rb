@@ -34,7 +34,8 @@ module BibTeX
       include: [:errors],
       strict: true,
       allow_missing_keys: false,
-      strip: true
+      strip: true,
+      strip_comments: false
     }
 
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
@@ -50,6 +51,10 @@ module BibTeX
       # Several space-separated words followed by `=', e.g. the
       # `Early Access Date' fields exported by Web of Science (#131).
       spaced_name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.%+&*-]+)+(?=\s*=)}io,
+      spaced_name_without_percent: %r{[[:alpha:][:digit:]/:_!$?.+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.+&*-]+)+(?=\s*=)}io,
+      name_without_percent: %r{[[:alpha:][:digit:]/:_!$?.+&*-]+}io,
+      tex_comment: /%[^\n]*/o,
+      tex_comments: /(?:\s*%[^\n]*)+/o,
       quote: /\s*"/o,
       unquote: /[{}"]/o,
       sharp: /\s*#\s*/o,
@@ -62,7 +67,9 @@ module BibTeX
       comment: /comment\b/io,
       preamble: /preamble\b/io,
       key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"{}-]+,}io,
-      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"-]*,}io
+      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"-]*,}io,
+      key_without_percent: %r{\s*[[:alpha:][:digit:] /:_!$?.+;&*'"{}-]+,}io,
+      optional_key_without_percent: %r{\s*[[:alpha:][:digit:] /:_!$?.+;&*'"-]*,}io
     }
 
     MODE = Hash.new(:meta).merge(
@@ -91,6 +98,10 @@ module BibTeX
     #   separated by spaces or tabs and joins them with underscores.
     # - :strip => true When enabled, newlines will be stripped from quoted
     #   string values.
+    # - :strip_comments => false When enabled, a '%' and the rest of its line
+    #   are ignored when they appear between the tokens of a BibTeX object
+    #   (biber-style TeX comments), e.g., on a line of their own or after a
+    #   field. A '%' inside a braced or quoted value is never a comment.
     #
     def initialize(options = {})
       @options = Lexer.defaults.merge(options)
@@ -146,6 +157,10 @@ module BibTeX
 
     def allow_missing_keys?
       !!@options[:allow_missing_keys]
+    end
+
+    def strip_comments?
+      !!@options[:strip_comments]
     end
 
     def strip_line_breaks?
@@ -205,13 +220,15 @@ module BibTeX
         push([:EQ, '='])
       when @scanner.scan(Lexer.patterns[:comma])
         push([:COMMA, ','])
-      when !strict? && @scanner.scan(Lexer.patterns[:spaced_name])
+      when strip_comments? && @scanner.scan(Lexer.patterns[:tex_comment])
+        # skip
+      when !strict? && @scanner.scan(Lexer.patterns[spaced_name_pattern])
         # Non-strict mode only: join the words so the field name stays
         # valid BibTeX when the entry is written out again.
         push([:NAME, @scanner.matched.split(/[\t ]+/).join('_')])
       when @scanner.scan(Lexer.patterns[:number])
         push([:NUMBER, @scanner.matched])
-      when @scanner.scan(Lexer.patterns[:name])
+      when @scanner.scan(Lexer.patterns[name_pattern])
         push([:NAME, @scanner.matched.rstrip])
       when @scanner.scan(Lexer.patterns[:quote])
         @mode = :literal
@@ -318,12 +335,28 @@ module BibTeX
           push([:LBRACE, '{'])
           @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
 
-          push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
+          @scanner.scan(Lexer.patterns[:tex_comments]) if strip_comments?
+          push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[key_pattern])
         end
 
       else
         error_unexpected_object
       end
+    end
+
+    # With :strip_comments, '%' starts a comment, so it cannot be part of
+    # a name or key.
+    def name_pattern
+      strip_comments? ? :name_without_percent : :name
+    end
+
+    def spaced_name_pattern
+      strip_comments? ? :spaced_name_without_percent : :spaced_name
+    end
+
+    def key_pattern
+      key = allow_missing_keys? ? :optional_key : :key
+      strip_comments? ? :"#{key}_without_percent" : key
     end
 
     # Called when parser leaves a BibTeX object.

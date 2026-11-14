@@ -45,6 +45,8 @@ module BibTeX
       # -:parse_names: set to false to disable automatic name parsing
       # -:parse_months: set to false to disable automatic month conversion
       # -:filter: convert all entries using the sepcified filter (not set by default)
+      # -:strip_comments: set to true to ignore TeX comments ('%' to the end of
+      #   the line) between the fields of an entry (disabled by default)
       #
       def open(path, options = {})
         b = parse(File.read(path, encoding: 'utf-8'), options)

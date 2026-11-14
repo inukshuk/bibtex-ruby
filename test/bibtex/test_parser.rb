@@ -153,6 +153,79 @@ module BibTeX
       end
     end
 
+    describe 'TeX comments inside entries (#132)' do
+      let(:input) { %(@book{book,\n% inside\nauthor = "John Doe" % after field\n}) }
+
+      it 'raises a parse error by default' do
+        assert_raises(ParseError) { Parser.new(debug: false).parse(input) }
+        assert_raises(ParseError) { Parser.new(debug: false, strict: false).parse(input) }
+      end
+
+      it 'ignores comments with :strip_comments set' do
+        bib = Parser.new(debug: false, parse_names: false, strip_comments: true).parse(input)
+
+        assert_equal 1, bib.length
+        assert_equal 'John Doe', bib[:book].author.to_s
+        assert_equal [:author], bib[:book].fields.keys
+      end
+
+      it 'ignores comments before the key, after a comma and in concatenations' do
+        bib = Parser.new(debug: false, strip_comments: true).parse(<<~BIB)
+          @misc{% before the key
+            key, % after the key, with a comma
+            title = "foo" # % inside a concatenation
+                    "bar", % after a comma
+            % on its own line
+            year = 2020 % after a number
+          }
+        BIB
+
+        assert_equal 'foobar', bib[:key].title.join.to_s
+        assert_equal '2020', bib[:key].year.to_s
+        assert_equal %i[title year], bib[:key].fields.keys
+      end
+
+      it 'preserves percent signs inside braced and quoted values' do
+        bib = Parser.new(debug: false, strip_comments: true).parse(<<~'BIB')
+          @misc{key,
+            url = {http://x/a%20b}, % comment
+            howpublished = "http://x/c%20d",
+            note = {50\% off},
+            title = "50\% off"
+          }
+        BIB
+
+        assert_equal 'http://x/a%20b', bib[:key].url.to_s
+        assert_equal 'http://x/c%20d', bib[:key].howpublished.to_s
+        assert_equal '50\% off', bib[:key].note.to_s
+        assert_equal '50\% off', bib[:key].title.to_s
+      end
+
+      it 'still skips comment lines between entries' do
+        bib = Parser.new(debug: false, strip_comments: true).parse(<<~BIB)
+          @misc{a, title = {A}}
+          % a comment between entries
+          @misc{b, title = {B}}
+        BIB
+
+        assert_equal %w[a b], bib.map(&:key)
+      end
+
+      it 'combines with multi-word field names in non-strict mode (#131)' do
+        bib = Parser.new(debug: false, strict: false, strip_comments: true).parse(<<~BIB)
+          @article{a,
+            title = {T}, % trailing comment
+            % Early Access Note = {commented out}
+            Early Access Date = {{NOV}}
+          }
+        BIB
+        entry = bib[0]
+
+        assert_equal %i[title early_access_date], entry.fields.keys
+        assert_equal '{NOV}', entry[:early_access_date].to_s
+      end
+    end
+
     describe 'backslashes and escape sequences' do
       it 'leaves backslashes intact' do
         _(Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title).must_be :==, 'a backslash: \\'
