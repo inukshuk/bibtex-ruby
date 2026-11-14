@@ -127,9 +127,9 @@ module BibTeX
     # pair as parameters.
     #
     # If no block is given, an enumerator is returned instead.
-    def each(&block)
+    def each(&)
       if block_given?
-        fields.each(&block)
+        fields.each(&)
         self
       else
         to_enum
@@ -263,13 +263,13 @@ module BibTeX
       names
     end
 
-    def method_missing(name, *args, &block)
+    def method_missing(name, *args, &)
       if fields.key?(name)
         fields[name]
       elsif name.to_s =~ /^(.+)=$/
         send(:add, Regexp.last_match(1).to_sym, args[0])
       elsif name =~ /^(?:convert|from)_([a-z]+)(!)?$/
-        Regexp.last_match(2) ? convert!(Regexp.last_match(1), &block) : convert(Regexp.last_match(1), &block)
+        Regexp.last_match(2) ? convert!(Regexp.last_match(1), &) : convert(Regexp.last_match(1), &)
       elsif has_parent? && parent.provides?(name)
         parent.provide(name)
       else
@@ -569,8 +569,8 @@ module BibTeX
     # the block returns true (the block will be called with each key-value pair).
     #
     # @see #convert!
-    def convert(*filters, &block)
-      block_given? ? dup.convert!(*filters, &block) : dup.convert!(*filters)
+    def convert(*filters, &)
+      block_given? ? dup.convert!(*filters, &) : dup.convert!(*filters)
     end
 
     # In-place variant of @see #convert

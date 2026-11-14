@@ -144,9 +144,9 @@ module BibTeX
       self
     end
 
-    def each(&block)
+    def each(&)
       if block_given?
-        data.each(&block)
+        data.each(&)
         self
       else
         to_enum
@@ -360,17 +360,17 @@ module BibTeX
       groups
     end
 
-    def sort!(*arguments, &block)
-      data.sort!(*arguments, &block)
+    def sort!(*arguments, &)
+      data.sort!(*arguments, &)
       self
     end
 
-    def sort(*arguments, &block)
-      dup.sort!(*arguments, &block)
+    def sort(*arguments, &)
+      dup.sort!(*arguments, &)
     end
 
-    def sort_by!(*arguments, &block)
-      data.sort_by!(*arguments, &block)
+    def sort_by!(*arguments, &)
+      data.sort_by!(*arguments, &)
       self
     end
 
@@ -484,16 +484,16 @@ module BibTeX
 
     alias q query
 
-    def each_entry(&block)
+    def each_entry(&)
       if block_given?
-        q('@entry').each(&block)
+        q('@entry').each(&)
       else
         q('@entry').to_enum
       end
     end
 
-    def find_by_type(*types, &block)
-      q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
+    def find_by_type(*types, &)
+      q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &)
     end
 
     alias find_by_types find_by_type
