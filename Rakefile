@@ -85,14 +85,16 @@ namespace :bench do
   desc 'Benchmarks the lib/ of another git ref (default: origin/master) and compares it with the working tree'
   task :compare, [:ref] => ['racc'] do |_t, args|
     require 'tmpdir'
+    require 'shellwords'
     ref = args[:ref] || 'origin/master'
+    abort "bench:compare: #{ref} is not a valid git ref" unless system('git', 'rev-parse', '--verify', '--quiet', "#{ref}^{commit}", out: File::NULL)
 
     Dir.mktmpdir('bibtex-bench') do |dir|
-      sh "git archive #{ref} lib | tar -x -C #{dir}"
+      sh "git archive #{ref.shellescape} lib | tar -x -C #{dir.shellescape}"
       baseline = File.join(dir, 'baseline.json')
       sh({ 'BIBTEX_LIB' => File.join(dir, 'lib'), 'LABEL' => ref, 'JSON' => baseline }, Gem.ruby, '-W0', 'benchmark/run.rb')
       puts
-      sh({ 'COMPARE' => baseline }, Gem.ruby, '-W0', 'benchmark/run.rb')
+      sh({ 'BIBTEX_LIB' => nil, 'LABEL' => nil, 'COMPARE' => baseline }, Gem.ruby, '-W0', 'benchmark/run.rb')
     end
   end
 end

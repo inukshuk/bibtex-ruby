@@ -726,10 +726,11 @@ wall time and allocated objects for parsing, export and query workloads
 on a generated bibliography, and compare the result with `master`:
 
     $ bundle exec rake bench
-    $ bundle exec rake bench:compare[origin/master]
+    $ bundle exec rake 'bench:compare[origin/master]'
 
 See `benchmark/run.rb` for the options (bibliography size, workloads,
-JSON output, memory_profiler figures).
+JSON output, memory_profiler figures). The benchmark exits with a
+non-zero status if a workload fails.
 
 Credits
 -------
