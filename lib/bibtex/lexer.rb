@@ -25,8 +25,8 @@ module BibTeX
   class Lexer
     extend Forwardable
 
-    attr_reader :options, :stack, :mode, :scanner
-    attr_writer :mode
+    attr_accessor :mode
+    attr_reader :options, :stack, :scanner
 
     def_delegator :@scanner, :string, :data
 
