@@ -121,6 +121,18 @@ module BibTeX
     end
 
     describe 'hash queries' do
+      it 'selects by type given as a String' do
+        assert_equal %w[ruby rails], keys(@bib.query(type: 'book'))
+      end
+
+      it 'selects all entries with type :entry' do
+        assert_equal %w[maksimovic ruby rails proc talk], keys(@bib.query(type: :entry))
+      end
+
+      it 'ignores conditions with keys that are not names' do
+        assert_empty @bib.query(1 => 'x')
+      end
+
       it 'selects by type' do
         assert_equal %w[ruby rails], keys(@bib.query(type: :book))
         assert_equal %w[ruby rails], keys(@bib.q(type: :book))

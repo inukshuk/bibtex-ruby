@@ -253,8 +253,11 @@ A Hash query matches an element when every condition matches; each
 condition is compared with `===`, so Strings match exactly, Regexps match
 anywhere, and Ranges, Classes and Procs work too. An Array means "any of".
 A field the entry does not have never matches, except for `nil`, which
-selects the elements lacking that field. Because values are plain Ruby
-objects, there is nothing to escape and values may contain commas:
+selects the elements lacking that field. One convenience applies to
+`:type` only: a Symbol or String type is checked like the string selectors
+check it, so `type: :entry` (or `'*'`) matches every entry and `type: 'book'`
+works like `type: :book`. Because values are plain Ruby objects, there is
+nothing to escape and values may contain commas:
 
 ```ruby
 bib.query(type: :article, author: /Maksimovi/)
@@ -263,6 +266,8 @@ bib.query(author: %q(Maksimovi\'{c}, Petar))
 #=> exact match, no escaping issues
 bib.query(type: [:book, :article])
 #=> all books and articles
+bib.query(type: :entry)
+#=> all entries, whatever their BibTeX type
 bib.query(:first, year: '2010'..'2015')
 #=> the first element published between 2010 and 2015
 bib.query(:none, type: :book)
@@ -290,11 +295,16 @@ in { type: :book, title: /Ruby/ => title } then puts title
 end
 ```
 
+Pattern matching sees the raw values only: `:type` is the entry's actual
+type (e.g. `:book`), so `type: :entry` does not match there. Use
+`e.entry?` or `bib.each_entry` instead.
+
 Migrating from string selectors:
 
 | String selector                | Hash query or pattern                                    |
 | ------------------------------ | -------------------------------------------------------- |
 | `'@book'`                      | `type: :book`                                            |
+| `'@entry'` or `'@*'`           | `type: :entry` (or `bib.each_entry`)                     |
 | `'@book, @article'`            | `type: [:book, :article]`                                |
 | `'@book[year=2009]'`           | `type: :book, year: '2009'`                              |
 | `'@article[year<=2007]'`       | `type: :article, year: ..'2007'` or a block              |

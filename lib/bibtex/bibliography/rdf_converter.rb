@@ -19,7 +19,7 @@ module BibTeX
 
       # @return [RDF::Graph] the RDF graph of this bibliography
       def convert!
-        bibtex.q('@entry').each do |entry|
+        bibtex.each_entry do |entry|
           BibTeX::Entry::RDFConverter.convert(entry, graph, agent)
         end
 

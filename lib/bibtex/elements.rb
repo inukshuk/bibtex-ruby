@@ -109,7 +109,8 @@ module BibTeX
     # Ranges, Classes and Procs all work. An Array pattern matches if any
     # of its members matches. A field the element does not have never
     # matches, except for a +nil+ pattern, which matches exactly those
-    # elements that lack the field.
+    # elements that lack the field. A Symbol or String +:type+ pattern is
+    # checked with #type?, so +type: :entry+ matches every entry.
     #
     # @example
     #   entry.matches?(type: :article, year: '2010'..'2015')
@@ -247,7 +248,9 @@ module BibTeX
       values = deconstruct_keys(conditions.keys)
 
       conditions.all? do |name, pattern|
-        if values.key?(name)
+        if name == :type
+          type_matches?(pattern)
+        elsif values.key?(name)
           pattern_matches?(pattern, values[name])
         else
           pattern.nil?
@@ -260,6 +263,16 @@ module BibTeX
         pattern.any? { |alternative| pattern_matches?(alternative, value) }
       else
         pattern === value # rubocop:disable Style/CaseEquality
+      end
+    end
+
+    # Symbol and String type patterns go through #type?, so that :entry
+    # matches every entry and 'book' matches like :book does.
+    def type_matches?(pattern)
+      case pattern
+      when ::Array then pattern.any? { |alternative| type_matches?(alternative) }
+      when ::Symbol, ::String then type?(pattern)
+      else pattern === type # rubocop:disable Style/CaseEquality
       end
     end
 

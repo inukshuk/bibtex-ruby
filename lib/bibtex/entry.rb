@@ -342,7 +342,7 @@ module BibTeX
       hash = { type: type, key: key }
 
       (keys.nil? ? field_names : keys).each do |name|
-        next if hash.key?(name)
+        next if hash.key?(name) || !name.respond_to?(:to_sym)
 
         value = self[name]
         hash[name] = value.to_s unless value.nil?

@@ -277,9 +277,12 @@ module BibTeX
     #
     # call-seq:
     # bib.replace #=> replaces all symbols
-    # bib.replace('@string, @preamble')
+    # bib.replace(type: %i[string preamble])
     # #=> replaces only symbols in @string and @preamble objects
     #
+    # @deprecated Passing a string selector such as '@string, @preamble'
+    #   is deprecated and will be removed in 7.0; pass a Hash of
+    #   conditions instead (see #query).
     def replace(filter = '')
       q(filter) { |e| e.replace(@strings.values) }
       self
@@ -527,11 +530,8 @@ module BibTeX
     alias q query
 
     def each_entry(&)
-      if block_given?
-        q { |e| e.has_type?(:entry) }.each(&)
-      else
-        q { |e| e.has_type?(:entry) }.to_enum
-      end
+      selected = q(&:entry?)
+      block_given? ? selected.each(&) : selected.to_enum
     end
 
     def find_by_type(*types, &)
