@@ -30,8 +30,8 @@ module BibTeX
 
     describe 'when empty' do
       it 'should be equal to an empty string' do
-        assert_equal Value.new, ''
-        assert_equal Value.new(''), ''
+        assert_equal '', Value.new
+        assert_equal '', Value.new('')
       end
       it 'should be empty' do
         assert_empty Value.new
