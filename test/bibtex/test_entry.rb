@@ -648,6 +648,34 @@ module BibTeX
                      "month = dec\n" \
                      "}\n", @bib['foo'].to_s(filter: :linebreaks)
       end
+
+      it 'leaves the options hash unchanged' do
+        options = { filter: :linebreaks }
+        @bib['foo'].to_s(options)
+
+        _(options).must_equal({ filter: :linebreaks })
+      end
+
+      it 'accepts a frozen options hash' do
+        _(@bib['foo'].to_s({}.freeze)).must_include 'title = {A'
+      end
+    end
+
+    describe '#to_hash' do
+      before do
+        @entry = Entry.new(bibtex_type: :book, bibtex_key: 'rails', title: 'Rails')
+      end
+
+      it 'leaves the options hash unchanged' do
+        options = {}
+        @entry.to_hash(options)
+
+        _(options).must_be_empty
+      end
+
+      it 'accepts a frozen options hash' do
+        _(@entry.to_hash({}.freeze)[:title]).must_equal '{Rails}'
+      end
     end
 
     describe 'default keys' do

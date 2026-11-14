@@ -613,12 +613,12 @@ module BibTeX
 
     # Returns a string representation of the entry.
     def to_s(options = {})
-      options[:quotes] ||= %w[{ }]
+      options = options.merge(quotes: %w[{ }]) unless options[:quotes]
       ["@#{type}{#{key},", content(options).gsub(/^/, '  '), "}\n"].join("\n")
     end
 
     def to_hash(options = {})
-      options[:quotes] ||= %w[{ }]
+      options = options.merge(quotes: %w[{ }]) unless options[:quotes]
       hash = { bibtex_key: key, bibtex_type: type }
       each_pair { |k, v| hash[k] = v.to_s(options) }
       hash

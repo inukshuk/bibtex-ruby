@@ -282,6 +282,25 @@ module BibTeX
         end
       end
 
+      describe '#to_s, #to_a and #to_hash' do
+        it 'leave the options hash unchanged' do
+          options = {}
+          @bib.to_s(options)
+          @bib.to_a(options)
+          @bib.to_hash(options)
+
+          _(options).must_be_empty
+        end
+
+        it 'accept a frozen options hash' do
+          options = {}.freeze
+
+          _(@bib.to_s(options)).must_include '@book{rails,'
+          _(@bib.to_a(options)).wont_be_empty
+          _(@bib.to_hash(options)[:bibliography]).wont_be_empty
+        end
+      end
+
       describe 'duplicates' do
         it 'understands select_duplicates_by' do
           assert_equal 1, @bib.select_duplicates_by.length
