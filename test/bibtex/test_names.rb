@@ -114,6 +114,20 @@ module BibTeX
         _(names.map(&:last)).must_equal %w[Poe Plato]
       end
 
+      it 'parses and appends the names of a string' do
+        names = Names.new(@poe)
+
+        _(names.add('Plato and Aristotle')).must_be_same_as names
+        _(names.map(&:last)).must_equal %w[Poe Plato Aristotle]
+      end
+
+      it 'parses and appends the names of any object that converts to a string' do
+        thing = Object.new
+        def thing.to_s = 'Plato'
+
+        _(Names.new.add(thing).map(&:last)).must_equal %w[Plato]
+      end
+
       it 'raises an ArgumentError for objects that cannot be converted to a string' do
         names = Names.new
         thing = BasicObject.new
@@ -128,6 +142,21 @@ module BibTeX
     end
 
     describe '.looks_like?' do
+      it 'returns true for strings that parse as a name' do
+        _(Name.looks_like?('Poe, Edgar Allen')).must_equal true
+      end
+
+      it 'returns true for objects whose string form parses as a name' do
+        thing = Object.new
+        def thing.to_s = 'Edgar Allen Poe'
+
+        _(Name.looks_like?(thing)).must_equal true
+      end
+
+      it 'returns false for strings that do not parse as a name' do
+        _(Name.looks_like?('')).must_equal false
+      end
+
       it 'returns false for objects that cannot be converted to a string' do
         thing = BasicObject.new
         def thing.respond_to?(*) = false
@@ -156,6 +185,10 @@ module BibTeX
 
       it 'does not rename the name if the block returns true' do
         _(@poe.rename_unless(first: 'E.A.') { |_n| true }.first).wont_equal 'E.A.'
+      end
+
+      it 'does not rename the name if no condition is given, as the complement of #rename_if' do
+        _(@poe.rename_unless(first: 'E.A.').first).must_equal 'Edgar Allen'
       end
 
       it 'yields the name to the block' do

@@ -84,7 +84,7 @@ module BibTeX
       if name.is_a?(Name)
         @tokens << name
       elsif name.respond_to?(:to_s)
-        @tokens += Names.parse(name.to_s)
+        @tokens += Names.parse(name.to_s).to_a
       else
         raise ArgumentError, "failed to add #{name.inspect}: not a name."
       end
@@ -132,7 +132,7 @@ module BibTeX
       # Returns true if thing looks like a name.
       # Actually converts thing to a string and tries to parse it.
       def looks_like?(thing)
-        thing.respond_to?(:to_s) && [Name.new.parse(string)].flatten.compact.empty?
+        thing.respond_to?(:to_s) && !Name.parse(thing.to_s).nil?
       end
     end
 
