@@ -218,39 +218,39 @@ module BibTeX
 
     def parse_bibtex
       case
-      when @scanner.scan(Lexer.patterns[:lbrace])
+      when @scanner.skip(Lexer.patterns[:lbrace])
         @brace_level += 1
         push([:LBRACE, '{'])
         @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
-      when @scanner.scan(Lexer.patterns[:rbrace])
+      when @scanner.skip(Lexer.patterns[:rbrace])
         @brace_level -= 1
         push([:RBRACE, '}'])
         return leave_object if @brace_level.zero?
 
         error_unbalanced_braces if @brace_level.negative?
-      when @scanner.scan(Lexer.patterns[:eq])
+      when @scanner.skip(Lexer.patterns[:eq])
         push([:EQ, '='])
-      when @scanner.scan(Lexer.patterns[:comma])
+      when @scanner.skip(Lexer.patterns[:comma])
         push([:COMMA, ','])
-      when strip_comments? && @scanner.scan(Lexer.patterns[:tex_comment])
+      when strip_comments? && @scanner.skip(Lexer.patterns[:tex_comment])
         # skip
-      when !strict? && @scanner.scan(Lexer.patterns[spaced_name_pattern])
+      when !strict? && @scanner.skip(Lexer.patterns[spaced_name_pattern])
         # Non-strict mode only: join the words so the field name stays
         # valid BibTeX when the entry is written out again.
         push([:NAME, @scanner.matched.split(/[\t ]+/).join('_')])
-      when @scanner.scan(Lexer.patterns[:number])
+      when @scanner.skip(Lexer.patterns[:number])
         push([:NUMBER, @scanner.matched])
-      when @scanner.scan(Lexer.patterns[name_pattern])
-        push([:NAME, @scanner.matched.rstrip])
-      when @scanner.scan(Lexer.patterns[:quote])
+      when @scanner.skip(Lexer.patterns[name_pattern])
+        push([:NAME, @scanner.matched])
+      when @scanner.skip(Lexer.patterns[:quote])
         @mode = :literal
-      when @scanner.scan(Lexer.patterns[:sharp])
+      when @scanner.skip(Lexer.patterns[:sharp])
         push([:SHARP, '#'])
-      when @scanner.scan(Lexer.patterns[:object])
+      when @scanner.skip(Lexer.patterns[:object])
         enter_object
-      when @scanner.scan(Lexer.patterns[:space])
+      when @scanner.skip(Lexer.patterns[:space])
         # skip
-      when @scanner.scan(Lexer.patterns[:period])
+      when @scanner.skip(Lexer.patterns[:period])
         error_unexpected_token
       end
     end
@@ -328,27 +328,27 @@ module BibTeX
       @brace_level = 0
       push [:AT, '@']
 
-      if @scanner.scan(Lexer.patterns[:string])
+      if @scanner.skip(Lexer.patterns[:string])
         @mode = @active_object = :string
         push [:STRING, @scanner.matched]
-      elsif @scanner.scan(Lexer.patterns[:preamble])
+      elsif @scanner.skip(Lexer.patterns[:preamble])
         @mode = @active_object = :preamble
         push [:PREAMBLE, @scanner.matched]
-      elsif @scanner.scan(Lexer.patterns[:comment])
+      elsif @scanner.skip(Lexer.patterns[:comment])
         @mode = @active_object = :comment
         push [:COMMENT, @scanner.matched]
-      elsif @scanner.scan(Lexer.patterns[:entry])
+      elsif @scanner.skip(Lexer.patterns[:entry])
         @mode = @active_object = :entry
         push [:NAME, @scanner.matched]
 
         # TODO: DRY - try to parse key
-        if @scanner.scan(Lexer.patterns[:lbrace])
+        if @scanner.skip(Lexer.patterns[:lbrace])
           @brace_level += 1
           push([:LBRACE, '{'])
           @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
 
-          @scanner.scan(Lexer.patterns[:tex_comments]) if strip_comments?
-          push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[key_pattern])
+          @scanner.skip(Lexer.patterns[:tex_comments]) if strip_comments?
+          push [:KEY, @scanner.matched.chop.strip] if @scanner.skip(Lexer.patterns[key_pattern])
         end
 
       else
