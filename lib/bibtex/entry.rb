@@ -63,10 +63,6 @@ module BibTeX
     # month abbreviation (:jan to :dec) if the value starts with a month
     # name or is a month number from 1 to 12; any other value is kept
     # as-is. Each call returns a new Value, so entries never share a month.
-    #
-    # This used to be a memoizing Hash keyed by the field's Value. As
-    # Values compare by identity, every parsed entry added a key that was
-    # never released, so the Hash and its lookup cost grew with each parse.
     MONTHS_FILTER = lambda do |month|
       case (string = month.to_s.strip)
       when /\A(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
