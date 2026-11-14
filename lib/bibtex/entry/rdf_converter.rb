@@ -496,12 +496,12 @@ class BibTeX::Entry::RDFConverter
   def type
     graph << [entry, RDF.type, bibo[bibo_class]]
 
-    case bibtex.type
+    graph << case bibtex.type
     when :proceedings, :journal
-      graph << [entry, RDF::Vocab::DC.type, 'Collection']
+      [entry, RDF::Vocab::DC.type, 'Collection']
     else
-      graph << [entry, RDF::Vocab::DC.type, 'Text']
-    end
+      [entry, RDF::Vocab::DC.type, 'Text']
+             end
   end
 
   def url
