@@ -566,7 +566,7 @@ class BibTeX::Entry::RDFConverter
     if key.nil?
       @agent
     else
-      key = key.respond_to?(:to_hash) ? key.to_hash : key
+      key = key.to_hash if key.respond_to?(:to_hash)
       @agent[key] ||= yield
     end
   end
