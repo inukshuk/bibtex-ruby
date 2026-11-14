@@ -5,7 +5,7 @@ require 'timeout'
 
 module BibTeX
   class TestBibtex < Minitest::Test
-    RAILS_BOOK = <<-BIBTEX.freeze
+    RAILS_BOOK = <<-BIBTEX
       @book{rails,
         address = {Raleigh, North Carolina},
         author = {Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David},
