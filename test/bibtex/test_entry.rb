@@ -288,6 +288,8 @@ module BibTeX
       end
 
       it 'does not allocate more on repeated parses' do
+        skip 'GC.stat has no allocation counter' unless GC.stat.key?(:total_allocated_objects)
+
         months = %w[jan Feb 3 {April}]
         input = (1..300).map { |i| "@misc{k#{i}, month = #{months[i % 4]}}" }.join("\n")
         Bibliography.parse(input)
@@ -296,7 +298,7 @@ module BibTeX
           Bibliography.parse(input)
           GC.stat(:total_allocated_objects) - before
         end
-        skip 'GC.stat cannot count allocations here' if allocations.first.zero?
+        skip 'GC.stat does not count allocations here' if allocations.first.zero?
 
         assert_operator allocations.last, :<, allocations.first * 1.2,
                         "allocations grew across parses: #{allocations.inspect}"
