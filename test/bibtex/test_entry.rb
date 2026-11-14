@@ -532,105 +532,6 @@ module BibTeX
       end
     end
 
-    def test_simple
-      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
-
-      refute_nil(bib)
-      assert_instance_of(BibTeX::Bibliography, bib)
-      assert_equal(4, bib.data.length)
-      assert_equal([BibTeX::Entry], bib.data.map(&:class).uniq)
-    end
-
-    def test_simple_keys_and_types
-      entries = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[0, 3]
-
-      assert_equal(%w[key:0 key:1 foo], entries.map(&:key))
-      assert_equal(%i[book article article], entries.map(&:type))
-    end
-
-    def test_simple_first_entry
-      entry = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[0]
-
-      assert_equal('Poe, Edgar A.', entry[:author].to_s)
-      assert_equal('2003', entry[:year])
-      assert_equal('American Library', entry[:publisher])
-      assert_equal('Selected \\emph{Poetry} and `Tales\'', entry.title)
-    end
-
-    def test_simple_second_entry
-      entry = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[1]
-
-      assert_equal('Hawthorne, Nathaniel', entry[:author].to_s)
-      assert_equal('2001', entry[:year])
-      assert_equal('American Library', entry[:publisher])
-      assert_equal('Tales and Sketches', entry.title)
-    end
-
-    def test_ghost_methods
-      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
-
-      assert_equal 'Poe, Edgar A.', bib[0].author.to_s
-
-      expected = 'Poe, Edgar Allen'
-      bib.data[0].author = expected
-
-      assert_equal expected, bib[0].author.to_s
-    end
-
-    def test_creation_simple
-      entry = BibTeX::Entry.new
-      entry.type = :book
-      entry.key = :raven
-      entry.author = 'Poe, Edgar A.'
-      entry.title = 'The Raven'
-
-      assert_equal :book, entry.type
-      assert_equal 'raven', entry.key
-      assert_equal 'Poe, Edgar A.', entry.author
-      assert_equal 'The Raven', entry.title
-    end
-
-    def test_creation_from_hash
-      entry = BibTeX::Entry.new(
-        bibtex_type: 'book',
-        bibtex_key: :raven,
-        author: 'Poe, Edgar A.',
-        title: 'The Raven'
-      )
-
-      assert_equal :book, entry.type
-      assert_equal 'raven', entry.key
-      assert_equal 'Poe, Edgar A.', entry.author
-      assert_equal 'The Raven', entry.title
-    end
-
-    def test_creation_from_block
-      entry = BibTeX::Entry.new do |e|
-        e.type = :book
-        e.key = 'raven'
-        e.author = 'Poe, Edgar A.'
-        e.title = 'The Raven'
-      end
-
-      assert_equal :book, entry.type
-      assert_equal 'raven', entry.key
-      assert_equal 'Poe, Edgar A.', entry.author
-      assert_equal 'The Raven', entry.title
-    end
-
-    def test_sorting
-      entries = []
-      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven3', author: 'Poe, Edgar A.', title: 'The Raven')
-      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven2', author: 'Poe, Edgar A.', title: 'The Raven')
-      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven1', author: 'Poe, Edgar A.', title: 'The Raven')
-      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven1', author: 'Poe, Edgar A.', title: 'The Aven')
-
-      entries.sort!
-
-      assert_equal %w[raven1 raven1 raven2 raven3], entries.map(&:key)
-      assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0, 2]
-    end
-
     describe 'default keys' do
       before do
         @e1 = Entry.new(bibtex_type: 'book', author: 'Poe, Edgar A.', title: 'The Raven', editor: 'John Hopkins', year: 1996)
@@ -873,6 +774,109 @@ module BibTeX
 
         _(entry.to_s).must_include 'howpublished = {Smith \\& Sons}'
       end
+    end
+  end
+
+  # Classic tests live outside EntryTest: methods defined in a Minitest::Spec
+  # are inherited by every nested describe class and would run once per class.
+  class EntryClassicTest < Minitest::Test
+    def test_simple
+      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
+
+      refute_nil(bib)
+      assert_instance_of(BibTeX::Bibliography, bib)
+      assert_equal(4, bib.data.length)
+      assert_equal([BibTeX::Entry], bib.data.map(&:class).uniq)
+    end
+
+    def test_simple_keys_and_types
+      entries = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[0, 3]
+
+      assert_equal(%w[key:0 key:1 foo], entries.map(&:key))
+      assert_equal(%i[book article article], entries.map(&:type))
+    end
+
+    def test_simple_first_entry
+      entry = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[0]
+
+      assert_equal('Poe, Edgar A.', entry[:author].to_s)
+      assert_equal('2003', entry[:year])
+      assert_equal('American Library', entry[:publisher])
+      assert_equal('Selected \\emph{Poetry} and `Tales\'', entry.title)
+    end
+
+    def test_simple_second_entry
+      entry = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[1]
+
+      assert_equal('Hawthorne, Nathaniel', entry[:author].to_s)
+      assert_equal('2001', entry[:year])
+      assert_equal('American Library', entry[:publisher])
+      assert_equal('Tales and Sketches', entry.title)
+    end
+
+    def test_ghost_methods
+      bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
+
+      assert_equal 'Poe, Edgar A.', bib[0].author.to_s
+
+      expected = 'Poe, Edgar Allen'
+      bib.data[0].author = expected
+
+      assert_equal expected, bib[0].author.to_s
+    end
+
+    def test_creation_simple
+      entry = BibTeX::Entry.new
+      entry.type = :book
+      entry.key = :raven
+      entry.author = 'Poe, Edgar A.'
+      entry.title = 'The Raven'
+
+      assert_equal :book, entry.type
+      assert_equal 'raven', entry.key
+      assert_equal 'Poe, Edgar A.', entry.author
+      assert_equal 'The Raven', entry.title
+    end
+
+    def test_creation_from_hash
+      entry = BibTeX::Entry.new(
+        bibtex_type: 'book',
+        bibtex_key: :raven,
+        author: 'Poe, Edgar A.',
+        title: 'The Raven'
+      )
+
+      assert_equal :book, entry.type
+      assert_equal 'raven', entry.key
+      assert_equal 'Poe, Edgar A.', entry.author
+      assert_equal 'The Raven', entry.title
+    end
+
+    def test_creation_from_block
+      entry = BibTeX::Entry.new do |e|
+        e.type = :book
+        e.key = 'raven'
+        e.author = 'Poe, Edgar A.'
+        e.title = 'The Raven'
+      end
+
+      assert_equal :book, entry.type
+      assert_equal 'raven', entry.key
+      assert_equal 'Poe, Edgar A.', entry.author
+      assert_equal 'The Raven', entry.title
+    end
+
+    def test_sorting
+      entries = []
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven3', author: 'Poe, Edgar A.', title: 'The Raven')
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven2', author: 'Poe, Edgar A.', title: 'The Raven')
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven1', author: 'Poe, Edgar A.', title: 'The Raven')
+      entries << Entry.new(bibtex_type: 'book', bibtex_key: 'raven1', author: 'Poe, Edgar A.', title: 'The Aven')
+
+      entries.sort!
+
+      assert_equal %w[raven1 raven1 raven2 raven3], entries.map(&:key)
+      assert_equal ['The Aven', 'The Raven'], entries.map(&:title)[0, 2]
     end
   end
 end
