@@ -98,10 +98,34 @@ module BibTeX
     end
 
     # Returns true if the element matches the given query.
+    #
+    # The query can be a Hash of conditions (recommended), a Symbol or
+    # String key, a Regexp matched against the element's string
+    # representation, or an Element.
+    #
+    # A Hash query matches when every condition matches: each key names a
+    # value exposed by #deconstruct_keys (+:type+, +:key+ or a field name)
+    # and each value is a pattern compared with +===+, so Strings, Regexps,
+    # Ranges, Classes and Procs all work. An Array pattern matches if any
+    # of its members matches. A field the element does not have never
+    # matches, except for a +nil+ pattern, which matches exactly those
+    # elements that lack the field.
+    #
+    # @example
+    #   entry.matches?(type: :article, year: '2010'..'2015')
+    #   entry.matches?(type: %i[book incollection], author: /Poe/)
+    #   entry.matches?(url: nil) # entries without a url
+    #
+    # @deprecated Passing a string selector such as '@book[year=2009]',
+    #   '!@book' or '@*' is deprecated; use a Hash of conditions or Ruby
+    #   pattern matching instead. String selectors keep working and only
+    #   warn when Warning[:deprecated] is enabled.
     def matches?(query)
       return true if query.nil? || (query.respond_to?(:empty?) && query.empty?)
 
       case query
+      when ::Hash
+        meets_conditions?(query)
       when Symbol
         query.to_s == id.to_s
       when Element
@@ -111,6 +135,7 @@ module BibTeX
       when %r{^/(.+)/$}
         to_s.match(Regexp.new(Regexp.last_match(1)))
       when /@(\*|\w+)(?:\[([^\]]*)\])?/
+        Deprecation.selector_warning
         query.scan(/(!)?@(\*|\w+)(?:\[([^\]]*)\])?/).any? do |non, type, condition|
           if non ? !has_type?(type) : has_type?(type)
             if condition.nil? || condition.empty?
@@ -149,6 +174,18 @@ module BibTeX
     alias meet? meets?
 
     alias to_s content
+
+    # Supports Ruby's pattern matching. All elements expose their +:type+
+    # (a Symbol such as +:comment+ or +:preamble+), so that you can match
+    # any element of a Bibliography by type:
+    #
+    #   bib.select { |e| e in { type: :preamble } }
+    #
+    # @param keys [Array<Symbol>, nil] the keys to return; nil for all
+    # @return [Hash{Symbol => Object}]
+    def deconstruct_keys(keys)
+      slice_keys({ type: type }, keys)
+    end
 
     def to_hash(_options = {})
       { type => content }
@@ -199,6 +236,31 @@ module BibTeX
     end
 
     private
+
+    def slice_keys(hash, keys)
+      keys.nil? ? hash : hash.slice(*keys)
+    end
+
+    def meets_conditions?(conditions)
+      conditions = conditions.transform_keys { |name| name.is_a?(::String) ? name.to_sym : name }
+      values = deconstruct_keys(conditions.keys)
+
+      conditions.all? do |name, pattern|
+        if values.key?(name)
+          pattern_matches?(pattern, values[name])
+        else
+          pattern.nil?
+        end
+      end
+    end
+
+    def pattern_matches?(pattern, value)
+      if pattern.is_a?(::Array)
+        pattern.any? { |alternative| pattern_matches?(alternative, value) }
+      else
+        pattern === value # rubocop:disable Style/CaseEquality
+      end
+    end
 
     def meets_condition?(condition)
       property, operator, value = condition.split(%r{\s*([!~/^<>]?=|!~|=~|<|>)\s*})
@@ -299,6 +361,15 @@ module BibTeX
       super
       bibliography.strings[@key] = nil
       self
+    end
+
+    # Supports Ruby's pattern matching: returns the +:type+ (+:string+),
+    # the +:key+ and the +:value+, the latter two as plain Strings.
+    #
+    # @param keys [Array<Symbol>, nil] the keys to return; nil for all
+    # @return [Hash{Symbol => Object}]
+    def deconstruct_keys(keys)
+      slice_keys({ type: type, key: @key.to_s, value: @value.to_s }, keys)
     end
 
     # Returns a string representation of the @string's content.

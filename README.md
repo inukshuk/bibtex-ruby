@@ -241,6 +241,78 @@ END
 
 ### Queries
 
+#### Hash queries and pattern matching
+
+The recommended way to search a Bibliography is to pass a Hash of
+conditions to `Bibliography#query` (or `#q`, `#[]` and `#delete`), or to use
+Ruby's pattern matching. Both look at the same values: an element's `:type`
+(the BibTeX type as a Symbol, e.g. `:article`), its `:key` and every field
+(including fields inherited via `crossref`) as a plain String.
+
+A Hash query matches an element when every condition matches; each
+condition is compared with `===`, so Strings match exactly, Regexps match
+anywhere, and Ranges, Classes and Procs work too. An Array means "any of".
+A field the entry does not have never matches, except for `nil`, which
+selects the elements lacking that field. Because values are plain Ruby
+objects, there is nothing to escape and values may contain commas:
+
+```ruby
+bib.query(type: :article, author: /Maksimovi/)
+#=> all articles by authors matching /Maksimovi/
+bib.query(author: %q(Maksimovi\'{c}, Petar))
+#=> exact match, no escaping issues
+bib.query(type: [:book, :article])
+#=> all books and articles
+bib.query(:first, year: '2010'..'2015')
+#=> the first element published between 2010 and 2015
+bib.query(:none, type: :book)
+#=> everything except books
+bib.query(type: :book, url: nil)
+#=> all books without a url
+bib.query(type: :book) { |e| e.year.to_i <= 2007 }
+#=> combine with a block for anything else
+bib[type: :article]
+#=> also works with Bibliography#[] and Bibliography#delete
+```
+
+Field values are Strings, so a range of years must be a String range such
+as `'2010'..'2015'` (this works for four-digit years); use a block when you
+need numeric comparisons.
+
+Entries also support pattern matching, which you can use with any
+Enumerable method:
+
+```ruby
+bib.select { |e| e in { type: :article | :inproceedings, year: '2010'.. } }
+
+case entry
+in { type: :book, title: /Ruby/ => title } then puts title
+end
+```
+
+Migrating from string selectors:
+
+| String selector                | Hash query or pattern                                    |
+| ------------------------------ | -------------------------------------------------------- |
+| `'@book'`                      | `type: :book`                                            |
+| `'@book, @article'`            | `type: [:book, :article]`                                |
+| `'@book[year=2009]'`           | `type: :book, year: '2009'`                              |
+| `'@article[year<=2007]'`       | `type: :article, year: ..'2007'` or a block              |
+| `'!@book'`                     | `bib.query(:none, type: :book)`                          |
+| `'@*[author ~= x]'`            | `author: /x/`                                            |
+| `'@incollection[booktitle]'`   | `type: :incollection, booktitle: String`                 |
+| `'@book[url!~x]'`              | `type: :book` with a block: `{ \|e\| e[:url].to_s !~ /x/ }` |
+
+#### String selectors (deprecated)
+
+The string selector language below (`'@book[year=2009]'`, `'!@book'`,
+`'@*'`, ...) is deprecated in favour of hash queries and pattern matching.
+It still works and is not going to change; if you run Ruby with deprecation
+warnings enabled (`Warning[:deprecated] = true` or `ruby -W:deprecated`),
+BibTeX-Ruby warns once when a string selector is used. Looking up an entry
+by its key (`bib['key']`, `bib[:key]`) or with a Regexp (`bib[/ruby/]`) is
+not affected.
+
 Since version 1.3 BibTeX-Ruby implements a simple query language to search
 Bibliographies via the `Bibliography#query` (or `Bibliography#q`) methods.
 Additionally, you can access individual elements or groups of elements via
