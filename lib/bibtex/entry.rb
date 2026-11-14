@@ -72,7 +72,7 @@ module BibTeX
       when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
         Value.new(string[0, 3].downcase.to_sym)
       when /^\d\d?$/
-        Value.new(MONTHS[month.to_i - 1] || month)
+        Value.new(MONTHS[string.to_i - 1] || month)
       else
         Value.new(month)
       end

@@ -223,7 +223,7 @@ module BibTeX
         [:jan, :jan, 1], [:dec, :dec, 12], [:jan, 'January', 1],
         [:jan, 'jan', 1], [:jan, ' Jan ', 1], [:jan, 'JAN', 1],
         [:sep, 'Sept.', 9], [:mar, 'March 2020', 3], [:jan, '1', 1],
-        [:jan, '01', 1], [:dec, '12', 12], [:dec, 12, 12],
+        [:jan, '01', 1], [:dec, '12', 12], [:dec, 12, 12], [:dec, :'12', 12],
         ['13', '13', nil], ['13', 13, nil], ['Spring', 'Spring', nil],
         ['', '', nil], [:foo, :foo, nil]
       ].each do |expected, input, numeric|
@@ -269,22 +269,32 @@ module BibTeX
         assert_equal :aug, b.month.v
       end
 
-      it 'does not retain parsed months' do
-        Bibliography.parse('@misc{a, month = jan}')
+      it 'returns a new month value on every conversion' do
+        input = Value.new('jan')
+        first = Entry::MONTHS_FILTER[input]
 
-        refute_respond_to Entry::MONTHS_FILTER, :size
+        assert_equal first, Entry::MONTHS_FILTER[input]
+        refute_same first, Entry::MONTHS_FILTER[input]
+        refute_same Entry::MONTHS_FILTER['jan'], Entry::MONTHS_FILTER['jan']
+      end
+
+      it 'does not share unknown month values between parsed entries' do
+        a, b = Bibliography.parse('@misc{a, month = {Spring}} @misc{b, month = {Spring}}').map { |e| e }
+
+        assert_equal a.month, b.month
+        refute_same a.month, b.month
       end
 
       it 'does not allocate more on repeated parses' do
-        skip 'GC.stat has no allocation counter' unless GC.stat.key?(:total_allocated_objects)
-
         months = %w[jan Feb 3 {April}]
         input = (1..300).map { |i| "@misc{k#{i}, month = #{months[i % 4]}}" }.join("\n")
+        Bibliography.parse(input)
         allocations = Array.new(3) do
           before = GC.stat(:total_allocated_objects)
           Bibliography.parse(input)
           GC.stat(:total_allocated_objects) - before
         end
+        skip 'GC.stat cannot count allocations here' if allocations.first.zero?
 
         assert_operator allocations.last, :<, allocations.first * 1.2,
                         "allocations grew across parses: #{allocations.inspect}"
