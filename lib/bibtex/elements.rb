@@ -76,7 +76,7 @@ module BibTeX
 
     # Returns the BibTeX type (if applicable) or the normalized class name.
     def type
-      self.class.name.split(/::/).last.gsub(/([[:lower:]])([[:upper:]])/) { "#{Regexp.last_match(1)}_#{Regexp.last_match(2)}" }.downcase.intern
+      self.class.name.split("::").last.gsub(/([[:lower:]])([[:upper:]])/) { "#{Regexp.last_match(1)}_#{Regexp.last_match(2)}" }.downcase.intern
     end
 
     # Returns a list of names for that Element. All Elements except Entries return an empty list.

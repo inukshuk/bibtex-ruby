@@ -245,7 +245,7 @@ module BibTeX
       end
 
       it 'supports query and additional block' do
-        assert_equal 1, @bib.q('@book') { |e| e.keywords.split(/,/).length > 1 }.length
+        assert_equal 1, @bib.q('@book') { |e| e.keywords.split(",").length > 1 }.length
       end
 
       it 'supports saving the bibliography to a file' do
