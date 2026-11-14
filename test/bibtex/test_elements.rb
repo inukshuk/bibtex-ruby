@@ -51,6 +51,12 @@ module BibTeX
         assert @element.type?(:comment)
       end
 
+      it 'answers type queries for classes' do
+        assert @element.type?(Comment)
+        assert @element.type?(Element)
+        refute @element.type?(String)
+      end
+
       it 'has an id' do
         assert_equal @element.id, @element.id
         assert_kind_of ::String, @element.id
@@ -81,6 +87,10 @@ module BibTeX
         assert_equal '{"comment":"blah"}', @element.to_json
         assert_equal '{"comment":"blah"}', @element.to_json(:something)
         assert_equal 'blah', @element.to_xml.text
+      end
+
+      it 'names its xml element after its type' do
+        assert_equal '<comment>blah</comment>', @element.to_xml.to_s
       end
 
       it 'tracks its bibliography' do
@@ -156,6 +166,13 @@ module BibTeX
         refute @a.matches?('@book[author~=o]')
       end
 
+      it 'supports =~ as an alias for ~=' do
+        assert @a.matches?('@book[title=~o+]')
+        assert @a.matches?('@book[title =~ ^F]')
+        refute @a.matches?('@book[title=~Z]')
+        refute @a.matches?('@book[author=~o]')
+      end
+
       it 'supports negated regular expression conditions' do
         assert @a.matches?('@book[title!~Z]')
         assert @a.matches?('@book[author!~Z]')
@@ -221,6 +238,14 @@ module BibTeX
         assert_equal 'foo = "bar"', @string.content
         assert_equal %(@string{ foo = "bar" }\n), @string.to_s
         assert_equal({ string: { foo: '"bar"' } }, @string.to_hash)
+      end
+
+      it 'serialises to xml' do
+        xml = @string.to_xml
+
+        assert_equal 'string', xml.name
+        assert_equal 'foo', xml.elements['key'].text
+        assert_equal '"bar"', xml.elements['value'].text
       end
 
       it 'yields itself on creation' do
