@@ -21,6 +21,7 @@ end
 
 group :profile do
   gem 'gnuplot', platforms: [:mri]
+  gem 'memory_profiler', platforms: [:mri]
   gem 'ruby-prof', platforms: [:mri]
 end
 
