@@ -208,7 +208,7 @@ class BibTeX::Entry::RDFConverter
 
   def howpublished
     return unless bibtex.field?(:howpublished)
-    return unless bibtex[:howpublished] =~ /^#{URI::DEFAULT_PARSER.make_regexp}$/
+    return unless /^#{URI::DEFAULT_PARSER.make_regexp}$/.match?(bibtex[:howpublished])
 
     remove_from_fallback(:howpublished)
 

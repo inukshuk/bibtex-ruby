@@ -30,7 +30,7 @@ module BibTeX
     def parse(string, options = {}, &)
       if string.length < 260 && File.exist?(string)
         Bibliography.open(string, options, &)
-      elsif string =~ %r{\A[a-z]+://}i
+      elsif %r{\A[a-z]+://}i.match?(string)
         Bibliography.open(string, options)
       else
         Bibliography.parse(string, options)
