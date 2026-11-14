@@ -507,14 +507,23 @@ module BibTeX
       other.respond_to?(:to_a) ? to_a <=> other.to_a : nil
     end
 
+    # call-seq:
+    #   bib.select_duplicates_by                          -> [[entry, ...], ...]
+    #   bib.select_duplicates_by(:title, :year)           -> [[entry, ...], ...]
+    #   bib.select_duplicates_by { |digest, entry| ... }  -> [[entry, ...], ...]
+    #
+    # Returns groups of entries that share the same digest. The digest
+    # is built from the given fields (year and title by default) and
+    # compared case-insensitively, ignoring whitespace. If a block is
+    # given, it receives the normalised digest and the entry and
+    # returns the digest to compare.
+    #
+    # @see Entry#digest
     def select_duplicates_by(*arguments, &block)
       arguments = %i[year title] if arguments.empty?
 
       groups = group_by(*arguments) do |digest, entry|
-        # 1.8 compatibility
-        # digest = digest[0] if digest.is_a?(Array)
-
-        digest.gsub(/\s+/, '').downcase
+        digest = digest.gsub(/\s+/, '').downcase
         digest = yield(digest, entry) unless block.nil?
         digest
       end
