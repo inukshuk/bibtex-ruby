@@ -7,7 +7,7 @@ module BibTeX
         assert Bibliography.new
       end
       it 'should be empty' do
-        assert Bibliography.new.empty?
+        assert_empty Bibliography.new
       end
     end
 

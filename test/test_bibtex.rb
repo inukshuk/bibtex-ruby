@@ -11,14 +11,14 @@ module BibTeX
       bib = BibTeX::Bibliography.open(Test.fixtures(:empty), debug: false)
       refute_nil(bib)
       assert_equal(BibTeX::Bibliography, bib.class)
-      assert(bib.empty?)
+      assert_empty(bib)
     end
 
     def test_no_bibtex
       bib = BibTeX::Bibliography.open(Test.fixtures(:no_bibtex), debug: false)
       refute_nil(bib)
       assert_equal(BibTeX::Bibliography, bib.class)
-      assert(bib.empty?)
+      assert_empty(bib)
     end
 
     def test_decoret
