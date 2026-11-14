@@ -270,13 +270,16 @@ module BibTeX
         assert_equal :aug, b.month.v
       end
 
-      it 'returns a new month value on every conversion' do
-        input = Value.new('jan')
-        first = Entry::MONTHS_FILTER[input]
+      it 'does not share a month value assigned to several entries' do
+        month = Value.new('jan')
+        a = Entry.new
+        b = Entry.new
+        a.month = month
+        b.month = month
 
-        assert_equal first, Entry::MONTHS_FILTER[input]
-        refute_same first, Entry::MONTHS_FILTER[input]
-        refute_same Entry::MONTHS_FILTER['jan'], Entry::MONTHS_FILTER['jan']
+        assert_equal a.month, b.month
+        refute_same a.month, b.month
+        refute_same month, a.month
       end
 
       it 'does not share unknown month values between parsed entries' do
