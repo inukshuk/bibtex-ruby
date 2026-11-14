@@ -669,7 +669,6 @@ module BibTeX
       alias_method "#{contributor}s=", writer
     end
 
-
     private
 
     # Returns a default key for this entry.
