@@ -320,6 +320,19 @@ module BibTeX
           it 'removes duplicates that differ only in case and whitespace with uniq!' do
             assert_equal %w[n1 n4], @dupes.uniq!(:title).map(&:key)
           end
+
+          it 'handles digests without whitespace, e.g. one-word titles' do
+            bib = BibTeX.parse <<-BIBTEX
+              @book{w1, title = {Ruby}}
+              @book{w2, title = {RUBY}}
+            BIBTEX
+
+            assert_equal([%w[w1 w2]], bib.select_duplicates_by(:title).map { |g| g.map(&:key) })
+          end
+
+          it 'handles uniq! by year, whose digest never contains whitespace' do
+            assert_equal %w[n1], @dupes.uniq!(:year).map(&:key)
+          end
         end
       end
 
