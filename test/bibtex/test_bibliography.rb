@@ -290,6 +290,37 @@ module BibTeX
         it 'understands duplicates?' do
           assert_predicate @bib, :duplicates?
         end
+
+        describe 'normalisation' do
+          before do
+            @dupes = BibTeX.parse <<-BIBTEX
+              @book{n1, title = {The Ruby Way}, year = {2006}}
+              @book{n2, title = {the  ruby   way}, year = {2006}}
+              @book{n3, title = {TheRubyWay}, year = {2006}}
+              @book{n4, title = {Another Book}, year = {2006}}
+            BIBTEX
+          end
+
+          it 'ignores case and whitespace when comparing digests' do
+            groups = @dupes.select_duplicates_by(:title)
+
+            assert_equal([%w[n1 n2 n3]], groups.map { |g| g.map(&:key) })
+          end
+
+          it 'passes the normalised digest to the block' do
+            digests = []
+            @dupes.select_duplicates_by(:title) do |d, _|
+              digests << d
+              d
+            end
+
+            assert_includes digests, 'book|title:therubyway'
+          end
+
+          it 'removes duplicates that differ only in case and whitespace with uniq!' do
+            assert_equal %w[n1 n4], @dupes.uniq!(:title).map(&:key)
+          end
+        end
       end
 
       describe '#uniq!' do
