@@ -47,12 +47,12 @@ task test: %w[racc test_task]
 file 'lib/bibtex/parser.output' => ['lib/bibtex/parser.rb']
 file 'lib/bibtex/parser.rb' => ['lib/bibtex/bibtex.y'] do
   # sh 'racc -v -g -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
-  sh 'bundle exec racc -F -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
+  sh 'bundle exec racc -F -l -o lib/bibtex/parser.rb lib/bibtex/bibtex.y'
 end
 
 file 'lib/bibtex/name_parser.rb' => ['lib/bibtex/names.y'] do
   # sh 'racc -v -g -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
-  sh 'bundle exec racc -F -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
+  sh 'bundle exec racc -F -l -o lib/bibtex/name_parser.rb lib/bibtex/names.y'
 end
 
 desc 'Run an IRB session with BibTeX-Ruby loaded'

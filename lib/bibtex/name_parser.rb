@@ -12,7 +12,6 @@ require 'strscan'
 module BibTeX
   class NameParser < Racc::Parser
 
-module_eval(<<'...end names.y/module_eval...', 'names.y', 118)
 
   @patterns = {
     :and => /,?\s+and\s+/io,
@@ -165,7 +164,6 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 118)
   end
 
 # -*- racc -*-
-...end names.y/module_eval...
 ##### State transition tables begin ###
 
 racc_action_table = [
@@ -343,207 +341,155 @@ Racc_debug_parser = false
 
 # reduce 0 omitted
 
-module_eval(<<'.,.,', 'names.y', 31)
-  def _reduce_1(val, _values, result)
-     result = []
+def _reduce_1(val, _values, result)
+ result = []
     result
-  end
-.,.,
+end
 
 # reduce 2 omitted
 
-module_eval(<<'.,.,', 'names.y', 33)
-  def _reduce_3(val, _values, result)
-     result = [val[0]]
+def _reduce_3(val, _values, result)
+ result = [val[0]]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 34)
-  def _reduce_4(val, _values, result)
-     result << val[1]
+def _reduce_4(val, _values, result)
+ result << val[1]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 36)
-  def _reduce_5(val, _values, result)
-     result = Name.new(val[1])
+def _reduce_5(val, _values, result)
+ result = Name.new(val[1])
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 37)
-  def _reduce_6(val, _values, result)
-     result = Name.new(val[1])
+def _reduce_6(val, _values, result)
+ result = Name.new(val[1])
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 41)
-  def _reduce_7(val, _values, result)
-               result = { :last => val[0] }
+def _reduce_7(val, _values, result)
+           result = { :last => val[0] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 45)
-  def _reduce_8(val, _values, result)
-               result = { :first => val[0].join(' '), :last => val[1] }
+def _reduce_8(val, _values, result)
+           result = { :first => val[0].join(' '), :last => val[1] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 49)
-  def _reduce_9(val, _values, result)
-               result = { :first => val[0].join(' '), :von => val[1], :last => val[2] }
+def _reduce_9(val, _values, result)
+           result = { :first => val[0].join(' '), :von => val[1], :last => val[2] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 53)
-  def _reduce_10(val, _values, result)
-               result = { :von => val[0], :last => val[1] }
+def _reduce_10(val, _values, result)
+           result = { :von => val[0], :last => val[1] }
 
     result
-  end
-.,.,
+end
 
 # reduce 11 omitted
 
-module_eval(<<'.,.,', 'names.y', 59)
-  def _reduce_12(val, _values, result)
-               result = { :last => val[0][0], :first => val[0][1] }
+def _reduce_12(val, _values, result)
+           result = { :last => val[0][0], :first => val[0][1] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 63)
-  def _reduce_13(val, _values, result)
-               result = { :von => val[0], :last => val[1][0], :first => val[1][1] }
+def _reduce_13(val, _values, result)
+           result = { :von => val[0], :last => val[1][0], :first => val[1][1] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 67)
-  def _reduce_14(val, _values, result)
-               result = { :von => val[0..1].join(' '), :last => val[2][0], :first => val[2][1] }
+def _reduce_14(val, _values, result)
+           result = { :von => val[0..1].join(' '), :last => val[2][0], :first => val[2][1] }
 
     result
-  end
-.,.,
+end
 
 # reduce 15 omitted
 
-module_eval(<<'.,.,', 'names.y', 73)
-  def _reduce_16(val, _values, result)
-              result = { :last => val[0], :jr => val[2][0], :first => val[2][1] }
+def _reduce_16(val, _values, result)
+          result = { :last => val[0], :jr => val[2][0], :first => val[2][1] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 77)
-  def _reduce_17(val, _values, result)
-              result = { :von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1] }
+def _reduce_17(val, _values, result)
+          result = { :von => val[0], :last => val[1], :jr => val[3][0], :first => val[3][1] }
 
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 81)
-  def _reduce_18(val, _values, result)
-              result = { :von => val[0..1].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1] }
+def _reduce_18(val, _values, result)
+          result = { :von => val[0..1].join(' '), :last => val[2], :jr => val[4][0], :first => val[4][1] }
 
     result
-  end
-.,.,
+end
 
 # reduce 19 omitted
 
-module_eval(<<'.,.,', 'names.y', 85)
-  def _reduce_20(val, _values, result)
-     result = val.join(' ')
+def _reduce_20(val, _values, result)
+ result = val.join(' ')
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 86)
-  def _reduce_21(val, _values, result)
-     result = val.join(' ')
+def _reduce_21(val, _values, result)
+ result = val.join(' ')
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 88)
-  def _reduce_22(val, _values, result)
-     result = [val[0], nil]
+def _reduce_22(val, _values, result)
+ result = [val[0], nil]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 89)
-  def _reduce_23(val, _values, result)
-     result = [val[0][0], val[0][1] ? val[0][1..-1].join(' ') : nil]
+def _reduce_23(val, _values, result)
+ result = [val[0][0], val[0][1] ? val[0][1..-1].join(' ') : nil]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 90)
-  def _reduce_24(val, _values, result)
-     result = [val[0][0], (val[0][1..-1] << val[1]).join(' ')]
+def _reduce_24(val, _values, result)
+ result = [val[0][0], (val[0][1..-1] << val[1]).join(' ')]
     result
-  end
-.,.,
+end
 
 # reduce 25 omitted
 
-module_eval(<<'.,.,', 'names.y', 93)
-  def _reduce_26(val, _values, result)
-     result = val[0].join(' ')
+def _reduce_26(val, _values, result)
+ result = val[0].join(' ')
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 94)
-  def _reduce_27(val, _values, result)
-     result = (val[0] << val[1]).join(' ')
+def _reduce_27(val, _values, result)
+ result = (val[0] << val[1]).join(' ')
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 96)
-  def _reduce_28(val, _values, result)
-     result = [nil,val[0]]
+def _reduce_28(val, _values, result)
+ result = [nil,val[0]]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 97)
-  def _reduce_29(val, _values, result)
-     result = [val[0],val[2]]
+def _reduce_29(val, _values, result)
+ result = [val[0],val[2]]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 99)
-  def _reduce_30(val, _values, result)
-     result = [val[0]]
+def _reduce_30(val, _values, result)
+ result = [val[0]]
     result
-  end
-.,.,
+end
 
-module_eval(<<'.,.,', 'names.y', 100)
-  def _reduce_31(val, _values, result)
-     result << val[1]
+def _reduce_31(val, _values, result)
+ result << val[1]
     result
-  end
-.,.,
+end
 
 # reduce 32 omitted
 
@@ -551,12 +497,10 @@ module_eval(<<'.,.,', 'names.y', 100)
 
 # reduce 34 omitted
 
-module_eval(<<'.,.,', 'names.y', 105)
-  def _reduce_35(val, _values, result)
-     result = val.join(' ')
+def _reduce_35(val, _values, result)
+ result = val.join(' ')
     result
-  end
-.,.,
+end
 
 # reduce 36 omitted
 
