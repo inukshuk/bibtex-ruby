@@ -789,5 +789,65 @@ module BibTeX
         end
       end
     end
+
+    describe '#to_s escaping of & (#170)' do
+      it 'escapes a bare & in a field value' do
+        entry = BibTeX.parse('@article{a, journal = {Trends in Ecology & Evolution}}')[:a]
+
+        _(entry.to_s).must_include 'journal = {Trends in Ecology \\& Evolution}'
+      end
+
+      it 'does not double-escape an already escaped \\&' do
+        entry = BibTeX.parse('@article{a, journal = {Trends in Ecology \\& Evolution}}')[:a]
+
+        _(entry.to_s).must_include 'journal = {Trends in Ecology \\& Evolution}'
+        _(entry.to_s).wont_include '\\\\&'
+      end
+
+      it 'escapes & again after convert(:latex)' do
+        bib = BibTeX.parse('@article{a, journal = {Trends in Ecology \\& Evolution}}')
+        converted = bib[:a].convert(:latex)
+
+        _(converted.journal.to_s).must_equal 'Trends in Ecology & Evolution'
+        _(converted.to_s).must_include 'journal = {Trends in Ecology \\& Evolution}'
+      end
+
+      it 'leaves the in-memory value untouched' do
+        entry = BibTeX.parse('@article{a, journal = {A & B}}')[:a]
+        entry.to_s
+
+        _(entry.journal.to_s).must_equal 'A & B'
+        _(entry.to_hash[:journal]).must_equal '{A & B}'
+      end
+
+      it 'does not escape & in verbatim fields' do
+        entry = BibTeX.parse(<<~BIB)[:a]
+          @misc{a,
+            url = {http://example.com/?a=1&b=2},
+            doi = {10.1000/a&b},
+            howpublished = {\\url{http://example.com/?a=1&b=2}},
+            note = {A & B}
+          }
+        BIB
+        out = entry.to_s
+
+        _(out).must_include 'url = {http://example.com/?a=1&b=2}'
+        _(out).must_include 'doi = {10.1000/a&b}'
+        _(out).must_include 'howpublished = {\\url{http://example.com/?a=1&b=2}}'
+        _(out).must_include 'note = {A \\& B}'
+      end
+
+      it 'does not escape & in BibDesk url fields' do
+        entry = BibTeX.parse('@misc{a, bdsk-url-1 = {http://example.com/?a=1&b=2}}')[:a]
+
+        _(entry.to_s).must_include 'bdsk-url-1 = {http://example.com/?a=1&b=2}'
+      end
+
+      it 'escapes & in howpublished without \\url' do
+        entry = BibTeX.parse('@misc{a, howpublished = {Smith & Sons}}')[:a]
+
+        _(entry.to_s).must_include 'howpublished = {Smith \\& Sons}'
+      end
+    end
   end
 end
