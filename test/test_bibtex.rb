@@ -113,7 +113,7 @@ module BibTeX
     def test_construct
       file = File.read(Test.fixtures(:roundtrip))
       bib = BibTeX::Bibliography.new
-      bib << BibTeX::Entry.new(RAILS_ATTRIBUTES.dup) # Entry.new deletes keys from its argument
+      bib << BibTeX::Entry.new(RAILS_ATTRIBUTES)
 
       assert_equal file.gsub(/\s+/, ''), bib.to_s.gsub(/\s+/, '')
     end

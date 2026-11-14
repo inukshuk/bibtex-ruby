@@ -69,10 +69,13 @@ module BibTeX
       @fields = {}
       @key = nil
 
-      self.type = attributes.delete(:bibtex_type) if attributes.key?(:bibtex_type)
-      self.key = attributes.delete(:bibtex_key) if attributes.key?(:bibtex_key)
-
-      add(attributes)
+      attributes.each_pair do |name, value|
+        case name
+        when :bibtex_type then self.type = value
+        when :bibtex_key then self.key = value
+        else fields[name.to_sym] = Value.create(value)
+        end
+      end
 
       yield self if block_given?
     end
