@@ -10,6 +10,7 @@ module BibTeX
       before do
         @name = Name.new(first: 'Charles Louis Xavier Joseph', prefix: 'de la', last: 'Vallee Poussin', suffix: 'Jr.')
       end
+
       it 'should implement upcase!' do
         assert_equal 'DE LA VALLEE POUSSIN, JR., CHARLES LOUIS XAVIER JOSEPH', @name.upcase!.to_s
       end
@@ -46,15 +47,19 @@ module BibTeX
         _(@poe.initials?).must_equal false
 
         @poe.first = 'Edgar A.'
+
         _(@poe.initials?).must_equal false
 
         @poe.first = 'E.A.'
+
         _(@poe.initials?).must_equal true
 
         @poe.first = ''
+
         _(@poe.initials?).must_equal false
 
         @poe.first = nil
+
         _(@poe.initials?).must_equal false
       end
     end
@@ -88,12 +93,14 @@ module BibTeX
       it 'does not merge duplicates' do
         n1 = Names.new(@poe)
         n2 = Names.new(@poe)
+
         assert_equal @poe.to_s, n1.merge!(n2).to_s
       end
 
       it 'merges different names' do
         n1 = Names.new(@poe)
         n2 = Names.new(Name.new(last: 'Plato'))
+
         assert_equal "#{@poe} and Plato", n1.merge!(n2).to_s
       end
     end

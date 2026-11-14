@@ -47,8 +47,10 @@ module BibTeX
       it 'should support string replacement of preamble contents' do
         assert_equal '"Maintained by " # maintainer', @preambles[2].value.to_s
         @bib.replace_strings
+
         assert_equal '"Maintained by " # "Myself"', @preambles[2].value.to_s
         @bib.join_strings
+
         assert_equal 'Maintained by Myself', @preambles[2].value.to_s
       end
     end

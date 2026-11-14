@@ -6,6 +6,7 @@ module BibTeX
       before do
         @bib = BibTeX.parse('@string{ foo = "bar" }')
       end
+
       it 'should should not be empty' do
         assert_equal 1, @bib.length
       end

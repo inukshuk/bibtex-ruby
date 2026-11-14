@@ -17,11 +17,13 @@ module BibTeX
         def f.apply
           nil
         end
+
         assert_same f, Filters.resolve(f)
       end
 
       it 'should return the filter if there is a filter by that name' do
         class FooBar < Filter; end
+
         assert_same FooBar.instance, Filters.resolve(:foobar)
         assert_same FooBar.instance, Filters.resolve('foobar')
         Filter.subclasses.delete(FooBar)

@@ -12,6 +12,7 @@ module BibTeX
       it 'preserves BibTeX::Names (and other subclasses of BibTeX::Value)' do
         e = Entry.new
         e.add(:author, Names.new(Name.new(first: 'first_name')))
+
         assert_equal e[:author].class, Names
       end
     end
@@ -74,6 +75,7 @@ module BibTeX
         describe 'resolve field values using array accessors #[]' do
           describe 'when a "title" is set in the entry itself' do
             before { @bib['a1'].title = 'A1' }
+
             it 'returns the title' do
               _(@bib['a1'].title).must_be :==, 'A1'
             end
@@ -87,6 +89,7 @@ module BibTeX
 
           describe 'when "booktitle" is undefined for the entry but defined in the reference' do
             before { @bib['a'].booktitle = 'A Booktitle' }
+
             it 'returns the referenced booktitle' do
               _(@bib['a1'].booktitle).must_be :==, @bib['a'].booktitle
             end
@@ -135,6 +138,7 @@ module BibTeX
             it 'copies referenced values to the entry' do
               @bib['a1'].title = 'a1'
               @bib['a1'].save_inherited_fields
+
               _(@bib['a1'].fields[:booktitle]).must_be :==, @bib['a'].title
               _(@bib['a1'].fields[:title]).wont_be :==, @bib['a'].title
             end
@@ -173,6 +177,7 @@ module BibTeX
       [[:jan, 'January'], [:feb, 'February'], [:sep, 'September']].each do |m|
         it 'should convert english months' do
           @entry.month = m[1]
+
           assert_equal m[0], @entry.month.v
         end
       end
@@ -180,12 +185,14 @@ module BibTeX
       [%i[jan jan], %i[feb feb], %i[sep sep]].each do |m|
         it 'should convert bibtex abbreviations' do
           @entry.month = m[1]
+
           assert_equal m[0], @entry.month.v
         end
       end
 
       it 'prints parsed months as symbols' do
         @entry.month = :aug
+
         assert_match(/month = aug/, @entry.content)
         assert_match(/month = aug/, @entry.to_s)
       end
@@ -193,10 +200,12 @@ module BibTeX
       [[:jan, 1], [:feb, 2], [:sep, 9]].each do |m|
         it 'should convert numbers' do
           @entry.month = m[1]
+
           assert_equal m[0], @entry.month.v
         end
         it 'should convert numbers when parsing' do
           @entry = Entry.parse("@misc{id, month = #{m[1]}}")[0]
+
           assert_equal m[0], @entry.month.v
           assert_equal m[1], @entry.month_numeric
         end
@@ -254,6 +263,7 @@ module BibTeX
 
       it 'supports renaming! of field attributes' do
         @entry.rename!(title: :foo)
+
         refute @entry.has_field?(:title)
         assert_equal 'Moby Dick', @entry[:foo]
       end
@@ -274,6 +284,7 @@ module BibTeX
       describe 'citeproc export' do
         it 'supports citeproc export' do
           e = @entry.to_citeproc
+
           assert_equal 'book', e['type']
           assert_equal 'New York', e['publisher-place']
           assert_equal [1993, 11], e['issued']['date-parts'][0]
@@ -331,16 +342,19 @@ module BibTeX
         it 'support literal dates in citeproc export' do
           @entry.year = 'Test'
           e = @entry.to_citeproc
+
           assert_equal({ 'literal' => 'Test' }, e['issued'])
         end
 
         it 'combines year, month and day in issued date' do
           @entry.update year: 2005, month: 5, day: 31
+
           assert_equal [[2005, 5, 31]], @entry.to_citeproc['issued']['date-parts']
         end
 
         it 'prefers biblatex syntax' do
           @entry.date = '2014-07-13'
+
           assert_equal [[2014, 7, 13]], @entry.to_citeproc['issued']['date-parts']
         end
 
@@ -353,6 +367,7 @@ module BibTeX
 
         it 'supports biblatex partial dates' do
           @entry.date = '2014-07'
+
           assert_equal [[2014, 7]], @entry.to_citeproc['issued']['date-parts']
         end
       end
@@ -387,12 +402,14 @@ module BibTeX
 
         it 'supports conditional arbitrary in-place conversion' do
           @entry.convert!(@filter) { |k, _v| k.to_s =~ /publisher/i }
+
           assert_equal 'Moby Dick', @entry.title
           assert_equal 'PENGUIN', @entry.publisher
         end
 
         it 'supports conditional arbitrary conversion' do
           e = @entry.convert(@filter) { |k, _v| k.to_s =~ /publisher/i }
+
           assert_equal 'Moby Dick', e.title
           assert_equal 'PENGUIN', e.publisher
           assert_equal 'Penguin', @entry.publisher
@@ -411,6 +428,7 @@ module BibTeX
 
           it 'does not change the original entry' do
             e = @entry.convert(:latex)
+
             _(e).wont_be :==, @entry
             _(e.title.to_s).wont_be :==, @entry.title.to_s
             _(e.title.to_s.length).must_be :<, @entry.title.to_s.length
@@ -419,6 +437,7 @@ module BibTeX
           it 'does not change the author of a parsed entry' do
             entry = BibTeX.parse('@book{o, author = {M\\"{o}by Dick}}')[0]
             e = entry.convert(:latex)
+
             _(e).wont_be :==, entry
             _(e.author.to_s.length).must_be :<, entry.author.to_s.length
           end
@@ -431,6 +450,7 @@ module BibTeX
 
           it 'changes the original entry in-place' do
             e = @entry.convert!(:latex)
+
             _(e).must_be :equal?, @entry
             _(e.title.to_s.length).must_be :==, @entry.title.to_s.length
           end
@@ -500,6 +520,7 @@ module BibTeX
           }
         BIBINPUT
       end
+
       it 'applies filters when converting to strings' do
         assert_equal "@misc{foo,\n  " \
                      "title = {A title},\n  " \
@@ -511,6 +532,7 @@ module BibTeX
 
     def test_simple
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
+
       refute_nil(bib)
       assert_instance_of(BibTeX::Bibliography, bib)
       assert_equal(4, bib.data.length)
@@ -647,6 +669,7 @@ module BibTeX
 
       it 'should register itself with its key' do
         @bib << @e
+
         _(@bib.entries.keys).must_include @e.key
       end
 
@@ -656,6 +679,7 @@ module BibTeX
         it 'should find a suitable key' do
           k = @e.key
           @bib << @e
+
           _(@bib.entries.keys).must_include @e.key
           _(k).wont_be :==, @e.key
         end
@@ -739,12 +763,15 @@ module BibTeX
         assert_predicate @book, :valid?
 
         @book.delete :publisher
+
         refute @book.valid?
 
         @book.publisher = 'Heineman'
+
         assert_predicate @book, :valid?
 
         @book.delete :year
+
         refute @book.valid?
       end
     end

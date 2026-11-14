@@ -61,14 +61,18 @@ module BibTeX
       end
       it 'should do nothing when containing only symbols' do
         value = Value.new(:foo)
+
         assert_equal value, value.join
         value = Value.new(:foo, :bar)
+
         assert_equal value, value.join
       end
       it 'should do nothing when containing only symbols and a single string' do
         value = Value.new(:foo, 'bar')
+
         assert_equal value, value.join
         value = Value.new('foo', :bar)
+
         assert_equal value, value.join
       end
     end
@@ -133,11 +137,13 @@ module BibTeX
 
         it 'does not alter the value when using a filter name' do
           @values.each { |v| v.convert(:upcase) }
+
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
         end
 
         it 'does not alter the value when using a ghost method' do
           @values.each(&:convert_upcase)
+
           assert_equal ['foo', '"foo" # bar'], @values.map(&:to_s)
         end
 
@@ -159,11 +165,13 @@ module BibTeX
 
         it 'alters the value when given the name of a filter' do
           @values.each { |v| v.convert!(:upcase) }
+
           assert_equal ['FOO', '"FOO" # bar'], @values.map(&:to_s)
         end
 
         it 'alters the value when using a ghost method' do
           @values.each(&:convert_upcase!)
+
           assert_equal ['FOO', '"FOO" # bar'], @values.map(&:to_s)
         end
       end

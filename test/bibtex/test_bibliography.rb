@@ -85,6 +85,7 @@ module BibTeX
         it 'extends the initials in matching names' do
           _(@bib.names.map(&:to_s)).wont_include 'Flanagan, Dave'
           @bib.extend_initials(%w[Dave Flanagan])
+
           _(@bib.names.map(&:to_s)).must_include 'Flanagan, Dave'
         end
       end
@@ -99,18 +100,21 @@ module BibTeX
       describe '#unify' do
         it 'sets all fields matching the given pattern to the passed-in value' do
           @bib.unify :publisher, /reilly/i, 'OReilly'
+
           assert_equal 'OReilly', @bib['segaran2007'].publisher
           assert_equal 'OReilly', @bib['flanagan2008'].publisher
         end
 
         it 'does not change the value of fields that do not match' do
           @bib.unify :publisher, /reilly/i, 'OReilly'
+
           assert_equal 'The Pragmatic Bookshelf', @bib['rails'].publisher
         end
 
         it 'passes each entry with matching fields to the block if given' do
           years = []
           @bib.unify(:publisher, /reilly/i) { |e| years << e.year.to_s }
+
           assert_equal %w[2007 2008], years.sort
         end
 
@@ -236,6 +240,7 @@ module BibTeX
         END
         assert_equal 1, @bib[entry].length
         entry.year = '2006'
+
         assert_equal 0, @bib[entry].length
       end
 
@@ -247,6 +252,7 @@ module BibTeX
         tmp = Tempfile.new('bibtex')
         tmp.close
         @bib.save_to(tmp.path)
+
         assert_equal @bib.length, BibTeX.open(tmp.path).length
       end
 
@@ -324,11 +330,13 @@ module BibTeX
 
         it 'supports arbitrary conversions' do
           @bib.convert(@filter)
+
           assert_equal 'RUBY, RAILS', @bib[:rails].keywords
         end
 
         it 'supports conditional arbitrary conversions' do
           @bib.convert(@filter) { |e| e.key != 'rails' }
+
           assert_equal 'ruby, rails', @bib[:rails].keywords
           assert_equal 'RUBY', @bib[:flanagan2008].keywords
         end
@@ -366,22 +374,26 @@ module BibTeX
 
         it 'can be sorted destructively' do
           @small_bib.sort!
+
           _(@small_bib.map(&:key)).must_equal %w[segaran2007 flanagan2008 rails]
         end
 
         it 'can be sorted by field destructively' do
           @small_bib.sort_by! { |e| -e[:year].to_i }
+
           _(@small_bib.map(&:key)).must_equal %w[rails flanagan2008 segaran2007]
         end
 
         it 'can be sorted non-destructively' do
           sorted_entries = @small_bib.sort
+
           _(sorted_entries.map(&:key)).must_equal %w[segaran2007 flanagan2008 rails]
           _(@small_bib.map(&:key)).must_equal %w[flanagan2008 rails segaran2007]
         end
 
         it 'can be sorted by field non-destructively' do
           sorted_entries = @small_bib.sort_by { |e| -e[:year].to_i }
+
           _(sorted_entries.map(&:key)).must_equal %w[rails flanagan2008 segaran2007]
           _(@small_bib.map(&:key)).must_equal %w[flanagan2008 rails segaran2007]
         end
@@ -405,6 +417,7 @@ module BibTeX
           @bib.to_xml.write(@bibtexml, 2)
           @bibtexml.rewind
           xml = REXML::Document.new(@bibtexml)
+
           _(xml.root.namespace).must_be :==, 'http://bibtexml.sf.net/'
           _(xml.root.get_elements('//bibtex:entry')).wont_be_empty
         end
@@ -413,6 +426,7 @@ module BibTeX
           @bib.to_xml(extended: true).write(@bibtexml, 2)
           @bibtexml.rewind
           xml = REXML::Document.new(@bibtexml)
+
           _(xml.root.namespace).must_be :==, 'http://bibtexml.sf.net/'
           _(xml.root.get_elements('//bibtex:person')).wont_be_empty
         end
