@@ -480,8 +480,11 @@ module BibTeX
         raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)"
       end
 
-      filter = block ? proc { |e| e.match?(q) && yield(e) } :
-        proc { |e| e.match?(q) }
+      filter = if block
+  proc { |e| e.match?(q) && yield(e) }
+else
+  proc { |e| e.match?(q) }
+end
 
       send(query_handler(selector), &filter)
     end
