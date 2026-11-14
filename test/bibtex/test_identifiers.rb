@@ -27,6 +27,23 @@ module BibTeX
       'fo{o' => 'fo{o', 'löwe' => 'löwe', '  spaced  ' => 'spaced', 'a.b-c_d!e$f?g&h*i' => 'a.b-c_d!e$f?g&h*i'
     }.freeze
 
+    # Unterminated entries followed by the next object.
+    UNTERMINATED = [
+      "@misc{a, title = {t},\n@book{b, title={t}}",
+      "@misc{a, title = {t}\n@book{b, title={t}}",
+      "@misc{a, title = t\n@book {b, title={t}}"
+    ].freeze
+
+    # Long runs of '@a' that made lexing quadratic while a word starting
+    # with '@' could extend over later '@'s (about 16 s for n = 50_000).
+    RUN = 50_000
+    ADVERSARIAL = {
+      "'@' + 'a@' * n + ' {'" => "@#{'a@' * RUN} {",
+      "an entry with '@a' * n + ' {'" => "@misc{k, #{'@a' * RUN} {",
+      "an entry ending in '@a' * n" => "@misc{k, #{'@a' * RUN}",
+      "a value of '@a' * n + ' x'" => "@misc{k, title = #{'@a' * RUN} x"
+    }.freeze
+
     def parse(input, options = {})
       BibTeX.parse(input, options)
     end
@@ -238,6 +255,94 @@ module BibTeX
           bib = parse('@misc{k, title = {T}} junk @misc{k2, title = {T2}}')
 
           assert_equal %w[k k2], bib.entries.keys
+        end
+      end
+
+      describe '@ at the start of a name' do
+        MODES.each do |mode, options|
+          describe "in #{mode} mode" do
+            it 'lexes @foo before = as a field NAME' do
+              assert_equal [[:AT, '@'], [:NAME, 'misc'], [:LBRACE, '{'], [:KEY, 'k'],
+                            [:NAME, '@foo'], [:EQ, '='], [:LBRACE, '{'], [:CONTENT, 'x'],
+                            [:RBRACE, '}'], [:RBRACE, '}'], [false, '$end']],
+                           tokens('@misc{k, @foo = {x}}', options)
+            end
+
+            it 'accepts @foo as a field name' do
+              bib = parse("@misc{k, @foo = {x}, title = {T}}\n@misc{k2, title = {T2}}", options)
+
+              assert_empty bib.errors
+              assert_equal %w[k k2], bib.entries.keys
+              assert_equal %i[@foo title], bib['k'].fields.keys
+            end
+
+            it 'accepts @m as an @string name and as a macro reference before , } and #' do
+              bib = parse("@string{@m = {x}}\n@misc{k, a = @m, b = @m # {y}, c = {y} # @m}", options)
+
+              assert_empty bib.errors
+              assert_equal %i[@m], bib.strings.keys
+              assert_equal :@m, bib['k'][:a].to_sym
+              resolved = bib.replace_strings.join_strings['k']
+
+              assert_equal 'x', resolved[:a].to_s
+              assert_equal 'xy', resolved[:b].to_s
+              assert_equal 'yx', resolved[:c].to_s
+            end
+
+            it 'still splits two entries separated by a trailing comma' do
+              bib = parse("@misc{a, title={t}},\n@book{b, title={t}}", options)
+
+              assert_empty bib.errors
+              assert_equal %w[a b], bib.entries.keys
+            end
+
+            it 'still accepts a trailing comma inside an entry before the next one' do
+              bib = parse("@misc{a, title={t},\n}\n@book{b, title={t}}", options)
+
+              assert_empty bib.errors
+              assert_equal %w[a b], bib.entries.keys
+            end
+
+            ADVERSARIAL.each do |label, input|
+              it "lexes #{label} in linear time" do
+                started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+                Lexer.new(options).analyse(input)
+                elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
+
+                # About 0.1 s when linear; generous for slow CI machines.
+                assert_operator elapsed, :<, 5, "took #{elapsed.round(2)} s"
+              end
+            end
+
+            it "ends a name that starts with '@' before the next '@'" do
+              assert_equal [[:NAME, '@a'], [:EQ, '=']], tokens('@misc{k, @a = {x}}', options)[4, 2]
+              refute_includes tokens('@misc{k, @a@b = {x}}', options), [:NAME, '@a@b']
+              assert_equal [:NAME, 'a@b@c'], tokens('@misc{k, a@b@c = {x}}', options)[4]
+            end
+
+            UNTERMINATED.each do |input|
+              it "still starts a new object after an unterminated entry: #{input.inspect}" do
+                stack = tokens(input, options)
+                start = stack.rindex([:AT, '@'])
+
+                assert_equal [[:AT, '@'], [:NAME, 'book'], [:LBRACE, '{'], [:KEY, 'b']], stack[start, 4]
+                refute(stack.any? { |type, value| type == :NAME && value.start_with?('@') })
+              end
+            end
+          end
+        end
+
+        it 'skips TeX comments between @foo and = with :strip_comments' do
+          bib = parse("@misc{k, @foo % comment\n = {x}}", strip_comments: true)
+
+          assert_empty bib.errors
+          assert_equal %i[@foo], bib['k'].fields.keys
+        end
+
+        it 'allows @ at the start of the last word of a non-strict multi-word name' do
+          bib = parse('@misc{k, early @date = {v}}', strict: false)
+
+          assert_equal %i[early_@date], bib['k'].fields.keys
         end
       end
 

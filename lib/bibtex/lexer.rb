@@ -40,6 +40,67 @@ module BibTeX
       strip_comments: false
     }
 
+    # bibtex.web's id_class: an identifier (field, @string or macro name)
+    # may hold any printable ASCII character except white space and these
+    # (illegal_id_char).
+    ILLEGAL_ID_CHARS = %q{"#%'(),={}}
+
+    # Characters of a citation key: those accepted before, plus '/' as in
+    # DBLP keys (DBLP:journals/dq/RossinK99). Braces only with a key that
+    # may not be empty. '-' comes last as it is spliced into a class.
+    KEY_CHAR = %q([:alnum:] :_!$?.+;&*'"/-)
+    private_constant :ILLEGAL_ID_CHARS, :KEY_CHAR
+
+    class << self
+      private
+
+      # A character class for identifiers. Non-ASCII letters and digits are
+      # a project extension, as is '%' unless :strip_comments makes it start
+      # a comment.
+      def id_char(percent:, at: true)
+        illegal = percent ? ILLEGAL_ID_CHARS.delete('%') : ILLEGAL_ID_CHARS
+        illegal += '@' unless at
+        # Escaped because the list is spliced into a character class, where
+        # ']', '\\', '^' or '-' would otherwise change its meaning.
+        "[[:alnum:]!-~&&[^#{Regexp.escape(illegal)}]]"
+      end
+
+      # One word of a name. id_class allows '@' anywhere, but '@' also
+      # starts the next object, which error recovery after an unterminated
+      # object relies on. Identifiers cannot contain = , } # { or (, so the
+      # character after '@word' decides unambiguously: a name if (after
+      # white space, and TeX comments when they are stripped) it is one of
+      # = , } #, an object start otherwise, e.g. at '{' or '('.
+      #
+      # A word that starts with '@' ends before the next '@'. Otherwise the
+      # lookahead would be retried from every '@' of a long run like
+      # @a@a@a... and rescan the rest of it each time, which is quadratic.
+      # So @a@b = x is not a name; a@b and a@b@c still are.
+      def word_pattern(percent:)
+        gap = percent ? '\s*' : '(?:\s|%[^\n]*)*'
+        char = id_char(percent:)
+        "(?:(?!@)#{char}+|@#{id_char(percent:, at: false)}+(?=#{gap}[=,}#]))"
+      end
+
+      # A name must not start with a digit (bibtex.web).
+      def name_pattern(percent:)
+        /(?![[:digit:]])#{word_pattern(percent:)}/
+      end
+
+      # Several words followed by '=', e.g. Web of Science's `Early Access
+      # Date' (#131). The words are joined into one name; as before, a word
+      # may start with a digit. By the rule above only the last word, which
+      # is followed by '=', can start with '@'.
+      def spaced_name_pattern(percent:)
+        word = word_pattern(percent:)
+        /#{word}(?:[\t ]+#{word})+(?=\s*=)/
+      end
+
+      def key_pattern(extra, optional:)
+        /\s*[#{extra}#{KEY_CHAR}]#{optional ? '*' : '+'},/
+      end
+    end
+
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
       space: /\s+/o,
@@ -49,12 +110,10 @@ module BibTeX
       eq: /\s*=\s*/o,
       comma: /\s*,\s*/o,
       number: /[[:digit:]]+/o,
-      name: /[[:alpha:][:digit:]:_!$?.%+&*-]+/io,
-      # Several space-separated words followed by `=', e.g. the
-      # `Early Access Date' fields exported by Web of Science.
-      spaced_name: /[[:alpha:][:digit:]:_!$?.%+&*-]+(?:[\t ]+[[:alpha:][:digit:]:_!$?.%+&*-]+)+(?=\s*=)/io,
-      spaced_name_without_percent: /[[:alpha:][:digit:]:_!$?.+&*-]+(?:[\t ]+[[:alpha:][:digit:]:_!$?.+&*-]+)+(?=\s*=)/io,
-      name_without_percent: /[[:alpha:][:digit:]:_!$?.+&*-]+/io,
+      name: name_pattern(percent: true),
+      name_without_percent: name_pattern(percent: false),
+      spaced_name: spaced_name_pattern(percent: true),
+      spaced_name_without_percent: spaced_name_pattern(percent: false),
       tex_comment: /%[^\n]*/o,
       tex_comments: /(?:\s*%[^\n]*)+/o,
       quote: /\s*"/o,
@@ -68,10 +127,10 @@ module BibTeX
       string: /string/io,
       comment: /comment\b/io,
       preamble: /preamble\b/io,
-      key: /\s*[[:alpha:][:digit:] :_!$?.%+;&*'"{}-]+,/io,
-      optional_key: /\s*[[:alpha:][:digit:] :_!$?.%+;&*'"-]*,/io,
-      key_without_percent: /\s*[[:alpha:][:digit:] :_!$?.+;&*'"{}-]+,/io,
-      optional_key_without_percent: /\s*[[:alpha:][:digit:] :_!$?.+;&*'"-]*,/io
+      key: key_pattern('%{}', optional: false),
+      optional_key: key_pattern('%', optional: true),
+      key_without_percent: key_pattern('{}', optional: false),
+      optional_key_without_percent: key_pattern('', optional: true)
     }
 
     MODE = Hash.new(:meta).merge(

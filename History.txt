@@ -18,6 +18,9 @@ Unreleased
 * PLACEHOLDER (R3): Bibliography#save_to replaces the file atomically (temp file + rename), resolving symlinks and keeping permission bits
 * Add dynamic field writers to Entry: entry.foo = value adds or replaces field :foo, converting the value like Entry#add; respond_to? returns true for any writer name, and :'=' alone is not a writer (#154)
 * Entry#respond_to? returns true or false for ghost methods (it could return a match object before)
+* Accept every character BibTeX allows in identifiers in field names, @string names and macro references, e.g. a/b, x;y, p[1], a|b, a^b, a~b, a<b> and a@b; also in each word of a non-strict multi-word field name (#154)
+* Accept '/' in entry keys, e.g. DBLP:journals/dq/RossinK99 (#154)
+* PLACEHOLDER (R2): names may start with '@' when followed by = , } or #; '@' followed by an identifier and { or ( still starts an object
 
 6.2.0 / 2025-07-20
 ==================
