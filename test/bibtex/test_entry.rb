@@ -716,7 +716,7 @@ module BibTeX
       end
     end
 
-    describe '#to_s escaping of & (#170)' do
+    describe '#to_s escaping of &' do
       it 'escapes a bare & in a field value' do
         entry = BibTeX.parse('@article{a, journal = {Trends in Ecology & Evolution}}')[:a]
 

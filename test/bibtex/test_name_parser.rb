@@ -25,7 +25,7 @@ module BibTeX
       end
     end
 
-    describe 'parse a last name ending in a lowercase word before the comma (#149)' do
+    describe 'parse a last name ending in a lowercase word before the comma' do
       it 'treats uppercase words followed by a lowercase word as the last name' do
         name = Name.parse("Rongiéras d'Usseau, Emmanuel")
 
