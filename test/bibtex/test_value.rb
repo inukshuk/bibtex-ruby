@@ -1,4 +1,4 @@
-require 'helper.rb'
+require 'helper'
 
 class Upcase < BibTeX::Filter
   def apply(value)

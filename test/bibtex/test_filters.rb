@@ -1,4 +1,4 @@
-require 'helper.rb'
+require 'helper'
 
 module BibTeX
   class FiltersTest < Minitest::Spec
