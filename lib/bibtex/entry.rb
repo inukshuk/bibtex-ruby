@@ -377,7 +377,7 @@ module BibTeX
     # @return [String] the digest string
     def digest(filter = [])
       names = field_names(filter)
-      digest = type.to_s
+      digest = +type.to_s
 
       names.zip(values_at(*names)).each do |key, value|
         digest << "|#{key}:#{value}"
