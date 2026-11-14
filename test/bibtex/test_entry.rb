@@ -218,6 +218,93 @@ module BibTeX
           assert_equal m[1], @entry.month_numeric
         end
       end
+
+      [
+        [:jan, :jan, 1], [:dec, :dec, 12], [:jan, 'January', 1],
+        [:jan, 'jan', 1], [:jan, ' Jan ', 1], [:jan, 'JAN', 1],
+        [:sep, 'Sept.', 9], [:mar, 'March 2020', 3], [:jan, '1', 1],
+        [:jan, '01', 1], [:dec, '12', 12], [:dec, 12, 12], [:dec, :'12', 12],
+        ['13', '13', nil], ['13', 13, nil], ['Spring', 'Spring', nil],
+        ['0', '0', nil], ['00', '00', nil],
+        ['', '', nil], [:foo, :foo, nil]
+      ].each do |expected, input, numeric|
+        it "normalises month #{input.inspect} to #{expected.inspect}" do
+          @entry.month = input
+
+          assert_equal expected, @entry.month.v
+          if numeric
+            assert_equal numeric, @entry.month_numeric
+            assert_equal numeric.to_s, @entry[:month_numeric].v
+          else
+            assert_nil @entry.month_numeric
+            refute @entry.field?(:month_numeric)
+          end
+        end
+      end
+
+      it 'normalises parsed months, keeping unknown values as-is' do
+        bib = Bibliography.parse(<<~BIB)
+          @misc{a, month = {January}}
+          @misc{b, month = "  Sep "}
+          @misc{c, month = {12}}
+          @misc{d, month = 13}
+          @misc{e, month = "Spring" # " 2020"}
+        BIB
+
+        months = bib.map { |e| e.month.v }
+
+        assert_equal [:jan, :sep, :dec, '13', '"Spring" # " 2020"'], months
+        assert_equal [1, 9, 12, nil, nil], bib.map(&:month_numeric)
+      end
+
+      it 'does not share month values between entries' do
+        a = Entry.new
+        b = Entry.new
+        a.month = :aug
+        b.month = :aug
+
+        refute_same a.month, b.month
+
+        a.month.replace('August')
+
+        assert_equal :aug, b.month.v
+      end
+
+      it 'does not share a month value assigned to several entries' do
+        month = Value.new('jan')
+        a = Entry.new
+        b = Entry.new
+        a.month = month
+        b.month = month
+
+        assert_equal a.month, b.month
+        refute_same a.month, b.month
+        refute_same month, a.month
+      end
+
+      it 'does not share unknown month values between parsed entries' do
+        a, b = Bibliography.parse('@misc{a, month = {Spring}} @misc{b, month = {Spring}}').map { |e| e }
+
+        assert_equal a.month, b.month
+        refute_same a.month, b.month
+      end
+
+      it 'does not allocate more on repeated parses' do
+        skip 'GC.stat has no allocation counter' unless GC.stat.key?(:total_allocated_objects)
+
+        months = %w[jan Feb 3 {April}]
+        input = (1..300).map { |i| "@misc{k#{i}, month = #{months[i % 4]}}" }.join("\n")
+        Bibliography.parse(input)
+        allocations = Array.new(3) do
+          before = GC.stat(:total_allocated_objects)
+          Bibliography.parse(input)
+          GC.stat(:total_allocated_objects) - before
+        end
+        skip 'GC.stat does not count allocations here' if allocations.first.zero?
+
+        assert_operator allocations.last, :<, allocations.first * 1.2,
+                        "allocations grew across parses: #{allocations.inspect}"
+      end
     end
 
     describe '#values_at' do

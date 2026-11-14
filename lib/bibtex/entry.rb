@@ -59,17 +59,6 @@ module BibTeX
 
     MONTHS = %i[jan feb mar apr may jun jul aug sep oct nov dec].freeze
 
-    MONTHS_FILTER = Hash.new do |h, k|
-      h[k] = case k.to_s.strip
-             when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
-               Value.new(k.to_s[0, 3].downcase.to_sym)
-             when /^\d\d?$/
-               Value.new(MONTHS[k.to_i - 1] || k)
-             else
-               Value.new(k)
-             end
-    end
-
     attr_reader :fields, :type
 
     def_delegators :@fields, :empty?
@@ -472,7 +461,7 @@ module BibTeX
       fields.delete(:month_numeric)
       return unless has_field?(:month)
 
-      fields[:month] = MONTHS_FILTER[fields[:month]]
+      fields[:month] = normalize_month(fields[:month])
 
       numeric = MONTHS.index(fields[:month].to_sym)
       fields[:month_numeric] = Value.new(numeric.succ) if numeric
@@ -687,6 +676,21 @@ module BibTeX
     end
 
     private
+
+    # Returns a new Value holding the BibTeX month abbreviation (:jan to
+    # :dec) if the month starts with a month name or is a month number from
+    # 1 to 12; any other month is kept as-is. Each call returns a new Value,
+    # so entries never share a month.
+    def normalize_month(month)
+      case (string = month.to_s.strip)
+      when /\A(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
+        Value.new(string[0, 3].downcase.to_sym)
+      when /\A\d\d?\z/
+        Value.new(string.to_i.between?(1, 12) ? MONTHS[string.to_i - 1] : month)
+      else
+        Value.new(month)
+      end
+    end
 
     # Escapes every & not already preceded by a backslash, unless the field
     # is verbatim, a BibDesk URL field, or a howpublished containing \url.
