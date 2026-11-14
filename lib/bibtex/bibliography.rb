@@ -216,7 +216,9 @@ module BibTeX
     # not yield to a block for additional refinement of the query.
     #
     def [](*arguments)
-      raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1, 2)
+      unless arguments.length.between?(1, 2)
+        raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)")
+      end
 
       if arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
         data[*arguments]
@@ -319,7 +321,9 @@ module BibTeX
         group = groups[name.sort_order(initials: true).downcase]
         group[:names] << name
 
-        group[:prototype] = name if group[:prototype].nil? || group[:prototype].first.to_s.length < name.first.to_s.length
+        if group[:prototype].nil? || group[:prototype].first.to_s.length < name.first.to_s.length
+          group[:prototype] = name
+        end
       end
 
       # extend all names in group to prototype
