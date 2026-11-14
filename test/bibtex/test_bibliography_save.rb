@@ -109,7 +109,10 @@ module BibTeX
             Encoding.default_external = original
           end
 
-          assert_equal @bib.to_s.b, File.binread(@path)
+          # Read back in text mode: on Windows the file has CRLF line endings,
+          # like any text-mode write, and reading in text mode undoes that.
+          assert_equal @bib.to_s, File.read(@path, encoding: Encoding::UTF_8)
+          assert_includes File.binread(@path), 'Über'.b
         end
 
         it 'round-trips non-ASCII content through BibTeX.open' do
