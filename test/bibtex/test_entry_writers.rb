@@ -156,6 +156,14 @@ module BibTeX
         end
       end
 
+      describe "a writer name whose field part ends in '=' (a==)" do
+        it 'is not a writer' do
+          refute_respond_to @entry, :'a=='
+          assert_raises(NoMethodError) { @entry.send(:'a==', 'x') }
+          assert_equal %i[title keywords], @entry.fields.keys
+        end
+      end
+
       describe 'unknown methods' do
         it 'still raise NoMethodError for undefined readers' do
           assert_raises(NoMethodError) { @entry.undefined_field }
