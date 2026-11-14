@@ -82,17 +82,8 @@ task profile: ['racc'] do
   require File.expand_path('test/profile.rb', __dir__)
 end
 
-desc 'Updates the Manifest file'
-task manifest: %w[clean racc] do
-  m = File.open('Manifest', 'w')
-  m.print FileList['**/*'].reject { |f|
-    f.start_with?('coverage') || f =~ /(rbc|swp|~|lock)$/
-  }.join("\n")
-  m.close
-end
-
 desc 'Builds the gem file'
-task build: ['manifest'] do
+task build: %w[clean racc] do
   system 'gem build bibtex-ruby.gemspec'
 end
 
