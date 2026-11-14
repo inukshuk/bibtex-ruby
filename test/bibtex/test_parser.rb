@@ -45,7 +45,7 @@ module BibTeX
         bib = Parser.new(debug: false, strict: false).parse(input)
 
         assert_equal 'George Martin06', bib.first.key
-        assert bib[:"George Martin06"]
+        assert bib[:'George Martin06']
       end
 
       it 'handles plus symbols in keys' do
@@ -53,7 +53,7 @@ module BibTeX
         bib = Parser.new(debug: false, strict: false).parse(input)
 
         assert_equal 'foo+bar', bib.first.key
-        assert bib[:"foo+bar"]
+        assert bib[:'foo+bar']
       end
 
       it 'allows semicolons in keys' do
@@ -61,7 +61,7 @@ module BibTeX
         bib = Parser.new(debug: false, strict: false).parse(input)
 
         assert_equal 'Gomez;', bib.first.key
-        assert bib[:"Gomez;"]
+        assert bib[:'Gomez;']
       end
 
       it 'allows quotes in keys' do
