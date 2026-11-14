@@ -177,7 +177,7 @@ module BibTeX
 
     # Returns true if the first name consists solely of initials.
     def initials?
-      !(first.nil? || first.empty? || first.to_s =~ /[[:alpha:]]{2,}[^\.]/)
+      !(first.nil? || first.empty? || first.to_s =~ /[[:alpha:]]{2,}[^.]/)
     end
 
     # Sets the name's first name to the passed-in name if the last name equals

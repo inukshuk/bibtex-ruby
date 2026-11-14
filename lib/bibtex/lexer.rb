@@ -46,20 +46,20 @@ module BibTeX
       eq: /\s*=\s*/o,
       comma: /\s*,\s*/o,
       number: /[[:digit:]]+/o,
-      name: %r{[[:alpha:][:digit:]/:_!$\?\.%+&\*-]+}io,
+      name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+}io,
       quote: /\s*"/o,
-      unquote: /[\{\}"]/o,
+      unquote: /[{}"]/o,
       sharp: /\s*#\s*/o,
       object: /@/o,
       period: /./o,
       strict_next: /@[\t ]*/o,
       next: /(^|\n)[\t ]*@[\t ]*/o,
-      entry: /[a-z\d:_!\.$%&*-]+/io,
+      entry: /[a-z\d:_!.$%&*-]+/io,
       string: /string/io,
       comment: /comment\b/io,
       preamble: /preamble\b/io,
-      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"{}-]+,}io,
-      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]*,}io
+      key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"{}-]+,}io,
+      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"-]*,}io
     }
 
     MODE = Hash.new(:meta).merge(
