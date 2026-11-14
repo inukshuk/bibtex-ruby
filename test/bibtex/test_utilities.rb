@@ -4,7 +4,7 @@ module BibTeX
   class TestUtilities < Minitest::Test
     def test_empty?
       assert_empty BibTeX.open(Test.fixtures(:empty))
-      refute BibTeX.open(Test.fixtures(:bibdesk)).empty?
+      refute_empty BibTeX.open(Test.fixtures(:bibdesk))
     end
 
     def test_parse

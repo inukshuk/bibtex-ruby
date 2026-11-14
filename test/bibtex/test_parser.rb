@@ -9,7 +9,7 @@ module BibTeX
 
       it 'returns a Bibliography instance' do
         assert @bib
-        refute @bib.empty?
+        refute_empty @bib
       end
 
       it 'parses all entries' do
