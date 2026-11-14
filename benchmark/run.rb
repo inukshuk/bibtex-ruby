@@ -8,7 +8,10 @@
 #   bundle exec rake bench N=5000 WORKLOADS=parse,to_s
 #   bundle exec rake bench JSON=base.json       # save the results
 #   bundle exec rake bench COMPARE=base.json    # compare with saved results
-#   bundle exec rake bench:compare[origin/master]
+#   bundle exec rake 'bench:compare[origin/master]'   # quote it for zsh
+#
+# The exit status is 1 if the configuration is invalid or if a workload
+# raised an error (the error is shown below the table).
 #
 # Configuration (environment variables):
 #
@@ -21,6 +24,9 @@
 #   COMPARE     JSON file of a previous run to compare the results with
 #   LABEL       name of this run in JSON output and comparisons
 #   BIBTEX_LIB  load BibTeX-Ruby from this lib directory instead of ./lib
+#
+# Entry::MONTHS_FILTER grows with every parse; the benchmark clears it
+# before each run so that the figures do not depend on earlier runs.
 
 begin
   require 'bundler/setup'
@@ -28,10 +34,18 @@ rescue LoadError
   nil
 end
 
-$LOAD_PATH.unshift(File.expand_path(ENV.fetch('BIBTEX_LIB', File.join(__dir__, '..', 'lib'))))
+# The script's own diagnostics are written to $stderr directly, because rake
+# runs it with -W0, which turns Kernel#warn into a no-op.
+LIB = File.expand_path(ENV.fetch('BIBTEX_LIB', File.join(__dir__, '..', 'lib')))
+abort "BIBTEX_LIB: #{LIB}/bibtex.rb does not exist" unless File.file?(File.join(LIB, 'bibtex.rb'))
+
+$LOAD_PATH.unshift(File.realpath(LIB))
 
 require 'json'
 require 'bibtex'
+
+loaded = $LOADED_FEATURES.find { |file| File.basename(file) == 'bibtex.rb' }
+abort "BIBTEX_LIB: loaded #{loaded} instead of a file in #{LIB}" unless loaded&.start_with?("#{File.realpath(LIB)}/")
 
 # Synthetic-corpus benchmark for BibTeX-Ruby; see the comment at the top.
 module BibTeXBenchmark
@@ -159,7 +173,7 @@ module BibTeXBenchmark
     end
 
     def run
-      names = config[:workloads] || WORKLOADS.keys
+      names = config[:workloads]
       names.to_h { |name| [name, measure(name)] }
     end
 
@@ -167,14 +181,22 @@ module BibTeXBenchmark
 
     def measure(name)
       prepare = preparation(name)
+      reset_global_state
       prepare.call.call # warm-up
-      result = { ms: best_time(prepare), allocated_objects: allocations(prepare.call) }
-      result.merge!(memory_profile(prepare.call)) if config[:memory]
+      result = { ms: best_time(prepare), allocated_objects: allocations(prepare) }
+      result.merge!(memory_profile(prepare)) if config[:memory]
       result
-    rescue KeyError
-      { error: "unknown workload (known: #{WORKLOADS.keys.join(', ')})" }
     rescue StandardError, NotImplementedError => e
-      { error: "#{e.class}: #{e.message[0, 120]}" }
+      { error: "#{e.class}: #{e.message[0, 120]}", at: e.backtrace&.first }
+    end
+
+    # Entry::MONTHS_FILTER is a global hash that grows with every parsed
+    # month value. Clearing it before each run keeps the allocation figures
+    # independent of the history of the process. It is guarded, so that this
+    # keeps working if the library stops leaking.
+    def reset_global_state
+      filter = BibTeX::Entry::MONTHS_FILTER if defined?(BibTeX::Entry::MONTHS_FILTER)
+      filter.clear if filter.respond_to?(:clear) && !filter.frozen?
     end
 
     # Returns a lambda that runs the workload's setup and returns a block
@@ -192,6 +214,7 @@ module BibTeXBenchmark
     def best_time(prepare)
       seconds = Array.new(config[:iterations]) do
         block = prepare.call
+        reset_global_state
         GC.start
         start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         block.call
@@ -200,14 +223,18 @@ module BibTeXBenchmark
       (seconds.min * 1000).round(2)
     end
 
-    def allocations(block)
+    def allocations(prepare)
+      block = prepare.call
+      reset_global_state
       GC.start
       before = GC.stat(:total_allocated_objects)
       block.call
       GC.stat(:total_allocated_objects) - before
     end
 
-    def memory_profile(block)
+    def memory_profile(prepare)
+      block = prepare.call
+      reset_global_state
       report = MemoryProfiler.report(&block)
       strings = report.allocated_objects_by_class.find { |h| h[:data] == 'String' }
       { allocated_mb: (report.total_allocated_memsize / 1_048_576.0).round(2), allocated_strings: strings&.dig(:count) }
@@ -225,15 +252,20 @@ module BibTeXBenchmark
       io.puts header
       io.puts line('workload', columns)
       @results['workloads'].each { |name, result| io.puts line(name, values(name, result)) }
+      errors.each { |name, result| io.puts "#{name}: #{result['error']} (#{result['at']})" }
+    end
+
+    def errors
+      @results['workloads'].select { |_, result| result['error'] }
     end
 
     private
 
     def header
-      text = "#{@results['label']}: bibtex-ruby #{@results['bibtex']}, ruby #{@results['ruby']}, " \
-             "N=#{@results['n']} (#{@results['entries']} entries), SEED=#{@results['seed']}, " \
-             "best of #{@results['iterations']}"
-      text += "\ncompared with #{@baseline['label']} (bibtex-ruby #{@baseline['bibtex']})" if @baseline
+      text = "#{@results['label']}: bibtex-ruby #{@results['bibtex']} (#{@results['lib']}), " \
+             "ruby #{@results['ruby']}, N=#{@results['n']} (#{@results['entries']} entries), " \
+             "SEED=#{@results['seed']}, best of #{@results['iterations']}"
+      text += "\ncompared with #{@baseline['label']} (bibtex-ruby #{@baseline['bibtex']}, #{@baseline['lib']})" if @baseline
       text
     end
 
@@ -248,12 +280,14 @@ module BibTeXBenchmark
     end
 
     def values(name, result)
-      return [result['error']] if result['error']
+      return ['error (see below)'] if result['error']
       return result.values_at('ms', 'allocated_objects', 'allocated_mb', 'allocated_strings') unless @baseline
 
-      base = @baseline.dig('workloads', name) || {}
+      base = @baseline.dig('workloads', name)
+      placeholder = base.nil? ? 'n/a' : 'error'
+      base = {} if base.nil? || base['error']
       %w[ms allocated_objects].flat_map do |key|
-        [base[key], result[key], delta(base[key], result[key])]
+        [base.fetch(key, placeholder), result[key], delta(base[key], result[key])]
       end
     end
 
@@ -270,36 +304,78 @@ module BibTeXBenchmark
 
   def self.config
     {
-      n: Integer(ENV.fetch('N', '1000')),
-      seed: Integer(ENV.fetch('SEED', '42')),
-      iterations: Integer(ENV.fetch('ITERATIONS', '5')),
-      workloads: ENV['WORKLOADS']&.split(',')&.map(&:strip),
-      memory: ENV['MEM'] == '1' && memory_profiler?
+      n: positive('N', '1000'), seed: Integer(ENV.fetch('SEED', '42')), iterations: positive('ITERATIONS', '5'),
+      workloads: workloads, memory: ENV['MEM'] == '1' && memory_profiler?
     }
+  end
+
+  def self.positive(name, default)
+    value = Integer(ENV.fetch(name, default))
+    abort "#{name} must be at least 1 (got #{value})" if value < 1
+    value
+  end
+
+  # An empty or missing list selects all workloads; unknown names abort.
+  def self.workloads
+    names = ENV.fetch('WORKLOADS', '').split(',').map(&:strip).reject(&:empty?)
+    return WORKLOADS.keys if names.empty?
+
+    unknown = names - WORKLOADS.keys
+    abort "unknown workload(s): #{unknown.join(', ')} (known: #{WORKLOADS.keys.join(', ')})" unless unknown.empty?
+    names.uniq
   end
 
   def self.memory_profiler?
     require 'memory_profiler'
     true
   rescue LoadError
-    warn 'MEM=1 needs the memory_profiler gem (bundle install --with profile); skipping memory figures'
+    note 'MEM=1 needs the memory_profiler gem (bundle install --with profile); skipping memory figures'
     false
+  end
+
+  # The version of the library under test, read from its version.rb:
+  # bundler/setup may already have loaded another one from ./lib.
+  def self.library_version
+    text = File.read(File.join(LIB, 'bibtex', 'version.rb'))
+    %w[MAJOR MINOR PATCH BUILD].filter_map { |part| text[/^\s*#{part}\s*=\s*(\d+)/, 1] }.join('.')
   end
 
   def self.results(config)
     runner = Runner.new(config)
     {
-      'label' => ENV.fetch('LABEL', 'current'), 'bibtex' => BibTeX::Version::STRING, 'ruby' => RUBY_VERSION,
+      'label' => ENV.fetch('LABEL', 'current'), 'bibtex' => library_version, 'lib' => LIB, 'ruby' => RUBY_VERSION,
       'n' => config[:n], 'entries' => runner.data.bibliography.length, 'seed' => config[:seed],
       'iterations' => config[:iterations], 'workloads' => JSON.parse(JSON.generate(runner.run))
     }
+  end
+
+  def self.note(text)
+    $stderr.write("note: #{text}\n")
+  end
+
+  # Notes when the baseline was measured with other settings.
+  def self.check_comparable(results, baseline)
+    %w[n seed iterations].each do |key|
+      next if baseline[key] == results[key]
+
+      note "baseline #{key} is #{baseline[key]}, this run #{results[key]}; the comparison may not be meaningful"
+    end
+    check_workloads(results['workloads'], baseline['workloads'])
+  end
+
+  def self.check_workloads(current, base)
+    (current.keys - base.keys).each { |name| note "baseline has no #{name} workload" }
+    base.each { |name, result| note "baseline #{name} failed" if result['error'] }
   end
 
   def self.run
     results = results(config)
     File.write(ENV.fetch('JSON'), JSON.pretty_generate(results)) if ENV['JSON']
     baseline = JSON.parse(File.read(ENV.fetch('COMPARE'))) if ENV['COMPARE']
-    Report.new(results, baseline).print
+    check_comparable(results, baseline) if baseline
+    report = Report.new(results, baseline)
+    report.print
+    exit 1 unless report.errors.empty?
   end
 end
 
