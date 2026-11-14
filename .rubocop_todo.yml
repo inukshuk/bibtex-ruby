@@ -6,12 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Gemspec/RequireMFA:
-  Exclude:
-    - 'bibtex-ruby.gemspec'
-
 # Offense count: 3
 # Configuration parameters: AllowedMethods.
 # AllowedMethods: enums
@@ -198,14 +192,6 @@ Naming/PredicatePrefix:
     - 'lib/bibtex/entry.rb'
 
 # Offense count: 1
-# Configuration parameters: EnforcedStyle, CheckMethodNames, CheckSymbols, AllowedIdentifiers, AllowedPatterns.
-# SupportedStyles: snake_case, normalcase, non_integer
-# AllowedIdentifiers: TLS1_1, TLS1_2, capture3, iso8601, rfc1123_date, rfc822, rfc2822, rfc3339, x86_64
-Naming/VariableNumber:
-  Exclude:
-    - 'Gemfile'
-
-# Offense count: 1
 # Configuration parameters: MinSize.
 Performance/CollectionLiteralInLoop:
   Exclude:
@@ -217,18 +203,6 @@ Performance/CollectionLiteralInLoop:
 Performance/Sum:
   Exclude:
     - 'test/benchmark.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Rake/Desc:
-  Exclude:
-    - 'Rakefile'
-
-# Offense count: 2
-Style/FileOpen:
-  Exclude:
-    - 'Rakefile'
-    - 'bibtex-ruby.gemspec'
 
 # Offense count: 47
 # This cop supports unsafe autocorrection (--autocorrect-all).
