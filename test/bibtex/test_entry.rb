@@ -269,7 +269,15 @@ module BibTeX
         assert_equal :aug, b.month.v
       end
 
-      it 'does not retain state or slow down across repeated parses' do
+      it 'does not retain parsed months' do
+        Bibliography.parse('@misc{a, month = jan}')
+
+        refute_respond_to Entry::MONTHS_FILTER, :size
+      end
+
+      it 'does not allocate more on repeated parses' do
+        skip 'GC.stat has no allocation counter' unless GC.stat.key?(:total_allocated_objects)
+
         months = %w[jan Feb 3 {April}]
         input = (1..300).map { |i| "@misc{k#{i}, month = #{months[i % 4]}}" }.join("\n")
         allocations = Array.new(3) do
@@ -280,7 +288,6 @@ module BibTeX
 
         assert_operator allocations.last, :<, allocations.first * 1.2,
                         "allocations grew across parses: #{allocations.inspect}"
-        refute_respond_to Entry::MONTHS_FILTER, :size
       end
     end
 
