@@ -20,6 +20,10 @@ Unreleased
 * Entry.new no longer removes :bibtex_type and :bibtex_key from the hash passed to it, and accepts a frozen hash
 * Entry#to_s and #to_hash, and so Bibliography#to_s, #to_a and #to_hash, no longer add :quotes to the options hash passed in, and accept a frozen hash
 * Reimplement Entry's dynamic field writers, Bibliography#save_to and the lexer's identifier and key rules from a written specification, without the code they replace (#154)
+* Behaviour change: the query condition "prop=~re" now matches a regular expression, like "prop~=re". It used to be read as the equality "prop=" with the value "~re", which could never have been intended
+* Fix Element#type? and Entry#type? raising NoMethodError when given a class, e.g. entry.type?(BibTeX::Entry)
+* Fix BibTeX::String#to_xml raising NoMethodError, and Element#to_xml producing an empty tag name for elements whose type is a symbol
+* Fix Names#add raising TypeError when given a string, and Name.looks_like? raising NameError and returning the inverse of its documented result
 
 6.2.0 / 2025-07-20
 ==================
