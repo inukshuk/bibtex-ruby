@@ -272,6 +272,16 @@ module BibTeX
         end
       end
 
+      describe '#to_yaml' do
+        it 'works without the caller requiring yaml' do
+          lib = File.expand_path('../../lib', __dir__)
+          script = "require 'bibtex'; print BibTeX.parse('@book{a, title = {T}}').to_yaml"
+          output = IO.popen([RbConfig.ruby, '-I', lib, '-e', script], err: File::NULL, &:read)
+
+          assert_match(/:title: "\{T\}"/, output)
+        end
+      end
+
       describe 'duplicates' do
         it 'understands select_duplicates_by' do
           assert_equal 1, @bib.select_duplicates_by.length
