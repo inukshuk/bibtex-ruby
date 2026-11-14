@@ -690,7 +690,11 @@ module BibTeX
 
     # Escapes every & not already preceded by a backslash, unless the field
     # is verbatim, a BibDesk URL field, or a howpublished containing \url.
+    #
+    # Most values contain no & at all; they are returned as is, skipping
+    # the field checks and the gsub.
     def escape_value(name, string)
+      return string unless string.include?('&')
       return string if verbatim_field?(name, string)
 
       string.gsub(/(?<!\\)&/, '\\\\&')
