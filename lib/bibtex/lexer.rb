@@ -39,7 +39,7 @@ module BibTeX
 
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
-      space: /[\s]+/o,
+      space: /\s+/o,
       lbrace: /\s*\{/o,
       rbrace: /\s*\}\s*/o,
       braces: /\{|\}/o,
