@@ -299,8 +299,8 @@ module BibTeX
         end
 
         it 'returns the bibliography unchanged if there are no duplicates' do
-          assert @a.length == @a.uniq!.length
-          assert @b.length == @b.uniq!.length
+          assert_equal @a.length, @a.uniq!.length
+          assert_equal @b.length, @b.uniq!.length
         end
 
         it 'removes duplicate entries and returns the bibliography' do
