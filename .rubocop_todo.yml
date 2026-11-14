@@ -6,71 +6,20 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-Gemspec/AddRuntimeDependency:
-  Exclude:
-    - 'bibtex-ruby.gemspec'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Gemspec/DeprecatedAttributeAssignment:
-  Exclude:
-    - 'bibtex-ruby.gemspec'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: TreatCommentsAsGroupSeparators, ConsiderPunctuation.
-Gemspec/OrderedDependencies:
-  Exclude:
-    - 'bibtex-ruby.gemspec'
-
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 Gemspec/RequireMFA:
   Exclude:
     - 'bibtex-ruby.gemspec'
 
-# Offense count: 10
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: with_first_argument, with_fixed_indentation
-Layout/ArgumentAlignment:
-  Exclude:
-    - 'test/bibtex/test_lexer.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Layout/EmptyLines:
-  Exclude:
-    - 'lib/bibtex/entry.rb'
-
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: leading, trailing
-Layout/LineContinuationLeadingSpace:
-  Exclude:
-    - 'test/bibtex/test_entry.rb'
-
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: space, no_space
-Layout/LineContinuationSpacing:
-  Exclude:
-    - 'test/bibtex/test_entry.rb'
-
-# Offense count: 26
+# Offense count: 21
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: Max, AllowHeredoc, AllowURI, AllowQualifiedName, URISchemes, AllowRBSInlineAnnotation, AllowCopDirectives, AllowedPatterns, SplitStrings.
 # URISchemes: http, https
 Layout/LineLength:
   Exclude:
     - 'features/step_definitions/bibtex_steps.rb'
-    - 'lib/bibtex/bibliography.rb'
     - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/error.rb'
     - 'lib/bibtex/lexer.rb'
     - 'lib/bibtex/value.rb'
     - 'test/bibtex/test_bibliography.rb'
@@ -78,30 +27,6 @@ Layout/LineLength:
     - 'test/bibtex/test_lexer.rb'
     - 'test/bibtex/test_names.rb'
     - 'test/bibtex/test_utilities.rb'
-
-# Offense count: 8
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowedMethods, AllowedPatterns.
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - 'features/step_definitions/bibtex_steps.rb'
-    - 'test/bibtex/test_value.rb'
-
-# Offense count: 6
-# This cop supports safe autocorrection (--autocorrect).
-Lint/AmbiguousOperatorPrecedence:
-  Exclude:
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/entry.rb'
-    - 'lib/bibtex/lexer.rb'
-    - 'lib/bibtex/names.rb'
-
-# Offense count: 25
-# This cop supports safe autocorrection (--autocorrect).
-Lint/AmbiguousRegexpLiteral:
-  Exclude:
-    - 'features/step_definitions/bibtex_steps.rb'
-    - 'features/step_definitions/name_steps.rb'
 
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -159,15 +84,7 @@ Lint/StructNewOverride:
   Exclude:
     - 'lib/bibtex/names.rb'
 
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: strict, consistent
-Lint/SymbolConversion:
-  Exclude:
-    - 'lib/bibtex/entry/rdf_converter.rb'
-
-# Offense count: 46
+# Offense count: 45
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes, Max.
 Metrics/AbcSize:
   Exclude:
@@ -195,11 +112,12 @@ Metrics/BlockLength:
     - 'test/bibtex/test_parser.rb'
     - 'test/bibtex/test_value.rb'
 
-# Offense count: 3
+# Offense count: 4
 # Configuration parameters: CountBlocks, CountModifierForms, Max.
 Metrics/BlockNesting:
   Exclude:
     - 'lib/bibtex/elements.rb'
+    - 'lib/bibtex/lexer.rb'
 
 # Offense count: 14
 # Configuration parameters: CountComments, Max, CountAsOne.
@@ -256,92 +174,11 @@ Metrics/PerceivedComplexity:
     - 'lib/bibtex/lexer.rb'
     - 'lib/bibtex/value.rb'
 
-# Offense count: 6
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertEmpty:
-  Exclude:
-    - 'test/bibtex/test_bibliography.rb'
-    - 'test/bibtex/test_utilities.rb'
-    - 'test/bibtex/test_value.rb'
-    - 'test/test_bibtex.rb'
-
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertEqual:
-  Exclude:
-    - 'test/bibtex/test_bibliography.rb'
-    - 'test/bibtex/test_value.rb'
-
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertInstanceOf:
-  Exclude:
-    - 'test/bibtex/test_entry.rb'
-    - 'test/test_bibtex.rb'
-
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertKindOf:
-  Exclude:
-    - 'test/bibtex/test_value.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertMatch:
-  Exclude:
-    - 'test/bibtex/test_value.rb'
-
-# Offense count: 8
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertOperator:
-  Exclude:
-    - 'test/bibtex/test_bibliography.rb'
-    - 'test/bibtex/test_value.rb'
-
-# Offense count: 13
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertPredicate:
-  Exclude:
-    - 'test/bibtex/test_bibliography.rb'
-    - 'test/bibtex/test_entry.rb'
-    - 'test/bibtex/test_utilities.rb'
-    - 'test/bibtex/test_value.rb'
-    - 'test/test_bibtex.rb'
-
-# Offense count: 5
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/AssertSame:
-  Exclude:
-    - 'test/bibtex/test_filters.rb'
-
 # Offense count: 2
 # This cop supports unsafe autocorrection (--autocorrect-all).
 Minitest/AssertTruthy:
   Exclude:
     - 'test/bibtex/test_entry.rb'
-
-# Offense count: 74
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/EmptyLineBeforeAssertionMethods:
-  Exclude:
-    - 'test/bibtex/test_bibliography.rb'
-    - 'test/bibtex/test_elements.rb'
-    - 'test/bibtex/test_entry.rb'
-    - 'test/bibtex/test_filters.rb'
-    - 'test/bibtex/test_names.rb'
-    - 'test/bibtex/test_parser.rb'
-    - 'test/bibtex/test_string.rb'
-    - 'test/bibtex/test_utilities.rb'
-    - 'test/bibtex/test_value.rb'
-    - 'test/test_bibtex.rb'
-    - 'test/test_export.rb'
-
-# Offense count: 15
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/LiteralAsActualArgument:
-  Exclude:
-    - 'test/bibtex/test_lexer.rb'
-    - 'test/bibtex/test_name_parser.rb'
 
 # Offense count: 19
 # Configuration parameters: Max.
@@ -352,45 +189,12 @@ Minitest/MultipleAssertions:
     - 'test/bibtex/test_names.rb'
     - 'test/bibtex/test_parser.rb'
 
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/RefuteEmpty:
-  Exclude:
-    - 'test/bibtex/test_parser.rb'
-    - 'test/bibtex/test_utilities.rb'
-
 # Offense count: 6
 # This cop supports unsafe autocorrection (--autocorrect-all).
 Minitest/RefuteFalse:
   Exclude:
     - 'test/bibtex/test_entry.rb'
     - 'test/bibtex/test_filters.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/RefuteNil:
-  Exclude:
-    - 'test/bibtex/test_string.rb'
-
-# Offense count: 11
-# This cop supports safe autocorrection (--autocorrect).
-Minitest/RefutePredicate:
-  Exclude:
-    - 'test/bibtex/test_entry.rb'
-    - 'test/bibtex/test_parser.rb'
-    - 'test/bibtex/test_string.rb'
-    - 'test/bibtex/test_utilities.rb'
-    - 'test/bibtex/test_value.rb'
-
-# Offense count: 23
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle, BlockForwardingName.
-# SupportedStyles: anonymous, explicit
-Naming/BlockForwarding:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
-    - 'lib/bibtex/entry.rb'
-    - 'lib/bibtex/utilities.rb'
 
 # Offense count: 1
 Naming/ConstantName:
@@ -444,33 +248,6 @@ Performance/CollectionLiteralInLoop:
     - 'lib/bibtex/lexer.rb'
 
 # Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Performance/RedundantBlockCall:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
-
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-Performance/RedundantSplitRegexpArgument:
-  Exclude:
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/filters.rb'
-    - 'test/bibtex/test_bibliography.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Performance/RegexpMatch:
-  Exclude:
-    - 'lib/bibtex/entry/rdf_converter.rb'
-    - 'lib/bibtex/utilities.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Performance/StringReplacement:
-  Exclude:
-    - 'lib/bibtex/elements.rb'
-
-# Offense count: 2
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: OnlySumOrWithInitialValue.
 Performance/Sum:
@@ -483,32 +260,13 @@ Rake/Desc:
   Exclude:
     - 'Rakefile'
 
-# Offense count: 33
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowOnlyRestArgument, UseAnonymousForwarding, RedundantRestArgumentNames, RedundantKeywordRestArgumentNames, RedundantBlockArgumentNames.
-# RedundantRestArgumentNames: args, arguments
-# RedundantKeywordRestArgumentNames: kwargs, options, opts
-# RedundantBlockArgumentNames: blk, block, proc
-Style/ArgumentsForwarding:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
-    - 'lib/bibtex/entry.rb'
-    - 'lib/bibtex/replaceable.rb'
-    - 'lib/bibtex/utilities.rb'
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 Style/ArrayIntersect:
   Exclude:
     - 'lib/bibtex/entry.rb'
 
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Style/BisectedAttrAccessor:
-  Exclude:
-    - 'lib/bibtex/lexer.rb'
-
-# Offense count: 2
+# Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, AllowedMethods, AllowedPatterns, AllowBracesOnProceduralOneLiners, BracesRequiredMethods.
 # SupportedStyles: line_count_based, semantic, braces_for_chaining, always_braces
@@ -518,7 +276,6 @@ Style/BisectedAttrAccessor:
 Style/BlockDelimiters:
   Exclude:
     - 'lib/bibtex/value.rb'
-    - 'test/bibtex/test_parser.rb'
 
 # Offense count: 4
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -531,14 +288,6 @@ Style/ClassAndModuleChildren:
     - 'lib/bibtex/bibliography/rdf_converter.rb'
     - 'lib/bibtex/entry/bibtexml_converter.rb'
     - 'lib/bibtex/entry/citeproc_converter.rb'
-    - 'lib/bibtex/entry/rdf_converter.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
-# SupportedStyles: assign_to_condition, assign_inside_condition
-Style/ConditionalAssignment:
-  Exclude:
     - 'lib/bibtex/entry/rdf_converter.rb'
 
 # Offense count: 12
@@ -627,14 +376,6 @@ Style/GlobalStdStream:
     - 'examples/bib2yaml.rb'
     - 'lib/bibtex.rb'
 
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: MinBodyLength, AllowConsecutiveConditionals.
-Style/GuardClause:
-  Exclude:
-    - 'lib/bibtex/entry/rdf_converter.rb'
-    - 'lib/bibtex/value.rb'
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: AllowSplatArgument.
@@ -651,22 +392,6 @@ Style/HashEachMethods:
     - 'lib/bibtex/bibliography.rb'
     - 'lib/bibtex/entry.rb'
 
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowIfModifier.
-Style/IfInsideElse:
-  Exclude:
-    - 'lib/bibtex/names.rb'
-
-# Offense count: 5
-# This cop supports safe autocorrection (--autocorrect).
-Style/IfUnlessModifier:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/error.rb'
-    - 'lib/bibtex/lexer.rb'
-
 # Offense count: 2
 Style/MissingRespondToMissing:
   Exclude:
@@ -682,24 +407,6 @@ Style/MixinUsage:
 Style/MultilineBlockChain:
   Exclude:
     - 'lib/bibtex/bibliography.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Style/MultilineTernaryOperator:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Style/NegatedIfElseCondition:
-  Exclude:
-    - 'lib/bibtex/entry.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Style/NestedTernaryOperator:
-  Exclude:
-    - 'lib/bibtex/entry.rb'
 
 # Offense count: 4
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -718,82 +425,11 @@ Style/OptionalBooleanParameter:
     - 'lib/bibtex/entry.rb'
     - 'lib/bibtex/value.rb'
 
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: same_as_string_literals, single_quotes, double_quotes
-Style/QuotedSymbols:
-  Exclude:
-    - 'test/bibtex/test_parser.rb'
-
-# Offense count: 10
-# This cop supports safe autocorrection (--autocorrect).
-Style/RedundantFileExtensionInRequire:
-  Exclude:
-    - 'test/bibtex/entry/test_rdf_converter.rb'
-    - 'test/bibtex/test_entry.rb'
-    - 'test/bibtex/test_filters.rb'
-    - 'test/bibtex/test_lexer.rb'
-    - 'test/bibtex/test_parser.rb'
-    - 'test/bibtex/test_string.rb'
-    - 'test/bibtex/test_utilities.rb'
-    - 'test/bibtex/test_value.rb'
-    - 'test/test_bibtex.rb'
-    - 'test/test_export.rb'
-
 # Offense count: 2
 # This cop supports unsafe autocorrection (--autocorrect-all).
 Style/RedundantFormat:
   Exclude:
     - 'test/benchmark.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Style/RedundantParentheses:
-  Exclude:
-    - 'test/bibtex/test_bibliography.rb'
-
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-Style/RedundantRegexpArgument:
-  Exclude:
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/filters.rb'
-    - 'test/bibtex/test_bibliography.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Style/RedundantRegexpCharacterClass:
-  Exclude:
-    - 'lib/bibtex/lexer.rb'
-
-# Offense count: 13
-# This cop supports safe autocorrection (--autocorrect).
-Style/RedundantRegexpEscape:
-  Exclude:
-    - 'lib/bibtex/lexer.rb'
-    - 'lib/bibtex/names.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Exclude:
-    - 'lib/bibtex/lexer.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-Style/RedundantSelfAssignmentBranch:
-  Exclude:
-    - 'lib/bibtex/entry/rdf_converter.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: implicit, explicit
-Style/RescueStandardError:
-  Exclude:
-    - 'lib/bibtex/compatibility.rb'
 
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -814,9 +450,3 @@ Style/SelectByRegexp:
 Style/StringConcatenation:
   Exclude:
     - 'test/bibtex/test_bibliography.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Style/SuperArguments:
-  Exclude:
-    - 'lib/bibtex/error.rb'
