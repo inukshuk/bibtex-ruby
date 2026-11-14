@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 When(/^I parse the name "(.*)"$/) do |string|
   @name = BibTeX::Name.parse(string)
 end

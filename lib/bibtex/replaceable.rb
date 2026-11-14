@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010  Sylvester Keil <sylvester.keil.or.at>

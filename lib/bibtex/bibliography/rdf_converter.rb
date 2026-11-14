@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BibTeX::Bibliography::RDFConverter
   # converts a BibTeX Bibliography to RDF
   # @return [RDF::Graph] the RDF graph of the bibliography

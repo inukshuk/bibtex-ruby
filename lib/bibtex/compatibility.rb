@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BibTeX
   def self.transliterate(str)
     str

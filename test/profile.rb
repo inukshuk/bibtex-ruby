@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('../lib/bibtex.rb', __dir__)
 
 require 'ruby-prof'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ruby -Ilib -rrubygems test/benchmark.rb
 
 require 'benchmark'

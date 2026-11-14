@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BibTeX
   class BibTeXError < StandardError
     attr_reader :original

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'helper'
 
 module BibTeX
@@ -8,7 +10,7 @@ module BibTeX
 
     describe 'string behaviour' do
       before do
-        @name = Name.new(first: 'Charles Louis Xavier Joseph', prefix: 'de la', last: 'Vallee Poussin', suffix: 'Jr.')
+        @name = Name.new(first: +'Charles Louis Xavier Joseph', prefix: +'de la', last: +'Vallee Poussin', suffix: +'Jr.')
       end
 
       it 'should implement upcase!' do
