@@ -130,6 +130,23 @@ text outside of regular BibTeX elements; however, if you wish to include
 everything, simply add `:include => [:meta_content]` to your invocation of
 **BibTeX.open** or **BibTeX.parse**.
 
+Biber and btparse accept TeX comments ('%' to the end of the line) between
+the fields of an entry; classic BibTeX does not. To accept such comments,
+pass `:strip_comments => true` to **BibTeX.open** or **BibTeX.parse**:
+
+```ruby
+BibTeX.parse <<-END, :strip_comments => true
+@book{key,
+  % a comment on its own line
+  author = {John Doe}, % a comment after a field
+  url = {http://example.com/a%20b}
+}
+END
+```
+
+A '%' inside a braced or quoted value (e.g., `50\%` or a URL) is never
+treated as a comment. This option is disabled by default.
+
 Once BibTeX-Ruby has parsed your '.bib' file, you can easily access individual
 entries. For example, if you set up your bibliography as follows:
 

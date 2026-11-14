@@ -49,5 +49,15 @@ module BibTeX
       assert_equal [:AT, :NAME, :LBRACE, :NAME, :RBRACE, false],
                    Lexer.new.analyse('@preamblestring{ preamble }').symbols
     end
+
+    it 'scans % as part of a NAME by default' do
+      assert_equal [:AT, :STRING, :LBRACE, :NAME, :EQ, :NAME, :RBRACE, false],
+                   Lexer.new.analyse('@string{ x = a%b }').symbols
+    end
+
+    it 'skips TeX comments between tokens with :strip_comments' do
+      assert_equal [:AT, :NAME, :LBRACE, :KEY, :NAME, :EQ, :STRING_LITERAL, :RBRACE, false],
+                   Lexer.new(strip_comments: true).analyse(%(@misc{% c\nfoo, % c\n a = "x" % c\n}% c)).symbols
+    end
   end
 end
