@@ -721,6 +721,17 @@ these commands (from within the bibtex-ruby directory):
     $ bundle exec rake
     $ bundle exec rubocop
 
+If your change may affect performance, run the benchmark, which measures
+wall time and allocated objects for parsing, export and query workloads
+on a generated bibliography, and compare the result with `master`:
+
+    $ bundle exec rake bench
+    $ bundle exec rake 'bench:compare[origin/master]'
+
+See `benchmark/run.rb` for the options (bibliography size, workloads,
+JSON output, memory_profiler figures). The benchmark exits with a
+non-zero status if a workload fails.
+
 Credits
 -------
 
