@@ -512,7 +512,7 @@ module BibTeX
     def test_simple
       bib = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false)
       refute_nil(bib)
-      assert_equal(BibTeX::Bibliography, bib.class)
+      assert_instance_of(BibTeX::Bibliography, bib)
       assert_equal(4, bib.data.length)
       assert_equal([BibTeX::Entry], bib.data.map(&:class).uniq)
       assert_equal('key:0', bib.data[0].key)
