@@ -188,7 +188,7 @@ module BibTeX
           mine = name.initials.split(/\.[^[:alpha:]]*/)
           other = initials(with_first).split(/\.[^[:alpha:]]*/)
 
-          mine == other || mine.length < other.length && mine == other[0, mine.length]
+          mine == other || (mine.length < other.length && mine == other[0, mine.length])
         end
       end
     end

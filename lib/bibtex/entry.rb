@@ -554,7 +554,7 @@ module BibTeX
     # Returns true if this entry is published inside a book, collection or journal
     def contained?
       has_field?(:container, :journal) ||
-        has_field?(:booktitle) && get(:booktitle) != get(:title)
+        (has_field?(:booktitle) && get(:booktitle) != get(:title))
     end
 
     # Returns an array containing the values associated with the given keys.

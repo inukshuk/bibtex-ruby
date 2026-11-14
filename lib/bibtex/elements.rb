@@ -85,7 +85,7 @@ module BibTeX
     end
 
     def has_type?(type)
-      self.type == type.intern || defined?(type) == 'constant' && is_a?(type)
+      self.type == type.intern || (defined?(type) == 'constant' && is_a?(type))
     end
 
     %i[entry book article collection string preamble comment].each do |type|
@@ -95,7 +95,7 @@ module BibTeX
 
     # Returns true if the element matches the given query.
     def matches?(query)
-      return true if query.nil? || query.respond_to?(:empty?) && query.empty?
+      return true if query.nil? || (query.respond_to?(:empty?) && query.empty?)
 
       case query
       when Symbol

@@ -189,7 +189,7 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:lbrace])
         @brace_level += 1
         push([:LBRACE, '{'])
-        @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
+        @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
       when @scanner.scan(Lexer.patterns[:rbrace])
         @brace_level -= 1
         push([:RBRACE, '}'])
@@ -306,7 +306,7 @@ module BibTeX
         if @scanner.scan(Lexer.patterns[:lbrace])
           @brace_level += 1
           push([:LBRACE, '{'])
-          @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
+          @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
 
           push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
         end
