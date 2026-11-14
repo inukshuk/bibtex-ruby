@@ -39,7 +39,7 @@ module BibTeX
 
     describe 'given a populated biliography' do
       before do
-        @bib = BibTeX.parse <<-END
+        @bib = BibTeX.parse <<-BIBTEX
         @book{rails,
           address = {Raleigh, North Carolina},
           author = {Ruby, Sam, and Thomas, Dave, and Hansson Heinemeier, David},
@@ -74,7 +74,7 @@ module BibTeX
           title={{Foo Bar}},
           author={Flanagan, David and Matsumoto, Yukihiro}
         }
-        END
+        BIBTEX
       end
 
       describe '#entries_at' do
@@ -231,7 +231,7 @@ module BibTeX
       end
 
       it 'supports queries by bibtex element' do
-        entry = Entry.parse(<<-END).first
+        entry = Entry.parse(<<-BIBTEX).first
         @article{segaran2007,
           title = {{Programming collective intelligence}},
           author = {Segaran, T.},
@@ -239,7 +239,7 @@ module BibTeX
           publisher = {O'Reilly},
           type={interview}
         }
-        END
+        BIBTEX
         assert_equal 1, @bib[entry].length
         entry.year = '2006'
 
@@ -284,7 +284,7 @@ module BibTeX
 
       describe '#uniq!' do
         before do
-          @a = BibTeX.parse <<-END
+          @a = BibTeX.parse <<-BIBTEX
             @book{b1,
               title = {FOO},
               year = {2013},
@@ -296,14 +296,14 @@ module BibTeX
               author = {Doe, John},
               pages = {1-3},
               }
-          END
-          @b = BibTeX.parse <<-END
+          BIBTEX
+          @b = BibTeX.parse <<-BIBTEX
             @book{b3,
               title = {FOO},
               year = {2013},
               author = {Doe, John},
               pages = {1-2}}
-          END
+          BIBTEX
         end
 
         it 'returns the bibliography unchanged if there are no duplicates' do
@@ -317,7 +317,7 @@ module BibTeX
 
         describe 'with block' do
           it 'removes duplicate entries and returns the bibliography' do
-            assert_operator @a.length, :>, @a.uniq!(:author) { |d, e| d + '|' + e.pages_from }.length
+            assert_operator @a.length, :>, @a.uniq!(:author) { |d, e| "#{d}|#{e.pages_from}" }.length
           end
         end
       end
@@ -346,7 +346,7 @@ module BibTeX
 
       describe 'sorting' do
         before do
-          @small_bib = BibTeX.parse <<-END
+          @small_bib = BibTeX.parse <<-BIBTEX
         @book{flanagan2008,
           title={{The ruby programming language}},
           author={Flanagan, D. and Matsumoto, Y.},
@@ -371,7 +371,7 @@ module BibTeX
           year={2007},
           publisher={O'Reilly}
         }
-          END
+          BIBTEX
         end
 
         it 'can be sorted destructively' do
