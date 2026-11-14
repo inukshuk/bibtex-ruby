@@ -17,7 +17,7 @@ module BibTeX
         assert_equal 'bar', @bib[0].value.to_s
       end
       it 'should have been registered' do
-        refute @bib.strings[:foo].nil?
+        refute_nil @bib.strings[:foo]
       end
     end
 
