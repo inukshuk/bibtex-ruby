@@ -42,6 +42,10 @@ module BibTeX
       unpublished: %i[author title note]
     ).freeze
 
+    # Fields whose content is verbatim (URLs, identifiers, file paths) and
+    # must therefore be written out without escaping special characters.
+    VERBATIM_FIELDS = %i[url doi eprint file].freeze
+
     # Defines the default fallbacks for values defined in cross-references
     FIELD_ALIASES = {
       booktitle: :title
@@ -593,8 +597,12 @@ module BibTeX
     end
 
     # Returns a string of all the entry's fields.
+    #
+    # A bare & is a LaTeX alignment character, so it is written out as \&
+    # (#170). An & that is already escaped is left alone, as are fields
+    # whose content is verbatim (see VERBATIM_FIELDS).
     def content(options = {})
-      fields.map { |k, _v| "#{k} = #{fields[k].to_s(options)}" }.join(",\n")
+      fields.map { |k, _v| "#{k} = #{escape_value(k, fields[k].to_s(options))}" }.join(",\n")
     end
 
     # Returns a string representation of the entry.
@@ -674,6 +682,20 @@ module BibTeX
     end
 
     private
+
+    # Escapes every & not already preceded by a backslash, unless the field
+    # is verbatim, a BibDesk URL field, or a howpublished containing \url.
+    def escape_value(name, string)
+      return string if verbatim_field?(name, string)
+
+      string.gsub(/(?<!\\)&/, '\\\\&')
+    end
+
+    def verbatim_field?(name, string)
+      VERBATIM_FIELDS.include?(name) ||
+        name.to_s.match?(/\Abdsk-url-\d+\z/) ||
+        (name == :howpublished && string.include?('\\url'))
+    end
 
     # Returns a default key for this entry.
     def default_key
