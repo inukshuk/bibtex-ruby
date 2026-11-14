@@ -9,7 +9,7 @@ Unreleased
 * Write @comment content verbatim, without padding spaces, so BibDesk groups survive a round-trip (#138)
 * Accept field names containing spaces in non-strict mode, e.g. Web of Science's "Early Access Date"; the words are joined with underscores (early_access_date) (#131)
 * Add :strip_comments parser option to ignore biber-style TeX comments ('%' to end of line) inside entries (#132)
-* Add hash queries (bib.query(type: :article, author: /Poe/)) and pattern matching for entries (Entry#deconstruct_keys); deprecate the string selector language ('@book[year=2009]'), which keeps working and only warns when Warning[:deprecated] is enabled (#126)
+* Add hash queries (bib.query(type: :article, author: /Poe/)) and pattern matching for entries (Entry#deconstruct_keys); deprecate the string selector language ('@book[year=2009]'), which keeps working until its removal in 7.0 and only warns when Warning[:deprecated] is enabled (#126)
 
 6.2.0 / 2025-07-20
 ==================

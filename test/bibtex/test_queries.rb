@@ -245,6 +245,7 @@ module BibTeX
         _, err = capture_io { @bib.query('@book[year=2009]') }
 
         assert_match(/string selectors .* are deprecated/, err)
+        assert_includes err, 'will be removed in BibTeX-Ruby 7.0'
         assert_includes err, "#{__FILE__}:#{line}: warning:"
 
         _, err = capture_io { @bib['@article'] }

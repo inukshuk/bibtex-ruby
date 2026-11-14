@@ -306,9 +306,9 @@ Migrating from string selectors:
 #### String selectors (deprecated)
 
 The string selector language below (`'@book[year=2009]'`, `'!@book'`,
-`'@*'`, ...) is deprecated in favour of hash queries and pattern matching.
-It still works and is not going to change; if you run Ruby with deprecation
-warnings enabled (`Warning[:deprecated] = true` or `ruby -W:deprecated`),
+`'@*'`, ...) is deprecated in favour of hash queries and pattern matching, and will be
+**removed in BibTeX-Ruby 7.0**. Until then it keeps working unchanged; if you
+run Ruby with deprecation warnings enabled (`Warning[:deprecated] = true` or `ruby -W:deprecated`),
 BibTeX-Ruby warns once when a string selector is used. Looking up an entry
 by its key (`bib['key']`, `bib[:key]`) or with a Regexp (`bib[/ruby/]`) is
 not affected.

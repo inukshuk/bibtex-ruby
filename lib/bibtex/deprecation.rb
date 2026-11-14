@@ -9,7 +9,8 @@ module BibTeX
   #
   # @api private
   module Deprecation
-    SELECTOR_MESSAGE = 'BibTeX-Ruby string selectors such as "@book[year=2009]" are deprecated; ' \
+    SELECTOR_MESSAGE = 'BibTeX-Ruby string selectors such as "@book[year=2009]" are deprecated ' \
+                       'and will be removed in BibTeX-Ruby 7.0; ' \
                        'use a Hash of conditions (bib.query(type: :book, year: "2009")) ' \
                        'or pattern matching instead'
 

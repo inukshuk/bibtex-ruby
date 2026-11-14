@@ -192,7 +192,8 @@ module BibTeX
     #   bib.delete(type: :comment)
     #
     # @deprecated Passing a string selector such as '@comment' is
-    #   deprecated; pass a Hash of conditions instead (see #query).
+    #   deprecated and will be removed in 7.0; pass a Hash of conditions
+    #   instead (see #query).
     def delete(*arguments, &block)
       objects = q(*arguments, &block).map { |o| o.removed_from_bibliography(self) }
       @data -= objects
@@ -229,8 +230,8 @@ module BibTeX
     # not yield to a block for additional refinement of the query.
     #
     # @deprecated Passing a string selector such as '@article' or
-    #   '@book[keywords=ruby]' is deprecated; pass a Hash of conditions
-    #   instead. Plain String or Symbol keys and Regexps are not deprecated.
+    #   '@book[keywords=ruby]' is deprecated and will be removed in 7.0;
+    #   pass a Hash of conditions instead. Plain String or Symbol keys and Regexps are not deprecated.
     def [](*arguments)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1, 2)
 
@@ -496,9 +497,10 @@ module BibTeX
     #   @return [Array<Element>, Element, nil]
     #
     # @deprecated Passing a string selector such as '@book[year<=2011]',
-    #   '!@book' or '@*' is deprecated; pass a Hash of conditions or use
-    #   pattern matching with #select instead. String selectors keep working
-    #   and only warn (once) when Warning[:deprecated] is enabled.
+    #   '!@book' or '@*' is deprecated and will be removed in 7.0; pass a
+    #   Hash of conditions or use pattern matching with #select instead.
+    #   Until then, string selectors keep working and only warn (once) when
+    #   Warning[:deprecated] is enabled.
     def query(*arguments, &block)
       case arguments.length
       when 0

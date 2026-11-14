@@ -117,9 +117,10 @@ module BibTeX
     #   entry.matches?(url: nil) # entries without a url
     #
     # @deprecated Passing a string selector such as '@book[year=2009]',
-    #   '!@book' or '@*' is deprecated; use a Hash of conditions or Ruby
-    #   pattern matching instead. String selectors keep working and only
-    #   warn when Warning[:deprecated] is enabled.
+    #   '!@book' or '@*' is deprecated and will be removed in 7.0; use a
+    #   Hash of conditions or Ruby pattern matching instead. Until then,
+    #   string selectors keep working and only warn when
+    #   Warning[:deprecated] is enabled.
     def matches?(query)
       return true if query.nil? || (query.respond_to?(:empty?) && query.empty?)
 
