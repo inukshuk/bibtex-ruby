@@ -198,10 +198,10 @@ module BibTeX
     def rename_if(attributes, conditions = {})
       if block_given?
         set(attributes) if yield self
-      else
-        set(attributes) if conditions.all? do |key, value|
+      elsif conditions.all? do |key, value|
           respond_to?(key) && send(key) == value
         end
+        set(attributes)
       end
 
       self
