@@ -30,7 +30,6 @@ Gem::Specification.new do |s|
   s.add_dependency('logger', ['~>1.7'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)
-  s.test_files   = Dir.glob('test/**/test*.rb')
   s.executables  = []
   s.require_path = 'lib'
 end
