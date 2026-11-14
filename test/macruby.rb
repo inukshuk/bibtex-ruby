@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # sudo dtrace -qs test/macruby.d -c "macruby -Ilib -rrubygems test/macruby.rb"
 
 require 'bibtex'

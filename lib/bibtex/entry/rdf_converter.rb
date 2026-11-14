@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BibTeX::Entry::RDFConverter
   DEFAULT_REMOVE_FROM_FALLBACK = %w[
     bdsk-file-1

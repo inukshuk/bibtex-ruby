@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015 Sylvester Keil <sylvester.keil.or.at>
@@ -702,7 +704,7 @@ module BibTeX
       k = names[0]
       k = k.respond_to?(:family) ? k.family : k.to_s
       k = BibTeX.transliterate(k).tr('"\'', '')
-      k = k[/[A-Za-z-]+/] || 'unknown'
+      k = k[/[A-Za-z-]+/] || +'unknown'
       k << (year.to_s[/\d+/] || '-')
       k << 'a'
       k.downcase

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BibTeX::Entry::CiteProcConverter
   CSL_FILTER = Hash.new { |_h, k| k }.merge(Hash[*%w[
     date issued

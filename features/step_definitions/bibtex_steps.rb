@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the bibliography:$/) do |string|
   @bibliography = BibTeX.parse(string)
 end
