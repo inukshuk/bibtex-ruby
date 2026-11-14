@@ -6,6 +6,7 @@ Unreleased
 * Remove official support for Ruby < 3.3, as they reached their End-of-Life
 * Fix parsing of names whose last name ends in a lowercase word, e.g. "Rongiéras d'Usseau, Emmanuel" (#149)
 * Escape bare & as \& in BibTeX output, except in verbatim fields like url and doi (#170)
+* Skip the & escaping for values without an &, so Bibliography#to_s is as fast as in 6.2.0 again and allocates fewer objects
 * Write @comment content verbatim, without padding spaces, so BibDesk groups survive a round-trip (#138)
 * Accept field names containing spaces in non-strict mode, e.g. Web of Science's "Early Access Date"; the words are joined with underscores (early_access_date) (#131)
 * Add :strip_comments parser option to ignore biber-style TeX comments ('%' to end of line) inside entries (#132)

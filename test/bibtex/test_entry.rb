@@ -774,6 +774,19 @@ module BibTeX
 
         _(entry.to_s).must_include 'howpublished = {Smith \\& Sons}'
       end
+
+      it 'escapes & in fields that only resemble BibDesk url fields' do
+        entry = BibTeX.parse('@misc{a, bdsk-url-x = {A & B}}')[:a]
+
+        _(entry.to_s).must_include 'bdsk-url-x = {A \\& B}'
+      end
+
+      it 'returns values without & as is, without copying them' do
+        entry = BibTeX::Entry.new
+        value = +'{Trends in Ecology}'
+
+        _(entry.send(:escape_value, :journal, value)).must_be_same_as value
+      end
     end
   end
 
