@@ -28,24 +28,6 @@ Lint/ConstantDefinitionInBlock:
     - 'test/bibtex/test_filters.rb'
     - 'test/bibtex/test_names.rb'
 
-# Offense count: 5
-# Configuration parameters: IgnoreLiteralBranches, IgnoreConstantBranches, IgnoreDuplicateElseBranch.
-Lint/DuplicateBranch:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
-    - 'lib/bibtex/entry/rdf_converter.rb'
-    - 'lib/bibtex/value.rb'
-
-# Offense count: 9
-# Configuration parameters: AllowedParentClasses.
-Lint/MissingSuper:
-  Exclude:
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/entry.rb'
-    - 'lib/bibtex/error.rb'
-    - 'lib/bibtex/filters.rb'
-    - 'lib/bibtex/names.rb'
-
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 Lint/RedundantCopDisableDirective:
@@ -57,16 +39,6 @@ Lint/RedundantCopDisableDirective:
 Lint/RedundantDirGlobSort:
   Exclude:
     - 'lib/bibtex/filters.rb'
-
-# Offense count: 1
-Lint/SharedMutableDefault:
-  Exclude:
-    - 'lib/bibtex/entry.rb'
-
-# Offense count: 1
-Lint/StructNewOverride:
-  Exclude:
-    - 'lib/bibtex/names.rb'
 
 # Offense count: 45
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes, Max.
@@ -179,11 +151,6 @@ Minitest/RefuteFalse:
     - 'test/bibtex/test_entry.rb'
     - 'test/bibtex/test_filters.rb'
 
-# Offense count: 1
-Naming/ConstantName:
-  Exclude:
-    - 'lib/bibtex/names.rb'
-
 # Offense count: 19
 # Configuration parameters: ForbiddenDelimiters.
 # ForbiddenDelimiters: (?i-mx:(^|\s)(EO[A-Z]{1}|END)(\s|$))
@@ -198,37 +165,12 @@ Naming/HeredocDelimiterNaming:
     - 'test/test_bibtex.rb'
 
 # Offense count: 1
-# Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
-# AllowedNames: as, at, by, cc, db, id, if, in, io, ip, of, on, os, pp, to
-Naming/MethodParameterName:
-  Exclude:
-    - 'lib/bibtex/elements.rb'
-
-# Offense count: 5
-# Configuration parameters: NamePrefix, ForbiddenPrefixes, AllowedMethods, MethodDefinitionMacros, UseSorbetSigs.
-# NamePrefix: is_, has_, have_, does_
-# ForbiddenPrefixes: is_, has_, have_, does_
-# AllowedMethods: is_a?
-# MethodDefinitionMacros: define_method, define_singleton_method
-Naming/PredicatePrefix:
-  Exclude:
-    - 'spec/**/*'
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/entry.rb'
-
-# Offense count: 1
 # Configuration parameters: EnforcedStyle, CheckMethodNames, CheckSymbols, AllowedIdentifiers, AllowedPatterns.
 # SupportedStyles: snake_case, normalcase, non_integer
 # AllowedIdentifiers: TLS1_1, TLS1_2, capture3, iso8601, rfc1123_date, rfc822, rfc2822, rfc3339, x86_64
 Naming/VariableNumber:
   Exclude:
     - 'Gemfile'
-
-# Offense count: 1
-# Configuration parameters: MinSize.
-Performance/CollectionLiteralInLoop:
-  Exclude:
-    - 'lib/bibtex/lexer.rb'
 
 # Offense count: 2
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -320,21 +262,10 @@ Style/HashEachMethods:
     - 'lib/bibtex/bibliography.rb'
     - 'lib/bibtex/entry.rb'
 
-# Offense count: 2
-Style/MissingRespondToMissing:
-  Exclude:
-    - 'lib/bibtex/entry.rb'
-    - 'lib/bibtex/value.rb'
-
 # Offense count: 1
 Style/MixinUsage:
   Exclude:
     - 'test/benchmark.rb'
-
-# Offense count: 1
-Style/MultilineBlockChain:
-  Exclude:
-    - 'lib/bibtex/bibliography.rb'
 
 # Offense count: 4
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -344,14 +275,6 @@ Style/NumericPredicate:
   Exclude:
     - 'spec/**/*'
     - 'lib/bibtex/lexer.rb'
-
-# Offense count: 3
-# Configuration parameters: AllowedMethods.
-# AllowedMethods: respond_to_missing?
-Style/OptionalBooleanParameter:
-  Exclude:
-    - 'lib/bibtex/entry.rb'
-    - 'lib/bibtex/value.rb'
 
 # Offense count: 2
 # This cop supports unsafe autocorrection (--autocorrect-all).

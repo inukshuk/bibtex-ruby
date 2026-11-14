@@ -81,6 +81,10 @@ module BibTeX
       literal: :literal, content: :content
     ).freeze
 
+    # Token types at which #backtrace stops unwinding the stack.
+    BACKTRACE_BOUNDARIES = %i[AT META_CONTENT].freeze
+    private_constant :BACKTRACE_BOUNDARIES
+
     class << self
       attr_reader :defaults, :patterns
     end
@@ -395,7 +399,7 @@ module BibTeX
 
     def backtrace(error)
       bt = []
-      bt.unshift(@stack.pop) until @stack.empty? || (!bt.empty? && %i[AT META_CONTENT].include?(bt[0][0]))
+      bt.unshift(@stack.pop) until @stack.empty? || (!bt.empty? && BACKTRACE_BOUNDARIES.include?(bt[0][0]))
       bt << error
       push [:ERROR, bt]
     end
