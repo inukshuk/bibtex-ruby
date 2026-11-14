@@ -17,6 +17,8 @@ Unreleased
 * Accept every character BibTeX allows in identifiers in field names, @string names and macro references, e.g. x;y, p[1], a|b, a^b, a~b, a<b>, a@b and @foo; these used to raise an unexpected-token error. An '@' followed by a name and '{' or '(' still starts a new entry, and a name that starts with '@' ends before the next '@'
 * Bibliography#save_to (and #save) replace the file atomically, so a failure while serialising or writing leaves the existing file untouched instead of empty or partly written; symlinked targets and permission bits are kept, and devices, pipes and files in read-only directories are written directly
 * Bibliography#save_to no longer adds :quotes to the options hash passed in
+* Entry.new no longer removes :bibtex_type and :bibtex_key from the hash passed to it, and accepts a frozen hash
+* Entry#to_s and #to_hash, and so Bibliography#to_s, #to_a and #to_hash, no longer add :quotes to the options hash passed in, and accept a frozen hash
 * Reimplement Entry's dynamic field writers, Bibliography#save_to and the lexer's identifier and key rules from a written specification, without the code they replace (#154)
 
 6.2.0 / 2025-07-20

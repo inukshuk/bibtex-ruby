@@ -390,6 +390,7 @@ module BibTeX
 
     # Returns a string representation of the bibliography.
     def to_s(options = {})
+      options = options.merge(quotes: %w[{ }]) unless options[:quotes]
       map { |o| o.to_s(options) }.join
     end
 
@@ -398,12 +399,13 @@ module BibTeX
     end
 
     def to_a(options = {})
+      options = options.merge(quotes: %w[{ }]) unless options[:quotes]
       map { |o| o.to_hash(options) }
     end
 
     # Returns a Ruby hash representation of the bibliography.
     def to_hash(options = {})
-      { bibliography: map { |o| o.to_hash(options) } }
+      { bibliography: to_a(options) }
     end
 
     # Returns a YAML representation of the bibliography.

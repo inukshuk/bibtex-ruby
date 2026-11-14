@@ -69,10 +69,13 @@ module BibTeX
       @fields = {}
       @key = nil
 
-      self.type = attributes.delete(:bibtex_type) if attributes.key?(:bibtex_type)
-      self.key = attributes.delete(:bibtex_key) if attributes.key?(:bibtex_key)
-
-      add(attributes)
+      attributes.each_pair do |name, value|
+        case name
+        when :bibtex_type then self.type = value
+        when :bibtex_key then self.key = value
+        else fields[name.to_sym] = Value.create(value)
+        end
+      end
 
       yield self if block_given?
     end
@@ -610,12 +613,12 @@ module BibTeX
 
     # Returns a string representation of the entry.
     def to_s(options = {})
-      options[:quotes] ||= %w[{ }]
+      options = options.merge(quotes: %w[{ }]) unless options[:quotes]
       ["@#{type}{#{key},", content(options).gsub(/^/, '  '), "}\n"].join("\n")
     end
 
     def to_hash(options = {})
-      options[:quotes] ||= %w[{ }]
+      options = options.merge(quotes: %w[{ }]) unless options[:quotes]
       hash = { bibtex_key: key, bibtex_type: type }
       each_pair { |k, v| hash[k] = v.to_s(options) }
       hash

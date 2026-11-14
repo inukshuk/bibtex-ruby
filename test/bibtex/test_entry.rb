@@ -14,6 +14,37 @@ module BibTeX
       it "won't be nil" do
         _(Entry.new).wont_be_nil
       end
+
+      describe 'given an attribute hash' do
+        before do
+          @attributes = { bibtex_type: :book, bibtex_key: 'rails', title: 'Agile Web Development', year: 2009 }
+        end
+
+        it 'takes type and key from the hash and the remaining keys as fields' do
+          entry = Entry.new(@attributes)
+
+          _(entry.type).must_equal :book
+          _(entry.key).must_equal 'rails'
+          _(entry.fields.keys).must_equal %i[title year]
+          _(entry[:title]).must_equal 'Agile Web Development'
+          _(entry[:year]).must_equal '2009'
+        end
+
+        it 'leaves the hash unchanged' do
+          expected = @attributes.dup
+          Entry.new(@attributes)
+
+          _(@attributes).must_equal expected
+        end
+
+        it 'accepts a frozen hash' do
+          entry = Entry.new(@attributes.freeze)
+
+          _(entry.type).must_equal :book
+          _(entry.key).must_equal 'rails'
+          _(entry.fields.keys).must_equal %i[title year]
+        end
+      end
     end
 
     describe '#add' do
@@ -616,6 +647,34 @@ module BibTeX
                      "series = {A series},\n  " \
                      "month = dec\n" \
                      "}\n", @bib['foo'].to_s(filter: :linebreaks)
+      end
+
+      it 'leaves the options hash unchanged' do
+        options = { filter: :linebreaks }
+        @bib['foo'].to_s(options)
+
+        _(options).must_equal({ filter: :linebreaks })
+      end
+
+      it 'accepts a frozen options hash' do
+        _(@bib['foo'].to_s({}.freeze)).must_include 'title = {A'
+      end
+    end
+
+    describe '#to_hash' do
+      before do
+        @entry = Entry.new(bibtex_type: :book, bibtex_key: 'rails', title: 'Rails')
+      end
+
+      it 'leaves the options hash unchanged' do
+        options = {}
+        @entry.to_hash(options)
+
+        _(options).must_be_empty
+      end
+
+      it 'accepts a frozen options hash' do
+        _(@entry.to_hash({}.freeze)[:title]).must_equal '{Rails}'
       end
     end
 
