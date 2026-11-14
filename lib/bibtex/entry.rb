@@ -691,8 +691,8 @@ module BibTeX
     # Escapes every & not already preceded by a backslash, unless the field
     # is verbatim, a BibDesk URL field, or a howpublished containing \url.
     #
-    # Most values contain no & at all; they are returned as is before any
-    # other check, so the common case allocates nothing.
+    # Most values contain no & at all; they are returned as is, skipping
+    # the field checks and the gsub.
     def escape_value(name, string)
       return string unless string.include?('&')
       return string if verbatim_field?(name, string)
@@ -700,11 +700,9 @@ module BibTeX
       string.gsub(/(?<!\\)&/, '\\\\&')
     end
 
-    # Symbol#match? (and String#match?) test the name without allocating
-    # a String, unlike name.to_s.match?.
     def verbatim_field?(name, string)
       VERBATIM_FIELDS.include?(name) ||
-        name.match?(/\Abdsk-url-\d+\z/) ||
+        name.to_s.match?(/\Abdsk-url-\d+\z/) ||
         (name == :howpublished && string.include?('\\url'))
     end
 
