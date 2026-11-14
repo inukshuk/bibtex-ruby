@@ -3,9 +3,9 @@
 require 'helper'
 
 module BibTeX
-  # R1 (REQUIREMENTS.md): dynamic field writers on BibTeX::Entry.
+  # Dynamic field writers on BibTeX::Entry.
   class EntryWritersTest < Minitest::Spec
-    describe 'R1 dynamic field writers' do
+    describe 'dynamic field writers' do
       before do
         @entry = Entry.new(bibtex_type: :book, bibtex_key: :moby, title: 'Moby Dick', keywords: 'whale')
       end

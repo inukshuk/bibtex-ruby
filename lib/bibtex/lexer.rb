@@ -88,7 +88,7 @@ module BibTeX
       end
 
       # Several words followed by '=', e.g. Web of Science's `Early Access
-      # Date' (#131). The words are joined into one name; as before, a word
+      # Date'. The words are joined into one name; as before, a word
       # may start with a digit. By the rule above only the last word, which
       # is followed by '=', can start with '@'.
       def spaced_name_pattern(percent:)

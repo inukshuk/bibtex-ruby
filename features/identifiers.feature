@@ -1,4 +1,4 @@
-Feature: Identifier characters in field names, @string names and macro references (R2)
+Feature: Identifier characters in field names, @string names and macro references
 	As a hacker who works with bibliographies
 	I want to parse every identifier that BibTeX itself accepts
 	Because exported bibliographies use field names like "a/b" or "p[1]"

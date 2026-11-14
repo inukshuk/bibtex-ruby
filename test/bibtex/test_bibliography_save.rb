@@ -5,7 +5,7 @@ require 'pathname'
 require 'tmpdir'
 
 module BibTeX
-  # R3 (REQUIREMENTS.md): BibTeX::Bibliography#save_to and #save.
+  # BibTeX::Bibliography#save_to and #save.
   class BibliographySaveTest < Minitest::Spec
     SOURCE = <<~BIBTEX
       @book{melville,
@@ -21,7 +21,7 @@ module BibTeX
       }
     BIBTEX
 
-    describe 'R3 saving' do
+    describe 'saving' do
       before do
         @dir = Dir.mktmpdir('bibtex-save')
         @path = File.join(@dir, 'out.bib')

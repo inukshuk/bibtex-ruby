@@ -4,13 +4,13 @@ require 'helper'
 require 'json'
 
 module BibTeX
-  # R2 (REQUIREMENTS.md) guard: widening the identifier characters must not
+  # Guard: the identifier characters accepted by the lexer must not
   # change how the fixtures in test/fixtures are lexed or parsed.
   #
   # test/fixtures/lexer_tokens.json was recorded from the lexer as it was
-  # before R2 was implemented. It holds the full token stream (Array#inspect
-  # of every token) for each fixture and for each section of errors.bib, for
-  # every lexer configuration listed in VARIANTS. Do not regenerate it to make
+  # before it accepted every BibTeX identifier character. It holds the full
+  # token stream (Array#inspect of every token) for each fixture and for each
+  # section of errors.bib, for every lexer configuration listed in VARIANTS. Do not regenerate it to make
   # a failing test pass: a difference means the lexer behaves differently.
   class FixtureLexingTest < Minitest::Spec
     SNAPSHOT = JSON.parse(File.read(File.expand_path('../fixtures/lexer_tokens.json', __dir__), encoding: 'utf-8'))
@@ -52,7 +52,7 @@ module BibTeX
       end
     end
 
-    describe 'R2 guard: fixtures are lexed and parsed exactly as before' do
+    describe 'fixtures are lexed and parsed exactly as before' do
       before { BibTeX.log.level = Logger::FATAL }
       after { BibTeX.log.level = Logger::WARN }
 

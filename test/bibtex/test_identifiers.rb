@@ -3,10 +3,11 @@
 require 'helper'
 
 module BibTeX
-  # R2 (REQUIREMENTS.md): identifier characters accepted by BibTeX::Lexer in
+  # Identifier characters accepted by BibTeX::Lexer in
   # field names, @string names, macro references and keys.
   class IdentifiersTest < Minitest::Spec
-    # Every example REQUIREMENTS.md names for R2.
+    # Characters BibTeX allows in identifiers, most of which the lexer used
+    # to reject.
     EXAMPLES = %w[a/b x;y p[1] a|b a^b a~b a<b> a@b].freeze
 
     MODES = {
@@ -21,7 +22,7 @@ module BibTeX
     # Characters BibTeX excludes from identifiers that the lexer rejects today.
     REJECTED = %w[' ( )].freeze
 
-    # Keys accepted before R2, mapped to the key they are parsed into.
+    # Keys accepted before the identifier characters were widened, mapped to the key they are parsed into.
     EXISTING_KEYS = {
       'key:0' => 'key:0', 'a+b' => 'a+b', 'a;b' => 'a;b', %(a'b"c) => %(a'b"c),
       'fo{o' => 'fo{o', 'löwe' => 'löwe', '  spaced  ' => 'spaced', 'a.b-c_d!e$f?g&h*i' => 'a.b-c_d!e$f?g&h*i'
@@ -52,7 +53,7 @@ module BibTeX
       Lexer.new(options).analyse(input).stack
     end
 
-    describe 'R2 identifier characters' do
+    describe 'identifier characters' do
       before { BibTeX.log.level = Logger::FATAL }
       after { BibTeX.log.level = Logger::WARN }
 
@@ -346,7 +347,7 @@ module BibTeX
         end
       end
 
-      describe 'non-strict field names made of several words (#131)' do
+      describe 'non-strict field names made of several words' do
         it 'uses the new characters in every word' do
           bib = parse('@misc{k, a/b x;y p[1] = {v}, title = {T}}', strict: false)
 
