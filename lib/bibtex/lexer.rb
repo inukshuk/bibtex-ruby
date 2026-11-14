@@ -47,6 +47,9 @@ module BibTeX
       comma: /\s*,\s*/o,
       number: /[[:digit:]]+/o,
       name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+}io,
+      # Several space-separated words followed by `=', e.g. the
+      # `Early Access Date' fields exported by Web of Science (#131).
+      spaced_name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.%+&*-]+)+(?=\s*=)}io,
       quote: /\s*"/o,
       unquote: /[{}"]/o,
       sharp: /\s*#\s*/o,
@@ -84,6 +87,8 @@ module BibTeX
     #   the `@' symbol is not possible except inside literals or @comment
     #   objects; for a more lenient lexer set to false and objects are
     #   expected to start after a new line (leading white space is permitted).
+    #   Non-strict mode also accepts field names made of several words
+    #   separated by spaces or tabs and joins them with underscores.
     # - :strip => true When enabled, newlines will be stripped from quoted
     #   string values.
     #
@@ -200,6 +205,10 @@ module BibTeX
         push([:EQ, '='])
       when @scanner.scan(Lexer.patterns[:comma])
         push([:COMMA, ','])
+      when !strict? && @scanner.scan(Lexer.patterns[:spaced_name])
+        # Non-strict mode only: join the words so the field name stays
+        # valid BibTeX when the entry is written out again.
+        push([:NAME, @scanner.matched.split(/[\t ]+/).join('_')])
       when @scanner.scan(Lexer.patterns[:number])
         push([:NUMBER, @scanner.matched])
       when @scanner.scan(Lexer.patterns[:name])

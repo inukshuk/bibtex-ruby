@@ -88,6 +88,71 @@ module BibTeX
       end
     end
 
+    describe 'field names containing spaces (#131)' do
+      before do
+        @input = '@article{a, title = {T}, Early Access Date = {{NOV}}, ' \
+                 'Early Access Year = {{2017}}, year = 2017}'
+      end
+
+      it 'joins the words with underscores in non-strict mode' do
+        entry = Parser.new(debug: false, strict: false).parse(@input)[0]
+
+        assert_equal %i[title early_access_date early_access_year year], entry.fields.keys
+        assert_equal '{NOV}', entry[:early_access_date].to_s
+        assert_equal '{2017}', entry[:early_access_year].to_s
+        assert_equal '2017', entry.year.to_s
+      end
+
+      it 'handles tabs and several spaces between the words' do
+        input = "@article{a, Early  \tAccess Date = {NOV}}"
+        entry = Parser.new(debug: false, strict: false).parse(input)[0]
+
+        assert_equal [:early_access_date], entry.fields.keys
+      end
+
+      it 'does not join words across line breaks' do
+        input = "@article{a, month = jan\n note = {x}}"
+        assert_raises ParseError do
+          Parser.new(debug: false, strict: false).parse(input)
+        end
+      end
+
+      it 'produces BibTeX output that parses again' do
+        entry = Parser.new(debug: false, strict: false).parse(@input)[0]
+        reparsed = Parser.new(debug: false).parse(entry.to_s)[0]
+
+        assert_equal entry.fields.keys, reparsed.fields.keys
+        assert_equal '{NOV}', reparsed[:early_access_date].to_s
+      end
+
+      it 'still raises in strict mode' do
+        assert_raises ParseError do
+          Parser.new(debug: false).parse(@input)
+        end
+      end
+
+      it 'still raises in strict mode via BibTeX.parse' do
+        assert_raises ParseError do
+          BibTeX.parse(@input)
+        end
+      end
+
+      it 'is available via BibTeX.parse with strict: false' do
+        entry = BibTeX.parse(@input, strict: false)[0]
+
+        assert_equal '{NOV}', entry[:early_access_date].to_s
+      end
+
+      it 'leaves single-word field names and values unaffected' do
+        input = '@article{a, title = {T}, month = jan, journal = foo # bar}'
+        strict = Parser.new(debug: false).parse(input)[0]
+        lenient = Parser.new(debug: false, strict: false).parse(input)[0]
+
+        assert_equal strict.fields.keys, lenient.fields.keys
+        assert_equal strict.to_s, lenient.to_s
+      end
+    end
+
     describe 'backslashes and escape sequences' do
       it 'leaves backslashes intact' do
         _(Parser.new.parse(%q(@misc{key, title = "a backslash: \"}))[0].title).must_be :==, 'a backslash: \\'

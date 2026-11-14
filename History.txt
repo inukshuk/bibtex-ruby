@@ -7,6 +7,7 @@ Unreleased
 * Fix parsing of names whose last name ends in a lowercase word, e.g. "Rongiéras d'Usseau, Emmanuel" (#149)
 * Escape bare & as \& in BibTeX output, except in verbatim fields like url and doi (#170)
 * Write @comment content verbatim, without padding spaces, so BibDesk groups survive a round-trip (#138)
+* Accept field names containing spaces in non-strict mode, e.g. Web of Science's "Early Access Date"; the words are joined with underscores (early_access_date) (#131)
 
 6.2.0 / 2025-07-20
 ==================
