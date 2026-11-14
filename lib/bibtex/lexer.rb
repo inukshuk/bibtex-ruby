@@ -309,9 +309,7 @@ module BibTeX
           push([:LBRACE, '{'])
           @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
 
-          if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
-            push [:KEY, @scanner.matched.chop.strip]
-          end
+          push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
         end
 
       else

@@ -22,9 +22,7 @@ module BibTeX
     end
 
     def trace=(trace)
-      unless trace.is_a?(Array)
-        raise(ArgumentError, "BibTeX::Error trace must be of type Array; was: #{trace.class.name}.")
-      end
+      raise(ArgumentError, "BibTeX::Error trace must be of type Array; was: #{trace.class.name}.") unless trace.is_a?(Array)
 
       @trace = trace
     end
