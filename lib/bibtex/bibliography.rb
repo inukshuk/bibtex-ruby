@@ -139,13 +139,7 @@ module BibTeX
 
     # Saves the bibliography to a file at the given path. Returns the bibliography.
     def save_to(path, options = {})
-      options[:quotes] ||= %w[{ }]
-
-      File.open(path, 'w:UTF-8') do |f|
-        f.write(to_s(options))
-      end
-
-      self
+      raise NotImplementedError, 'Bibliography#save_to is being reimplemented (#154)'
     end
 
     def each(&)

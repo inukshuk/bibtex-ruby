@@ -49,12 +49,12 @@ module BibTeX
       eq: /\s*=\s*/o,
       comma: /\s*,\s*/o,
       number: /[[:digit:]]+/o,
-      name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+}io,
+      name: /[[:alpha:][:digit:]:_!$?.%+&*-]+/io,
       # Several space-separated words followed by `=', e.g. the
       # `Early Access Date' fields exported by Web of Science.
-      spaced_name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.%+&*-]+)+(?=\s*=)}io,
-      spaced_name_without_percent: %r{[[:alpha:][:digit:]/:_!$?.+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.+&*-]+)+(?=\s*=)}io,
-      name_without_percent: %r{[[:alpha:][:digit:]/:_!$?.+&*-]+}io,
+      spaced_name: /[[:alpha:][:digit:]:_!$?.%+&*-]+(?:[\t ]+[[:alpha:][:digit:]:_!$?.%+&*-]+)+(?=\s*=)/io,
+      spaced_name_without_percent: /[[:alpha:][:digit:]:_!$?.+&*-]+(?:[\t ]+[[:alpha:][:digit:]:_!$?.+&*-]+)+(?=\s*=)/io,
+      name_without_percent: /[[:alpha:][:digit:]:_!$?.+&*-]+/io,
       tex_comment: /%[^\n]*/o,
       tex_comments: /(?:\s*%[^\n]*)+/o,
       quote: /\s*"/o,
@@ -68,10 +68,10 @@ module BibTeX
       string: /string/io,
       comment: /comment\b/io,
       preamble: /preamble\b/io,
-      key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"{}-]+,}io,
-      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"-]*,}io,
-      key_without_percent: %r{\s*[[:alpha:][:digit:] /:_!$?.+;&*'"{}-]+,}io,
-      optional_key_without_percent: %r{\s*[[:alpha:][:digit:] /:_!$?.+;&*'"-]*,}io
+      key: /\s*[[:alpha:][:digit:] :_!$?.%+;&*'"{}-]+,/io,
+      optional_key: /\s*[[:alpha:][:digit:] :_!$?.%+;&*'"-]*,/io,
+      key_without_percent: /\s*[[:alpha:][:digit:] :_!$?.+;&*'"{}-]+,/io,
+      optional_key_without_percent: /\s*[[:alpha:][:digit:] :_!$?.+;&*'"-]*,/io
     }
 
     MODE = Hash.new(:meta).merge(

@@ -262,8 +262,6 @@ module BibTeX
     def method_missing(name, *args, &)
       if fields.key?(name)
         fields[name]
-      elsif name.to_s =~ /^(.+)=$/
-        send(:add, Regexp.last_match(1).to_sym, args[0])
       elsif name =~ /^(?:convert|from)_([a-z]+)(!)?$/
         Regexp.last_match(2) ? convert!(Regexp.last_match(1), &) : convert(Regexp.last_match(1), &)
       elsif has_parent? && parent.provides?(name)
@@ -274,7 +272,7 @@ module BibTeX
     end
 
     def respond_to_missing?(method, include_private = false)
-      provides?(method.to_sym) || method.to_s.match(/=$/) ||
+      provides?(method.to_sym) ||
         method =~ /^(?:convert|from)_([a-z]+)(!)?$/ ||
         (has_parent? && parent.respond_to?(method, include_private)) || super
     end
