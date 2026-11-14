@@ -31,7 +31,7 @@ expect 0
 rule
 
   bibliography : /* empty */                       { result = BibTeX::Bibliography.new(@options) }
-               | objects                           { result = val[0] }
+               | objects
 
   objects : object                                 { result = BibTeX::Bibliography.new(@options) << val[0] }
           | objects object                         { result << val[1] }
@@ -40,15 +40,15 @@ rule
          | META_CONTENT                            { result = BibTeX::MetaContent.new(val[0]) }
          | ERROR                                   { result = BibTeX::Error.new(val[0]) }
 
-  at_object : comment                              { result = val[0] }
-            | string                               { result = val[0] }
-            | preamble                             { result = val[0] }
-            | entry                                { result = val[0] }
+  at_object : comment
+            | string
+            | preamble
+            | entry
 
   comment : COMMENT LBRACE content RBRACE          { result = BibTeX::Comment.new(val[2]) }
 
   content : /* empty */                            { result = '' }
-          | CONTENT                                { result = val[0] }
+          | CONTENT
 
   preamble : PREAMBLE LBRACE string_value RBRACE   { result = BibTeX::Preamble.new(val[2]) }
 
@@ -61,24 +61,24 @@ rule
 
   string_literal : NAME                            { result = val[0].downcase.to_sym }
                  | LBRACE content RBRACE           { result = val[1] }
-                 | STRING_LITERAL                  { result = val[0] }
+                 | STRING_LITERAL
 
   entry : entry_head assignments RBRACE            { result = val[0] << val[1] }
         | entry_head assignments COMMA RBRACE      { result = val[0] << val[1] }
-        | entry_head RBRACE                        { result = val[0] }
+        | entry_head RBRACE
 
   entry_head : NAME LBRACE opt_key                 { result = BibTeX::Entry.new(:bibtex_type => val[0].downcase.to_sym, :bibtex_key => val[2]) }
 
   opt_key :                                        { missing_key }
           | KEY
 
-  assignments : assignment                         { result = val[0] }
+  assignments : assignment
               | assignments COMMA assignment       { result.merge!(val[2]) }
 
   assignment : NAME EQ value                       { result = { val[0].downcase.to_sym => val[2] } }
 
-  value : string_value                             { result = val[0] }
-        | NUMBER                                   { result = val[0] }
+  value : string_value
+        | NUMBER
 
 end
 
