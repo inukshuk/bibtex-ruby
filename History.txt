@@ -13,7 +13,7 @@ Unreleased
 * Fix Bibliography#to_yaml raising NoMethodError unless the caller had already required 'yaml'
 * Enable frozen_string_literal in the generated parsers and stop mutating strings that Ruby 3.4+ will freeze (Symbol#to_s in Entry#digest, the name parser's word buffer); these emitted deprecation warnings and would raise FrozenError in a future Ruby
 * Allocate fewer objects when parsing: the lexer no longer builds a method name per token or copies matched punctuation, and the grammar drops redundant actions
-* Fix a memory leak in month parsing: Entry::MONTHS_FILTER memoized every parsed entry's month and never released it, so memory use and parse time grew with each parse in a long-running process (parsing 2,000 entries a third time took ~3x as long as the first). Months are now normalised without a cache, entries no longer share month Values, and padded months like " Jan " are recognised
+* Fix a memory leak in month parsing: Entry::MONTHS_FILTER cached every parsed month and never released it, so memory use and parse time grew with each parse (#196). Entries no longer share month Values; padded months like " Jan " are recognised, while "0", "00" and values with line breaks are no longer mistaken for months
 
 6.2.0 / 2025-07-20
 ==================

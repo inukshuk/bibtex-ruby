@@ -60,19 +60,19 @@ module BibTeX
     MONTHS = %i[jan feb mar apr may jun jul aug sep oct nov dec].freeze
 
     # Converts a month field value into a new Value holding the BibTeX
-    # month abbreviation (:jan to :dec) if the value names a month or is
-    # a month number; any other value is kept as-is. Each call returns a
-    # new Value, so entries never share a month.
+    # month abbreviation (:jan to :dec) if the value starts with a month
+    # name or is a month number from 1 to 12; any other value is kept
+    # as-is. Each call returns a new Value, so entries never share a month.
     #
     # This used to be a memoizing Hash keyed by the field's Value. As
     # Values compare by identity, every parsed entry added a key that was
     # never released, so the Hash and its lookup cost grew with each parse.
     MONTHS_FILTER = lambda do |month|
       case (string = month.to_s.strip)
-      when /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
+      when /\A(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
         Value.new(string[0, 3].downcase.to_sym)
-      when /^\d\d?$/
-        Value.new(MONTHS[string.to_i - 1] || month)
+      when /\A\d\d?\z/
+        Value.new(string.to_i.between?(1, 12) ? MONTHS[string.to_i - 1] : month)
       else
         Value.new(month)
       end

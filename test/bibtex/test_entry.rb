@@ -225,6 +225,8 @@ module BibTeX
         [:sep, 'Sept.', 9], [:mar, 'March 2020', 3], [:jan, '1', 1],
         [:jan, '01', 1], [:dec, '12', 12], [:dec, 12, 12], [:dec, :'12', 12],
         ['13', '13', nil], ['13', 13, nil], ['Spring', 'Spring', nil],
+        ['0', '0', nil], ['00', '00', nil], ["x\n12", "x\n12", nil],
+        ["Spring\njan", "Spring\njan", nil],
         ['', '', nil], [:foo, :foo, nil]
       ].each do |expected, input, numeric|
         it "normalises month #{input.inspect} to #{expected.inspect}" do
