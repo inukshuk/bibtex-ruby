@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 module BibTeX
+  # Base class for all errors raised by BibTeX-Ruby. Keeps a reference
+  # to the original exception (if any) that caused it.
   class BibTeXError < StandardError
     attr_reader :original
 
@@ -18,6 +22,7 @@ module BibTeX
     attr_reader :trace
 
     def initialize(trace = [])
+      super()
       @trace = trace
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015 Sylvester Keil <sylvester.keil.or.at>
@@ -25,7 +27,7 @@ module BibTeX
     include Enumerable
 
     # Defines the required fields of the standard entry types
-    REQUIRED_FIELDS = Hash.new([]).merge(
+    REQUIRED_FIELDS = Hash.new([].freeze).merge(
       article: %i[author title journal year],
       book: [%i[author editor], :title, :publisher, :year],
       booklet: [:title],
@@ -74,6 +76,7 @@ module BibTeX
 
     # Creates a new instance. If a hash is given, the entry is populated accordingly.
     def initialize(attributes = {})
+      super()
       @fields = {}
       @key = nil
 
@@ -182,19 +185,19 @@ module BibTeX
       @type = type.to_sym
     end
 
-    def has_type?(type)
+    def type?(type)
       type.to_s.match(/^(?:entry|\*)$/i) || @type.casecmp?(type.to_sym) || super
     end
 
-    alias type? has_type?
+    alias has_type? type?
 
-    def has_field?(*names)
+    def field?(*names)
       names.flatten.any? do |name|
         name.respond_to?(:to_sym) ? fields.key?(name.to_sym) : false
       end
     end
 
-    alias field? has_field?
+    alias has_field? field?
 
     def inherits?(*names)
       names.flatten.any? do |name|
@@ -245,7 +248,7 @@ module BibTeX
     #
     # If the second optional argument is true (default) and the Entry contains
     # a cross-reference, the list will include all inherited fields.
-    def field_names(filter = [], include_inherited = true)
+    def field_names(filter = [], include_inherited = true) # rubocop:disable Style/OptionalBooleanParameter -- public API
       names = fields.keys
 
       names.concat(inherited_fields) if include_inherited && has_parent?
@@ -281,10 +284,10 @@ module BibTeX
       end
     end
 
-    def respond_to?(method, include_all = false)
+    def respond_to_missing?(method, include_private = false)
       provides?(method.to_sym) || method.to_s.match(/=$/) ||
         method =~ /^(?:convert|from)_([a-z]+)(!)?$/ ||
-        (has_parent? && parent.respond_to?(method, include_all)) || super
+        (has_parent? && parent.respond_to?(method, include_private)) || super
     end
 
     # Returns a copy of the Entry with all the field names renamed.
@@ -355,7 +358,7 @@ module BibTeX
     # definitions of all the required fields for that type.
     def valid?
       REQUIRED_FIELDS[type].all? do |f|
-        f.is_a?(Array) ? !(f & fields.keys).empty? : !fields[f].nil?
+        f.is_a?(Array) ? f.intersect?(fields.keys) : !fields[f].nil?
       end
     end
 
@@ -443,12 +446,12 @@ module BibTeX
 
     def replace(*arguments)
       arguments = bibliography.q('@string') if arguments.empty?
-      fields.values.each { |v| v.replace(*arguments) }
+      fields.each_value { |v| v.replace(*arguments) }
       self
     end
 
     def join
-      fields.values.each(&:join)
+      fields.each_value(&:join)
       self
     end
 
@@ -489,7 +492,7 @@ module BibTeX
       strings = bibliography ? bibliography.strings.values : []
 
       NAME_FIELDS.each do |key|
-        if name = fields[key]
+        if (name = fields[key])
           name = name.dup.replace(strings).join.to_name
           fields[key] = name unless name.nil?
         end
@@ -504,11 +507,12 @@ module BibTeX
     end
 
     # Returns true if the Entry has a valid cross-reference in the Bibliography.
-    def has_parent?
+    def parent?
       !parent.nil?
     end
 
-    alias has_cross_reference? has_parent?
+    alias has_parent? parent?
+    alias has_cross_reference? parent?
 
     # Returns true if the Entry cross-references an Entry which is not
     # registered in the current Bibliography.
@@ -528,11 +532,12 @@ module BibTeX
 
     # Returns true if the entry is cross-referenced by another entry in the
     # Bibliography.
-    def has_children?
+    def children?
       !children.empty?
     end
 
-    alias cross_referenced? has_children?
+    alias has_children? children?
+    alias cross_referenced? children?
 
     # Returns a list of all entries in the Bibliography containing a
     # cross-reference to this entry or [] if there are no references to this
@@ -702,7 +707,7 @@ module BibTeX
       k = names[0]
       k = k.respond_to?(:family) ? k.family : k.to_s
       k = BibTeX.transliterate(k).tr('"\'', '')
-      k = k[/[A-Za-z-]+/] || 'unknown'
+      k = k[/[A-Za-z-]+/] || +'unknown'
       k << (year.to_s[/\d+/] || '-')
       k << 'a'
       k.downcase

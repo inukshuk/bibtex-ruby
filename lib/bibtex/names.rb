@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015  Sylvester Keil <sylvester.keil.or.at>
@@ -30,13 +32,6 @@ module BibTeX
     rescue StandardError => e
       BibTeX.log.info(e.message)
       nil
-    end
-
-    def initialize(*arguments)
-      @tokens = []
-      arguments.flatten.compact.each do |argument|
-        add(argument)
-      end
     end
 
     def replace(*_arguments)
@@ -113,11 +108,13 @@ module BibTeX
 
   # A Name comprises individual name parts (first, last, prefix and suffix),
   # but behaves almost like an atomic string value.
+  # rubocop:disable Lint/StructNewOverride -- `first` is a public Name attribute; renaming it would break the API.
   class Name < Struct.new(:first, :last, :prefix, :suffix)
+    # rubocop:enable Lint/StructNewOverride
     extend Forwardable
     include Comparable
 
-    BibTeXML = {
+    BibTeXML = { # rubocop:disable Naming/ConstantName -- public constant; renaming would break the API.
       first: :first,
       last: :last,
       prefix: :prelast,
@@ -125,7 +122,7 @@ module BibTeX
     }.freeze
 
     def_delegators :to_s, :=~, :===,
-                   *String.instance_methods(false).reject { |m| m =~ /^\W|to_s|dup|replace|each|first|last|!$/ }
+                   *String.instance_methods(false).grep_v(/^\W|to_s|dup|replace|each|first|last|!$/)
 
     class << self
       def parse(string)
@@ -140,6 +137,7 @@ module BibTeX
     end
 
     def initialize(attributes = {})
+      super()
       set(attributes)
     end
 
@@ -246,7 +244,7 @@ module BibTeX
     end
 
     def to_hash
-      Hash[each_pair.to_a]
+      each_pair.to_h
     end
 
     def to_xml

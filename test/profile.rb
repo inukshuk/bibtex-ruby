@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require File.expand_path('../lib/bibtex.rb', __dir__)
 
 require 'ruby-prof'
 
-data = <<~END
+data = <<~BIBTEX
   @book{pickaxe,
   	Address = {Raleigh, North Carolina},
   	Author = "Thomas, Dave, and Fowler, Chad, and Hunt, Andy",
@@ -14,7 +16,7 @@ data = <<~END
   	Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
   	Year = {2009}
   }
-END
+BIBTEX
 
 data *= 50
 # data = File.open(File.expand_path('../fixtures/benchmark.bib', __FILE__)).read

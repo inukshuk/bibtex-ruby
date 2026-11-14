@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'helper'
 
 module BibTeX
   class FiltersTest < Minitest::Spec
     it 'should Filters should be singleton classes' do
-      assert_equal false, Filter.respond_to?(:new)
+      refute_respond_to Filter, :new
       assert_same Filter.instance, Filter.instance
     end
 
@@ -22,11 +24,13 @@ module BibTeX
       end
 
       it 'should return the filter if there is a filter by that name' do
-        class FooBar < Filter; end
+        foo_bar = FiltersTest.const_set(:FooBar, Class.new(Filter))
 
-        assert_same FooBar.instance, Filters.resolve(:foobar)
-        assert_same FooBar.instance, Filters.resolve('foobar')
-        Filter.subclasses.delete(FooBar)
+        assert_same foo_bar.instance, Filters.resolve(:foobar)
+        assert_same foo_bar.instance, Filters.resolve('foobar')
+      ensure
+        Filter.subclasses.delete(foo_bar)
+        FiltersTest.send(:remove_const, :FooBar)
       end
 
       it 'should return nil if there is no filter by that name' do

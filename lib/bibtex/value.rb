@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015  Sylvester Keil <sylvester.keil.or.at>
@@ -49,9 +51,7 @@ module BibTeX
     alias to_a tokens
 
     def_delegators :to_s, :=~, :===,
-                   *String.instance_methods(false).reject { |m|
-                     m =~ /^\W|^(length|dup|replace|to_s|to_i|inspect)$|!$/
-                   }
+                   *String.instance_methods(false).grep_v(/^\W|^(length|dup|replace|to_s|to_i|inspect)$|!$/)
 
     def_delegators :@tokens, :[], :length
     def_delegator :@tokens, :each, :each_token
@@ -102,9 +102,7 @@ module BibTeX
       case argument
       when Value
         @tokens += argument.tokens.dup
-      when ::String
-        @tokens << argument
-      when Symbol
+      when ::String, Symbol
         @tokens << argument
       else
         unless argument.respond_to?(:to_s)
@@ -264,7 +262,7 @@ module BibTeX
 
     # Returns all symbols contained in the Value.
     def symbols
-      @tokens.select { |v| v.is_a?(Symbol) }
+      @tokens.grep(Symbol)
     end
 
     # Returns a new Value with all string values converted according to the given filter(s).
@@ -290,7 +288,7 @@ module BibTeX
       end
     end
 
-    def respond_to?(method, include_all = false)
+    def respond_to_missing?(method, include_private = false)
       method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
     end
 

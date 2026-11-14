@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'helper'
 
 module BibTeX
@@ -62,7 +64,7 @@ module BibTeX
     # BibDesk stores library state in @comment blocks and expects to find
     # them again verbatim, e.g. by the literal prefix
     # '@comment{BibDesk Static Groups{' (#138).
-    BIBDESK_STATIC_GROUPS = <<~BIB.freeze
+    BIBDESK_STATIC_GROUPS = <<~BIB
       @comment{BibDesk Static Groups{
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

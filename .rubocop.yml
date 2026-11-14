@@ -20,3 +20,24 @@ AllCops:
 
 Layout/LineLength:
   Max: 150
+
+# Test classes and nested Minitest::Spec `describe` blocks grow with the
+# behaviour they cover; splitting them to satisfy length limits would be
+# artificial. `inherit_mode` keeps the Exclude lists from .rubocop_todo.yml.
+Metrics/BlockLength:
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - 'test/**/*'
+
+Metrics/ClassLength:
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - 'test/**/*'
+
+# A test may check a handful of related properties of a single result.
+Minitest/MultipleAssertions:
+  Max: 6

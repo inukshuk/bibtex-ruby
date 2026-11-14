@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015  Sylvester Keil <sylvester.keil.or.at>
@@ -40,7 +42,7 @@ module BibTeX
   # An instance of the Ruby core class +Logger+.
   # Used for logging by BibTeX-Ruby.
   #
-  @log = Logger.new(STDERR)
+  @log = Logger.new($stderr)
   @log.level = ENV.key?('DEBUG') ? Logger::DEBUG : Logger::WARN
   @log.datetime_format = '%Y-%m-%d %H:%M:%S'
 

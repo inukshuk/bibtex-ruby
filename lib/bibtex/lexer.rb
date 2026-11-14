@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #--
 # BibTeX-Ruby
 # Copyright (C) 2010-2015 Sylvester Keil <http://sylvester.keil.or.at>
@@ -78,6 +80,10 @@ module BibTeX
       comment: :bibtex,  meta: :meta,
       literal: :literal, content: :content
     ).freeze
+
+    # Token types at which #backtrace stops unwinding the stack.
+    BACKTRACE_BOUNDARIES = %i[AT META_CONTENT].freeze
+    private_constant :BACKTRACE_BOUNDARIES
 
     class << self
       attr_reader :defaults, :patterns
@@ -213,9 +219,9 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:rbrace])
         @brace_level -= 1
         push([:RBRACE, '}'])
-        return leave_object if @brace_level == 0
+        return leave_object if @brace_level.zero?
 
-        error_unbalanced_braces if @brace_level < 0
+        error_unbalanced_braces if @brace_level.negative?
       when @scanner.scan(Lexer.patterns[:eq])
         push([:EQ, '='])
       when @scanner.scan(Lexer.patterns[:comma])
@@ -262,7 +268,7 @@ module BibTeX
         push([:CONTENT, match])
       when '}'
         @brace_level -= 1
-        if @brace_level == 0
+        if @brace_level.zero?
           push([:CONTENT, match.chop])
           push([:RBRACE, '}'])
           leave_object
@@ -270,7 +276,7 @@ module BibTeX
           push([:CONTENT, match.chop])
           push([:RBRACE, '}'])
           @mode = :bibtex
-        elsif @brace_level < 0
+        elsif @brace_level.negative?
           push([:CONTENT, match.chop])
           error_unbalanced_braces
         else
@@ -393,7 +399,7 @@ module BibTeX
 
     def backtrace(error)
       bt = []
-      bt.unshift(@stack.pop) until @stack.empty? || (!bt.empty? && %i[AT META_CONTENT].include?(bt[0][0]))
+      bt.unshift(@stack.pop) until @stack.empty? || (!bt.empty? && BACKTRACE_BOUNDARIES.include?(bt[0][0]))
       bt << error
       push [:ERROR, bt]
     end

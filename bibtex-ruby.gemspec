@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
 
@@ -32,6 +34,7 @@ Gem::Specification.new do |s|
   s.files        = Dir['lib/**/*.{rb,y}', 'History.txt', 'LICENSE', 'README.md']
   s.executables  = []
   s.require_path = 'lib'
+  s.metadata['rubygems_mfa_required'] = 'true'
 end
 
 # vim: syntax=ruby
