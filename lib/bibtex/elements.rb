@@ -191,7 +191,7 @@ module BibTeX
 
     # Returns the Element as a nicely formatted string.
     def inspect
-      "#<#{self.class} #{content.gsub(/\n/, ' ')}>"
+      "#<#{self.class} #{content.tr("\n", ' ')}>"
     end
 
     private
