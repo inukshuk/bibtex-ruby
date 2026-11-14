@@ -720,7 +720,7 @@ module BibTeX
       end
 
       it 'is true by default' do
-        assert @misc.valid?
+        assert_predicate @misc, :valid?
       end
 
       it 'is not true by default for types with mandatory fields' do
@@ -736,13 +736,13 @@ module BibTeX
           publisher: 'Heineman'
         )
 
-        assert @book.valid?
+        assert_predicate @book, :valid?
 
         @book.delete :publisher
         refute @book.valid?
 
         @book.publisher = 'Heineman'
-        assert @book.valid?
+        assert_predicate @book, :valid?
 
         @book.delete :year
         refute @book.valid?

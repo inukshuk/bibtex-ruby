@@ -57,7 +57,7 @@ module BibTeX
       end
       it 'should should be atomic after join when containing only strings' do
         refute Value.new('foo', 'bar').atomic?
-        assert Value.new('foo', 'bar').join.atomic?
+        assert_predicate Value.new('foo', 'bar').join, :atomic?
       end
       it 'should do nothing when containing only symbols' do
         value = Value.new(:foo)

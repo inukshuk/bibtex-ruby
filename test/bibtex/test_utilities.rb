@@ -19,8 +19,8 @@ module BibTeX
       BibTeX.log.level = Logger::ERROR
 
       refute BibTeX.parse(' @book{ id, author = {Poe, Edgar Allen}, title = "Ligeia" } ').valid?
-      assert BibTeX.parse(' @book{ id, author = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } ').valid?
-      assert BibTeX.parse(' @book{ id, editor = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } ').valid?
+      assert_predicate BibTeX.parse(' @book{ id, author = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } '), :valid?
+      assert_predicate BibTeX.parse(' @book{ id, editor = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } '), :valid?
       refute BibTeX.parse(' @book{ id, xxxxxx = {Poe, Edgar Allen}, title = "Ligeia", publisher = "Penguin", year = 1996 } ').valid?
       refute BibTeX.parse(' @book{ id, author = {Poe, Edgar Allen}, title = "Lig"eia", publisher = "Penguin", year = 1996 } ').valid?
       assert BibTeX.valid?(Test.fixtures(:bibdesk))

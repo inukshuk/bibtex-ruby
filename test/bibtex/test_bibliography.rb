@@ -270,7 +270,7 @@ module BibTeX
         end
 
         it 'understands duplicates?' do
-          assert @bib.duplicates?
+          assert_predicate @bib, :duplicates?
         end
       end
 
