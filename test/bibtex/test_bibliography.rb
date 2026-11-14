@@ -134,7 +134,7 @@ module BibTeX
         end
 
         it 'uses the given block to determine the key' do
-          assert_equal @bib.entries.length, (@bib.group_by { 'x' })['x'].length
+          assert_equal @bib.entries.length, @bib.group_by { 'x' }['x'].length
         end
       end
 
