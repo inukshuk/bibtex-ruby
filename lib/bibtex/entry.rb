@@ -259,13 +259,21 @@ module BibTeX
       names
     end
 
-    def method_missing(name, *args, &)
+    # Ghost methods: a writer `<field>=` for any non-empty field name that
+    # does not itself end in '=' (so :'=', :'==' and :'a==' stay unknown
+    # methods), and the convert_<filter>, convert_<filter>! and
+    # from_<filter> conversions.
+    FIELD_WRITER = /\A(?<field>.*[^=])=\z/m
+    CONVERSION = /\A(?:convert|from)_(?<filter>[a-z]+)(?<bang>!)?\z/
+    private_constant :FIELD_WRITER, :CONVERSION
+
+    def method_missing(name, *, &)
       if fields.key?(name)
         fields[name]
-      elsif name.to_s =~ /^(.+)=$/
-        send(:add, Regexp.last_match(1).to_sym, args[0])
-      elsif name =~ /^(?:convert|from)_([a-z]+)(!)?$/
-        Regexp.last_match(2) ? convert!(Regexp.last_match(1), &) : convert(Regexp.last_match(1), &)
+      elsif (writer = FIELD_WRITER.match(name))
+        write_field(writer[:field], *)
+      elsif (conversion = CONVERSION.match(name))
+        conversion[:bang] ? convert!(conversion[:filter], &) : convert(conversion[:filter], &)
       elsif has_parent? && parent.provides?(name)
         parent.provide(name)
       else
@@ -274,8 +282,9 @@ module BibTeX
     end
 
     def respond_to_missing?(method, include_private = false)
-      provides?(method.to_sym) || method.to_s.match(/=$/) ||
-        method =~ /^(?:convert|from)_([a-z]+)(!)?$/ ||
+      provides?(method.to_sym) ||
+        FIELD_WRITER.match?(method) ||
+        CONVERSION.match?(method) ||
         (has_parent? && parent.respond_to?(method, include_private)) || super
     end
 
@@ -690,6 +699,14 @@ module BibTeX
       else
         Value.new(month)
       end
+    end
+
+    # Backs the ghost writers; checks the arity a real writer would have.
+    def write_field(name, *values)
+      raise ::ArgumentError, "wrong number of arguments (given #{values.length}, expected 1)" unless values.length == 1
+
+      # Same conversion as #add, like the generated writers above.
+      add(name, values[0])
     end
 
     # Escapes every & not already preceded by a backslash, unless the field

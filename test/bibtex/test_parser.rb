@@ -268,6 +268,10 @@ module BibTeX
         assert_equal 3, @bib.meta_contents.length
       end
 
+      it 'keeps comments and meta content in document order' do
+        assert_equal [MetaContent, Comment, MetaContent, Comment, MetaContent], @bib.data.map(&:class)
+      end
+
       it 'should parse @comment content as string' do
         assert_equal ' A comment can contain pretty much anything ', @bib.comments[0].content
         assert_equal %(\n@string{ foo = "bar" }\n\n@string{ bar = "foo" }\n), @bib.comments[1].content
@@ -365,6 +369,40 @@ module BibTeX
           }
         BIBTEX
         assert_equal '1=highlight', bib[:foo][:'author+an']
+      end
+    end
+
+    describe 'given meta content between objects' do
+      it 'drops the line breaks that only separate objects' do
+        input = "intro\n@book{a, title = {x}}\n\n@book{b, title = {y}}\n@comment{c}\ntail\n"
+        bib = Parser.new(include: [:meta_content]).parse(input)
+
+        assert_equal ["intro\n", '', '', "\ntail\n"], bib.meta_contents.map(&:to_s)
+      end
+    end
+
+    describe 'given TeX comments and :strip_comments' do
+      it 'skips a comment that follows white space before the key' do
+        bib = Parser.new(strip_comments: true).parse("@misc{ % c\n  foo, a = {x}}")
+
+        assert_equal %w[foo], bib.entries.keys
+        assert_equal %i[a], bib['foo'].fields.keys
+      end
+    end
+
+    describe 'given malformed entry types and keys' do
+      it 'rejects entry types with characters BibTeX does not allow there' do
+        assert_raises(ParseError) { Parser.new.parse('@bo/ok{a, title = {x}}') }
+        assert_raises(ParseError) { Parser.new.parse('@bo[k]{a, title = {x}}') }
+      end
+
+      it 'rejects a line break or tab between the key and its comma' do
+        assert_raises(ParseError) { Parser.new.parse("@book{a\n, title = {x}}") }
+        assert_raises(ParseError) { Parser.new.parse("@book{a\t, title = {x}}") }
+      end
+
+      it 'keeps a space between the key and its comma as part of a valid entry' do
+        assert_equal %w[a], Parser.new.parse('@book{a , title = {x}}').entries.keys
       end
     end
   end

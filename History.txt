@@ -14,6 +14,10 @@ Unreleased
 * Enable frozen_string_literal in the generated parsers and stop mutating strings that Ruby 3.4+ will freeze (Symbol#to_s in Entry#digest, the name parser's word buffer); these emitted deprecation warnings and would raise FrozenError in a future Ruby
 * Allocate fewer objects when parsing: the lexer no longer builds a method name per token or copies matched punctuation, and the grammar drops redundant actions
 * Fix a memory leak in month parsing: Entry::MONTHS_FILTER cached every parsed month and never released it, so memory use and parse time grew with each parse (#196). The constant is removed; months are normalised by Entry#parse_month. Entries no longer share month Values; padded months like " Jan " are recognised, while "0" and "00" are no longer mistaken for months
+* Accept every character BibTeX allows in identifiers in field names, @string names and macro references, e.g. x;y, p[1], a|b, a^b, a~b, a<b>, a@b and @foo; these used to raise an unexpected-token error. An '@' followed by a name and '{' or '(' still starts a new entry, and a name that starts with '@' ends before the next '@'
+* Bibliography#save_to (and #save) replace the file atomically, so a failure while serialising or writing leaves the existing file untouched instead of empty or partly written; symlinked targets and permission bits are kept, and devices, pipes and files in read-only directories are written directly
+* Bibliography#save_to no longer adds :quotes to the options hash passed in
+* Reimplement Entry's dynamic field writers, Bibliography#save_to and the lexer's identifier and key rules from a written specification, without the code they replace (#154)
 
 6.2.0 / 2025-07-20
 ==================
