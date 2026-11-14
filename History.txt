@@ -11,6 +11,7 @@ Unreleased
 * Add :strip_comments parser option to ignore biber-style TeX comments ('%' to end of line) inside entries (#132)
 * Fix Bibliography#to_yaml raising NoMethodError unless the caller had already required 'yaml'
 * Enable frozen_string_literal in the generated parsers and stop mutating strings that Ruby 3.4+ will freeze (Symbol#to_s in Entry#digest, the name parser's word buffer); these emitted deprecation warnings and would raise FrozenError in a future Ruby
+* Allocate fewer objects when parsing: the lexer no longer builds a method name per token or copies matched punctuation, and the grammar drops redundant actions
 
 6.2.0 / 2025-07-20
 ==================

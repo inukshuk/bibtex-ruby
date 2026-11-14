@@ -118,19 +118,19 @@ racc_goto_default = [
 racc_reduce_table = [
   0, 0, :racc_error,
   0, 19, :_reduce_1,
-  1, 19, :_reduce_2,
+  1, 19, :_reduce_none,
   1, 20, :_reduce_3,
   2, 20, :_reduce_4,
   2, 21, :_reduce_5,
   1, 21, :_reduce_6,
   1, 21, :_reduce_7,
-  1, 22, :_reduce_8,
-  1, 22, :_reduce_9,
-  1, 22, :_reduce_10,
-  1, 22, :_reduce_11,
+  1, 22, :_reduce_none,
+  1, 22, :_reduce_none,
+  1, 22, :_reduce_none,
+  1, 22, :_reduce_none,
   4, 23, :_reduce_12,
   0, 27, :_reduce_13,
-  1, 27, :_reduce_14,
+  1, 27, :_reduce_none,
   4, 25, :_reduce_15,
   4, 24, :_reduce_16,
   3, 29, :_reduce_17,
@@ -138,18 +138,18 @@ racc_reduce_table = [
   3, 28, :_reduce_19,
   1, 30, :_reduce_20,
   3, 30, :_reduce_21,
-  1, 30, :_reduce_22,
+  1, 30, :_reduce_none,
   3, 26, :_reduce_23,
   4, 26, :_reduce_24,
-  2, 26, :_reduce_25,
+  2, 26, :_reduce_none,
   3, 31, :_reduce_26,
   0, 33, :_reduce_27,
   1, 33, :_reduce_none,
-  1, 32, :_reduce_29,
+  1, 32, :_reduce_none,
   3, 32, :_reduce_30,
   3, 34, :_reduce_31,
-  1, 35, :_reduce_32,
-  1, 35, :_reduce_33 ]
+  1, 35, :_reduce_none,
+  1, 35, :_reduce_none ]
 
 racc_reduce_n = 34
 
@@ -246,10 +246,7 @@ def _reduce_1(val, _values, result)
     result
 end
 
-def _reduce_2(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 2 omitted
 
 def _reduce_3(val, _values, result)
  result = BibTeX::Bibliography.new(@options) << val[0]
@@ -276,25 +273,13 @@ def _reduce_7(val, _values, result)
     result
 end
 
-def _reduce_8(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 8 omitted
 
-def _reduce_9(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 9 omitted
 
-def _reduce_10(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 10 omitted
 
-def _reduce_11(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 11 omitted
 
 def _reduce_12(val, _values, result)
  result = BibTeX::Comment.new(val[2])
@@ -306,10 +291,7 @@ def _reduce_13(val, _values, result)
     result
 end
 
-def _reduce_14(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 14 omitted
 
 def _reduce_15(val, _values, result)
  result = BibTeX::Preamble.new(val[2])
@@ -346,10 +328,7 @@ def _reduce_21(val, _values, result)
     result
 end
 
-def _reduce_22(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 22 omitted
 
 def _reduce_23(val, _values, result)
  result = val[0] << val[1]
@@ -361,10 +340,7 @@ def _reduce_24(val, _values, result)
     result
 end
 
-def _reduce_25(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 25 omitted
 
 def _reduce_26(val, _values, result)
  result = BibTeX::Entry.new(:bibtex_type => val[0].downcase.to_sym, :bibtex_key => val[2])
@@ -378,10 +354,7 @@ end
 
 # reduce 28 omitted
 
-def _reduce_29(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 29 omitted
 
 def _reduce_30(val, _values, result)
  result.merge!(val[2])
@@ -393,15 +366,9 @@ def _reduce_31(val, _values, result)
     result
 end
 
-def _reduce_32(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 32 omitted
 
-def _reduce_33(val, _values, result)
- result = val[0]
-    result
-end
+# reduce 33 omitted
 
 def _reduce_none(val, _values, result)
   val[0]
