@@ -65,6 +65,7 @@ require 'bibtex/compatibility'
 
 require 'bibtex/names'
 require 'bibtex/replaceable'
+require 'bibtex/deprecation'
 require 'bibtex/elements'
 require 'bibtex/entry'
 require 'bibtex/entry/citeproc_converter'

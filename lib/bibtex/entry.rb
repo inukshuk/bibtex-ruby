@@ -319,6 +319,38 @@ module BibTeX
 
     alias get []
 
+    # Supports Ruby's pattern matching.
+    #
+    # Returns the entry's +:type+ (the BibTeX type as a Symbol, e.g.
+    # +:article+), its +:key+ (a String) and every field (including fields
+    # inherited via crossref) as a plain String. Because values are Strings,
+    # String, Regexp and Range patterns work as expected; note that years
+    # are Strings too, so use String ranges such as <tt>"2010".."2015"</tt>.
+    #
+    # The +:type+ and +:key+ entries always refer to the BibTeX type and the
+    # citation key, even if the entry has fields named +type+ or +key+.
+    #
+    # @example
+    #   case entry
+    #   in { type: :article | :inproceedings, year: '2010'.. }
+    #     ...
+    #   end
+    #
+    # @param keys [Array<Symbol>, nil] the keys to return; nil for all
+    # @return [Hash{Symbol => Object}]
+    def deconstruct_keys(keys)
+      hash = { type: type, key: key }
+
+      (keys.nil? ? field_names : keys).each do |name|
+        next if hash.key?(name) || !name.respond_to?(:to_sym)
+
+        value = self[name]
+        hash[name] = value.to_s unless value.nil?
+      end
+
+      keys.nil? ? hash : hash.slice(*keys)
+    end
+
     def fetch(name, default = nil)
       get(name) || (block_given? ? yield(name) : default)
     end
@@ -445,7 +477,7 @@ module BibTeX
     end
 
     def replace(*arguments)
-      arguments = bibliography.q('@string') if arguments.empty?
+      arguments = bibliography.q(type: :string) if arguments.empty?
       fields.each_value { |v| v.replace(*arguments) }
       self
     end
@@ -543,7 +575,7 @@ module BibTeX
     # cross-reference to this entry or [] if there are no references to this
     # entry.
     def children
-      bibliography&.q("@entry[crossref=#{key}]") || []
+      bibliography&.q(crossref: key) || []
     end
 
     alias cross_referenced_by children

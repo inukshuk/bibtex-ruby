@@ -16,4 +16,7 @@ end
 require 'minitest'
 require 'bibtex'
 
+# The features exercise the deprecated string selectors on purpose.
+BibTeX::Deprecation.silence!
+
 World(Minitest::Assertions)

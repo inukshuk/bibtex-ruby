@@ -18,6 +18,11 @@ require 'tempfile'
 
 require 'bibtex'
 
+# The existing tests exercise the deprecated string selectors on purpose;
+# keep them quiet even when the suite runs with Warning[:deprecated] = true.
+# test_queries.rb resets this to assert on the warning itself.
+BibTeX::Deprecation.silence!
+
 module BibTeX
   module Test
     class << self

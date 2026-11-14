@@ -186,6 +186,14 @@ module BibTeX
     #
     # Returns the object (or the list of objects) that were deleted; nil
     # if the object was not part of the bibliography.
+    #
+    # Accepts the same arguments as #query, including a Hash of conditions:
+    #
+    #   bib.delete(type: :comment)
+    #
+    # @deprecated Passing a string selector such as '@comment' is
+    #   deprecated and will be removed in 7.0; pass a Hash of conditions
+    #   instead (see #query).
     def delete(*arguments, &block)
       objects = q(*arguments, &block).map { |o| o.removed_from_bibliography(self) }
       @data -= objects
@@ -214,11 +222,16 @@ module BibTeX
     # => Returns all objects that match 'ruby' anywhere or []
     # >> bib['@book[keywords=ruby]']
     # => Returns all books whose keywords attribute equals 'ruby' or []
+    # >> bib[type: :book, keywords: 'ruby']
+    # => Same as above, using a Hash of conditions (see #query)
     #
     # Returns an element or a list of elements according to the given index,
     # range, or query. Contrary to the Bibliography#query this method does
     # not yield to a block for additional refinement of the query.
     #
+    # @deprecated Passing a string selector such as '@article' or
+    #   '@book[keywords=ruby]' is deprecated and will be removed in 7.0;
+    #   pass a Hash of conditions instead. Plain String or Symbol keys and Regexps are not deprecated.
     def [](*arguments)
       raise(ArgumentError, "wrong number of arguments (#{arguments.length} for 1..2)") unless arguments.length.between?(1, 2)
 
@@ -264,9 +277,12 @@ module BibTeX
     #
     # call-seq:
     # bib.replace #=> replaces all symbols
-    # bib.replace('@string, @preamble')
+    # bib.replace(type: %i[string preamble])
     # #=> replaces only symbols in @string and @preamble objects
     #
+    # @deprecated Passing a string selector such as '@string, @preamble'
+    #   is deprecated and will be removed in 7.0; pass a Hash of
+    #   conditions instead (see #query).
     def replace(filter = '')
       q(filter) { |e| e.replace(@strings.values) }
       self
@@ -282,7 +298,7 @@ module BibTeX
     alias join_strings join
 
     def rename(*arguments, &block)
-      q('@entry') { |e| e.rename(*arguments, &block) }
+      each_entry { |e| e.rename(*arguments, &block) }
       self
     end
 
@@ -405,7 +421,7 @@ module BibTeX
 
     # Returns a CiteProc JSON representation of the bibliography. Only BibTeX enrties are exported.
     def to_citeproc(options = {})
-      q('@entry').map { |o| o.to_citeproc(options) }
+      each_entry.map { |o| o.to_citeproc(options) }
     end
 
     # Returns a REXML::Document representation of the bibliography using the
@@ -463,6 +479,31 @@ module BibTeX
     #     >> bib.query(:none, '@book')
     #     => same as bib.reject { |b| b.has_type?(:book) }
     #
+    # Instead of a selector string you can pass a Hash of conditions. An
+    # element matches when every condition matches its value as exposed by
+    # Element#deconstruct_keys (+:type+ as a Symbol, +:key+ and all fields
+    # as Strings), compared with +===+. An Array pattern matches if any of
+    # its members matches; a missing field never matches, except for a
+    # +nil+ pattern, which selects the elements lacking that field:
+    #
+    #   bib.query(type: :article, author: /Maksimovi/)
+    #   bib.query(type: %i[book article])
+    #   bib.query(:first, year: '2010'..'2015')
+    #   bib.query(:none, type: :book)
+    #   bib.query(author: %q(Maksimovi\'{c}, Petar))
+    #   bib.query(type: :book, url: nil)
+    #   bib.query(type: :book) { |e| e.year.to_i > 2010 }
+    #
+    # @overload query(selector = :all, conditions = nil, &block)
+    #   @param selector [Symbol] :all, :first or :none
+    #   @param conditions [Hash{Symbol => Object}, Symbol, String, Regexp, nil]
+    #   @return [Array<Element>, Element, nil]
+    #
+    # @deprecated Passing a string selector such as '@book[year<=2011]',
+    #   '!@book' or '@*' is deprecated and will be removed in 7.0; pass a
+    #   Hash of conditions or use pattern matching with #select instead.
+    #   Until then, string selectors keep working and only warn (once) when
+    #   Warning[:deprecated] is enabled.
     def query(*arguments, &block)
       case arguments.length
       when 0
@@ -489,15 +530,18 @@ module BibTeX
     alias q query
 
     def each_entry(&)
-      if block_given?
-        q('@entry').each(&)
-      else
-        q('@entry').to_enum
-      end
+      selected = q(&:entry?)
+      block_given? ? selected.each(&) : selected.to_enum
     end
 
     def find_by_type(*types, &)
-      q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &)
+      types = types.flatten.compact
+
+      # Types carrying selector syntax (e.g. 'book[year=2009]') still go
+      # through the deprecated string selector language.
+      return q(types.map { |t| "@#{t}" }.join(', '), &) unless types.all? { |t| t.to_s.match?(/\A(?:\*|\w+)\z/) }
+
+      q { |e| (types.empty? || types.any? { |t| e.has_type?(t) }) && (!block_given? || yield(e)) }
     end
 
     alias find_by_types find_by_type
