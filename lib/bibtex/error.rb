@@ -35,14 +35,14 @@ module BibTeX
 
     # Called when the element was added to a bibliography.
     def added_to_bibliography(bibliography)
-      super(bibliography)
+      super
       bibliography.errors << self
       self
     end
 
     # Called when the element was removed from a bibliography.
     def removed_from_bibliography(bibliography)
-      super(bibliography)
+      super
       bibliography.errors.delete(self)
       self
     end
