@@ -8,6 +8,16 @@ When(/^I parse the following file:$/) do |string|
   @bibliography = BibTeX.parse(string)
 end
 
+# Options are written as "name: value" pairs separated by commas, e.g.
+# "strict: false, strip_comments: true"; values are true or false.
+When(/^I parse the following file with options (.+):$/) do |options, string|
+  options = options.split(/\s*,\s*/).to_h do |pair|
+    name, value = pair.split(/\s*:\s*/, 2)
+    [name.to_sym, value == 'true']
+  end
+  @bibliography = BibTeX.parse(string, options)
+end
+
 When(/^I search for "([^"]*)"$/) do |query|
   @result = @bibliography.query(query)
 end
