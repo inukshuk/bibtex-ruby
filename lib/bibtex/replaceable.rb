@@ -30,8 +30,8 @@ module BibTeX
       @value = Value.new(value)
     end
 
-    def replace(*arguments)
-      @value.replace(*arguments)
+    def replace(*)
+      @value.replace(*)
       self
     end
 

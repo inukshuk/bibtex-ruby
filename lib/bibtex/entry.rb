@@ -284,8 +284,8 @@ module BibTeX
     end
 
     # Returns a copy of the Entry with all the field names renamed.
-    def rename(*arguments)
-      dup.rename!(*arguments)
+    def rename(*)
+      dup.rename!(*)
     end
 
     # Renames the given field names unless a field with the new name already

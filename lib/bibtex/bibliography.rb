@@ -360,17 +360,17 @@ module BibTeX
       groups
     end
 
-    def sort!(*arguments, &)
-      data.sort!(*arguments, &)
+    def sort!(*, &)
+      data.sort!(*, &)
       self
     end
 
-    def sort(*arguments, &)
-      dup.sort!(*arguments, &)
+    def sort(*, &)
+      dup.sort!(*, &)
     end
 
-    def sort_by!(*arguments, &)
-      data.sort_by!(*arguments, &)
+    def sort_by!(*, &)
+      data.sort_by!(*, &)
       self
     end
 
