@@ -56,7 +56,7 @@ module BibTeX
         assert_equal 'foobar', Value.new(%w[foo bar]).join.to_s
       end
       it 'should should be atomic after join when containing only strings' do
-        refute Value.new('foo', 'bar').atomic?
+        refute_predicate Value.new('foo', 'bar'), :atomic?
         assert_predicate Value.new('foo', 'bar').join, :atomic?
       end
       it 'should do nothing when containing only symbols' do

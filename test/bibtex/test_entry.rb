@@ -748,8 +748,8 @@ module BibTeX
       end
 
       it 'is not true by default for types with mandatory fields' do
-        refute @book.valid?
-        refute @article.valid?
+        refute_predicate @book, :valid?
+        refute_predicate @article, :valid?
       end
 
       it 'is true only if all mandatory fields are present' do
@@ -764,7 +764,7 @@ module BibTeX
 
         @book.delete :publisher
 
-        refute @book.valid?
+        refute_predicate @book, :valid?
 
         @book.publisher = 'Heineman'
 
@@ -772,7 +772,7 @@ module BibTeX
 
         @book.delete :year
 
-        refute @book.valid?
+        refute_predicate @book, :valid?
       end
     end
 
