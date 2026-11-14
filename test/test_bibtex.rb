@@ -19,6 +19,21 @@ module BibTeX
       }
     BIBTEX
 
+    # The entry in test/fixtures/roundtrip.bib.
+    RAILS_ATTRIBUTES = {
+      bibtex_type: :book,
+      bibtex_key: 'rails',
+      address: 'Raleigh, North Carolina',
+      author: 'Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David',
+      booktitle: 'Agile Web Development with Rails',
+      edition: 'third',
+      keywords: 'ruby, rails',
+      publisher: 'The Pragmatic Bookshelf',
+      series: 'The Facets of Ruby',
+      title: 'Agile Web Development with Rails',
+      year: '2009'
+    }.freeze
+
     def setup; end
 
     def teardown; end
@@ -37,6 +52,10 @@ module BibTeX
       refute_nil(bib)
       assert_instance_of(BibTeX::Bibliography, bib)
       assert_empty(bib)
+
+      with_meta = BibTeX::Bibliography.open(Test.fixtures(:no_bibtex), include: [:meta_content])
+
+      assert_equal([BibTeX::MetaContent], with_meta.data.map(&:class))
     end
 
     def test_decoret
@@ -45,7 +64,16 @@ module BibTeX
       assert_equal(15, bib.length)
       assert_equal([BibTeX::Entry, BibTeX::Comment, BibTeX::String, BibTeX::Preamble], bib.data.map(&:class).uniq)
       assert_equal('py03', bib.data[0].key)
-      # TODO: missing assertions
+    end
+
+    def test_decoret_objects
+      bib = BibTeX::Bibliography.open(Test.fixtures(:decoret), debug: false)
+
+      assert_equal(%w[py03 key03 key01 key02 steward03 sweig42], bib.entries.keys)
+      assert_equal(%i[mar firstname lastname email maintainer], bib.strings.keys)
+      assert_equal({ BibTeX::Entry => 6, BibTeX::Comment => 2, BibTeX::String => 5, BibTeX::Preamble => 2 },
+                   bib.data.map(&:class).tally)
+      assert_empty(bib.errors)
     end
 
     def test_decoret_py03
@@ -64,42 +92,30 @@ module BibTeX
       assert_equal('A {bunch {of} braces {in}} title', entry[:title])
     end
 
-    # def test_errors
-    #   bib = BibTeX.open(Test.fixtures(:errors), :debug => false)
-    #   #refute_nil(bib)
-    # end
-
     def test_bibdesk
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), debug: false)
 
       assert_equal 3, bib.length
-      assert_equal 'rails', bib[0].key
+      assert_equal %w[rails dragon pickaxe], bib.entries.keys
+      assert_empty bib.errors
+      assert_equal %i[address author booktitle date-added date-modified edition isbn keywords publisher series title year],
+                   bib['rails'].fields.keys
       assert_equal '2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified']
     end
 
     def test_roundtrip
-      # file = File.read(Test.fixtures(:roundtrip))
-      # bib = BibTeX.parse(file, :debug => false)
-      # assert_equal file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, '')
+      file = File.read(Test.fixtures(:roundtrip))
+      bib = BibTeX.parse(file)
+
+      assert_equal file.gsub(/\s+/, ''), bib.to_s.gsub(/\s+/, '')
     end
 
     def test_construct
-      # file = File.read(Test.fixtures(:roundtrip))
-      # bib = BibTeX::Bibliography.new
-      # bib << BibTeX::Entry.new({
-      #   :bibtex_type => :book,
-      #   :key => 'rails',
-      #   :address => 'Raleigh, North Carolina',
-      #   :author => 'Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David',
-      #   :booktitle => 'Agile Web Development with Rails',
-      #   :edition => 'third',
-      #   :keywords => 'ruby, rails',
-      #   :publisher => 'The Pragmatic Bookshelf',
-      #   :series => 'The Facets of Ruby',
-      #   :title => 'Agile Web Development with Rails',
-      #   :year => '2009'
-      # })
-      # assert_equal(file.gsub(/[\s]+/, ''), bib.to_s.gsub(/[\s]+/, ''))
+      file = File.read(Test.fixtures(:roundtrip))
+      bib = BibTeX::Bibliography.new
+      bib << BibTeX::Entry.new(RAILS_ATTRIBUTES.dup) # Entry.new deletes keys from its argument
+
+      assert_equal file.gsub(/\s+/, ''), bib.to_s.gsub(/\s+/, '')
     end
 
     def test_parse
