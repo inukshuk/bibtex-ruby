@@ -592,9 +592,9 @@ module BibTeX
 
     # Returns a string of all the entry's fields.
     #
-    # A bare & is a LaTeX alignment character, so it is written out as \&
-    # (#170). An & that is already escaped is left alone, as are fields
-    # whose content is verbatim (see VERBATIM_FIELDS).
+    # A bare & is a LaTeX alignment character, so it is written out as \&.
+    # An & that is already escaped is left alone, as are fields whose
+    # content is verbatim (see VERBATIM_FIELDS).
     def content(options = {})
       fields.map { |k, _v| "#{k} = #{escape_value(k, fields[k].to_s(options))}" }.join(",\n")
     end
@@ -638,7 +638,7 @@ module BibTeX
       fields[:date].to_s[/\d{4}/]
     end
 
-    # Generate accessors for required fields (#52)
+    # Generate accessors for required fields
     REQUIRED_FIELDS.values.flatten.uniq.each do |name|
       unless method_defined? name
         define_method(name) do

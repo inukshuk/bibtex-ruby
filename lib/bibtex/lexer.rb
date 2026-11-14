@@ -51,7 +51,7 @@ module BibTeX
       number: /[[:digit:]]+/o,
       name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+}io,
       # Several space-separated words followed by `=', e.g. the
-      # `Early Access Date' fields exported by Web of Science (#131).
+      # `Early Access Date' fields exported by Web of Science.
       spaced_name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.%+&*-]+)+(?=\s*=)}io,
       spaced_name_without_percent: %r{[[:alpha:][:digit:]/:_!$?.+&*-]+(?:[\t ]+[[:alpha:][:digit:]/:_!$?.+&*-]+)+(?=\s*=)}io,
       name_without_percent: %r{[[:alpha:][:digit:]/:_!$?.+&*-]+}io,

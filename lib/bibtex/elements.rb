@@ -369,7 +369,7 @@ module BibTeX
 
     # Returns the @comment verbatim: the content is written without
     # padding so that tools like BibDesk, which store state in @comment
-    # blocks, find them again after a round-trip (#138).
+    # blocks, find them again after a round-trip.
     def to_s(_options = {})
       "@comment{#{@content}}\n"
     end

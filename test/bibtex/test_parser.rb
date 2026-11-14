@@ -90,7 +90,7 @@ module BibTeX
       end
     end
 
-    describe 'field names containing spaces (#131)' do
+    describe 'field names containing spaces' do
       before do
         @input = '@article{a, title = {T}, Early Access Date = {{NOV}}, ' \
                  'Early Access Year = {{2017}}, year = 2017}'
@@ -155,7 +155,7 @@ module BibTeX
       end
     end
 
-    describe 'TeX comments inside entries (#132)' do
+    describe 'TeX comments inside entries' do
       let(:input) { %(@book{book,\n% inside\nauthor = "John Doe" % after field\n}) }
 
       it 'raises a parse error by default' do
@@ -213,7 +213,7 @@ module BibTeX
         assert_equal %w[a b], bib.map(&:key)
       end
 
-      it 'combines with multi-word field names in non-strict mode (#131)' do
+      it 'combines with multi-word field names in non-strict mode' do
         bib = Parser.new(debug: false, strict: false, strip_comments: true).parse(<<~BIB)
           @article{a,
             title = {T}, % trailing comment
