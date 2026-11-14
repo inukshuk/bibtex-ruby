@@ -58,8 +58,8 @@ module BibTeX
       end
 
       it 'has an id' do
-        assert_equal @element.id, @element.id
         assert_kind_of ::String, @element.id
+        refute_empty @element.id
       end
 
       it 'inspects itself' do

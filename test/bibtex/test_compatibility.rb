@@ -17,10 +17,9 @@ module BibTeX
     end
 
     def test_transliterate_falls_back_when_normalization_fails
-      str = +'café ok'
-      str.define_singleton_method(:unicode_normalize) { |*| raise ArgumentError, 'boom' }
+      binary = 'café ok'.b
 
-      assert_equal 'caf ok', BibTeX.transliterate(str)
+      assert_equal 'caf ok', BibTeX.transliterate(binary)
     end
   end
 end
