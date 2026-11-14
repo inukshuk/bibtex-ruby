@@ -476,7 +476,7 @@ module BibTeX
         raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)"
       end
 
-      filter = block ? proc { |e| e.match?(q) && block.call(e) } :
+      filter = block ? proc { |e| e.match?(q) && yield(e) } :
         proc { |e| e.match?(q) }
 
       send(query_handler(selector), &filter)
@@ -510,7 +510,7 @@ module BibTeX
         # digest = digest[0] if digest.is_a?(Array)
 
         digest.gsub(/\s+/, '').downcase
-        digest = block.call(digest, entry) unless block.nil?
+        digest = yield(digest, entry) unless block.nil?
         digest
       end.values.select { |d| d.length > 1 }
     end
