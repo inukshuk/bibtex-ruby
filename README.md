@@ -295,6 +295,22 @@ bib.query('@book') { |e| e.keywords.split(/,/).length > 1 }
 #=> Returns all book entries with two or more keywords or []
 ```
 
+Note that the `^=`, `~=` and `!~` operators treat their value as a **regular
+expression** (it is passed to Ruby's `String#match`). Regexp metacharacters
+such as `\ . + ( ) { } [ ]` are therefore special, and a literal backslash
+has to be escaped twice: once for the Ruby string and once for the regexp.
+Also, the query string itself is split on `,` (to separate alternatives such
+as `'@book, @article'`), so a value can never contain a comma. For values
+like LaTeX-escaped names, use `Regexp.escape` or a block:
+
+```ruby
+# author = {Maksimovi\'{c}, Petar}
+bib["@*[author ~= #{Regexp.escape(%q(Maksimovi\'{c}))}]"]
+bib["@*[author ~= Maksimovi\\\\'{c}]"]   # same as above, escaped by hand
+bib.query { |e| e.author.to_s.include?(%q(Maksimovi\'{c})) }
+#=> all three return the entry
+```
+
 Queries offer syntactic sugar for common enumerator invocations:
 
 ```ruby
