@@ -58,7 +58,7 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 118)
     @brace_level = 0
     @last_and = 0
     @stack = [[:ANDFL,'(^start)']]
-    @word = [:PWORD,'']
+    @word = [:PWORD, +'']
     do_scan
   end
 
@@ -113,7 +113,7 @@ module_eval(<<'...end names.y/module_eval...', 'names.y', 118)
   def push_word
     unless @word[1].empty?
       @stack.push(@word)
-      @word = [:PWORD,'']
+      @word = [:PWORD, +'']
     end
   end
 

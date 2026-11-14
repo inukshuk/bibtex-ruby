@@ -161,7 +161,7 @@ require 'strscan'
     @brace_level = 0
     @last_and = 0
     @stack = [[:ANDFL,'(^start)']]
-    @word = [:PWORD,'']
+    @word = [:PWORD, +'']
     do_scan
   end
 
@@ -216,7 +216,7 @@ require 'strscan'
   def push_word
     unless @word[1].empty?
       @stack.push(@word)
-      @word = [:PWORD,'']
+      @word = [:PWORD, +'']
     end
   end
 

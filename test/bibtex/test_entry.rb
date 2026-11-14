@@ -252,6 +252,17 @@ module BibTeX
       it 'accepts a filter' do
         assert_equal 'book|year:2012', Entry.new(bibtex_type: 'book', title: 'foo', year: 2012).digest([:year])
       end
+
+      it 'does not mutate the string returned by Symbol#to_s' do
+        deprecated = Warning[:deprecated]
+        Warning[:deprecated] = true
+
+        assert_silent do
+          Entry.new(bibtex_type: 'book', title: 'foo').digest
+        end
+      ensure
+        Warning[:deprecated] = deprecated
+      end
     end
 
     describe 'given an entry' do
