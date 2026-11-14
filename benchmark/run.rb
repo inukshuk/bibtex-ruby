@@ -269,14 +269,22 @@ module BibTeXBenchmark
       text
     end
 
-    def memory?
-      @results['workloads'].each_value.any? { |result| result.key?('allocated_mb') }
+    def memory?(results = @results)
+      results['workloads'].each_value.any? { |result| result.key?('allocated_mb') }
+    end
+
+    # The figures shown next to the baseline: allocated MB only when both
+    # runs were made with MEM=1.
+    def compared
+      %w[ms allocated_objects] + (memory? && memory?(@baseline) ? ['allocated_mb'] : [])
     end
 
     def columns
-      return ['base ms', 'ms', 'Δ ms', 'base allocs', 'allocs', 'Δ allocs'] if @baseline
+      unless @baseline
+        return %w[ms allocs] + (memory? ? ['alloc MB', 'strings'] : [])
+      end
 
-      %w[ms allocs] + (memory? ? ['alloc MB', 'strings'] : [])
+      ['base ms', 'ms', 'Δ ms', 'base allocs', 'allocs', 'Δ allocs', 'base MB', 'MB', 'Δ MB'].first(compared.size * 3)
     end
 
     def values(name, result)
@@ -286,7 +294,7 @@ module BibTeXBenchmark
       base = @baseline.dig('workloads', name)
       placeholder = base.nil? ? 'n/a' : 'error'
       base = {} if base.nil? || base['error']
-      %w[ms allocated_objects].flat_map do |key|
+      compared.flat_map do |key|
         [base.fetch(key, placeholder), result[key], delta(base[key], result[key])]
       end
     end
@@ -369,9 +377,9 @@ module BibTeXBenchmark
   end
 
   def self.run
+    baseline = JSON.parse(File.read(ENV.fetch('COMPARE'))) if ENV['COMPARE']
     results = results(config)
     File.write(ENV.fetch('JSON'), JSON.pretty_generate(results)) if ENV['JSON']
-    baseline = JSON.parse(File.read(ENV.fetch('COMPARE'))) if ENV['COMPARE']
     check_comparable(results, baseline) if baseline
     report = Report.new(results, baseline)
     report.print
