@@ -9,6 +9,7 @@ Unreleased
 * Write @comment content verbatim, without padding spaces, so BibDesk groups survive a round-trip (#138)
 * Accept field names containing spaces in non-strict mode, e.g. Web of Science's "Early Access Date"; the words are joined with underscores (early_access_date) (#131)
 * Add :strip_comments parser option to ignore biber-style TeX comments ('%' to end of line) inside entries (#132)
+* Fix Bibliography#to_yaml raising NoMethodError unless the caller had already required 'yaml'
 
 6.2.0 / 2025-07-20
 ==================

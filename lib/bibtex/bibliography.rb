@@ -395,6 +395,7 @@ module BibTeX
 
     # Returns a YAML representation of the bibliography.
     def to_yaml(options = {})
+      require 'yaml'
       to_a(options).to_yaml
     end
 
