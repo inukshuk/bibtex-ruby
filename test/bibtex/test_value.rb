@@ -170,9 +170,9 @@ module BibTeX
 
       describe 'value' do
         it 'returns numbers as strings' do
-          assert Value.new(42).v.is_a?(::String)
-          assert Value.new(-42).v.is_a?(::String)
-          assert Value.new('a42').v.is_a?(::String)
+          assert_kind_of ::String, Value.new(42).v
+          assert_kind_of ::String, Value.new(-42).v
+          assert_kind_of ::String, Value.new('a42').v
         end
       end
 
