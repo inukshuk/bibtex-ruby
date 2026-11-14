@@ -12,22 +12,6 @@ Gemspec/RequireMFA:
   Exclude:
     - 'bibtex-ruby.gemspec'
 
-# Offense count: 21
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: Max, AllowHeredoc, AllowURI, AllowQualifiedName, URISchemes, AllowRBSInlineAnnotation, AllowCopDirectives, AllowedPatterns, SplitStrings.
-# URISchemes: http, https
-Layout/LineLength:
-  Exclude:
-    - 'features/step_definitions/bibtex_steps.rb'
-    - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/lexer.rb'
-    - 'lib/bibtex/value.rb'
-    - 'test/bibtex/test_bibliography.rb'
-    - 'test/bibtex/test_entry.rb'
-    - 'test/bibtex/test_lexer.rb'
-    - 'test/bibtex/test_names.rb'
-    - 'test/bibtex/test_utilities.rb'
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: AllowSafeAssignment.
@@ -112,12 +96,11 @@ Metrics/BlockLength:
     - 'test/bibtex/test_parser.rb'
     - 'test/bibtex/test_value.rb'
 
-# Offense count: 4
+# Offense count: 3
 # Configuration parameters: CountBlocks, CountModifierForms, Max.
 Metrics/BlockNesting:
   Exclude:
     - 'lib/bibtex/elements.rb'
-    - 'lib/bibtex/lexer.rb'
 
 # Offense count: 14
 # Configuration parameters: CountComments, Max, CountAsOne.
