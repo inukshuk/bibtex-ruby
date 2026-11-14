@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency('logger', ['~>1.7'])
   s.add_dependency('racc', ['~>1.7'])
 
-  s.files        = File.open('Manifest').readlines.map(&:chomp)
+  s.files        = Dir['lib/**/*.{rb,y}', 'History.txt', 'LICENSE', 'README.md']
   s.executables  = []
   s.require_path = 'lib'
 end
