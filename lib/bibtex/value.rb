@@ -108,12 +108,11 @@ module BibTeX
         @tokens << argument
       else
         unless argument.respond_to?(:to_s)
-  raise(ArgumentError, "Failed to create Value from argument #{argument.inspect}; expected String, Symbol or Value instance.")
-end
-          @tokens << argument.to_s
-        
-          
-        
+          raise(ArgumentError, "Failed to create Value from argument #{argument.inspect}; expected String, Symbol or Value instance.")
+        end
+
+        @tokens << argument.to_s
+
       end
       self
     end

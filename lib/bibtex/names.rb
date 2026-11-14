@@ -199,8 +199,8 @@ module BibTeX
       if block_given?
         set(attributes) if yield self
       elsif conditions.all? do |key, value|
-          respond_to?(key) && send(key) == value
-        end
+        respond_to?(key) && send(key) == value
+      end
         set(attributes)
       end
 

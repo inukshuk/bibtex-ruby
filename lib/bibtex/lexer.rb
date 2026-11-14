@@ -194,6 +194,7 @@ module BibTeX
         @brace_level -= 1
         push([:RBRACE, '}'])
         return leave_object if @brace_level == 0
+
         error_unbalanced_braces if @brace_level < 0
       when @scanner.scan(Lexer.patterns[:eq])
         push([:EQ, '='])

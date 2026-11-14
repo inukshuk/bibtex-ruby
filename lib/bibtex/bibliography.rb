@@ -481,10 +481,10 @@ module BibTeX
       end
 
       filter = if block
-  proc { |e| e.match?(q) && yield(e) }
-else
-  proc { |e| e.match?(q) }
-end
+                 proc { |e| e.match?(q) && yield(e) }
+               else
+                 proc { |e| e.match?(q) }
+               end
 
       send(query_handler(selector), &filter)
     end

@@ -586,10 +586,10 @@ module BibTeX
 
     def <=>(other)
       if type == other.type
-key == other.key ? to_s <=> other.to_s : key <=> other.key
-else
-type <=> other.type
-end
+        key == other.key ? to_s <=> other.to_s : key <=> other.key
+      else
+        type <=> other.type
+      end
     end
 
     # Returns a string of all the entry's fields.
