@@ -188,14 +188,14 @@ module BibTeX
       end
 
       it 'raises a parser error' do
-        _ {
+        _ do
           Parser.new.parse <<-END
             @book{book1,
              title = "Parse error because"
              author = "comma missing between title and author"
             }
           END
-        }.must_raise(ParseError)
+        end.must_raise(ParseError)
       end
     end
 
