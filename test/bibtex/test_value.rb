@@ -38,8 +38,8 @@ module BibTeX
         assert_empty Value.new('')
       end
       it 'should match an empty pattern' do
-        assert Value.new =~ //
-        assert Value.new('') =~ //
+        assert_match //, Value.new
+        assert_match //, Value.new('')
       end
     end
 
