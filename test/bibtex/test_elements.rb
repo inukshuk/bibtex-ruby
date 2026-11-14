@@ -63,7 +63,7 @@ module BibTeX
   class CommentTest < Minitest::Spec
     # BibDesk stores library state in @comment blocks and expects to find
     # them again verbatim, e.g. by the literal prefix
-    # '@comment{BibDesk Static Groups{' (#138).
+    # '@comment{BibDesk Static Groups{'.
     BIBDESK_STATIC_GROUPS = <<~BIB
       @comment{BibDesk Static Groups{
       <?xml version="1.0" encoding="UTF-8"?>
@@ -88,7 +88,7 @@ module BibTeX
       end
     end
 
-    describe 'given a BibDesk Static Groups comment (#138)' do
+    describe 'given a BibDesk Static Groups comment' do
       it 'round-trips a bibliography with LF line breaks byte-for-byte' do
         bib = BibTeX.parse(BIBDESK_STATIC_GROUPS)
 
