@@ -25,8 +25,9 @@
 #   LABEL       name of this run in JSON output and comparisons
 #   BIBTEX_LIB  load BibTeX-Ruby from this lib directory instead of ./lib
 #
-# Entry::MONTHS_FILTER grows with every parse; the benchmark clears it
-# before each run so that the figures do not depend on earlier runs.
+# In versions before #196, Entry::MONTHS_FILTER grows with every parse;
+# the benchmark clears it before each run so that comparisons with such
+# versions do not depend on earlier runs.
 
 begin
   require 'bundler/setup'
@@ -190,10 +191,10 @@ module BibTeXBenchmark
       { error: "#{e.class}: #{e.message[0, 120]}", at: e.backtrace&.first }
     end
 
-    # Entry::MONTHS_FILTER is a global hash that grows with every parsed
-    # month value. Clearing it before each run keeps the allocation figures
-    # independent of the history of the process. It is guarded, so that this
-    # keeps working if the library stops leaking.
+    # Before #196, Entry::MONTHS_FILTER was a global hash that grew with
+    # every parsed month value. Clearing it before each run keeps the
+    # figures of such versions (e.g. in bench:compare) independent of the
+    # history of the process. Newer versions have nothing to clear.
     def reset_global_state
       filter = BibTeX::Entry::MONTHS_FILTER if defined?(BibTeX::Entry::MONTHS_FILTER)
       filter.clear if filter.respond_to?(:clear) && !filter.frozen?
