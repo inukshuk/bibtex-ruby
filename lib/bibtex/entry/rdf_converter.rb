@@ -97,8 +97,8 @@ class BibTeX::Entry::RDFConverter
 
   def bdsk_url
     count = 1
-    while bibtex.field?("bdsk-url-#{count}".to_sym)
-      field = "bdsk-url-#{count}".to_sym
+    while bibtex.field?(:"bdsk-url-#{count}")
+      field = :"bdsk-url-#{count}"
       remove_from_fallback(field)
       graph << [entry, RDF::Vocab::DC.URI, bibtex[field].to_s]
       graph << [entry, bibo[:uri], bibtex[field].to_s]
