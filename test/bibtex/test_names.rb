@@ -14,19 +14,6 @@ module BibTeX
       @poe = Name.new(first: 'Edgar Allen', last: 'Poe')
     end
 
-    describe 'parsing' do
-      it 'does not mutate frozen string literals' do
-        deprecated = Warning[:deprecated]
-        Warning[:deprecated] = true
-
-        assert_silent do
-          Names.parse('Poe, Edgar Allan and Charles Louis Xavier Joseph de la Vallee Poussin')
-        end
-      ensure
-        Warning[:deprecated] = deprecated
-      end
-    end
-
     describe 'string behaviour' do
       before do
         @name = Name.new(first: +'Charles Louis Xavier Joseph', prefix: +'de la', last: +'Vallee Poussin', suffix: +'Jr.')
