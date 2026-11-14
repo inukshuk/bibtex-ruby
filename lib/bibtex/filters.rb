@@ -3,6 +3,8 @@
 require 'singleton'
 
 module BibTeX
+  # Base class for value filters. Subclasses are singletons that implement
+  # +apply+ to transform a value; they are registered automatically.
   class Filter
     include Singleton
 
@@ -28,10 +30,12 @@ module BibTeX
     alias << apply
   end
 
+  # Loads the bundled filters and resolves filter names, classes or
+  # instances to Filter objects.
   module Filters
     LOAD_PATH = [File.expand_path(__dir__), 'filters'].join('/').freeze
 
-    Dir.glob("#{LOAD_PATH}/*.rb").sort.each do |filter|
+    Dir.glob("#{LOAD_PATH}/*.rb").each do |filter|
       require filter
     end
 

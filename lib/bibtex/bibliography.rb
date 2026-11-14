@@ -354,7 +354,7 @@ module BibTeX
     def group_by(*arguments, &block)
       groups = Hash.new { |h, k| h[k] = [] }
 
-      entries.values.each do |e|
+      entries.each_value do |e|
         groups[e.digest(arguments, &block)] << e
       end
 

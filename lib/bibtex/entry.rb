@@ -358,7 +358,7 @@ module BibTeX
     # definitions of all the required fields for that type.
     def valid?
       REQUIRED_FIELDS[type].all? do |f|
-        f.is_a?(Array) ? !(f & fields.keys).empty? : !fields[f].nil?
+        f.is_a?(Array) ? f.intersect?(fields.keys) : !fields[f].nil?
       end
     end
 
@@ -446,12 +446,12 @@ module BibTeX
 
     def replace(*arguments)
       arguments = bibliography.q('@string') if arguments.empty?
-      fields.values.each { |v| v.replace(*arguments) }
+      fields.each_value { |v| v.replace(*arguments) }
       self
     end
 
     def join
-      fields.values.each(&:join)
+      fields.each_value(&:join)
       self
     end
 
@@ -492,7 +492,7 @@ module BibTeX
       strings = bibliography ? bibliography.strings.values : []
 
       NAME_FIELDS.each do |key|
-        if name = fields[key]
+        if (name = fields[key])
           name = name.dup.replace(strings).join.to_name
           fields[key] = name unless name.nil?
         end

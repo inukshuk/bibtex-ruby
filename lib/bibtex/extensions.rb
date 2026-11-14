@@ -19,6 +19,7 @@
 #++
 
 module BibTeX
+  # Namespace for optional extensions to BibTeX-Ruby.
   module Extensions
   end
 end

@@ -66,6 +66,7 @@ task :console, [:script] do |_t, args|
   IRB.start
 end
 
+desc 'Loads BibTeX-Ruby with warnings enabled and prints its version'
 task :check_warnings do
   $VERBOSE = true
   require 'bibtex'
