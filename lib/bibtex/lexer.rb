@@ -81,6 +81,12 @@ module BibTeX
       literal: :literal, content: :content
     ).freeze
 
+    # The parse method to call in each mode; looked up instead of built
+    # with string interpolation, which would allocate once per token.
+    PARSE_METHODS = { bibtex: :parse_bibtex, meta: :parse_meta,
+                      literal: :parse_literal, content: :parse_content }.freeze
+    private_constant :PARSE_METHODS
+
     # Token types at which #backtrace stops unwinding the stack.
     BACKTRACE_BOUNDARIES = %i[AT META_CONTENT].freeze
     private_constant :BACKTRACE_BOUNDARIES
@@ -203,7 +209,7 @@ module BibTeX
 
       self.data = string || @scanner.string
 
-      send("parse_#{MODE[@mode]}") until @scanner.eos?
+      send(PARSE_METHODS[MODE[@mode]]) until @scanner.eos?
 
       push([false, '$end'])
     end
