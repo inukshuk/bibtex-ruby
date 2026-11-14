@@ -25,12 +25,11 @@ Gem::Specification.new do |s|
     export/conversion to formats such as YAML, JSON, CSL, and XML (BibTeXML).
   END_DESCRIPTION
 
-  s.add_runtime_dependency('racc', ['~>1.7'])
-  s.add_runtime_dependency('latex-decode', ['~>0.0'])
-  s.add_runtime_dependency('logger', ['~>1.7'])
+  s.add_dependency('latex-decode', ['~>0.0'])
+  s.add_dependency('logger', ['~>1.7'])
+  s.add_dependency('racc', ['~>1.7'])
 
   s.files        = File.open('Manifest').readlines.map(&:chomp)
-  s.test_files   = Dir.glob('test/**/test*.rb')
   s.executables  = []
   s.require_path = 'lib'
 end

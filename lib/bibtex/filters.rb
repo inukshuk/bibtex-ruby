@@ -41,7 +41,7 @@ module BibTeX
         filter
       elsif filter.respond_to?(:to_s)
         klass = Filter.subclasses.detect do |c|
-          c.name == filter.to_s || c.name.split(/::/)[-1] =~ /^#{filter}$/i
+          c.name == filter.to_s || c.name.split('::')[-1] =~ /^#{filter}$/i
         end
         klass&.instance
       end

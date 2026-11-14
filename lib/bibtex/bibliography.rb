@@ -144,9 +144,9 @@ module BibTeX
       self
     end
 
-    def each(&block)
+    def each(&)
       if block_given?
-        data.each(&block)
+        data.each(&)
         self
       else
         to_enum
@@ -360,17 +360,17 @@ module BibTeX
       groups
     end
 
-    def sort!(*arguments, &block)
-      data.sort!(*arguments, &block)
+    def sort!(*, &)
+      data.sort!(*, &)
       self
     end
 
-    def sort(*arguments, &block)
-      dup.sort!(*arguments, &block)
+    def sort(*, &)
+      dup.sort!(*, &)
     end
 
-    def sort_by!(*arguments, &block)
-      data.sort_by!(*arguments, &block)
+    def sort_by!(*, &)
+      data.sort_by!(*, &)
       self
     end
 
@@ -476,24 +476,27 @@ module BibTeX
         raise ArgumentError, "wrong number of arguments (#{arguments.length} for 0..2)"
       end
 
-      filter = block ? proc { |e| e.match?(q) && block.call(e) } :
-        proc { |e| e.match?(q) }
+      filter = if block
+                 proc { |e| e.match?(q) && yield(e) }
+               else
+                 proc { |e| e.match?(q) }
+               end
 
       send(query_handler(selector), &filter)
     end
 
     alias q query
 
-    def each_entry(&block)
+    def each_entry(&)
       if block_given?
-        q('@entry').each(&block)
+        q('@entry').each(&)
       else
         q('@entry').to_enum
       end
     end
 
-    def find_by_type(*types, &block)
-      q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &block)
+    def find_by_type(*types, &)
+      q(types.flatten.compact.map { |t| "@#{t}" }.join(', '), &)
     end
 
     alias find_by_types find_by_type
@@ -510,7 +513,7 @@ module BibTeX
         # digest = digest[0] if digest.is_a?(Array)
 
         digest.gsub(/\s+/, '').downcase
-        digest = block.call(digest, entry) unless block.nil?
+        digest = yield(digest, entry) unless block.nil?
         digest
       end.values.select { |d| d.length > 1 }
     end

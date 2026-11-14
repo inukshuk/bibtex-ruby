@@ -1,4 +1,4 @@
-require 'helper.rb'
+require 'helper'
 
 module BibTeX
   class StringTest < Minitest::Spec
@@ -6,6 +6,7 @@ module BibTeX
       before do
         @bib = BibTeX.parse('@string{ foo = "bar" }')
       end
+
       it 'should should not be empty' do
         assert_equal 1, @bib.length
       end
@@ -16,7 +17,7 @@ module BibTeX
         assert_equal 'bar', @bib[0].value.to_s
       end
       it 'should have been registered' do
-        refute @bib.strings[:foo].nil?
+        refute_nil @bib.strings[:foo]
       end
     end
 

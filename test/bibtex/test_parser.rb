@@ -1,4 +1,4 @@
-require 'helper.rb'
+require 'helper'
 
 module BibTeX
   class ParserTest < Minitest::Spec
@@ -9,7 +9,7 @@ module BibTeX
 
       it 'returns a Bibliography instance' do
         assert @bib
-        refute @bib.empty?
+        refute_empty @bib
       end
 
       it 'parses all entries' do
@@ -43,27 +43,31 @@ module BibTeX
       it 'handles whitespace in keys' do
         input = '@Misc{George Martin06,title = {FEAST FOR CROWS}}'
         bib = Parser.new(debug: false, strict: false).parse(input)
+
         assert_equal 'George Martin06', bib.first.key
-        assert bib[:"George Martin06"]
+        assert bib[:'George Martin06']
       end
 
       it 'handles plus symbols in keys' do
         input = '@Misc{foo+bar,title = {Foobar}}'
         bib = Parser.new(debug: false, strict: false).parse(input)
+
         assert_equal 'foo+bar', bib.first.key
-        assert bib[:"foo+bar"]
+        assert bib[:'foo+bar']
       end
 
       it 'allows semicolons in keys' do
         input = '@Misc{Gomez;,title = {Foobar}}'
         bib = Parser.new(debug: false, strict: false).parse(input)
+
         assert_equal 'Gomez;', bib.first.key
-        assert bib[:"Gomez;"]
+        assert bib[:'Gomez;']
       end
 
       it 'allows quotes in keys' do
         input = %(@Misc{Gomez'1",title = {Foobar}})
         bib = Parser.new(debug: false, strict: false).parse(input)
+
         assert_equal %(Gomez'1"), bib.first.key
         assert bib[:"Gomez'1\""]
       end
@@ -77,6 +81,7 @@ module BibTeX
 
       it 'tolerates missing key with :allow_missing_keys set' do
         input = '@misc{title = {Crime and Punishment}}'
+
         assert_equal :misc, Parser.new(
           debug: false, strict: false, allow_missing_keys: true
         ).parse(input)[0].type
@@ -183,14 +188,14 @@ module BibTeX
       end
 
       it 'raises a parser error' do
-        _ {
+        _ do
           Parser.new.parse <<-END
             @book{book1,
              title = "Parse error because"
              author = "comma missing between title and author"
             }
           END
-        }.must_raise(ParseError)
+        end.must_raise(ParseError)
       end
     end
 

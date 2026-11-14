@@ -1,4 +1,4 @@
-require 'helper.rb'
+require 'helper'
 require 'timeout'
 
 module BibTeX
@@ -9,20 +9,23 @@ module BibTeX
 
     def test_empty
       bib = BibTeX::Bibliography.open(Test.fixtures(:empty), debug: false)
+
       refute_nil(bib)
-      assert_equal(BibTeX::Bibliography, bib.class)
-      assert(bib.empty?)
+      assert_instance_of(BibTeX::Bibliography, bib)
+      assert_empty(bib)
     end
 
     def test_no_bibtex
       bib = BibTeX::Bibliography.open(Test.fixtures(:no_bibtex), debug: false)
+
       refute_nil(bib)
-      assert_equal(BibTeX::Bibliography, bib.class)
-      assert(bib.empty?)
+      assert_instance_of(BibTeX::Bibliography, bib)
+      assert_empty(bib)
     end
 
     def test_decoret
       bib = BibTeX::Bibliography.open(Test.fixtures(:decoret), debug: false)
+
       assert_equal(15, bib.length)
       assert_equal([BibTeX::Entry, BibTeX::Comment, BibTeX::String, BibTeX::Preamble], bib.data.map(&:class).uniq)
       assert_equal('py03', bib.data[0].key)
@@ -42,6 +45,7 @@ module BibTeX
 
     def test_bibdesk
       bib = BibTeX::Bibliography.open(Test.fixtures(:bibdesk), debug: false)
+
       assert_equal 3, bib.length
       assert_equal 'rails', bib[0].key
       assert_equal '2010-08-05 10:06:32 +0200', bib[:dragon]['date-modified']
@@ -92,6 +96,7 @@ module BibTeX
       assert_equal(2, bib.length)
       refute_nil(bib[:rails])
       bib.replace_strings
+
       assert_equal 'The Pragmatic Bookshelf', bib['rails'].publisher
     end
 

@@ -177,7 +177,7 @@ module BibTeX
 
     # Returns true if the first name consists solely of initials.
     def initials?
-      !(first.nil? || first.empty? || first.to_s =~ /[[:alpha:]]{2,}[^\.]/)
+      !(first.nil? || first.empty? || first.to_s =~ /[[:alpha:]]{2,}[^.]/)
     end
 
     # Sets the name's first name to the passed-in name if the last name equals
@@ -188,7 +188,7 @@ module BibTeX
           mine = name.initials.split(/\.[^[:alpha:]]*/)
           other = initials(with_first).split(/\.[^[:alpha:]]*/)
 
-          mine == other || mine.length < other.length && mine == other[0, mine.length]
+          mine == other || (mine.length < other.length && mine == other[0, mine.length])
         end
       end
     end
@@ -198,10 +198,10 @@ module BibTeX
     def rename_if(attributes, conditions = {})
       if block_given?
         set(attributes) if yield self
-      else
-        set(attributes) if conditions.all? do |key, value|
-          respond_to?(key) && send(key) == value
-        end
+      elsif conditions.all? do |key, value|
+        respond_to?(key) && send(key) == value
+      end
+        set(attributes)
       end
 
       self

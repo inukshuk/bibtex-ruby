@@ -97,8 +97,8 @@ class BibTeX::Entry::RDFConverter
 
   def bdsk_url
     count = 1
-    while bibtex.field?("bdsk-url-#{count}".to_sym)
-      field = "bdsk-url-#{count}".to_sym
+    while bibtex.field?(:"bdsk-url-#{count}")
+      field = :"bdsk-url-#{count}"
       remove_from_fallback(field)
       graph << [entry, RDF::Vocab::DC.URI, bibtex[field].to_s]
       graph << [entry, bibo[:uri], bibtex[field].to_s]
@@ -208,7 +208,7 @@ class BibTeX::Entry::RDFConverter
 
   def howpublished
     return unless bibtex.field?(:howpublished)
-    return unless bibtex[:howpublished] =~ /^#{URI::DEFAULT_PARSER.make_regexp}$/
+    return unless /^#{URI::DEFAULT_PARSER.make_regexp}$/.match?(bibtex[:howpublished])
 
     remove_from_fallback(:howpublished)
 
@@ -309,10 +309,10 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:location)
 
     graph << [entry, RDF::Vocab::DC.Location, bibtex[:location].to_s]
-    if %i[proceedings inproceedings conference].include?(bibtex.type)
-      event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
-      graph << [entry, event[:place], org]
-    end
+    return unless %i[proceedings inproceedings conference].include?(bibtex.type)
+
+    event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
+    graph << [entry, event[:place], org]
   end
 
   def lccn
@@ -462,10 +462,10 @@ class BibTeX::Entry::RDFConverter
       else degree
       end
 
-    unless degree.nil?
-      remove_from_fallback(:type)
-      graph << [entry, bibo[:degree], degree]
-    end
+    return if degree.nil?
+
+    remove_from_fallback(:type)
+    graph << [entry, bibo[:degree], degree]
   end
 
   def title
@@ -496,12 +496,12 @@ class BibTeX::Entry::RDFConverter
   def type
     graph << [entry, RDF.type, bibo[bibo_class]]
 
-    case bibtex.type
-    when :proceedings, :journal
-      graph << [entry, RDF::Vocab::DC.type, 'Collection']
-    else
-      graph << [entry, RDF::Vocab::DC.type, 'Text']
-    end
+    graph << case bibtex.type
+             when :proceedings, :journal
+               [entry, RDF::Vocab::DC.type, 'Collection']
+             else
+               [entry, RDF::Vocab::DC.type, 'Text']
+             end
   end
 
   def url
@@ -566,7 +566,7 @@ class BibTeX::Entry::RDFConverter
     if key.nil?
       @agent
     else
-      key = key.respond_to?(:to_hash) ? key.to_hash : key
+      key = key.to_hash if key.respond_to?(:to_hash)
       @agent[key] ||= yield
     end
   end

@@ -25,8 +25,8 @@ module BibTeX
   class Lexer
     extend Forwardable
 
-    attr_reader :options, :stack, :mode, :scanner
-    attr_writer :mode
+    attr_accessor :mode
+    attr_reader :options, :stack, :scanner
 
     def_delegator :@scanner, :string, :data
 
@@ -39,27 +39,27 @@ module BibTeX
 
     # Patterns Cache (#37: MacRuby does not cache regular expressions)
     @patterns = {
-      space: /[\s]+/o,
+      space: /\s+/o,
       lbrace: /\s*\{/o,
       rbrace: /\s*\}\s*/o,
       braces: /\{|\}/o,
       eq: /\s*=\s*/o,
       comma: /\s*,\s*/o,
       number: /[[:digit:]]+/o,
-      name: %r{[[:alpha:][:digit:]/:_!$\?\.%+&\*-]+}io,
+      name: %r{[[:alpha:][:digit:]/:_!$?.%+&*-]+}io,
       quote: /\s*"/o,
-      unquote: /[\{\}"]/o,
+      unquote: /[{}"]/o,
       sharp: /\s*#\s*/o,
       object: /@/o,
       period: /./o,
       strict_next: /@[\t ]*/o,
       next: /(^|\n)[\t ]*@[\t ]*/o,
-      entry: /[a-z\d:_!\.$%&*-]+/io,
+      entry: /[a-z\d:_!.$%&*-]+/io,
       string: /string/io,
       comment: /comment\b/io,
       preamble: /preamble\b/io,
-      key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"{}-]+,}io,
-      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$\?\.%+;&\*'"-]*,}io
+      key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"{}-]+,}io,
+      optional_key: %r{\s*[[:alpha:][:digit:] /:_!$?.%+;&*'"-]*,}io
     }
 
     MODE = Hash.new(:meta).merge(
@@ -189,12 +189,13 @@ module BibTeX
       when @scanner.scan(Lexer.patterns[:lbrace])
         @brace_level += 1
         push([:LBRACE, '{'])
-        @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
+        @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
       when @scanner.scan(Lexer.patterns[:rbrace])
         @brace_level -= 1
         push([:RBRACE, '}'])
         return leave_object if @brace_level == 0
-        return error_unbalanced_braces if @brace_level < 0
+
+        error_unbalanced_braces if @brace_level < 0
       when @scanner.scan(Lexer.patterns[:eq])
         push([:EQ, '='])
       when @scanner.scan(Lexer.patterns[:comma])
@@ -306,7 +307,7 @@ module BibTeX
         if @scanner.scan(Lexer.patterns[:lbrace])
           @brace_level += 1
           push([:LBRACE, '{'])
-          @mode = :content if @brace_level > 1 || @brace_level == 1 && active?(:comment)
+          @mode = :content if @brace_level > 1 || (@brace_level == 1 && active?(:comment))
 
           push [:KEY, @scanner.matched.chop.strip] if @scanner.scan(Lexer.patterns[allow_missing_keys? ? :optional_key : :key])
         end

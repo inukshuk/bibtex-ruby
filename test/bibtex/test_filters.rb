@@ -1,15 +1,15 @@
-require 'helper.rb'
+require 'helper'
 
 module BibTeX
   class FiltersTest < Minitest::Spec
     it 'should Filters should be singleton classes' do
       assert_equal false, Filter.respond_to?(:new)
-      assert_equal Filter.instance.object_id, Filter.instance.object_id
+      assert_same Filter.instance, Filter.instance
     end
 
     describe 'Filters.resolve' do
       it 'should return the filter if a filter is given' do
-        assert_equal Filter.instance.object_id, Filters.resolve(Filter.instance).object_id
+        assert_same Filter.instance, Filters.resolve(Filter.instance)
       end
 
       it 'should return the parameter if it quacks like a filter' do
@@ -17,13 +17,15 @@ module BibTeX
         def f.apply
           nil
         end
-        assert_equal f.object_id, Filters.resolve(f).object_id
+
+        assert_same f, Filters.resolve(f)
       end
 
       it 'should return the filter if there is a filter by that name' do
         class FooBar < Filter; end
-        assert_equal FooBar.instance.object_id, Filters.resolve(:foobar).object_id
-        assert_equal FooBar.instance.object_id, Filters.resolve('foobar').object_id
+
+        assert_same FooBar.instance, Filters.resolve(:foobar)
+        assert_same FooBar.instance, Filters.resolve('foobar')
         Filter.subclasses.delete(FooBar)
       end
 

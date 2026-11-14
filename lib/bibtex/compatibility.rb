@@ -3,7 +3,7 @@ module BibTeX
     str
       .unicode_normalize(:nfkd)
       .encode(Encoding::ASCII, invalid: :replace, undef: :replace, replace: '')
-  rescue
+  rescue StandardError
     str.gsub(/[^\x20-\x7E]/, '')
   end
 end
