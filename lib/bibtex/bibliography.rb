@@ -223,13 +223,10 @@ module BibTeX
       if arguments[0].is_a?(Numeric) || arguments[0].is_a?(Range)
         data[*arguments]
       elsif arguments.length == 1
-        if arguments[0].nil?
+        if arguments[0].nil? || (arguments[0].respond_to?(:empty?) && arguments[0].empty?)
           nil
-        elsif arguments[0].respond_to?(:empty?) && arguments[0].empty?
-          nil
-        elsif arguments[0].is_a?(Symbol)
-          entries[arguments[0]]
-        elsif arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@', '!@')
+        elsif arguments[0].is_a?(Symbol) ||
+              (arguments[0].respond_to?(:start_with?) && !arguments[0].start_with?('@', '!@'))
           entries[arguments[0]]
         else
           query(*arguments)
@@ -510,14 +507,16 @@ module BibTeX
     def select_duplicates_by(*arguments, &block)
       arguments = %i[year title] if arguments.empty?
 
-      group_by(*arguments) do |digest, entry|
+      groups = group_by(*arguments) do |digest, entry|
         # 1.8 compatibility
         # digest = digest[0] if digest.is_a?(Array)
 
         digest.gsub(/\s+/, '').downcase
         digest = yield(digest, entry) unless block.nil?
         digest
-      end.values.select { |d| d.length > 1 }
+      end
+
+      groups.values.select { |d| d.length > 1 }
     end
 
     alias duplicates select_duplicates_by

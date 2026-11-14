@@ -32,13 +32,6 @@ module BibTeX
       nil
     end
 
-    def initialize(*arguments)
-      @tokens = []
-      arguments.flatten.compact.each do |argument|
-        add(argument)
-      end
-    end
-
     def replace(*_arguments)
       self
     end
@@ -113,11 +106,13 @@ module BibTeX
 
   # A Name comprises individual name parts (first, last, prefix and suffix),
   # but behaves almost like an atomic string value.
+  # rubocop:disable Lint/StructNewOverride -- `first` is a public Name attribute; renaming it would break the API.
   class Name < Struct.new(:first, :last, :prefix, :suffix)
+    # rubocop:enable Lint/StructNewOverride
     extend Forwardable
     include Comparable
 
-    BibTeXML = {
+    BibTeXML = { # rubocop:disable Naming/ConstantName -- public constant; renaming would break the API.
       first: :first,
       last: :last,
       prefix: :prelast,
@@ -140,6 +135,7 @@ module BibTeX
     end
 
     def initialize(attributes = {})
+      super()
       set(attributes)
     end
 

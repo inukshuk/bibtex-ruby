@@ -102,9 +102,7 @@ module BibTeX
       case argument
       when Value
         @tokens += argument.tokens.dup
-      when ::String
-        @tokens << argument
-      when Symbol
+      when ::String, Symbol
         @tokens << argument
       else
         unless argument.respond_to?(:to_s)
@@ -290,7 +288,7 @@ module BibTeX
       end
     end
 
-    def respond_to?(method, include_all = false)
+    def respond_to_missing?(method, include_private = false)
       method =~ /^(?:convert|from)_([a-z]+)(!)?$/ || super
     end
 

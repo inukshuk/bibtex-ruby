@@ -7,6 +7,7 @@ module BibTeX
     class << self
       # Hook called by Ruby if Filter is subclassed
       def inherited(base)
+        super
         base.class_eval { include Singleton }
         subclasses << base
       end

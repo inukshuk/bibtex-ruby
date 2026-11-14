@@ -18,6 +18,7 @@ module BibTeX
     attr_reader :trace
 
     def initialize(trace = [])
+      super()
       @trace = trace
     end
 

@@ -84,9 +84,11 @@ module BibTeX
       []
     end
 
-    def has_type?(type)
+    def type?(type)
       self.type == type.intern || (defined?(type) == 'constant' && is_a?(type))
     end
+
+    alias has_type? type?
 
     %i[entry book article collection string preamble comment].each do |type|
       method_id = "#{type}?"
@@ -137,8 +139,8 @@ module BibTeX
     alias meet_any? meets_any?
 
     # Returns true if the element meets all or any of the given conditions.
-    def meets?(conditions, op = :all?)
-      conditions.send(op) do |condition|
+    def meets?(conditions, operator = :all?)
+      conditions.send(operator) do |condition|
         meets_condition? condition
       end
     end
@@ -260,6 +262,7 @@ module BibTeX
 
     # Creates a new instance.
     def initialize(key = nil, value = nil)
+      super()
       @key = key.to_sym
       @value = Value.new(value)
       yield self if block_given?
@@ -338,6 +341,7 @@ module BibTeX
 
     # Creates a new instance.
     def initialize(value = '')
+      super()
       @value = Value.new(value)
     end
 
@@ -357,6 +361,7 @@ module BibTeX
     attr_accessor :content
 
     def initialize(content = '')
+      super()
       @content = content
     end
 
@@ -380,6 +385,7 @@ module BibTeX
     attr_accessor :content
 
     def initialize(content = '')
+      super()
       @content = content
     end
 

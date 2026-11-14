@@ -453,12 +453,10 @@ class BibTeX::Entry::RDFConverter
 
     degree =
       case bibtex[:type]
-      when 'mathesis' then bibo['degrees/ma']
-      when 'phdthesis' then bibo['degrees/phd']
-      when /Dissertation/i then bibo['degrees/phd']
+      when 'mathesis', /Magisterarbeit/i then bibo['degrees/ma']
+      when 'phdthesis', /Dissertation/i then bibo['degrees/phd']
       when /Bachelor['s]{0,2} Thesis/i then "Bachelor's Thesis"
       when /Diplomarbeit/i then bibo['degrees/ms']
-      when /Magisterarbeit/i then bibo['degrees/ma']
       else degree
       end
 
