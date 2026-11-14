@@ -309,10 +309,10 @@ class BibTeX::Entry::RDFConverter
     remove_from_fallback(:location)
 
     graph << [entry, RDF::Vocab::DC.Location, bibtex[:location].to_s]
-    if %i[proceedings inproceedings conference].include?(bibtex.type)
+    return unless %i[proceedings inproceedings conference].include?(bibtex.type)
       event = RDF::Vocabulary.new('http://purl.org/NET/c4dm/event.owl')
       graph << [entry, event[:place], org]
-    end
+    
   end
 
   def lccn
@@ -462,10 +462,10 @@ class BibTeX::Entry::RDFConverter
       else degree
       end
 
-    unless degree.nil?
+    return if degree.nil?
       remove_from_fallback(:type)
       graph << [entry, bibo[:degree], degree]
-    end
+    
   end
 
   def title
