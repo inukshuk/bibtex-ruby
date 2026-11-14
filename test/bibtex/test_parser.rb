@@ -24,17 +24,17 @@ module BibTeX
         assert_equal %i[book article article commentary], @bib.map(&:type)
       end
 
-      it 'should parse all values correctly' do
+      it 'should parse all values of the first entry correctly' do
         assert_equal 'Poe, Edgar A.', @bib[:'key:0'].author.to_s
-        assert_equal 'Hawthorne, Nathaniel', @bib[:'key:1'].author.to_s
-
         assert_equal '2003', @bib[:'key:0'].year
-        assert_equal '2001', @bib[:'key:1'].year
-
         assert_equal 'American Library', @bib[:'key:0'].publisher
-        assert_equal 'American Library', @bib[:'key:1'].publisher
-
         assert_equal %q(Selected \emph{Poetry} and `Tales'), @bib[:'key:0'].title
+      end
+
+      it 'should parse all values of the second entry correctly' do
+        assert_equal 'Hawthorne, Nathaniel', @bib[:'key:1'].author.to_s
+        assert_equal '2001', @bib[:'key:1'].year
+        assert_equal 'American Library', @bib[:'key:1'].publisher
         assert_equal 'Tales and Sketches', @bib[:'key:1'].title
       end
     end
@@ -236,7 +236,7 @@ module BibTeX
       end
 
       it 'parses complex LaTeX markup' do
-        b = Parser.new.parse(<<-END)[0]
+        b = Parser.new.parse(<<-BIBTEX)[0]
           @book{proust_1996,
             address = {Paris},
             author = {Proust, Jo\\"{e}lle},
@@ -247,7 +247,7 @@ module BibTeX
             title = {Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux},
             year = {1996}
           }
-        END
+        BIBTEX
         _(b.booktitle).must_be :==, "Perception et Intermodalit\\'{e}: Approches Actuelles De La Question De Molyneux"
         _(b.editor.to_s).must_be :==, 'Proust, Jo\"{e}lle'
       end
@@ -327,25 +327,25 @@ module BibTeX
 
       it 'raises a parser error' do
         _ do
-          Parser.new.parse <<-END
+          Parser.new.parse <<-BIBTEX
             @book{book1,
              title = "Parse error because"
              author = "comma missing between title and author"
             }
-          END
+          BIBTEX
         end.must_raise(ParseError)
       end
     end
 
     describe 'given an entry with empty values' do
       it 'does not raise an error' do
-        bib = BibTeX.parse <<-END
+        bib = BibTeX.parse <<-BIBTEX
           @Incollection{test,
             author = {author},
             title = {title},
             editor = {},
           }
-        END
+        BIBTEX
 
         assert_equal 'author', bib[:test][:author]
         assert_equal 'title', bib[:test][:title]
@@ -355,13 +355,13 @@ module BibTeX
 
     describe 'anotations' do
       it 'handles annotation in fields' do
-        bib = BibTeX.parse <<-END
+        bib = BibTeX.parse <<-BIBTEX
           @article{foo,
             title={Some Title},
             author={SureName1, GivenName 1 and SureName2, GivenName 2},
             author+an={1=highlight}
           }
-        END
+        BIBTEX
         assert_equal '1=highlight', bib[:foo][:'author+an']
       end
     end

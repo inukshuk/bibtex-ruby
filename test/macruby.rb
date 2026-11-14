@@ -2,7 +2,7 @@
 
 require 'bibtex'
 
-input = <<~END
+input = <<~BIBTEX
   @book{pickaxe,
   	Address = {Raleigh, North Carolina},
   	Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
@@ -14,7 +14,7 @@ input = <<~END
   	Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
   	Year = {2009}
   }
-END
+BIBTEX
 
 lexer = BibTeX::Lexer.new
 lexer.data = input * 100

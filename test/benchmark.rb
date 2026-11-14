@@ -1,13 +1,11 @@
 # ruby -Ilib -rrubygems test/benchmark.rb
 
 require 'benchmark'
-include Benchmark
-
 require 'bibtex'
 
 # data = File.open(BibTeX::Test.fixtures(:benchmark)).read
 
-input = <<~END
+input = <<~BIBTEX
   @book{pickaxe,
   	Address = {Raleigh, North Carolina},
   	Author = {Thomas, Dave, and Fowler, Chad, and Hunt, Andy},
@@ -19,7 +17,7 @@ input = <<~END
   	Title = {Programming Ruby 1.9: The Pragmatic Programmer's Guide},
   	Year = {2009}
   }
-END
+BIBTEX
 
 n = 31
 k = 10
@@ -32,7 +30,7 @@ g = []
 # Ruby 1.9.3
 format = Benchmark.const_defined?(:FMTSTR) ? Benchmark::FMTSTR : Benchmark::FORMAT
 
-Benchmark.benchmark((' ' * 15) + CAPTION, 7, format, format('%14s:', 'sum(f)'), format('%14s:', 'sum(g)')) do |b|
+Benchmark.benchmark((' ' * 15) + Benchmark::CAPTION, 7, format, '        sum(f):', '        sum(g):') do |b|
   1.step(n, k) do |i|
     f << b.report(format('%14s:', "f(#{i})")) do
       i.times do
@@ -51,7 +49,7 @@ Benchmark.benchmark((' ' * 15) + CAPTION, 7, format, format('%14s:', 'sum(f)'), 
     end
   end
 
-  [f.inject(:+), g.inject(:+)]
+  [f.sum(Benchmark::Tms.new), g.sum(Benchmark::Tms.new)]
 end
 
 # require 'gnuplot'

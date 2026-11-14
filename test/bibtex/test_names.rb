@@ -2,6 +2,12 @@ require 'helper'
 
 module BibTeX
   class NamesTest < Minitest::Spec
+    class UpcaseAll < BibTeX::Filter
+      def apply(value)
+        value.upcase
+      end
+    end
+
     before do
       @poe = Name.new(first: 'Edgar Allen', last: 'Poe')
     end
@@ -124,8 +130,13 @@ module BibTeX
         _(Name.new(first: 'E. A', last: 'Poe').extend_initials('Edgar Allen', 'Poe').first).must_equal 'Edgar Allen'
         _(Name.new(first: 'E A', last: 'Poe').extend_initials('Edgar Allen', 'Poe').first).must_equal 'Edgar Allen'
         _(Name.new(first: 'E. Allen', last: 'Poe').extend_initials('Edgar Allen', 'Poe').first).must_equal 'Edgar Allen'
-        _(Name.new(first: 'E.A.', last: 'Poe').extend_initials('Edgar A.', 'Poe').first).must_equal 'Edgar A.'
+      end
 
+      it 'extends the first name to a partially abbreviated name' do
+        _(Name.new(first: 'E.A.', last: 'Poe').extend_initials('Edgar A.', 'Poe').first).must_equal 'Edgar A.'
+      end
+
+      it 'extends hyphenated first names if the last name and initials match' do
         _(Name.new(first: 'Edgar-A.', last: 'Poe').extend_initials('Edgar-Allen', 'Poe').first).must_equal 'Edgar-Allen'
         _(Name.new(first: 'E.-Allen', last: 'Poe').extend_initials('Edgar-Allen', 'Poe').first).must_equal 'Edgar-Allen'
         _(Name.new(first: 'E.-A.', last: 'Poe').extend_initials('Edgar-Allen', 'Poe').first).must_equal 'Edgar-Allen'
@@ -150,12 +161,6 @@ module BibTeX
     end
 
     describe 'conversions' do
-      class UpcaseAll < BibTeX::Filter
-        def apply(value)
-          value.upcase
-        end
-      end
-
       describe '#convert' do
         it 'converts the value when given a filter instance' do
           _(Names.parse('Poe and Hawthorne').convert(UpcaseAll.instance).to_s).must_be :==, 'POE and HAWTHORNE'

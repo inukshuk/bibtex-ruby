@@ -3,6 +3,20 @@ require 'timeout'
 
 module BibTeX
   class TestBibtex < Minitest::Test
+    RAILS_BOOK = <<-BIBTEX.freeze
+      @book{rails,
+        address = {Raleigh, North Carolina},
+        author = {Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David},
+        booktitle = {Agile Web Development with Rails},
+        edition = {third},
+        keywords = {ruby, rails},
+        publisher = pragprog,
+        series = {The Facets of Ruby},
+        title = {Agile Web Development with Rails},
+        year = {2009}
+      }
+    BIBTEX
+
     def setup; end
 
     def teardown; end
@@ -29,13 +43,23 @@ module BibTeX
       assert_equal(15, bib.length)
       assert_equal([BibTeX::Entry, BibTeX::Comment, BibTeX::String, BibTeX::Preamble], bib.data.map(&:class).uniq)
       assert_equal('py03', bib.data[0].key)
-      assert_equal(:article, bib[:py03].type)
-      assert_equal("D\\'ecoret, Xavier", bib[:py03][:author].to_s)
-      assert_equal('PyBiTex', bib[:py03][:title])
-      assert_equal('2003', bib[:py03][:year])
-      assert_equal(:article, bib[:key03].type)
-      assert_equal('A {bunch {of} braces {in}} title', bib[:key03][:title])
       # TODO: missing assertions
+    end
+
+    def test_decoret_py03
+      entry = BibTeX::Bibliography.open(Test.fixtures(:decoret), debug: false)[:py03]
+
+      assert_equal(:article, entry.type)
+      assert_equal("D\\'ecoret, Xavier", entry[:author].to_s)
+      assert_equal('PyBiTex', entry[:title])
+      assert_equal('2003', entry[:year])
+    end
+
+    def test_decoret_key03
+      entry = BibTeX::Bibliography.open(Test.fixtures(:decoret), debug: false)[:key03]
+
+      assert_equal(:article, entry.type)
+      assert_equal('A {bunch {of} braces {in}} title', entry[:title])
     end
 
     # def test_errors
@@ -79,19 +103,7 @@ module BibTeX
     def test_parse
       bib = BibTeX::Bibliography.new
       bib.add(BibTeX::Element.parse(' @string{ pragprog = "The Pragmatic Bookshelf" } '))
-      bib.add(BibTeX::Element.parse(<<-END))
-      @book{rails,
-        address = {Raleigh, North Carolina},
-        author = {Ruby, Sam and Thomas, Dave and Hansson Heinemeier, David},
-        booktitle = {Agile Web Development with Rails},
-        edition = {third},
-        keywords = {ruby, rails},
-        publisher = pragprog,
-        series = {The Facets of Ruby},
-        title = {Agile Web Development with Rails},
-        year = {2009}
-      }
-      END
+      bib.add(BibTeX::Element.parse(RAILS_BOOK))
 
       assert_equal(2, bib.length)
       refute_nil(bib[:rails])
@@ -107,17 +119,20 @@ module BibTeX
 
     def test_missing_key
       assert_raises(BibTeX::ParseError) do
-        BibTeX.parse(<<-EOF)
+        BibTeX.parse(<<-BIBTEX)
           @article{}
-        EOF
+        BIBTEX
       end
-      refute_empty BibTeX.parse(<<-EOF, allow_missing_keys: true)
+    end
+
+    def test_missing_key_allowed
+      refute_empty BibTeX.parse(<<-BIBTEX, allow_missing_keys: true)
         @article{}
-      EOF
-      refute_empty BibTeX.parse(<<-EOF, allow_missing_keys: true)
+      BIBTEX
+      refute_empty BibTeX.parse(<<-BIBTEX, allow_missing_keys: true)
         @article{},
         @article{}
-      EOF
+      BIBTEX
     end
   end
 end

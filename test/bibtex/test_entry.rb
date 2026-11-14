@@ -2,6 +2,12 @@ require 'helper'
 
 module BibTeX
   class EntryTest < Minitest::Spec
+    class SuffixB < BibTeX::Filter
+      def apply(value)
+        value.is_a?(::String) ? "#{value}b" : value
+      end
+    end
+
     describe 'a new entry' do
       it "won't be nil" do
         _(Entry.new).wont_be_nil
@@ -19,40 +25,40 @@ module BibTeX
 
     describe 'cross-references' do
       it 'has no cross-reference by default' do
-        assert_equal false, Entry.new.has_cross_reference?
+        refute_predicate Entry.new, :has_cross_reference?
       end
 
       it 'is not cross-referenced by default' do
-        assert_equal false, Entry.new.cross_referenced?
+        refute_predicate Entry.new, :cross_referenced?
         _(Entry.new.cross_referenced_by).must_be_empty
       end
 
       describe 'given a bibliography with cross referenced entries' do
         before do
-          @bib = Bibliography.parse <<-END
+          @bib = Bibliography.parse <<-BIBTEX
             @book{a, editor = "A", title = "A"}
             @incollection{a1, crossref = "a"}
             @incollection{b1, crossref = "b2"}
             @book{b, author = "B", title = "B", date = "2020", urldate = "2020"}
-          END
+          BIBTEX
         end
 
         describe '#has_cross_reference?' do
           it 'returns true if the entry has a valid cross-reference' do
-            assert_equal true, @bib['a1'].has_cross_reference?
+            assert_predicate @bib['a1'], :has_cross_reference?
           end
           it 'returns false if the entry has no valid cross-reference' do
-            assert_equal false, @bib['a'].has_cross_reference?
-            assert_equal false, @bib['b1'].has_cross_reference?
+            refute_predicate @bib['a'], :has_cross_reference?
+            refute_predicate @bib['b1'], :has_cross_reference?
           end
         end
 
         describe '#cross_referenced?' do
           it 'returns true if the entry is cross-referenced by another entry' do
-            assert_equal true, @bib['a'].cross_referenced?
+            assert_predicate @bib['a'], :cross_referenced?
           end
           it 'returns false if the entry is not cross-referenced' do
-            assert_equal false, @bib['a1'].cross_referenced?
+            refute_predicate @bib['a1'], :cross_referenced?
           end
         end
 
@@ -373,12 +379,6 @@ module BibTeX
       end
 
       describe 'given a filter object or a filter name' do
-        class SuffixB < BibTeX::Filter
-          def apply(value)
-            value.is_a?(::String) ? "#{value}b" : value
-          end
-        end
-
         before do
           @filter = Object.new
           def @filter.apply(value)
@@ -478,12 +478,12 @@ module BibTeX
 
       describe 'howpublished' do
         it 'converts to "URL" when there is a url (without filters)' do
-          bibtex = <<-END
+          bibtex = <<-BIBTEX
             @book{noauthor_2017-xx,
               title = "Google",
               howpublished = "\\url{http://www.google.com/}"
             }
-          END
+          BIBTEX
           bibliography = Bibliography.parse(bibtex)
 
           citeproc = bibliography.to_citeproc
@@ -493,12 +493,12 @@ module BibTeX
         end
 
         it 'converts to "URL" when there is a url (with latex)' do
-          bibtex = <<-END
+          bibtex = <<-BIBTEX
             @book{noauthor_2017-xx,
               title = "Google",
               howpublished = "\\url{http://www.google.com/}"
             }
-          END
+          BIBTEX
           bibliography = Bibliography.parse(bibtex, filter: :latex)
 
           citeproc = bibliography.to_citeproc
@@ -537,20 +537,31 @@ module BibTeX
       assert_instance_of(BibTeX::Bibliography, bib)
       assert_equal(4, bib.data.length)
       assert_equal([BibTeX::Entry], bib.data.map(&:class).uniq)
-      assert_equal('key:0', bib.data[0].key)
-      assert_equal('key:1', bib.data[1].key)
-      assert_equal('foo', bib.data[2].key)
-      assert_equal(:book, bib.data[0].type)
-      assert_equal(:article, bib.data[1].type)
-      assert_equal(:article, bib.data[2].type)
-      assert_equal('Poe, Edgar A.', bib.data[0][:author].to_s)
-      assert_equal('Hawthorne, Nathaniel', bib.data[1][:author].to_s)
-      assert_equal('2003', bib.data[0][:year])
-      assert_equal('2001', bib.data[1][:year])
-      assert_equal('American Library', bib.data[0][:publisher])
-      assert_equal('American Library', bib.data[1][:publisher])
-      assert_equal('Selected \\emph{Poetry} and `Tales\'', bib.data[0].title)
-      assert_equal('Tales and Sketches', bib.data[1].title)
+    end
+
+    def test_simple_keys_and_types
+      entries = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[0, 3]
+
+      assert_equal(%w[key:0 key:1 foo], entries.map(&:key))
+      assert_equal(%i[book article article], entries.map(&:type))
+    end
+
+    def test_simple_first_entry
+      entry = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[0]
+
+      assert_equal('Poe, Edgar A.', entry[:author].to_s)
+      assert_equal('2003', entry[:year])
+      assert_equal('American Library', entry[:publisher])
+      assert_equal('Selected \\emph{Poetry} and `Tales\'', entry.title)
+    end
+
+    def test_simple_second_entry
+      entry = BibTeX::Bibliography.open(Test.fixtures(:entry), debug: false).data[1]
+
+      assert_equal('Hawthorne, Nathaniel', entry[:author].to_s)
+      assert_equal('2001', entry[:year])
+      assert_equal('American Library', entry[:publisher])
+      assert_equal('Tales and Sketches', entry.title)
     end
 
     def test_ghost_methods
@@ -694,7 +705,7 @@ module BibTeX
         assert @e.meet? ['']
       end
 
-      it 'it returns true when all conditions hold' do
+      it 'it returns true when all equality conditions hold' do
         refute @e.meet? ['author = Edgar']
 
         @e.author = 'Poe, Edgar A.'
@@ -703,6 +714,10 @@ module BibTeX
         refute @e.meet? ['author = Poe, Edgar']
 
         assert @e.meet? ['author = Poe, Edgar A.']
+      end
+
+      it 'it returns true when all prefix and pattern conditions hold' do
+        @e.author = 'Poe, Edgar A.'
 
         assert @e.meet? ['author ^= Poe']
         refute @e.meet? ['author ^= Edgar']
@@ -713,7 +728,9 @@ module BibTeX
         assert @e.meet? ['author ~= [a-z]*']
 
         assert @e.meet? ['author ^= P\w+']
+      end
 
+      it 'it returns true when all date comparisons hold' do
         @e.date = '2019-11-18'
 
         assert @e.meet? ['date = 2019-11-18']
@@ -721,6 +738,10 @@ module BibTeX
         assert @e.meet? ['date <= 2019-12-18']
         assert @e.meet? ['date > 2019-10-18']
         assert @e.meet? ['date < 2019-12-18']
+      end
+
+      it 'it returns false when a date comparison fails' do
+        @e.date = '2019-11-18'
 
         refute @e.meet? ['date >= 2019-12-18']
         refute @e.meet? ['date <= 2019-10-18']
@@ -728,7 +749,9 @@ module BibTeX
         refute @e.meet? ['date < 2019-10-18']
         refute @e.meet? ['date > 2019-11-18']
         refute @e.meet? ['date < 2019-11-18']
+      end
 
+      it 'it compares numeric values numerically' do
         @e['x'] = '019'
 
         assert @e.meet? ['x < 20']
