@@ -304,12 +304,12 @@ module BibTeX
         end
 
         it 'removes duplicate entries and returns the bibliography' do
-          assert @a.length > @a.uniq!(:author).length
+          assert_operator @a.length, :>, @a.uniq!(:author).length
         end
 
         describe 'with block' do
           it 'removes duplicate entries and returns the bibliography' do
-            assert @a.length > @a.uniq!(:author) { |d, e| d + '|' + e.pages_from }.length
+            assert_operator @a.length, :>, @a.uniq!(:author) { |d, e| d + '|' + e.pages_from }.length
           end
         end
       end
