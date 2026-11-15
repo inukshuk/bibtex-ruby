@@ -3,8 +3,6 @@
 source 'https://rubygems.org', cooldown: 7
 gemspec
 
-gem 'json', '~>2.0', platforms: :jruby
-
 gem 'rdf', '~>3.0'
 gem 'rdf-vocab', '~>3.0'
 
@@ -21,7 +19,6 @@ end
 
 group :profile do
   gem 'memory_profiler', platforms: [:mri]
-  gem 'ruby-prof', platforms: [:mri]
 end
 
 group :coverage do
@@ -34,5 +31,4 @@ group :development do
   gem 'rubocop-minitest', '~> 0.41', require: false
   gem 'rubocop-performance', '~> 1.27', require: false
   gem 'rubocop-rake', '~> 0.7', require: false
-  gem 'yard'
 end

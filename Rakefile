@@ -16,9 +16,6 @@ require 'rake/testtask'
 
 require 'bibtex/version'
 
-require 'yard'
-YARD::Rake::YardocTask.new
-
 Rake::TestTask.new(:test_task) do |t|
   t.libs << 'lib' << 'test'
   t.test_files = FileList['test/**/test_*.rb']
@@ -97,11 +94,6 @@ namespace :bench do
       sh({ 'BIBTEX_LIB' => nil, 'LABEL' => nil, 'COMPARE' => baseline }, Gem.ruby, '-W0', 'benchmark/run.rb')
     end
   end
-end
-
-desc 'Runs the profiler'
-task profile: ['racc'] do
-  require File.expand_path('test/profile.rb', __dir__)
 end
 
 desc 'Builds the gem file'

@@ -3,7 +3,6 @@
 **/*~
 *.rbc
 doc/**/*
-.yardoc
 .bundle
 lib/bibtex/parser.output
 lib/bibtex/name_parser.output
