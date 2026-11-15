@@ -2,7 +2,6 @@ Feature: Parse BibTeX cross-references
   As a hacker who works with bibliographies
   I want to be able to parse BibTeX files with cross-referenced entries
 
-	@wip
 	Scenario: A BibTeX file with six entries and three cross-references
 		When I parse the following file:
 		"""

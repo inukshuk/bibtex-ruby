@@ -286,5 +286,16 @@ module BibTeX
         end
       end
     end
+
+    describe 'first names with an accented word in display order' do
+      ["Paul {\\'E}mile Victor", "Paul \\'emile Victor", "Paul {\\'e}mile Victor"].each do |string|
+        it "parses #{string} with the accented word in the first name" do
+          skip 'known failure: the accented word is parsed as the von part'
+          name = Name.parse(string)
+
+          assert_equal [string.delete_suffix(' Victor'), '', 'Victor'], [name.first, name.von, name.last].map(&:to_s)
+        end
+      end
+    end
   end
 end

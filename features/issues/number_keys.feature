@@ -1,4 +1,4 @@
-Feature: Keys containing '/' symbols
+Feature: Keys starting with numbers
 	As a hacker who works with bibliographies
 	I want to parse BibTeX entries with keys starting with numbers
 	Because they frequently occur in key naming schemes

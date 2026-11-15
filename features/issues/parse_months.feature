@@ -1,4 +1,4 @@
-Feature: Keys containing '/' symbols
+Feature: Parse numeric months
 	As a hacker who works with bibliographies
 	I want to export BibTeX entries to the CiteProc format
 	

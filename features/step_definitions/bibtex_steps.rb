@@ -94,10 +94,6 @@ Then(/^my bibliography should contain an entry with an? (?:key|id) like "([^"]*)
   pattern = Regexp.compile key
   refute_nil(@bibliography.detect { |e| e.key.to_s =~ pattern })
 end
-Then(/^my bibliography should contain an entry with (?:key|id) "([^"]*)" and a?n? (\w+) value of "([^"]*)"$/) do |key, field, value|
-  refute_nil @bibliography[key.to_s]
-  assert_equal value, @bibliography[key.to_s][field.downcase.to_sym].to_s
-end
 
 Then(/^my bibliography should not contain an entry with (?:key|id) "([^"]*)"$/) do |key|
   assert_nil @bibliography[key.to_sym]
