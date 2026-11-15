@@ -1,4 +1,4 @@
-Feature: Parse BibTeX preambles
+Feature: Parse BibTeX entries
 	As a hacker who works with bibliographies
 	I want to be able to parse BibTeX files with entries
 	Because that's what BibTeX is all about
