@@ -126,7 +126,6 @@ module BibTeX
   end
 
   def check_name_order
-    return if RUBY_VERSION < '1.9'
     @stack[@last_and][0] = :ANDLF if @stack[@last_and][0] != :ANDLF && @src.matched =~ NameParser.patterns[:last_first]
   end
 
