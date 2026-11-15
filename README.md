@@ -633,10 +633,6 @@ and writes the following XML to standard out (shortened):
 </bibtex:file>
 ```
 
-Look at the 'examples' directory for more elaborate examples of a BibTeX to
-YAML and a BibTeX to HTML converter using **#to_citeproc** to format a
-bibliography using [CSL](https://citationstyles.org/).
-
 BibTeX-Ruby offers an API which lets you manipulate BibTeX objects (string
 replacement, name parsing etc.); however, sometimes you just want quick access
 to your bibliography's contents. In these cases the **to_hash** method is

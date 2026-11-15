@@ -18,6 +18,10 @@ When(/^I parse the following file with options (.+):$/) do |options, string|
   @bibliography = BibTeX.parse(string, options)
 end
 
+When(/^I parse the following file keeping the text between objects:$/) do |string|
+  @bibliography = BibTeX.parse(string, include: [:meta_content])
+end
+
 When(/^I search for "([^"]*)"$/) do |query|
   @result = @bibliography.query(query)
 end
