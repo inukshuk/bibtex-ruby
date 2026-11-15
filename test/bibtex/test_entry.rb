@@ -47,6 +47,23 @@ module BibTeX
       end
     end
 
+    describe '#type?' do
+      before { @entry = Entry.new(bibtex_type: :book) }
+
+      it 'matches the entry type by name' do
+        assert @entry.type?(:book)
+        refute @entry.type?(:article)
+      end
+
+      it 'matches the entry class' do
+        assert @entry.type?(Entry)
+      end
+
+      it 'does not match an unrelated class' do
+        refute @entry.type?(Comment)
+      end
+    end
+
     describe '#add' do
       it 'preserves BibTeX::Names (and other subclasses of BibTeX::Value)' do
         e = Entry.new

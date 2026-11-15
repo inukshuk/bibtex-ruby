@@ -79,6 +79,77 @@ module BibTeX
       end
     end
 
+    describe '#replace' do
+      it 'returns the receiver unchanged when it has no symbols' do
+        value = Value.new('foo')
+
+        assert_same value, value.replace(String.new(:foo, 'bar'))
+        assert_equal 'foo', value.to_s
+      end
+
+      it 'returns the receiver itself when it has symbols' do
+        value = Value.new(:foo)
+
+        assert_same value, value.replace(String.new(:foo, 'bar'))
+      end
+
+      it 'replaces all tokens with a plain Ruby string' do
+        assert_equal 'baz', Value.new(:foo, 'bar').replace('baz').to_s
+      end
+
+      it 'replaces a matching symbol with the value of a BibTeX string' do
+        assert_equal 'bar', Value.new(:foo).replace(String.new(:foo, 'bar')).to_s
+      end
+
+      it 'splices the tokens of a multi-token BibTeX string in place' do
+        string = String.new(:foo, Value.new('a', :b))
+
+        assert_equal '"x" # "a" # b # "y"', Value.new('x', :foo, 'y').replace(string).to_s
+      end
+
+      it 'leaves non-matching symbols and strings alone' do
+        assert_equal 'other # "bar"', Value.new(:other, 'bar').replace(String.new(:foo, 'x')).to_s
+      end
+
+      it 'replaces every occurrence of the symbol' do
+        assert_equal '"x" # "x"', Value.new(:foo, :foo).replace(String.new(:foo, 'x')).to_s
+      end
+
+      it 'replaces symbols using a hash' do
+        assert_equal '"1" # "2"', Value.new(:a, :b).replace(a: '1', b: '2').to_s
+      end
+
+      it 'keeps tokens without a hash entry' do
+        assert_equal '"1" # b # "lit"', Value.new(:a, :b, 'lit').replace(a: '1').to_s
+      end
+
+      it 'accepts several arguments and applies them in order' do
+        value = Value.new(:a, :b).replace(String.new(:a, 'x'), { b: 'y' })
+
+        assert_equal '"x" # "y"', value.to_s
+      end
+
+      it 'flattens array arguments' do
+        value = Value.new(:a, :b).replace([String.new(:a, 'x'), String.new(:b, 'y')])
+
+        assert_equal '"x" # "y"', value.to_s
+      end
+
+      it 'ignores unsupported argument types' do
+        value = Value.new(:a)
+
+        assert_equal 'a', value.replace(42, nil).to_s
+      end
+
+      it 'does nothing when called without arguments' do
+        assert_equal 'a', Value.new(:a).replace.to_s
+      end
+
+      it 'stops replacing once a plain string has removed all symbols' do
+        assert_equal 'abc', Value.new(:a).replace('abc', String.new(:a, 'x')).to_s
+      end
+    end
+
     describe '#merge!' do
       it 'merges two strings by combining them' do
         assert_equal '"foo" # "bar"', Value.new('foo').merge!(Value.new('bar')).to_s

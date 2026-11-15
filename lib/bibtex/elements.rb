@@ -87,7 +87,7 @@ module BibTeX
     end
 
     def type?(type)
-      self.type == type.intern || (defined?(type) == 'constant' && is_a?(type))
+      type.is_a?(Module) ? is_a?(type) : self.type == type.intern
     end
 
     alias has_type? type?
@@ -169,7 +169,7 @@ module BibTeX
 
     def to_xml(_options = {})
       require 'rexml/document'
-      xml = REXML::Element.new(type)
+      xml = REXML::Element.new(type.to_s)
       xml.text = content
       xml
     end
@@ -201,7 +201,7 @@ module BibTeX
     private
 
     def meets_condition?(condition)
-      property, operator, value = condition.split(%r{\s*([!~/^<>]?=|!~|=~|<|>)\s*})
+      property, operator, value = condition.split(%r{\s*(=~|[!~/^<>]?=|!~|<|>)\s*})
 
       if property.nil?
         true
@@ -318,15 +318,15 @@ module BibTeX
     def to_xml(_options = {})
       require 'rexml/document'
 
-      xml = REXML::Element.new(:string)
+      xml = REXML::Element.new('string')
 
-      k = REXML::Element.new(:key)
-      v = REXML::Element.new(:value)
+      k = REXML::Element.new('key')
+      v = REXML::Element.new('value')
       k.text = key.to_s
       v.text = value.to_s(quotes: '"')
 
-      xml.add_elements(k)
-      xml.add_elements(v)
+      xml.add_element(k)
+      xml.add_element(v)
 
       xml
     end

@@ -178,6 +178,8 @@ module BibTeX
     end
 
     def type?(type)
+      return super if type.is_a?(Module)
+
       type.to_s.match(/^(?:entry|\*)$/i) || @type.casecmp?(type.to_sym) || super
     end
 
