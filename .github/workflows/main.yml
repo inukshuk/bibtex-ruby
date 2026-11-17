@@ -4,37 +4,53 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+permissions:
+  contents: read
 jobs:
-  rubocop:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "4.0"
           bundler: latest
           bundler-cache: true
       - run: bundle exec rubocop --format github --format progress
-  minitest:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler: latest
+          bundler-cache: true
+      - run: bundle exec rake build
+      - name: Check that the generated parsers are up to date
+        run: git diff --exit-code
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
         ruby-version:
           - "3.3"
           - "3.4"
           - "4.0"
+          - jruby
         include:
-          - os: ubuntu-latest
-            ruby-version: jruby
+          - os: macos-latest
+            ruby-version: "4.0"
+          - os: windows-latest
+            ruby-version: "4.0"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler: latest
-          bundler-cache: true # runs `bundle install` and caches installed gems automatically
+          bundler-cache: true
       - run: bundle exec rake
