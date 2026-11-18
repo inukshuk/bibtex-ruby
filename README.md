@@ -731,10 +731,12 @@ non-zero status if a workload fails.
 Credits
 -------
 
-Copyright 2011-2015 [Sylvester Keil](https://github.com/inukshuk).
+Copyright (c) 2010-2026 The BibTeX-Ruby Contributors.
 
 Kudos to all [contributors](https://github.com/inukshuk/bibtex-ruby/graphs/contributors)
 who have made BibTeX-Ruby possible.
 
-This software is distributed under the terms and conditions of the GNU GPL,
-version 3 or later. See LICENSE for details.
+This software is dual-licensed under the
+[BSD 2-Clause License](https://opensource.org/license/bsd-2-clause) or the
+[GNU GPL v3.0 or later](https://www.gnu.org/licenses/gpl-3.0.html), at your option
+(SPDX: `GPL-3.0-or-later OR BSD-2-Clause`). See LICENSE for details.

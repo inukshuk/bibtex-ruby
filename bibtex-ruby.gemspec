@@ -6,10 +6,9 @@ Gem::Specification.new do |s|
   s.name        = 'bibtex-ruby'
   s.version     = BibTeX::Version::STRING.dup
   s.required_ruby_version = '>= 3.3'
-  s.authors     = ['Sylvester Keil']
-  s.email       = ['sylvester@keil.or.at']
-  s.homepage    = 'http://inukshuk.github.com/bibtex-ruby'
-  s.license     = 'GPL-3.0-or-later'
+  s.authors     = ['The BibTeX-Ruby Contributors']
+  s.homepage    = 'https://github.com/inukshuk/bibtex-ruby'
+  s.licenses    = ['GPL-3.0-or-later', 'BSD-2-Clause']
 
   s.summary     = 'A BibTeX parser, converter and API for Ruby.'
   s.description = <<-END_DESCRIPTION.gsub(/^\s+/, '')

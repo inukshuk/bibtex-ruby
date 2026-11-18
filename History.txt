@@ -1,6 +1,7 @@
 Unreleased
 ==========
 
+* Dual-license bibtex-ruby under GPL-3.0-or-later and BSD-2-Clause (see #154)
 * Make test suite compatible with minitest 6
 * Add official support for Ruby 4.0
 * Remove official support for Ruby < 3.3, as they reached their End-of-Life
